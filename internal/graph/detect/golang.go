@@ -63,6 +63,17 @@ func (b *GoBuild) Env() []string {
 	return env
 }
 
+// Key renders the configuration for the graph manifest and the cache check:
+// "" for nil (host defaults), otherwise goos, goarch, cgo and sorted tags.
+func (b *GoBuild) Key() string {
+	if b == nil {
+		return ""
+	}
+	tags := append([]string(nil), b.Tags...)
+	sort.Strings(tags)
+	return fmt.Sprintf("goos=%s;goarch=%s;cgo=%s;tags=%s", b.GOOS, b.GOARCH, b.CGOEnabled, strings.Join(tags, ","))
+}
+
 // BuildFlags returns the go command flags of the configuration.
 func (b *GoBuild) BuildFlags() []string {
 	if b == nil || len(b.Tags) == 0 {

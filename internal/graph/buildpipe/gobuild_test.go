@@ -1,7 +1,10 @@
 package buildpipe_test
 
 import (
+	"bytes"
+	"log/slog"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
@@ -52,5 +55,62 @@ func TestRun_GoBuildSelectsTargetFiles(t *testing.T) {
 				t.Errorf("GOOS=%s: platform declared %d times (%v), want once", c.goos, len(platform), platform)
 			}
 		})
+	}
+}
+
+// TestRun_GoBuildChangeForcesColdBuild: rebuilding the same output directory
+// for another build configuration must not reuse the incremental cache of the
+// first one; the manifest records the configuration.
+func TestRun_GoBuildChangeForcesColdBuild(t *testing.T) {
+	src, err := filepath.Abs("../../buildscope/testdata/mod")
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := t.TempDir()
+	var logs bytes.Buffer
+	build := func(goos string) persist.Manifest {
+		logs.Reset()
+		return runBuild(t, src, out, func(o *buildpipe.Options) {
+			o.GoBuild = &detect.GoBuild{GOOS: goos, GOARCH: "amd64", CGOEnabled: "0"}
+			o.Languages = []string{"go"}
+			o.Logger = slog.New(slog.NewTextHandler(&logs, nil))
+		})
+	}
+	linux := build("linux")
+	if linux.GoBuild != "goos=linux;goarch=amd64;cgo=0;tags=" {
+		t.Fatalf("manifest go_build = %q", linux.GoBuild)
+	}
+	darwin := build("darwin")
+	if darwin.GoBuild != "goos=darwin;goarch=amd64;cgo=0;tags=" {
+		t.Errorf("manifest go_build after the second build = %q", darwin.GoBuild)
+	}
+	if strings.Contains(logs.String(), "incremental build complete") || !strings.Contains(logs.String(), "Go build configuration changed") {
+		t.Errorf("the darwin build reused the linux cache:\n%s", logs.String())
+	}
+	// The same configuration again is an ordinary cache hit.
+	build("darwin")
+	if strings.Contains(logs.String(), "Go build configuration changed") {
+		t.Errorf("an unchanged configuration was treated as a change:\n%s", logs.String())
+	}
+	st, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = st.Close() }()
+	nodes, err := st.AllNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range nodes {
+		if filepath.ToSlash(n.FilePath) == "lib/lib_linux.go" {
+			t.Fatalf("node from lib/lib_linux.go survived the darwin rebuild: the linux cache was reused")
+		}
+	}
+	m, err := st.GetManifest()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.GoBuild != darwin.GoBuild {
+		t.Errorf("stored manifest go_build = %q, want %q", m.GoBuild, darwin.GoBuild)
 	}
 }

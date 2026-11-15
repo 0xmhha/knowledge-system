@@ -929,6 +929,7 @@ func buildManifestSkeleton(opt Options, goCount, tsCount, solCount, protoCount i
 		CKGVersion:          opt.CKGVersion,
 		BuildTimestamp:      time.Now().UTC().Format(time.RFC3339),
 		SrcRoot:             opt.SrcRoot,
+		GoBuild:             opt.GoBuild.Key(),
 		Languages: map[string]int{
 			"go": goCount, "ts": tsCount, "sol": solCount, "proto": protoCount,
 		},
