@@ -155,7 +155,13 @@ func (w *fileWalker) walk(f *ast.File) {
 		switch d := d.(type) {
 		case *ast.FuncDecl:
 			cid := w.declare(d.Name)
-			if cid == "" || d.Body == nil {
+			if cid == "" {
+				continue
+			}
+			if d.Body == nil {
+				// A declaration implemented elsewhere (assembly, linkname):
+				// its signature still refers to types.
+				w.typeRefsIn(cid, d.Type)
 				continue
 			}
 			w.relations(cid, d)
@@ -255,17 +261,28 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 		return
 	}
 	if sel, ok := ast.Unparen(c.Fun).(*ast.SelectorExpr); ok {
-		if s := w.info.Selections[sel]; s != nil && s.Kind() == gotypes.MethodVal && gotypes.IsInterface(s.Recv()) {
-			if fn, ok := s.Obj().(*gotypes.Func); ok && w.inScope(fn) {
-				w.iface.add(Pair{From: caller, To: canonicalID(fn), File: w.rel, Line: line, InClosure: inClosure})
+		// An interface method call: the receiver is an interface, or a struct
+		// that embeds one (c.Read() with Conn{Reader}). In both cases the
+		// selected method is declared by an interface; StaticCallee is nil.
+		if s := w.info.Selections[sel]; s != nil && s.Kind() == gotypes.MethodVal {
+			if fn, ok := s.Obj().(*gotypes.Func); ok && isInterfaceMethod(fn) {
+				if w.inScope(fn) {
+					w.iface.add(Pair{From: caller, To: canonicalID(fn), File: w.rel, Line: line, InClosure: inClosure})
+				}
+				return
 			}
-			return
 		}
 	}
 	if tv, ok := w.info.Types[c.Fun]; ok && (tv.IsType() || tv.IsBuiltin()) {
 		return // conversion or builtin, not a call to code
 	}
 	w.t.DynamicCallSites++
+}
+
+// isInterfaceMethod reports whether fn is declared by an interface type.
+func isInterfaceMethod(fn *gotypes.Func) bool {
+	sig, ok := fn.Type().(*gotypes.Signature)
+	return ok && sig.Recv() != nil && gotypes.IsInterface(sig.Recv().Type())
 }
 
 func (w *fileWalker) typeRefsIn(from string, n ast.Node) {
