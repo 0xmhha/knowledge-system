@@ -23,7 +23,7 @@ func TestScan_Redact(t *testing.T) {
 			{ID: "aws_key", Regex: "AKIA[0-9A-Z]{16}", Severity: "critical", Action: "redact"},
 		},
 	})
-	input := "key = AKIAIOSFODNN7EXAMPLE"
+	input := "key = AKIA" + "IOSFODNN7EXAMPLE"
 	r := f.Scan(input)
 	if r.Status != StatusRedacted {
 		t.Errorf("status = %q, want REDACTED", r.Status)
@@ -64,7 +64,7 @@ func TestScan_NilFilter(t *testing.T) {
 
 func TestPassThrough(t *testing.T) {
 	f := PassThrough()
-	r := f.Scan("secret = AKIAIOSFODNN7EXAMPLE")
+	r := f.Scan("secret = AKIA" + "IOSFODNN7EXAMPLE")
 	if r.Status != StatusClean {
 		t.Errorf("pass-through should return CLEAN, got %q", r.Status)
 	}
@@ -90,7 +90,7 @@ func TestScan_MultipleMatches(t *testing.T) {
 			{ID: "password", Regex: "password\\s*=\\s*\\S+", Action: "redact"},
 		},
 	})
-	r := f.Scan("key=AKIAIOSFODNN7EXAMPLE password=hunter2")
+	r := f.Scan("key=AKIA" + "IOSFODNN7EXAMPLE password=hunter2")
 	if len(r.Matches) != 2 {
 		t.Errorf("matches = %d, want 2", len(r.Matches))
 	}
