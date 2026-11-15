@@ -103,8 +103,10 @@ declarations from build tags (for example `gfp_decl.go` and `gfp_generic.go` in 
 
 ### 4.1 Identity
 
-A symbol id is a string the frontend builds from compiler-resolved facts; the node id is a hash of it, made in one
-place in the core.
+A symbol id is a string the frontend builds from compiler-resolved facts; it is the cross-snapshot identity. The node
+id is the store's key, made in one place in the core (`parse.NodeID`, used by the Go frontend since 2026-11-15) from
+the language, the declaring file, the qualified name and the start byte, so two declarations never share a node id
+even when their qualified names and offsets match.
 
 ```
 symbol_id = <language> ":" <module identity> ":" <symbol path> [ "@" <file> ":" <declaration offset> ]

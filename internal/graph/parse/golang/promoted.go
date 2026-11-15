@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -39,10 +40,27 @@ func EmitPromotedMethods(pkgs []*packages.Package, nodes []types.Node) ([]types.
 	// qname -> node (for the declaring method's position + the embedding
 	// type's ID, and to detect a qname that already exists).
 	byQname := make(map[string]types.Node, len(nodes))
+	// byCanonical finds the embedding type and the declaring method by their
+	// import-path identity; the short qname is shared by packages with the
+	// same name. The qname stays the fallback for nodes without a canonical id.
+	byCanonical := make(map[string]types.Node, len(nodes))
 	for _, n := range nodes {
 		if _, dup := byQname[n.QualifiedName]; !dup {
 			byQname[n.QualifiedName] = n
 		}
+		if n.CanonicalID != "" {
+			if _, dup := byCanonical[n.CanonicalID]; !dup {
+				byCanonical[n.CanonicalID] = n
+			}
+		}
+	}
+	find := func(obj gotypes.Object, qname string) (types.Node, bool) {
+		if cid := goCanonicalID(obj); cid != "" {
+			n, ok := byCanonical[cid]
+			return n, ok
+		}
+		n, ok := byQname[qname]
+		return n, ok
 	}
 
 	emitted := map[string]bool{}
@@ -67,7 +85,7 @@ func EmitPromotedMethods(pkgs []*packages.Package, nodes []types.Node) ([]types.
 				continue
 			}
 			embedType := named.Obj().Pkg().Name() + "." + named.Obj().Name()
-			embedNode, haveEmbed := byQname[embedType]
+			embedNode, haveEmbed := find(named.Obj(), embedType)
 			if !haveEmbed {
 				continue
 			}
@@ -89,7 +107,7 @@ func EmitPromotedMethods(pkgs []*packages.Package, nodes []types.Node) ([]types.
 					continue
 				}
 				declQname := declNamed.Obj().Pkg().Name() + "." + declNamed.Obj().Name() + "." + fn.Name()
-				declNode, inModule := byQname[declQname]
+				declNode, inModule := find(fn, declQname)
 				if !inModule {
 					continue // stdlib / external embed — no node to point at
 				}
@@ -102,7 +120,7 @@ func EmitPromotedMethods(pkgs []*packages.Package, nodes []types.Node) ([]types.
 				}
 				emitted[promotedQname] = true
 
-				id := MakeID(promotedQname, "go", declNode.StartByte)
+				id := parse.NodeID("go", embedNode.FilePath, promotedQname, declNode.StartByte)
 				outNodes = append(outNodes, types.Node{
 					ID:            id,
 					Type:          types.NodeMethod,

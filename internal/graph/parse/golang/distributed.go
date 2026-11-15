@@ -106,7 +106,7 @@ func (v *declVisitor) funcDeclIDQname(fd *ast.FuncDecl) (id, qname string) {
 		qname = v.pkgName + "." + fd.Name.Name
 	}
 	_, startByte := v.pos(fd.Pos())
-	return MakeID(qname, "go", startByte), qname
+	return v.declID(qname, startByte), qname
 }
 
 // maybeEmitHTTPListensOn checks whether call is one of the supported HTTP

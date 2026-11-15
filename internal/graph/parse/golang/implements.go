@@ -53,7 +53,7 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) []types.E
 	// appear as src/dst of implements/extends are indexed:
 	//   - Struct, TypeAlias, Enum: valid implements src
 	//   - Interface: valid implements dst AND extends src/dst
-	index := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
+	index := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
 
 	// Collect every named type from every loaded package's top-level scope.
 	// Dedupe by qname — the same package can appear twice (base + test

@@ -188,7 +188,7 @@ func (v *declVisitor) appendLogicBlockPos(parentID, parentQname string, t types.
 	startLn, startBy := v.pos(startPos)
 	endLn, endBy := v.pos(endPos)
 	qname := fmt.Sprintf("%s#%s@%d", parentQname, t, startBy)
-	id := MakeID(qname, "go", startBy)
+	id := v.declID(qname, startBy)
 	v.nodes = append(v.nodes, types.Node{
 		ID: id, Type: t, Name: string(t), QualifiedName: qname,
 		FilePath: v.relPath, StartLine: startLn, EndLine: endLn,

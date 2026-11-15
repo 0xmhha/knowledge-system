@@ -157,6 +157,26 @@ All 21 unexpected edges left on the new graph are graph defects:
 - 1 type reference: a function-local type bound to the package-level type of the same name
   (`enr.TestSortedGetAndSet` declares its own `type pair`; the graph links it to `p2p/enr.pair`).
 
+### Node identity by file (2026-11-15)
+
+Go node ids now include the declaring file (`parse.NodeID`), package nodes are keyed by package directory, call sites
+find their enclosing function by byte span instead of by qualified name, declarations that share a canonical id
+(several `init`) are told apart by position, and an object go/types resolves without a canonical id (a local type)
+no longer falls back to a package-level declaration of the same short name. Same base commit 6e41d966, graph rebuilt
+with `ckg build`:
+
+| measure | before | after |
+|---|---|---|
+| static call recall | 0.9986 | 0.9989 |
+| interface call recall | 0.9943 | 0.9943 |
+| type-reference recall | 0.567 | 0.568 |
+| misresolved (calls, interface calls, type references) | 0, 0, 0 | 0, 0, 0 |
+| unexpected call edges | 14 | 0 |
+| unexpected type-reference edges | 7 | 0 |
+| missing declarations | 4 | 0 |
+
+Every unexpected edge the corrected verifier reported on this commit was one of these identity defects.
+
 ## Order of fixes (proposed)
 
 By expected effect on retrieval, cheapest first:

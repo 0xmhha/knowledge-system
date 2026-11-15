@@ -164,7 +164,13 @@ import (
 // 1.24 (2026-10-11): review index — nodes.is_test, code_edges and
 // node_commits, recomputed after every build (RebuildReviewIndex). The bump
 // forces a cold rebuild so existing graphs gain the index.
-const SchemaVersion = "1.24"
+//
+// 1.25 (2026-11-15): Go node ids include the declaring file (parse.NodeID) and
+// package nodes are keyed by package directory, so packages that declare the
+// same name (crypto/bn256/google and crypto/bn256/cloudflare, two package
+// main) no longer share node ids; call sites find their function by span, not
+// by qualified name. Stored node ids change, so force a cold rebuild.
+const SchemaVersion = "1.25"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

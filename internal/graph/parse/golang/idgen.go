@@ -7,3 +7,8 @@ import "github.com/0xmhha/knowledge-system/internal/graph/parse"
 func MakeID(qname, lang string, startByte int) string {
 	return parse.MakeID(qname, lang, startByte)
 }
+
+// declID is the node id of a node declared in the visitor's file.
+func (v *declVisitor) declID(qname string, startByte int) string {
+	return parse.NodeID("go", v.relPath, qname, startByte)
+}
