@@ -156,6 +156,20 @@ func readEdges(g GraphReader, kinds []types.EdgeType) (map[string]map[string]boo
 // compare classifies each truth pair against the graph edges.
 func compare(pairs []Pair, edges map[string]map[string]bool, declNode map[string]string, idx nodeIndex, samples int) RelationStats {
 	var s RelationStats
+	// truthTargets holds, per source node, the target nodes go/types supports
+	// in this family. A same-name edge to one of them is correct, so the
+	// absent edge next to it is missing, not misresolved.
+	truthTargets := map[string]map[string]bool{}
+	for _, p := range pairs {
+		from, okFrom := declNode[p.From]
+		to, okTo := declNode[p.To]
+		if okFrom && okTo {
+			if truthTargets[from] == nil {
+				truthTargets[from] = map[string]bool{}
+			}
+			truthTargets[from][to] = true
+		}
+	}
 	for _, p := range pairs {
 		s.Truth++
 		from, okFrom := declNode[p.From]
@@ -168,7 +182,7 @@ func compare(pairs []Pair, edges map[string]map[string]bool, declNode map[string
 			s.Matched++
 			continue
 		}
-		if wrong := sameNameTarget(edges[from], to, idx); wrong != "" {
+		if wrong := sameNameTarget(edges[from], truthTargets[from], to, idx); wrong != "" {
 			s.Misresolved++
 			if len(s.MisresolvedSamples) < samples {
 				s.MisresolvedSamples = append(s.MisresolvedSamples,
@@ -192,8 +206,9 @@ func compare(pairs []Pair, edges map[string]map[string]bool, declNode map[string
 }
 
 // sameNameTarget returns a description of a graph target of from that has
-// the expected node's name but is a different node, or "".
-func sameNameTarget(targets map[string]bool, want string, idx nodeIndex) string {
+// the expected node's name but is a different node and not itself a
+// supported target (supported), or "".
+func sameNameTarget(targets, supported map[string]bool, want string, idx nodeIndex) string {
 	w := idx.byID[want]
 	ids := make([]string, 0, len(targets))
 	for id := range targets {
@@ -202,7 +217,7 @@ func sameNameTarget(targets map[string]bool, want string, idx nodeIndex) string 
 	sort.Strings(ids)
 	for _, id := range ids {
 		n := idx.byID[id]
-		if id != want && n.Name == w.Name && n.Type == w.Type {
+		if id != want && !supported[id] && n.Name == w.Name && n.Type == w.Type {
 			return fmt.Sprintf("%s (%s:%d)", n.CanonicalID, n.FilePath, n.StartLine)
 		}
 	}

@@ -34,9 +34,11 @@ type RelationStats struct {
 	Truth   int `json:"truth"`
 	Matched int `json:"matched"`
 	// Misresolved: the graph has an edge from the caller to another node of
-	// the same name and kind, but not to the declaration go/types resolves.
+	// the same name and kind, but not to the declaration go/types resolves,
+	// and go/types does not support that other edge either.
 	Misresolved int `json:"misresolved"`
-	// Missing: no edge to the expected node and no same-name substitute.
+	// Missing: the edge to the expected node is absent and no unsupported
+	// same-name edge stands in for it.
 	Missing int `json:"missing"`
 	// MissingInClosure counts the Missing pairs whose first site is inside a
 	// function literal.

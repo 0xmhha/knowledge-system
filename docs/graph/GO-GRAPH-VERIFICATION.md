@@ -21,11 +21,12 @@ Go files recorded in the graph.
 |---|---|---|
 | declarations | package-level funcs, methods, interface methods, types, consts, vars, with the documented canonical id format; init functions keyed by position | node of a declaration kind in the same file, same canonical id without the `@line` suffix, span containing the name |
 | static calls | `typeutil.StaticCallee` inside a function body, closures included, attributed to the enclosing declaration | `calls` and `invokes` edges |
-| interface calls | method value selections on an interface receiver | `calls` and `invokes` edges |
-| type references | uses of a package-level named type from a declaration | `uses_type` and `instantiates` edges |
+| interface calls | method value selections whose method is declared by an interface, on an interface receiver or through an interface embedded in a struct | `calls` and `invokes` edges |
+| type references | uses of a package-level named type from a declaration, including the signature of a function declared without a Go body (assembly) | `uses_type` and `instantiates` edges |
 
 Per relation a truth pair is matched, misresolved (the graph links the caller to another node of the same name
-and kind), missing, or has an endpoint without a node. Graph edges between matched declarations without a truth
+and kind, and that other edge is not a truth pair either), missing (the edge is absent; an edge to a same-named node
+that is itself a truth pair does not stand in for it), or has an endpoint without a node. Graph edges between matched declarations without a truth
 pair are counted as unexpected; misresolved edges are among them. Dynamic calls (function values, method values,
 closures) and calls in package-level initialisers are counted, not checked: go/types gives no callee for the
 first, and the second have no enclosing function.
@@ -118,13 +119,43 @@ package-level declaration: 123.
 ### What these numbers are not
 
 - Recall is over pairs, not call sites; a pair counts once however many times it is called.
-- "Misresolved" means the caller has an edge to another node with the same name and kind and none to the expected
-  one. When the caller really calls both (an edge to one is right, the call to the other is missing for another
-  reason, e.g. it sits in a function literal), the pair is still counted as misresolved. The 2 static and 6
-  type-reference cases left after D2 look like this; they were not checked one by one.
+- "Misresolved" means the caller has an edge to another node with the same name and kind, none to the expected one,
+  and go/types does not support the other edge. Before 2026-11-15 the last condition was missing, so a function that
+  refers to both `graphql.Block` and `types.Block` and has only the second edge counted the first as misresolved
+  instead of missing; the earlier rows on this page include such cases.
 - Truth covers Go only, the files the graph holds, and the host GOOS/GOARCH (no build tags).
 - Whether a defect changes an evidence pack is not measured here. That is the next step: fix a class, rebuild,
   and compare packs on the evaluation cases.
+
+### Rebuilt evaluation graphs (2026-11-15)
+
+The 11 go-stablenet base commits rebuilt with knowledge-system fe94d906 (D2, D3, D4, D8) and measured with the
+verifier as corrected on 2026-11-15. Base commit 6e41d966, 1,418 Go files, against the 2026-11-03 evaluation graph
+of the same commit (built by an older ckg, 9147b083); the other 10 commits differ by a few pairs.
+
+| relation | truth | matched (old -> new) | misresolved (old -> new) | missing (old -> new) | recall (old -> new) |
+|---|---|---|---|---|---|
+| static calls | 33,370 | 32,421 -> 33,322 | 255 -> 0 | 657 -> 11 | 0.9716 -> 0.9986 |
+| interface calls | 3,307 | 3,222 -> 3,288 | 1 -> 0 | 66 -> 1 | 0.9743 -> 0.9943 |
+| type references | 28,309 | 14,995 -> 16,062 | 831 -> 0 | 12,480 -> 12,244 | 0.530 -> 0.567 |
+
+Unexpected edges: calls 1,437 -> 14, type references 124 -> 7. Declarations missing: 4 -> 4. The verifier
+correction itself moved, on the new graph, 11 type references from misresolved to missing, 19 calls through embedded
+interfaces from unexpected to matched, and 4 bodyless assembly declarations from unexpected to matched.
+
+All 21 unexpected edges left on the new graph are graph defects:
+
+- 13 calls and 3 type references, and the 4 missing declarations: node id collision (roadmap D11). The node id
+  hashes the qualified name, which uses the package name, not the import path, plus the start byte.
+  `crypto/bn256/google` and `crypto/bn256/cloudflare` are different packages that both declare `package bn256`;
+  `TestPairings` starts at byte 254 of `main_test.go` in both, so both get one id and cloudflare's node is dropped,
+  leaving its edges under google's node.
+- 1 call and 3 type references: lookups by qualified name inside one build. `systemcontracts/compile` and
+  `rlp/rlpgen` are both `package main`, so both `main` functions are `main.main`; several `init` functions of one
+  package are all `<pkg>.init`. The edges of one land on the other (`compile.main -> rlpgen.(*Config).process`,
+  `core/vm.init` of `contracts.go` -> `twoOperandParams`, which only `instructions_test.go`'s `init` uses).
+- 1 type reference: a function-local type bound to the package-level type of the same name
+  (`enr.TestSortedGetAndSet` declares its own `type pair`; the graph links it to `p2p/enr.pair`).
 
 ## Order of fixes (proposed)
 
