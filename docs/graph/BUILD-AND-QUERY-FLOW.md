@@ -127,6 +127,13 @@ decision D10; JSON lines keep that move cheap.
 1. Per-area levels and the default per-run log files. Done for ckg (2026-11-16): `internal/logx` (`ParseLevels`,
    `NewHandler`, `LevelTrace`, `RunLogFile`, `DailyLogFile`), `ckg build` writes `<out>/logs/build-<time>.jsonl`,
    `ckg mcp` writes a daily file in the user cache directory; ckv and cks follow.
-2. Build summaries: resolve counts by reason, duplicate node ids, dropped edges, cache decision reason.
+2. Build summaries: resolve counts by reason, duplicate node ids, dropped edges, cache decision reason. Done
+   (2026-11-16) for the first three: `resolve summary` (area `resolve`) with `unresolved_<reason>` counts and DEBUG
+   samples, the manifest's `unresolved_refs_count`, `duplicate node ids` (area `graph`, WARN, checked before
+   `graph.Build` because that is where a repeated id keeps one node), and `cache decision` (area `cache`) with the path
+   and its reason. On go-stablenet 6e41d966 (`gstable-linux-amd64`) the first build with them reported 46,199 dropped Go
+   references (outside the graph 26,864, no target 19,127, bare name 208) and one duplicate node id, which was a
+   defect: a package-level `var testBlockchainsLock sync.Mutex` got a Variable and a Mutex node with one id. Mutex
+   node ids now carry the node kind (schema 1.26) and the warning is gone.
 3. MCP request records with a request id in `ckg mcp`; the same id passed through CKS.
 4. Keep this page and the code in step: a stage that changes updates its row here.

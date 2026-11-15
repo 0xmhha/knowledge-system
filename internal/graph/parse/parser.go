@@ -1,6 +1,8 @@
 package parse
 
 import (
+	"fmt"
+
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -50,6 +52,44 @@ type ParseResult struct {
 type ResolvedGraph struct {
 	Nodes []types.Node
 	Edges []types.Edge
+	// Unresolved counts, by reason, the pending references Resolve could not
+	// bind to a node and dropped; UnresolvedSamples keeps the first few per
+	// reason as "target (file:line)". Nil when the parser does not count.
+	Unresolved        map[string]int
+	UnresolvedSamples map[string][]string
+}
+
+// Reasons a reference is left unresolved.
+const (
+	// UnresolvedOutsideGraph: the target has a canonical id but no node, so it
+	// lies outside the graph (standard library, outside modules, files the
+	// build does not compile).
+	UnresolvedOutsideGraph = "outside_graph"
+	// UnresolvedNoTarget: the parser cleared the target because the call has
+	// no declaration to bind (builtins, conversions, function values,
+	// closures).
+	UnresolvedNoTarget = "no_target"
+	// UnresolvedBareName: a typed build left only a bare name, which go/types
+	// could not tie to a declaration of the graph (a method of the builtin
+	// error interface, a call through an expression).
+	UnresolvedBareName = "bare_name"
+	// UnresolvedNoMatch: no node has the target's qualified name.
+	UnresolvedNoMatch = "no_match"
+)
+
+// UnresolvedSampleLimit caps the samples kept per reason.
+const UnresolvedSampleLimit = 20
+
+// CountUnresolved records one dropped reference on rg.
+func (rg *ResolvedGraph) CountUnresolved(reason, target, file string, line int) {
+	if rg.Unresolved == nil {
+		rg.Unresolved = map[string]int{}
+		rg.UnresolvedSamples = map[string][]string{}
+	}
+	rg.Unresolved[reason]++
+	if len(rg.UnresolvedSamples[reason]) < UnresolvedSampleLimit {
+		rg.UnresolvedSamples[reason] = append(rg.UnresolvedSamples[reason], fmt.Sprintf("%s (%s:%d)", target, file, line))
+	}
 }
 
 // Parser is the contract every language parser implements.

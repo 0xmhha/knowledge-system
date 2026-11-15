@@ -109,6 +109,18 @@ func TestIdentity_DeclarationsDoNotCollide(t *testing.T) {
 	if !set["p/p2.go:init -instantiates-> p/p2.go:B"] {
 		t.Errorf("missing edge p/p2.go:init -instantiates-> p/p2.go:B")
 	}
+	// A package-level mutex is a Variable node and a Mutex node; both stay.
+	muIDs := map[types.NodeType]string{}
+	for _, n := range nodes {
+		if n.Name == "mu" && n.FilePath == "p/local.go" {
+			muIDs[n.Type] = n.ID
+		}
+	}
+	if muIDs[types.NodeVariable] == "" || muIDs[types.NodeMutex] == "" {
+		t.Errorf("package-level mutex nodes = %v, want a Variable and a Mutex node", muIDs)
+	} else if muIDs[types.NodeVariable] == muIDs[types.NodeMutex] {
+		t.Errorf("Variable and Mutex node of mu share id %s; graph.Build keeps one of them", muIDs[types.NodeMutex])
+	}
 	// Both packages named x keep their declarations.
 	var dos []string
 	for _, n := range nodes {

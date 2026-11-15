@@ -300,13 +300,16 @@ func Run(opt Options) (persist.Manifest, error) {
 			return persist.Manifest{}, fmt.Errorf("cache diff: %w", derr)
 		}
 		if decisions.IsAllCached() {
+			logCacheDecision(log, "short_circuit", "all files cached", decisions)
 			return runShortCircuit(opt, log, decisions, old, goCount, tsCount, solCount, protoCount)
 		}
+		logCacheDecision(log, "incremental", "files changed", decisions)
 		return runIncremental(opt, log, decisions, goCount, tsCount, solCount, protoCount, filter)
 	}
 	if opt.NoCache {
 		log.Info("Cache: bypassed (--no-cache); full rebuild")
 	}
+	logCacheDecision(log, "cold", coldReason(opt, old, sameGoBuild), CacheDecisions{})
 	return runCold(opt, log, discovery, filter)
 }
 
@@ -353,6 +356,7 @@ func runCold(opt Options, log *slog.Logger,
 			return persist.Manifest{}, fmt.Errorf("go pipeline: %w", err)
 		}
 		parseErrs += n
+		logResolveSummary(log, "go", rg)
 		resolved = append(resolved, rg)
 		allPending = append(allPending, pending...)
 		goFuncFieldTouches = fieldTouches
@@ -403,6 +407,7 @@ func runCold(opt Options, log *slog.Logger,
 
 	// (4) graph build + validate
 	log.Debug("pass2.resolve.start", "pending_refs", len(allPending))
+	warnDuplicateNodeIDs(log, resolved)
 	g, err := graph.Build(resolved)
 	if err != nil {
 		return persist.Manifest{}, fmt.Errorf("graph.Build: %w", err)
@@ -527,6 +532,7 @@ func runCold(opt Options, log *slog.Logger,
 
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
+	m.UnresolvedRefsCount = unresolvedTotal(resolved)
 	// buildManifestSkeleton computes EnrichDigest from g, which is code-only, so
 	// it is always "" here. Recompute it over the overlay actually injected into
 	// the store so the manifest pins the enrichment (empty when none was applied).
