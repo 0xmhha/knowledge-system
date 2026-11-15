@@ -4,7 +4,10 @@ import (
 	"context"
 	"log/slog"
 	"os"
-	"strings"
+	"path/filepath"
+	"time"
+
+	"github.com/0xmhha/knowledge-system/internal/logx"
 )
 
 // multiHandler fans out log records to two slog.Handler instances.
@@ -42,41 +45,76 @@ func (m *multiHandler) WithGroup(name string) slog.Handler {
 
 // newLogger builds an slog.Logger from CLI flags and the CKG_LOG_LEVEL env var.
 //
-// Level resolution (first match wins):
-//  1. --verbose flag → slog.LevelDebug
-//  2. CKG_LOG_LEVEL=debug env var → slog.LevelDebug
-//  3. default → slog.LevelInfo
+// CKG_LOG_LEVEL takes a default level and per-area overrides, for example
+// "info,resolve=debug,mcp=trace" (internal/logx); --verbose sets the default
+// to debug. Areas are set by components with log.With(logx.AreaKey, name).
 //
 // When logFile is non-empty the logger tees output:
-//   - log file: JSON (machine-readable, one record per line)
-//   - stderr:   text (human-readable)
+//   - log file: JSON (machine-readable, one record per line), every level
+//     the areas enable, trace included
+//   - stderr:   text (human-readable), debug at most, never trace
 //
 // When logFile is empty only the text handler on stderr is used.
 //
 // The returned cleanup func closes the log file if one was opened.
 // Callers must defer the cleanup call.
 func newLogger(verbose bool, logFile string) (*slog.Logger, func(), error) {
-	level := slog.LevelInfo
-	if verbose || strings.EqualFold(os.Getenv("CKG_LOG_LEVEL"), "debug") {
-		level = slog.LevelDebug
+	spec := os.Getenv("CKG_LOG_LEVEL")
+	if verbose {
+		spec = "debug," + spec
 	}
-
-	stderrOpts := &slog.HandlerOptions{Level: level}
-	stderrHandler := slog.NewTextHandler(os.Stderr, stderrOpts)
+	levels, err := logx.ParseLevels(spec)
+	if err != nil {
+		return nil, func() {}, err
+	}
+	if verbose {
+		levels.Default = slog.LevelDebug
+	}
+	stderrLevel := levels.Min()
+	if stderrLevel < slog.LevelDebug {
+		stderrLevel = slog.LevelDebug
+	}
+	stderrHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: stderrLevel})
 
 	if logFile == "" {
-		return slog.New(stderrHandler), func() {}, nil
+		return slog.New(logx.NewHandler(stderrHandler, levels)), func() {}, nil
 	}
 
 	f, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
 	if err != nil {
 		return nil, func() {}, err
 	}
-
-	fileOpts := &slog.HandlerOptions{Level: level}
-	fileHandler := slog.NewJSONHandler(f, fileOpts)
-
-	h := &multiHandler{a: fileHandler, b: stderrHandler}
+	fileHandler := slog.NewJSONHandler(f, &slog.HandlerOptions{Level: levels.Min()})
+	h := logx.NewHandler(&multiHandler{a: fileHandler, b: stderrHandler}, levels)
 	cleanup := func() { _ = f.Close() }
 	return slog.New(h), cleanup, nil
+}
+
+// buildLogFile is the default log file of a build: a new JSON file per run in
+// <out>/logs, the newest 20 kept. An explicit --log-file wins.
+func buildLogFile(explicit, outDir string) (string, error) {
+	if explicit != "" {
+		return explicit, nil
+	}
+	return logx.RunLogFile(filepath.Join(outDir, "logs"), "build", 20, time.Now())
+}
+
+// serverLogFile is the default log file of a long-running server (ckg mcp):
+// one JSON file per day in the user cache directory, not in the graph
+// directory, because servers open graphs read-only and a graph directory can
+// be a published dataset. An explicit --log-file wins; without a cache
+// directory the server logs to stderr only.
+func serverLogFile(explicit, prefix string) string {
+	if explicit != "" {
+		return explicit
+	}
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		return ""
+	}
+	p, err := logx.DailyLogFile(filepath.Join(cache, "knowledge-system", "logs"), prefix, time.Now())
+	if err != nil {
+		return ""
+	}
+	return p
 }

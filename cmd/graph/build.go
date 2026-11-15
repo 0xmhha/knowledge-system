@@ -24,12 +24,6 @@ func newBuildCmd() *cobra.Command {
 		Use:   "build",
 		Short: "Parse a source tree and produce graph.db",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log, cleanup, err := newLogger(rootVerbose, rootLogFile)
-			if err != nil {
-				return fmt.Errorf("init logger: %w", err)
-			}
-			defer cleanup()
-
 			effectiveSrc := src
 			var worktreeCleanup func()
 			if atCommit != "" {
@@ -51,6 +45,16 @@ func newBuildCmd() *cobra.Command {
 				_, _ = fmt.Fprintf(os.Stderr, "ckg: graph already exists at %s (use --force to rebuild)\n", effectiveOut)
 				return nil
 			}
+
+			logFile, err := buildLogFile(rootLogFile, effectiveOut)
+			if err != nil {
+				return fmt.Errorf("log file: %w", err)
+			}
+			log, cleanup, err := newLogger(rootVerbose, logFile)
+			if err != nil {
+				return fmt.Errorf("init logger: %w", err)
+			}
+			defer cleanup()
 
 			// --files-from-main generates the include/exclude filter in-memory
 			// from a Go main-package closure (go list -deps), replacing the

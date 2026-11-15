@@ -50,3 +50,20 @@ func TestLoadScope_RejectsOtherSchemaAndEmpty(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildLogFile(t *testing.T) {
+	out := t.TempDir()
+	p, err := buildLogFile("", out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if filepath.Dir(p) != filepath.Join(out, "logs") || filepath.Ext(p) != ".jsonl" {
+		t.Errorf("default build log = %s, want <out>/logs/build-*.jsonl", p)
+	}
+	if got, _ := buildLogFile("/tmp/x.jsonl", out); got != "/tmp/x.jsonl" {
+		t.Errorf("explicit --log-file not kept: %s", got)
+	}
+	if got := serverLogFile("/tmp/y.jsonl", "mcp"); got != "/tmp/y.jsonl" {
+		t.Errorf("explicit server log not kept: %s", got)
+	}
+}
