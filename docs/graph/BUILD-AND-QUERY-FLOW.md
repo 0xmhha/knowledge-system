@@ -46,6 +46,7 @@ sequenceDiagram
 | Parse (pass 1) | `buildpipe/language_runners.go`, `internal/graph/parse/golang` | files, go/packages | nodes, edges, pending refs |
 | Resolve (pass 2) | `parse/golang/resolve.go` | pending refs | edges between nodes |
 | Post-passes | `parse/golang` (`implements.go`, `uses_type.go`, `instantiates.go`, `promoted.go`, ...) | packages, nodes | more edges and nodes |
+| Contract records | `buildpipe/contract_records.go`, `parse/golang/contract.go` | Go resolved graph | `Decl`, `Ref` records and the graph rebuilt from them |
 | Validate | `buildpipe/pipeline.go` (`validateAndSanitize`) | graph | graph without dangling edges |
 | Persist | `internal/graph/persist` | graph | `graph.db`, manifest |
 | Verify (separate run) | `internal/graph/verify` | graph, source, configuration | report |
@@ -83,6 +84,7 @@ Levels: `ERROR`, `WARN`, `INFO` (operation default), `DEBUG` (development), `TRA
 | Resolve | references resolved, unresolved by reason (outside the build, dynamic, no node) | first N unresolved per reason | every reference and its target |
 | Duplicate node ids | `WARN`: how many ids were produced twice, with the first N pairs (qualified name, file) | — | — |
 | Post-passes | edges added per pass, seconds | — | — |
+| Contract records | declarations, test declarations, references, seconds | — | — |
 | Validate | dangling edges dropped (`WARN` when not zero) | first N dropped edges | — |
 | Persist | nodes, edges, seconds | — | — |
 | MCP request | request id, tool, result size, seconds, error | sanitized arguments, start-symbol resolution | nodes visited with cost |
@@ -100,8 +102,8 @@ Rules:
 ## 5. Levels by area
 
 `CKG_LOG_LEVEL` (and `CKV_LOG_LEVEL`, and a CKS equivalent) takes a default level and per-area overrides, for example
-`CKG_LOG_LEVEL=info,resolve=debug,mcp=trace`. Areas: `scope`, `cache`, `discovery`, `parse`, `resolve`, `passes`,
-`persist`, `mcp`, `compose`. `--verbose` stays a shortcut for `debug` everywhere.
+`CKG_LOG_LEVEL=info,resolve=debug,mcp=trace`. Areas: `scope`, `cache`, `discovery`, `parse`, `resolve`, `contract`,
+`graph`, `passes`, `persist`, `mcp`, `compose`. `--verbose` stays a shortcut for `debug` everywhere.
 
 | Mode | Default | Where |
 |---|---|---|

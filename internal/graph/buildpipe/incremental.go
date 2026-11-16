@@ -406,6 +406,9 @@ func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached
 		}
 		parseErrs += n
 		logResolveSummary(log, "go", rg)
+		if rg, err = goThroughContract(log, rg); err != nil {
+			return nil, nil, 0, false, nil, err
+		}
 		resolved = append(resolved, rg)
 		dirtyPending = append(dirtyPending, pending...)
 	}

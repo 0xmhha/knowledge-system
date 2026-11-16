@@ -178,7 +178,9 @@ Edge kinds, grouped:
 | History | `changed_by`, `parent` (section 7) |
 
 Confidence: `certain` (compiler or linker resolved it), `static_may` (an analysis estimates it can happen, for example
-VTA), `observed` (seen in a test run trace), `unresolved` is a separate record, not an edge. Unresolved references
+VTA), `observed` (seen in a test run trace), `unbound` (a placeholder a later pass binds, such as the endpoint a Go
+HTTP or gRPC client calls before the cross-language linker finds its server; stored as `AMBIGUOUS` today),
+`unresolved` is a separate record, not an edge. Unresolved references
 are kept so that recall gaps can be counted instead of disappearing.
 
 ### 4.4 Layers and configurations
@@ -311,8 +313,37 @@ Increments, each with tests and a `ckg verify` run on go-stablenet, smallest fir
 4. **Frontend interface for Go.** The Go parser, Resolve and the post-passes move behind `Frontend.Load`; the
    pipeline consumes `Unit` records for Go. The other languages keep their current path until step 8.
 
-Confidence values are mapped in increment 1 (`EXTRACTED` to `certain`, `INFERRED` to `static_may`); `AMBIGUOUS`
-edges become `Unresolved` records in increment 2.
+Confidence values are mapped in increment 1 (`EXTRACTED` to `certain`, `INFERRED` to `static_may`, `AMBIGUOUS` to
+`unbound`); increment 2 decides whether the `unbound` placeholders become `Unresolved` records that the
+cross-language linker reads.
+
+Increment 1 is done (2026-11-16):
+
+- `internal/graph/contract` holds `Decl`, `Ref`, `Unresolved`, `Unit`, layer, confidence and the common kinds; it
+  imports only `pkg/graph/types`. `Ref.From` and `Ref.To` are node ids, and `Decl` carries the node id, until the
+  core owns identity in increment 4.
+- `parse/golang.ToUnit` and `FromUnit` turn the Go resolved graph into records and back. A field the records do not
+  hold (the Solidity markers, a store id) or a confidence without a contract value fails the build instead of being
+  dropped; the check compares the rest of the node with the zero value, so a field added to `types.Node` later is
+  caught too.
+- Every Go build goes through the records (`buildpipe.goThroughContract`, area `contract`), cold and incremental.
+  Scores (degrees, PageRank, usage) are not carried: `score.Compute` sets them at the end of every build. An older
+  ordering problem shows here: the topic tree names each topic after its member with the highest PageRank
+  (`cluster/naming.go`), but runs before `score.Compute`. In a cold build every PageRank is still 0, so a topic takes
+  its first member's name; in an incremental build the nodes reloaded from the store held the previous build's
+  PageRank, so the same source could get other topic names. Not carrying scores makes incremental naming match cold
+  naming; naming by PageRank still does not take effect, which is a separate decision (move `score.Compute` before
+  the topic tree, which renames topics in every graph).
+- The layer is the path rule of today's `is_test` until increment 3.
+- go-stablenet 6e41d966 (`gstable-linux-amd64`, the scope's module cache), built cold with the binary of main
+  (9db6e143) and with this one: every table of `graph.db` is equal (191,860 nodes, 265,620 edges, 104,740 pending
+  refs, the package and topic trees, the search index); only the build time differs. The records step takes 0.11 s
+  for 172,281 declarations and 243,030 references; peak memory 3.57 GB before, 3.60 GB after. `ckg verify --scope`
+  on the new graph: 0 misresolved, 0 unexpected edges, 0 missing declarations, static calls 27,148 of 27,163.
+- Found on the way: `ckg build` type-checks with the module cache of its environment, not the module directories the
+  scope lists. Built with a different cache, the same source gave 849 instead of 208 bare-name references and six
+  fewer edges, and nothing in the log said why, because type-loading errors are not logged yet (the "Type loading"
+  row of [the flow page](./BUILD-AND-QUERY-FLOW.md) section 4).
 
 ## 10. Open points and proposed defaults
 

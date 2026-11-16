@@ -357,6 +357,9 @@ func runCold(opt Options, log *slog.Logger,
 		}
 		parseErrs += n
 		logResolveSummary(log, "go", rg)
+		if rg, err = goThroughContract(log, rg); err != nil {
+			return persist.Manifest{}, err
+		}
 		resolved = append(resolved, rg)
 		allPending = append(allPending, pending...)
 		goFuncFieldTouches = fieldTouches
