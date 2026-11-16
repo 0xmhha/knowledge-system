@@ -100,9 +100,13 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 			}
 		}
 	}
+	// Scores first: topic labels name each community after its highest-
+	// PageRank member (cluster.LabelCommunity), so PageRank must be filled
+	// before the topic tree is built. Neither tree reads or changes scores
+	// otherwise, and nothing below changes nodes or edges.
+	score.Compute(g)
 	pkgTree := cluster.BuildPkgTree(g)
 	topicTree := cluster.BuildTopicTree(g, []float64{0.5, 1.0, 2.0}, 42)
-	score.Compute(g)
 	return pkgTree, topicTree, hunkBlobs, nil
 }
 

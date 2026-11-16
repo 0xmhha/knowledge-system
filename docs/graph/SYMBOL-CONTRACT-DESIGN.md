@@ -332,8 +332,13 @@ Increment 1 is done (2026-11-16):
   (`cluster/naming.go`), but runs before `score.Compute`. In a cold build every PageRank is still 0, so a topic takes
   its first member's name; in an incremental build the nodes reloaded from the store held the previous build's
   PageRank, so the same source could get other topic names. Not carrying scores makes incremental naming match cold
-  naming; naming by PageRank still does not take effect, which is a separate decision (move `score.Compute` before
-  the topic tree, which renames topics in every graph).
+  naming. `emitDerivedPasses` now runs `score.Compute` before the package and topic trees (schema 1.27), so a
+  topic is named after its highest-PageRank member. Neither tree reads scores, so the communities are the same; on
+  go-stablenet 6e41d966 every other table and the `ckg verify` output are unchanged, and among topics with two or
+  more members the share named after the highest-PageRank member rose from 63%, 49% and 39% (resolutions 0, 1, 2)
+  to 100%, with no topic of two or more members named after a statement node (was 18). Topic rows are written per
+  label, so communities with the same label still replace each other: only about 39,000 of 191,860 nodes per
+  resolution have a topic row, before and after.
 - The layer is the path rule of today's `is_test` until increment 3.
 - go-stablenet 6e41d966 (`gstable-linux-amd64`, the scope's module cache), built cold with the binary of main
   (9db6e143) and with this one: every table of `graph.db` is equal (191,860 nodes, 265,620 edges, 104,740 pending
