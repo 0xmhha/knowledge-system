@@ -327,7 +327,7 @@ Increment 1 is done (2026-11-16):
   dropped; the check compares the rest of the node with the zero value, so a field added to `types.Node` later is
   caught too.
 - Every Go build goes through the records (`buildpipe.goThroughContract`, area `contract`), cold and incremental.
-  Scores (degrees, PageRank, usage) are not carried: `score.Compute` sets them at the end of every build. An older
+  Scores (degrees, PageRank, usage) are not carried: `score.Compute` sets them in every build. An older
   ordering problem shows here: the topic tree names each topic after its member with the highest PageRank
   (`cluster/naming.go`), but runs before `score.Compute`. In a cold build every PageRank is still 0, so a topic takes
   its first member's name; in an incremental build the nodes reloaded from the store held the previous build's
