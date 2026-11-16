@@ -1,6 +1,6 @@
 # ckg structure: from project source to graph.db, and every way it is queried
 
-Status: 2026-11-16, code at main 9b8d456d. A map of the code graph engine (ckg) as it is, with sequence diagrams:
+Status: 2026-11-16, code at main 9b8d456d; section 8 records the fixes made after the first version of this page. A map of the code graph engine (ckg) as it is, with sequence diagrams:
 how `ckg build` turns a project's source into `graph.db`, what each stored table holds and who writes it, and every
 surface that reads the graph (`ckg mcp`, `ckg api`, the CLI, and the CKS search composer). The design the engine
 moves to is [the shared symbol contract](./SYMBOL-CONTRACT-DESIGN.md); logging and the short flow summary are in
@@ -28,6 +28,27 @@ flowchart LR
 Every reader opens the database read-only (`persist.OpenReadOnly`, `mode=ro&immutable=1`); CKS opens it in its own
 process through `ckgclient.NewReal`, not over MCP or HTTP.
 
+### 1.1 Where the build scope JSON comes from
+
+`ckg build` does not make the scope; a separate command does, and `--scope` is optional (without it Go files are
+discovered by walking the tree, as for the other languages).
+
+```
+go run ./cmd/buildscope -root <go-stablenet> -config gstable-linux-amd64 \
+  -goos linux -goarch amd64 -cgo 1 ./cmd/gstable > scope-linux.json
+ckg build --src <go-stablenet> --scope scope-linux.json --out <graph dir> --no-cache
+```
+
+`internal/buildscope.ExtractGo` runs the go command with the configuration's `GOOS`, `GOARCH`, `CGO_ENABLED` and
+tags (`GOWORK=off`): `go env` for the effective target, `go version` and a sha256 of the go binary for the toolchain,
+and `go list -e -deps -json <entry points>` for the build. Every main-module package the entry points reach gives its
+`GoFiles`, `CgoFiles` and `SFiles` (role production), `TestGoFiles` and `XTestGoFiles` (role test) and
+`IgnoredGoFiles` (excluded by build constraints); every other module becomes an outside module with its version and
+directory; `go list` errors go to `problems`. `ckg build --scope` keeps only the Go files the scope lists (production
+and test), type-checks them with the scope's target, compares the loaded modules with the scope's, and still walks the
+tree for Solidity, TypeScript and Proto files. The scope records the toolchain that made it but the build does not
+check it: a scope made with go1.26.8 builds with whatever go is on `PATH`.
+
 ## 2. Build: entry and cache decision
 
 ```mermaid
@@ -54,11 +75,13 @@ sequenceDiagram
   end
 ```
 
-- A manifest is usable when its schema version equals `SchemaVersion` (`buildpipe/cache.go`, 1.27), the builder
+- A manifest is usable when its schema version equals `SchemaVersion` (`buildpipe/cache.go`, 1.28), the builder
   version equals the ckg version, and it lists files. `DiffManifest` marks a file cached when its mtime and parser
   version are unchanged, or when its cache key (sha256 of content, ckg, parser and schema version) is unchanged.
-- `--force` only skips the "graph already exists" check; an unchanged tree still short-circuits.
-- The short circuit rewrites the manifest (time, staleness) and leaves every graph table as it was.
+- `--force` only skips the "graph already exists" check; an unchanged tree still short-circuits, and its help text
+  now says so. `--rebuild-metrics` had no effect and is deprecated.
+- The short circuit rewrites the manifest (time, staleness) and leaves every graph table as it was. Like the
+  incremental build it writes a copy, `graph.db.building`, and renames it over `graph.db` (section 4).
 
 ## 3. Cold build
 
@@ -142,7 +165,7 @@ Each pass that adds edges is followed by `validateAndSanitize`.
 ```mermaid
 sequenceDiagram
   participant I as runIncremental (incremental.go)
-  participant S as graph.db (opened read-write in place)
+  participant S as graph.db.building (a copy of graph.db)
   participant L as runLanguagePipelines
   participant B as graph.Build
   I->>S: delete edges of types changed_in, blame, binds_to, implements, extends, http_calls
@@ -155,6 +178,7 @@ sequenceDiagram
   I->>B: reloaded edges first, then new ones
   I->>I: derived passes (no lock propagation)
   I->>S: insert new nodes and edges, trees, blobs of changed files, FTS, pending refs, overlay, review index, manifest
+  I->>I: rename graph.db.building to graph.db
 ```
 
 Known differences from a cold build (roadmap D10, measured on go-stablenet): duplicate `uses_type` edges, missing
@@ -176,6 +200,45 @@ rewritten in the store, no PR history and no lock propagation. Evaluation graphs
 | `code_edges`, `node_commits` | `RebuildReviewIndex` | code relations between production nodes; node to commit | CKS `review_function` only |
 | `manifest` | `SetManifest` | build metadata (schema, versions, go_build, digests, counts, files, staleness) | readers' snapshot checks, HTTP `/api/manifest`, report, exports |
 
+### 5.1 What the stored tables hold on go-stablenet
+
+Measured on a cold build of go-stablenet 6e41d966 with the linux/amd64 scope (191,860 nodes, 265,620 edges; the
+source copy has no git history, so `node_prs`, `node_commits` and the Commit and Hunk nodes are empty).
+
+Consistent:
+
+- No edge points at a missing node, and no two edges share type, source, destination and line.
+- `nodes_fts` has one row per node; every `code_edges` row is also an `edges` row; every `pending_refs` source exists.
+- Every Go statement node (CallSite, IfStmt, LoopStmt, ReturnStmt, SwitchStmt, Channel, Goroutine) is contained by
+  the function whose byte span holds it.
+
+Not connected, or connected only to its parent:
+
+| What | Count | Why |
+|---|---|---|
+| nodes with no edge at all | 33 | JavaScript files (rpc and console test data, tracers) that define nothing the TS frontend captures |
+| File nodes without a parent | 62 | Solidity and TypeScript files: those frontends emit no Package node |
+| AwaitPoint nodes without a parent | 54 | the TS frontend links them to their function by `awaits` only |
+| Package nodes | 139 | roots; packages are linked to their files, not to each other |
+| Import nodes linked only to their file | 6,870 | an import names a package, but no edge goes from the Import node to that Package node, so package dependencies cannot be walked |
+| Variables and Constants linked only to their file | 7,392 and 1,522 | no edge records where a variable or constant is read or written (`writes_field` covers struct fields only; 4,098 of 6,848 Field nodes have no access edge) |
+| Go functions and methods with no callee in the graph | 4,478 of 9,507 production ones | calls into the standard library and outside modules are counted (`outside_graph`), not stored |
+| statement nodes | 96,149 call sites, all if, loop, return and switch nodes | leaves under their function; calls are lifted to the function, so a statement says where, not what |
+
+Wrong:
+
+- TypeScript and JavaScript declarations store the span of their name, not of their body (`runQuery` in
+  `parse/typescript/declarations.go` reads the `@name` capture). Their blobs hold the name only, and none of the
+  19,775 TS statement nodes lies inside its parent's span.
+- In minified files (`graphql/internal/graphiql/graphiql.min.js`, 18,728 nodes) the TS frontend finds a call's
+  function by name and line, which one-line files with names like `i` and `a` cannot tell apart: 4,485 call sites
+  keep their own `calls` edge to an unrelated function. The three vendored `*.min.js` files hold 21,757 of the
+  graph's 191,860 nodes.
+- `references` edges do not exist in the graph, yet `RelationReferences` maps to them in CKS (`planTraversal`), so
+  intents that ask for references (feature, refactor, concurrency, security) get nothing from that relation.
+- 1,507 self loops: 1,402 `invokes` placeholders for calls through function values, 73 recursive `calls`, and 32
+  `timeout_path` or `cancellation_path` edges from a function to itself.
+
 ## 6. Query surfaces
 
 ### 6.1 `ckg mcp` (stdio)
@@ -189,18 +252,19 @@ sequenceDiagram
   participant S as persist reader (sqlite_reader.go)
   A->>M: tools/call find_callers {qname, depth}
   M->>H: RegisterAll handlers (12 tools)
-  H->>Q: resolveSeed: canonical id, then exact qualified name, then suffix match
+  M->>M: LogToolCalls: one record per call (area mcp, request id)
+  H->>Q: resolveSeed: canonical id (that node only), then exact qualified name, then suffix match
   alt several qualified names match
     H-->>A: ambiguous + candidates
   else none
     H-->>A: not_found
   end
   H->>H: interface method seeds (1-hop implements)
-  H->>Q: NeighborhoodByQname(seed, depth <= 5, reverse, calls + invokes)
+  H->>Q: NeighborhoodByIDs(canonical seed) or NeighborhoodByQname(seed), depth <= 5, reverse, calls + invokes
   Q->>S: hop by hop: edges by src/dst index, then NodesByIDs
   S-->>Q: nodes, edges (AMBIGUOUS Commit/Hunk nodes removed)
   Q-->>H: subgraph
-  H-->>A: {seed_qname, nodes, edges} (bodies only with include_blobs)
+  H-->>A: {seed_qname, seed_id, nodes, edges} (bodies only with include_blobs)
 ```
 
 | Tool | Seed | Reads and walk | Limits |
@@ -271,14 +335,21 @@ sequenceDiagram
   P->>G: stage 2: BM25Search(keyword, 10), FindSymbol(keyword, kinds)
   G->>S: SearchFTS, FindByCanonicalID, then suffix FindSymbol
   P->>P: reciprocal rank fusion (ckv weight 5, BM25 1, symbols 1.5), join by file:start-end
-  P->>G: stage 3: Neighbors(citation, relations, hops) for the top 10 seeds
-  G->>S: NodesByFilePath, span match, NeighborhoodByQname
+  P->>G: stage 3: Neighbors(citation, relations, 3 hops) for the top 10 seeds
+  G->>S: NodesByFilePath, span match, then one NeighborhoodByIDs per hop
   P->>P: budget.Allocate: bodies read from source files (not blobs)
   P-->>A: evidence pack (citations, bodies, graph neighbors, knowledge)
 ```
 
 The composer joins ckv and ckg results by the citation key `file:start-end`, not by canonical id; ckv hits carry a
 canonical id, but the composer uses it only for the ontology boost.
+
+Stage 3 walks three hops for every intent (it was one or two). `Neighbors` starts from the node at the seed's file and
+span, walks one hop per query, and stamps each neighbour with the hop it was reached at, so the expander's
+`score / (1 + distance)` discounts far neighbours; each hop expands at most the 200 nodes with the highest PageRank,
+and the per-seed cap (50) is shared between the hops. On go-stablenet a three-hop walk took at most 0.13 s (15 hub
+functions and 40 sampled ones, both directions); from hub functions it returned on average 10, 14 and 14 callers at
+hops 1, 2 and 3, where one hop returned 25.
 
 ## 7. Planned versus present
 
@@ -289,27 +360,46 @@ canonical id, but the composer uses it only for the ontology boost.
 | structure first, bodies on request | mostly; `get_context_for_task` includes bodies by default |
 | a token budget on every walk, reporting what was cut | only `get_context_for_task` and evidence; traversals have no node cap or budget |
 | in-memory adjacency index, root-cause walk (D14), A* path search (D10) | absent; walks are SQL hop by hop |
-| MCP request records with one request id | absent: `ckg mcp` builds a logger and discards it; handlers do not log |
+| MCP request records with one request id | `ckg mcp` writes one record per tool call (request id, tool, arguments, seconds, result size, outcome); the records of one task are not yet tied together |
 
 ## 8. Defects found while mapping
 
-Read in the code (checked again on main):
+Read in the code, then fixed (2026-11-16; each fix has a test that fails without it):
 
-1. `resolveSeed` (`pkg/graph/mcphandlers/helpers.go`) turns a canonical id into its qualified name, so every node
-   sharing that name becomes a root; its comment says a canonical id traverses one exact node.
-2. `ckg mcp` discards the logger it creates (`cmd/graph/mcp.go`), so no MCP request is logged.
-3. `ckgclient.Real.Neighbors` reports `Distance: 1` for every neighbor, also for 2-hop results, while stage 3 scores
-   by distance.
-4. `--force` does not rebuild an unchanged tree; `Options.RebuildMetrics` (`--rebuild-metrics`) is never read.
-5. Readers open with `immutable=1`, which assumes the file is replaced by rename; incremental builds and the short
-   circuit write `graph.db` in place (risk for `ckg watch` next to a reader; not reproduced).
-6. Topic rows are keyed by label (`cluster.TopicTree.ResolutionMembers`), so communities with the same label replace
-   each other.
+1. `resolveSeed` (`pkg/graph/mcphandlers/helpers.go`) turned a canonical id into its qualified name, so every node
+   sharing that name became a root, against its own comment. Fixed: a canonical id seed walks its own node only
+   (`NeighborhoodByIDs`, new in the store reader); responses add `seed_id`.
+2. `ckg mcp` discarded the logger it created, so no MCP request was logged. Fixed: `LogToolCalls` writes one record
+   per tool call.
+3. `ckgclient.Real.Neighbors` reported `Distance: 1` for every neighbour, also for 2-hop results, while stage 3
+   scores by distance; it also started from every node with the seed's qualified name. Fixed: it walks hop by hop
+   from the matched node and stamps the hop (section 6.4); `GetSubgraph` stamps distances too. Stage 3 walks three
+   hops.
+4. `--force` did not rebuild an unchanged tree while its help said "rebuild"; `--rebuild-metrics` was never read.
+   Fixed: the help text says what `--force` does; `--rebuild-metrics` is deprecated and the unread option removed.
+5. Readers open with `immutable=1`, which assumes the file is replaced by rename, while incremental builds and the
+   short circuit wrote `graph.db` in place. Fixed: both write `graph.db.building` and rename it.
+6. Topic rows are keyed by label (`cluster.TopicTree.ResolutionMembers`), so communities with the same label
+   replaced each other. Fixed: repeated labels of one resolution are numbered (schema 1.28). On go-stablenet
+   topic_tree held 117,099 rows for 191,860 nodes at three resolutions; it now holds all 575,580, with nodes and edges
+   unchanged and `ckg verify` unchanged (0 misresolved static calls). The rows show a second problem, not fixed:
+   521,933 of them (91%) are one-node communities, because Leiden sees only calls, invokes, uses_type, implements
+   and extends edges, and statement, variable, constant and import nodes have none.
 
-Reported by the mapping, not yet checked again:
+Reported by the mapping, then checked in the code and on the go-stablenet graph (not fixed):
 
-7. `FindSymbol` has `LIMIT 100` with no order, so candidate lists over 100 are an arbitrary subset.
-8. Stage 1's confidence gate: FTS scores are min-max normalised per result set, so every keyword with a hit scores
-   1.0 and the 0.5 gate passes only with two candidates or fewer (inferred).
-9. `--at-commit` records the temporary worktree path as `src_root` unless `--logical-src-root` is given.
-10. `manifest.ckgignore` is never set; file entries' `edge_ids` are zero after a cold build.
+7. Confirmed. `findSymbolQuery` (`persist/sqlite_reader.go`) ends in `LIMIT 100` with no `ORDER BY`, so a name with
+   more than 100 rows gets an arbitrary subset, and `NeighborhoodByQname` roots come from the same query. On
+   go-stablenet 27 simple names have more than 100 nodes (mostly `import:` nodes, `err`, `_`), 2 of them among
+   functions and methods; 17 qualified names have more than 100 nodes, all imports.
+8. Confirmed. `normalizeSearchHits` min-max normalises each FTS result set, so the best hit of any non-empty set
+   scores 1.0. Stage 1's `rerankScored` keeps the best score per keyword, so every keyword with a hit scores 1.0,
+   the sort keeps extraction order, and `computeConfidence` (top over sum) is 1/N: the 0.5 gate passes only with
+   two keywords or fewer, so stage 1 nearly always runs its second round.
+9. Confirmed. With `--at-commit` the build reads a temporary `git worktree` and records it as `src_root` unless
+   `--logical-src-root` is given; the worktree is removed when the build ends, so readers that read bodies from
+   `src_root` (the CKS composer) find no files.
+10. Confirmed. `manifest.ckgignore` is never set (the stored value is `null`), and on go-stablenet all 197,043
+    `edge_ids` in the file entries are 0: `computeColdFileEntries` takes them from the in-memory edges, and
+    `InsertEdges` never writes the row ids back.
+    Nothing reads `edge_ids`.
