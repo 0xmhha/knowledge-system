@@ -100,9 +100,13 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 			}
 		}
 	}
+	// Scores first: topic labels name each community after its highest-
+	// PageRank member (cluster.LabelCommunity), so PageRank must be filled
+	// before the topic tree is built. Neither tree reads or changes scores
+	// otherwise, and nothing below changes nodes or edges.
+	score.Compute(g)
 	pkgTree := cluster.BuildPkgTree(g)
 	topicTree := cluster.BuildTopicTree(g, []float64{0.5, 1.0, 2.0}, 42)
-	score.Compute(g)
 	return pkgTree, topicTree, hunkBlobs, nil
 }
 
@@ -357,6 +361,9 @@ func runCold(opt Options, log *slog.Logger,
 		}
 		parseErrs += n
 		logResolveSummary(log, "go", rg)
+		if rg, err = goThroughContract(log, rg); err != nil {
+			return persist.Manifest{}, err
+		}
 		resolved = append(resolved, rg)
 		allPending = append(allPending, pending...)
 		goFuncFieldTouches = fieldTouches
@@ -533,6 +540,7 @@ func runCold(opt Options, log *slog.Logger,
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
 	m.UnresolvedRefsCount = unresolvedTotal(resolved)
+	m.GoLoadErrorsCount = goLoadErrors(resolved)
 	// buildManifestSkeleton computes EnrichDigest from g, which is code-only, so
 	// it is always "" here. Recompute it over the overlay actually injected into
 	// the store so the manifest pins the enrichment (empty when none was applied).

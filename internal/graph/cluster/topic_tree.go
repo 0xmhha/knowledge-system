@@ -116,7 +116,7 @@ func BuildTopicTree(g *graph.Graph, gammas []float64, seed int64) *TopicTree {
 		for _, c := range commIDs {
 			members := groups[c]
 			// Sort member indices so LabelCommunity sees a deterministic order
-			// (topPageRankName falls back to first member when PageRank is unset).
+			// (topPageRankName falls back to the first member on a PageRank tie).
 			sort.Ints(members)
 			ms := make([]types.Node, 0, len(members))
 			ids := make([]string, 0, len(members))

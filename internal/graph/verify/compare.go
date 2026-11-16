@@ -61,7 +61,9 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 		return Report{}, err
 	}
 	idx := newNodeIndex(nodes)
-	r := Report{Files: len(scope)}
+	r := Report{Files: len(scope), Load: LoadStats{LoadProblems: truth.Load,
+		ModulesMatched: truth.Modules.Matched, ModulesOtherVersion: truth.Modules.OtherVersion,
+		ModulesOtherDir: truth.Modules.OtherDir, ModulesNotLoaded: truth.Modules.NotLoaded}}
 	declNode := r.matchDecls(truth, idx, opts.Samples)
 	calls, err := readEdges(g, callEdgeTypes)
 	if err != nil {

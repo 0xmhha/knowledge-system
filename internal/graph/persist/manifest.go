@@ -56,7 +56,12 @@ type Manifest struct {
 	CKGIgnore           []string       `json:"ckgignore,omitempty"`
 	ParseErrorsCount    int            `json:"parse_errors_count"`
 	UnresolvedRefsCount int            `json:"unresolved_refs_count"`
-	ClusteringStatus    string         `json:"clustering_status"` // "ok" | "pkg_only"
+	// GoLoadErrorsCount is the number of errors the go command reported
+	// while loading and type-checking the Go packages (missing modules,
+	// type errors). References into a package with errors lose their
+	// targets, so a graph with errors is incomplete.
+	GoLoadErrorsCount int    `json:"go_load_errors_count,omitempty"`
+	ClusteringStatus  string `json:"clustering_status"` // "ok" | "pkg_only"
 	// GraphDigest is a deterministic, build-invariant hash of the CODE graph —
 	// the coordinate pin anchor CKV/CKS use to assert they are aligned to the
 	// same graph (see docs/coordination-reindex-migration-2026-07-10.md § Q1).
@@ -174,6 +179,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"ckgignore", m.CKGIgnore},
 		{"parse_errors_count", m.ParseErrorsCount},
 		{"unresolved_refs_count", m.UnresolvedRefsCount},
+		{"go_load_errors_count", m.GoLoadErrorsCount},
 		// "files" is the incremental-cache fingerprint blob. It can be large
 		// on big repos (~120 bytes per file), but JSON-blob storage in the
 		// existing kv table is fine for now — a later change may move this to

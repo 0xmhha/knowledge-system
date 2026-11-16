@@ -174,7 +174,13 @@ import (
 // 1.26 (2026-11-16): Mutex node ids carry the node kind, so a package-level
 // `var mu sync.Mutex` keeps both its Variable and its Mutex node (they shared
 // one id and graph.Build kept one). Stored node ids change.
-const SchemaVersion = "1.26"
+//
+// 1.27 (2026-11-16): scores are computed before the topic tree, so topic_tree
+// labels name each community after its highest-PageRank member instead of its
+// first member. Stored topic labels change; force a cold rebuild so an
+// unchanged source tree does not keep the old labels through the all-cached
+// short circuit.
+const SchemaVersion = "1.27"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

@@ -33,6 +33,9 @@ func loadScope(path string) (*buildscope.Scope, *detect.GoBuild, *filterlist.Fil
 		return nil, nil, nil, fmt.Errorf("scope %s: schema version %d, want %d", path, s.SchemaVersion, buildscope.SchemaVersion)
 	}
 	b := &detect.GoBuild{GOOS: s.Target.GOOS, GOARCH: s.Target.GOARCH, CGOEnabled: s.Target.CGOEnabled, Tags: s.Target.Tags}
+	for _, m := range s.OutsideModules {
+		b.Modules = append(b.Modules, detect.ModuleUse{Path: m.Path, Version: m.Version, Dir: m.Dir})
+	}
 	fl := &filterlist.FilterList{Include: append([]string(nil), nonGoGlobs...)}
 	n := 0
 	for _, f := range s.Files {

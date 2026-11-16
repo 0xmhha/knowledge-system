@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/link"
@@ -177,9 +178,12 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // matches the existing INFERRED-confidence semantics of AST-only builds.
 func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
 	p := gop.New(srcRoot)
+	loadStart := time.Now()
+	loadErrs := 0
 	if pkgs, err := detect.GoPackagesFor(srcRoot, detect.ModeTypes, goBuild); err != nil {
 		log.Warn("Go packages typed-load failed; concurrency pass falls back to AST-only", "err", err)
 	} else {
+		loadErrs = logGoLoad(log, pkgs, goBuild, time.Since(loadStart).Seconds())
 		p.SetPackages(pkgs)
 	}
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "go")
@@ -247,6 +251,9 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 		wfEdges := gop.EmitFieldWriteEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, wfEdges...)
 		log.Debug("writes_field emitted", "count", len(wfEdges))
+	}
+	if rg != nil {
+		rg.LoadErrors = loadErrs
 	}
 	return rg, pending, p.FuncFieldTouches(), errs, err
 }

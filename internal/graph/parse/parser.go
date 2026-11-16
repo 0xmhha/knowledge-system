@@ -57,6 +57,10 @@ type ResolvedGraph struct {
 	// reason as "target (file:line)". Nil when the parser does not count.
 	Unresolved        map[string]int
 	UnresolvedSamples map[string][]string
+	// LoadErrors is the number of errors the language toolchain reported
+	// while loading the sources (Go: go/packages list, parse and type
+	// errors over the packages and their dependencies).
+	LoadErrors int
 }
 
 // Reasons a reference is left unresolved.
