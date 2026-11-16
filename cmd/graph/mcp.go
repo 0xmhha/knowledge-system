@@ -25,7 +25,7 @@ func newMCPCmd() *cobra.Command {
 		Use:   "mcp",
 		Short: "Run the MCP stdio server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, cleanup, err := newLogger(rootVerbose, serverLogFile(rootLogFile, "mcp"))
+			log, cleanup, err := newLogger(rootVerbose, serverLogFile(rootLogFile, "mcp"))
 			if err != nil {
 				return fmt.Errorf("init logger: %w", err)
 			}
@@ -39,9 +39,13 @@ func newMCPCmd() *cobra.Command {
 			defer func() { _ = store.Close() }()
 
 			mcphandlers.SetNamespaceRoot(kmcp.Root(namespace, ""))
-			s := server.NewMCPServer(name, mcpServerVersion)
+			// One record per tool call (area "mcp"), so an answer can be traced
+			// to the call and arguments that produced it.
+			s := server.NewMCPServer(name, mcpServerVersion,
+				server.WithToolHandlerMiddleware(mcphandlers.LogToolCalls(log)))
 			mcphandlers.RegisterAll(s, store)
 
+			log.With("area", "mcp").Info("mcp server started", "graph", db)
 			_, _ = fmt.Fprintf(os.Stderr, "ckg mcp: stdio server bound to %s\n", db)
 			if err := server.ServeStdio(s); err != nil {
 				return fmt.Errorf("serve stdio: %w", err)

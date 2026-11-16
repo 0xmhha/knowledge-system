@@ -45,8 +45,12 @@ file (silent corruption defense; see decision D9 in `archive/spec-ckg-v0.2.md`).
 ```
 ckg build --src=… --out=…           # default: use cache when available
 ckg build --src=… --out=… --no-cache             # force full rebuild
-ckg build --src=… --out=… --rebuild-metrics      # force PageRank/Leiden recompute
+ckg build --src=… --out=… --force                # build over an existing graph.db (cache still used)
 ```
+
+`--rebuild-metrics` is deprecated and has no effect (2026-11-16): scores and communities are recomputed by every
+build that changes a file, and an unchanged tree short-circuits; use `--no-cache` to recompute it. Without `--force`
+or `--no-cache`, `ckg build` stops when the output directory already holds a `graph.db`.
 
 Routing inside `buildpipe.Run`:
 
@@ -126,9 +130,8 @@ closed them). What remains intentionally simplified:
   re-resolves cached files that pointed at a now-dirty/removed file.
 - **Cluster + score recompute on any dirt.** PageRank/Leiden are not
   preserved across incremental rebuilds. The `<1% change-ratio reuse`
-  optimisation in spec §4 is deferred. `--rebuild-metrics` exists as a
-  forward-compatible escape hatch — currently a no-op when nothing is
-  dirty.
+  optimisation in spec §4 is deferred. `--rebuild-metrics` is deprecated
+  and has no effect.
 - **Cross-language `binds_to` rebuild on any TS/Sol dirt.** The xlang
   linker has no per-file granularity; we drop & re-emit the binds_to
   set whenever any TS or Sol file changes.

@@ -57,13 +57,16 @@ func interfaceMethodSeeds(reader store.Reader, methodQname string) []string {
 // reverseCallersUnion walks the reverse call graph from `resolved` AND from every
 // interface method it satisfies (the interface-dispatch bridge), unioning the
 // nodes/edges. Dedups nodes by ID and edges by (src,dst,type).
-func reverseCallersUnion(reader store.Reader, resolved string, depth int) ([]types.Node, []types.Edge, error) {
-	seeds := append([]string{resolved}, interfaceMethodSeeds(reader, resolved)...)
+func reverseCallersUnion(reader store.Reader, resolved seedRef, depth int) ([]types.Node, []types.Edge, error) {
+	seeds := []seedRef{resolved}
+	for _, q := range interfaceMethodSeeds(reader, resolved.QName) {
+		seeds = append(seeds, seedRef{QName: q})
+	}
 	nodeByID := map[string]types.Node{}
 	edgeSeen := map[string]struct{}{}
 	var edges []types.Edge
 	for _, sd := range seeds {
-		ns, es, err := reader.NeighborhoodByQname(sd, depth, true /*reverse*/, callEdgeTypes...)
+		ns, es, err := sd.neighborhood(reader, depth, true /*reverse*/, callEdgeTypes...)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -99,51 +102,111 @@ func textResult(payload any) *mcp.CallToolResult {
 // semantically wrong and noisy for LLM consumers.
 var callEdgeTypes = []string{"calls", "invokes"}
 
-// resolveSeed maps a user-supplied seed — which may be a fully-qualified
-// name ("a.Greet") or a bare short name ("Greet") — to a single canonical
-// qualified_name for the graph-traversal tools (find_callers /
-// find_callees / get_subgraph). It mirrors find_symbol's exact-or-suffix
-// logic so an agent that located a symbol via find_symbol(exact=false) can
-// feed the same bare name to the traversal tools instead of silently
-// getting an empty result (those tools resolve seeds with exact=true).
+// seedRef is a resolved traversal seed: the qualified name reported back to
+// the caller and, when the seed named one exact node (a canonical id), that
+// node's id. Traversals start from IDs when they are set, so a canonical id
+// walks only its own node even when other nodes share its qualified name.
+type seedRef struct {
+	QName string
+	IDs   []string
+}
+
+// neighborhood walks from the seed: from its node ids when the seed is
+// exact, otherwise from every node carrying its qualified name.
+func (s seedRef) neighborhood(reader store.Reader, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	if len(s.IDs) > 0 {
+		return reader.NeighborhoodByIDs(s.IDs, depth, reverse, edgeTypes...)
+	}
+	return reader.NeighborhoodByQname(s.QName, depth, reverse, edgeTypes...)
+}
+
+// subgraph walks from the seed in both directions over every edge type.
+func (s seedRef) subgraph(reader store.Reader, depth int) ([]types.Node, []types.Edge, error) {
+	if len(s.IDs) == 0 {
+		return reader.SubgraphByQname(s.QName, depth)
+	}
+	fwdN, fwdE, err := reader.NeighborhoodByIDs(s.IDs, depth, false)
+	if err != nil {
+		return nil, nil, err
+	}
+	revN, revE, err := reader.NeighborhoodByIDs(s.IDs, depth, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	merged := map[string]types.Node{}
+	for _, n := range append(fwdN, revN...) {
+		merged[n.ID] = n
+	}
+	nodes := make([]types.Node, 0, len(merged))
+	for _, n := range merged {
+		nodes = append(nodes, n)
+	}
+	return nodes, append(fwdE, revE...), nil
+}
+
+// nodes returns the seed's own nodes.
+func (s seedRef) nodes(reader store.Reader) ([]types.Node, error) {
+	if len(s.IDs) > 0 {
+		return reader.NodesByIDs(s.IDs)
+	}
+	return reader.FindSymbol(s.QName, true, store.FindSymbolOptions{})
+}
+
+// result adds the seed to a traversal payload: seed_qname always, seed_id
+// when the traversal started from one exact node.
+func (s seedRef) result(payload map[string]any) map[string]any {
+	payload["seed_qname"] = s.QName
+	if len(s.IDs) == 1 {
+		payload["seed_id"] = s.IDs[0]
+	}
+	return payload
+}
+
+// resolveSeed maps a user-supplied seed — a canonical id, a fully-qualified
+// name ("a.Greet") or a bare short name ("Greet") — to the seed the
+// graph-traversal tools (find_callers / find_callees / get_subgraph /
+// change_history) walk from. It mirrors find_symbol's exact-or-suffix logic
+// so an agent that located a symbol via find_symbol(exact=false) can feed
+// the same bare name to the traversal tools instead of silently getting an
+// empty result.
 //
 // Resolution order:
 //  0. exact match on canonical_id — globally unique (ADR-0001), so a hit is
-//     unambiguous by construction; resolves to that node's qualified_name.
+//     unambiguous by construction; the seed is that one node.
 //  1. exact match on qualified_name — the common, unambiguous case.
 //  2. suffix match (bare name) when exact found nothing.
 //
 // Return contract:
-//   - ok=true, qname set            exactly one distinct qname matched.
+//   - ok=true, seed set             exactly one node (step 0) or one distinct
+//     qname matched.
 //   - ambiguous=true, candidates set the suffix matched >1 distinct qname;
 //     the caller should surface them so the agent can retry with a full
 //     qname (ADR-0001: a multi-match is reported, never silently picked).
 //   - all-zero (ok=false)           nothing matched (not_found).
 //
-// Multiple nodes sharing ONE qualified_name (e.g. the same symbol across
-// languages) is not ambiguous: every such node becomes a traversal root
-// inside NeighborhoodByQname/SubgraphByQname. To traverse one exact node
-// regardless of qname collisions, seed with its canonical_id (step 0).
-func resolveSeed(reader store.Reader, seed, lang string) (qname string, candidates []string, ambiguous bool, ok bool) {
+// Several nodes sharing ONE qualified_name (e.g. the same symbol across
+// languages) is not ambiguous for a qname seed: every such node becomes a
+// traversal root. A canonical id seed starts from its own node only.
+func resolveSeed(reader store.Reader, seed, lang string) (resolved seedRef, candidates []string, ambiguous bool, ok bool) {
 	if seed == "" {
-		return "", nil, false, false
+		return seedRef{}, nil, false, false
 	}
 	opts := store.FindSymbolOptions{Language: lang}
 
-	// 0. exact canonical_id — unambiguous; resolve to the node's qualified_name.
+	// 0. exact canonical_id — unambiguous; the seed is that node.
 	if n, found, err := reader.FindByCanonicalID(seed); err == nil && found {
-		return n.QualifiedName, nil, false, true
+		return seedRef{QName: n.QualifiedName, IDs: []string{n.ID}}, nil, false, true
 	}
 
 	// 1. exact qualified_name.
 	if nodes, err := reader.FindSymbol(seed, true, opts); err == nil && len(nodes) > 0 {
-		return seed, nil, false, true
+		return seedRef{QName: seed}, nil, false, true
 	}
 
 	// 2. suffix fallback for bare names.
 	nodes, err := reader.FindSymbol(seed, false, opts)
 	if err != nil || len(nodes) == 0 {
-		return "", nil, false, false
+		return seedRef{}, nil, false, false
 	}
 	seen := map[string]struct{}{}
 	distinct := make([]string, 0, len(nodes))
@@ -155,10 +218,10 @@ func resolveSeed(reader store.Reader, seed, lang string) (qname string, candidat
 		distinct = append(distinct, n.QualifiedName)
 	}
 	if len(distinct) == 1 {
-		return distinct[0], nil, false, true
+		return seedRef{QName: distinct[0]}, nil, false, true
 	}
 	sort.Strings(distinct) // deterministic order keeps cks's prompt cache stable
-	return "", distinct, true, false
+	return seedRef{}, distinct, true, false
 }
 
 // seedNotFoundResult is the uniform payload the traversal tools return

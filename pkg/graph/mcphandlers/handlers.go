@@ -70,11 +70,10 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 		if err != nil {
 			return nil, err
 		}
-		return textResult(map[string]any{
-			"seed_qname": resolved,
-			"nodes":      attachBlobs(reader, nodes, incl),
-			"edges":      edges,
-		}), nil
+		return textResult(resolved.result(map[string]any{
+			"nodes": attachBlobs(reader, nodes, incl),
+			"edges": edges,
+		})), nil
 	})
 }
 
@@ -99,15 +98,14 @@ func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 		if !ok {
 			return textResult(seedNotFoundResult(q)), nil
 		}
-		nodes, edges, err := reader.NeighborhoodByQname(resolved, d, false, callEdgeTypes...)
+		nodes, edges, err := resolved.neighborhood(reader, d, false, callEdgeTypes...)
 		if err != nil {
 			return nil, err
 		}
-		return textResult(map[string]any{
-			"seed_qname": resolved,
-			"nodes":      attachBlobs(reader, nodes, incl),
-			"edges":      edges,
-		}), nil
+		return textResult(resolved.result(map[string]any{
+			"nodes": attachBlobs(reader, nodes, incl),
+			"edges": edges,
+		})), nil
 	})
 }
 
@@ -133,15 +131,14 @@ func RegisterGetSubgraph(s *server.MCPServer, reader store.Reader) {
 		if !ok {
 			return textResult(seedNotFoundResult(q)), nil
 		}
-		nodes, edges, err := reader.SubgraphByQname(resolved, d)
+		nodes, edges, err := resolved.subgraph(reader, d)
 		if err != nil {
 			return nil, err
 		}
-		return textResult(map[string]any{
-			"seed_qname": resolved,
-			"nodes":      attachBlobs(reader, nodes, incl),
-			"edges":      edges,
-		}), nil
+		return textResult(resolved.result(map[string]any{
+			"nodes": attachBlobs(reader, nodes, incl),
+			"edges": edges,
+		})), nil
 	})
 }
 

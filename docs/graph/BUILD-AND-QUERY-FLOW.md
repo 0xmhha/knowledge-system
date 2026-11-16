@@ -3,14 +3,16 @@
 Status: 2026-11-16. How source becomes a graph and how a query walks it, the points where a run must leave a log
 record for debugging, the log levels for development and operation, and where logs are written. The build stages are
 those of `internal/graph/buildpipe` today; the contract they move to is
-[the shared symbol contract](./SYMBOL-CONTRACT-DESIGN.md). User decision 2026-11-16: logs go to per-run files next to
+[the shared symbol contract](./SYMBOL-CONTRACT-DESIGN.md). The full map of the code, every stored table and every
+query surface, with detailed sequence diagrams, is [the ckg structure](./CKG-STRUCTURE.md). User decision 2026-11-16: logs go to per-run files next to
 the graph, with readable text on stderr; central collection is added with the server mode of decision D10.
 
 ## 1. Why
 
 Defects so far were silent. Two Go packages named `bn256` got one node id and the store's `INSERT OR REPLACE`
 (`internal/graph/persist/sqlite_writer.go`) kept one node without a word; `Resolve` drops every reference it cannot
-bind (`internal/graph/parse/golang/resolve.go`) and the manifest field `unresolved_refs_count` is never set. Both were
+bind (`internal/graph/parse/golang/resolve.go`) and the manifest field `unresolved_refs_count` was never set (both
+now logged and counted, section 7). Both were
 found only by building a separate verifier. Today the build logs counts per stage ("detected files", "built N
 nodes"), the graph MCP tools log nothing per request, and only the search composer has a per-stage trace
 (`CKS_DEBUG_TRACE`, a JSONL file). The logs below make such defects visible in the run that causes them.
@@ -27,9 +29,9 @@ sequenceDiagram
   participant A as post-passes
   participant S as store
   U->>X: read scope (--scope) or host defaults
+  U->>D: list files per language (go/packages for Go)
   U->>S: read old manifest
   U->>U: cache decision: cold, incremental or short-circuit
-  U->>D: list files per language (go/packages for Go)
   D->>P: Go files of the build, type-checked for its configuration
   P->>R: nodes, edges, pending references per file
   R->>A: resolved graph

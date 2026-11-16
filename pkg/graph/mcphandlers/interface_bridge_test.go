@@ -38,7 +38,7 @@ func TestFindCallers_InterfaceDispatchBridge(t *testing.T) {
 
 	// Negative control: a plain reverse walk from the concrete method does NOT
 	// reach UseHasher (the call goes through the interface method).
-	baseNodes, _, err := store.NeighborhoodByQname(resolved, 2, true, callEdgeTypes...)
+	baseNodes, _, err := store.NeighborhoodByQname(resolved.QName, 2, true, callEdgeTypes...)
 	if err != nil {
 		t.Fatalf("base NeighborhoodByQname: %v", err)
 	}

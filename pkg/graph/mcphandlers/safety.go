@@ -70,6 +70,16 @@ func (s *llmSafeReader) NeighborhoodByQname(qname string, depth int, reverse boo
 	return nodes, edges, nil
 }
 
+func (s *llmSafeReader) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	nodes, edges, err := s.Reader.NeighborhoodByIDs(ids, depth, reverse, edgeTypes...)
+	if err != nil {
+		return nil, nil, err
+	}
+	nodes = filterLLMSafe(nodes)
+	edges = filterLLMSafeEdges(edges, nodeIDSet(nodes))
+	return nodes, edges, nil
+}
+
 func (s *llmSafeReader) SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error) {
 	nodes, edges, err := s.Reader.SubgraphByQname(qname, depth)
 	if err != nil {

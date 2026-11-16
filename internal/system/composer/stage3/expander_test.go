@@ -307,30 +307,17 @@ func TestIntentToRelations(t *testing.T) {
 	}
 }
 
+// TestIntentToHops: every intent walks three hops (2026-11-16 decision; a
+// single hop says almost nothing about where a problem comes from).
 func TestIntentToHops(t *testing.T) {
 	t.Parallel()
-	traces := []contract.Intent{
-		contract.IntentBugFix,
-		contract.IntentRefactor,
-		contract.IntentArchExplain,
-		contract.IntentConcurrencySafety,
-		contract.IntentSecurity,
-	}
-	for _, i := range traces {
-		if got := intentToHops(i); got != 2 {
-			t.Errorf("intentToHops(%v) = %d, want 2 (trace intent)", i, got)
-		}
-	}
-	surface := []contract.Intent{
-		contract.IntentFeatureAdd,
-		contract.IntentTestAdd,
-		contract.IntentDocsUpdate,
-		contract.IntentQAReview,
-		contract.IntentUnknown,
-	}
-	for _, i := range surface {
-		if got := intentToHops(i); got != 1 {
-			t.Errorf("intentToHops(%v) = %d, want 1 (surface intent)", i, got)
+	for _, i := range []contract.Intent{
+		contract.IntentBugFix, contract.IntentRefactor, contract.IntentArchExplain,
+		contract.IntentConcurrencySafety, contract.IntentSecurity, contract.IntentFeatureAdd,
+		contract.IntentTestAdd, contract.IntentDocsUpdate, contract.IntentQAReview, contract.IntentUnknown,
+	} {
+		if got := intentToHops(i); got != 3 {
+			t.Errorf("intentToHops(%v) = %d, want 3", i, got)
 		}
 	}
 }

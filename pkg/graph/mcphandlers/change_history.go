@@ -71,7 +71,7 @@ func changeHistory(reader store.Reader, qname string, cutoff time.Time, k int) (
 		}, nil
 	}
 
-	nodes, err := reader.FindSymbol(resolved, true, store.FindSymbolOptions{})
+	nodes, err := resolved.nodes(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -106,5 +106,5 @@ func changeHistory(reader store.Reader, qname string, cutoff time.Time, k int) (
 	if k > 0 && len(prs) > k {
 		prs = prs[:k]
 	}
-	return map[string]any{"seed_qname": resolved, "prs": prs}, nil
+	return resolved.result(map[string]any{"prs": prs}), nil
 }

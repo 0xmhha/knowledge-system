@@ -97,7 +97,6 @@ func newBuildCmd() *cobra.Command {
 				Logger:              log,
 				CKGVersion:          ckgVersion,
 				NoCache:             noCache,
-				RebuildMetrics:      rebuildMetrics,
 				DBDSN:               dbDsn,
 				StrictValidate:      strictValidate,
 				FilesFromPath:       filesFrom,
@@ -142,12 +141,13 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&atCommit, "at-commit", "",
 		"build from a specific git commit using git worktree (leaves --src working tree untouched)")
 	cmd.Flags().BoolVar(&force, "force", false,
-		"rebuild even if graph.db already exists at the output directory")
+		"build over an existing graph.db at the output directory; unchanged files still come from the cache (--no-cache rebuilds everything)")
 	cmd.Flags().StringSliceVar(&langs, "lang", []string{"auto"}, "languages: auto|go,ts,sol")
 	cmd.Flags().BoolVar(&noCache, "no-cache", false,
 		"bypass A3 incremental cache; full rebuild from scratch")
-	cmd.Flags().BoolVar(&rebuildMetrics, "rebuild-metrics", false,
-		"force PageRank/Leiden recompute even when cache would otherwise reuse them")
+	cmd.Flags().BoolVar(&rebuildMetrics, "rebuild-metrics", false, "no effect; kept so existing scripts still parse")
+	_ = cmd.Flags().MarkDeprecated("rebuild-metrics",
+		"it has no effect: scores and communities are recomputed by every build that changes a file; use --no-cache to recompute an unchanged tree")
 	cmd.Flags().StringVar(&dbDsn, "db", "",
 		"PostgreSQL DSN (e.g. postgres://user:pass@host/dbname); if set, store graph in PG instead of local SQLite. DEPRECATED (ADR-0003): SQLite is the sole maintained backend")
 	cmd.Flags().BoolVar(&strictValidate, "strict-validate", false,

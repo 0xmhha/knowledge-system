@@ -86,6 +86,7 @@ type symbolCall struct {
 }
 type neighCall struct {
 	qname  string
+	ids    []string // set by NeighborhoodByIDs
 	depth  int
 	rev    bool
 	etypes []string
@@ -159,6 +160,59 @@ func (m *mockStoreReader) ConcurrencyAnalyze(symbol string, depth, maxTotal int)
 func (m *mockStoreReader) NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
 	m.neighCh = append(m.neighCh, neighCall{qname: qname, depth: depth, rev: reverse, etypes: edgeTypes})
 	return m.neighOut, m.neighEdges, m.neighErr
+}
+
+// NeighborhoodByIDs walks neighEdges from ids, depth hops, keeping the edge
+// types asked for, so a hop-by-hop caller sees one hop per call.
+func (m *mockStoreReader) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	m.neighCh = append(m.neighCh, neighCall{ids: append([]string(nil), ids...), depth: depth, rev: reverse, etypes: edgeTypes})
+	if m.neighErr != nil {
+		return nil, nil, m.neighErr
+	}
+	byID := map[string]types.Node{}
+	for _, n := range m.neighOut {
+		byID[n.ID] = n
+	}
+	want := map[string]bool{}
+	for _, t := range edgeTypes {
+		want[t] = true
+	}
+	seen := map[string]bool{}
+	var nodes []types.Node
+	add := func(id string) {
+		if n, ok := byID[id]; ok && !seen[id] {
+			seen[id] = true
+			nodes = append(nodes, n)
+		}
+	}
+	frontier := map[string]bool{}
+	for _, id := range ids {
+		frontier[id] = true
+		add(id)
+	}
+	var edges []types.Edge
+	for d := 0; d < depth && len(frontier) > 0; d++ {
+		next := map[string]bool{}
+		for _, e := range m.neighEdges {
+			if len(want) > 0 && !want[string(e.Type)] {
+				continue
+			}
+			near, far := e.Src, e.Dst
+			if reverse {
+				near, far = e.Dst, e.Src
+			}
+			if !frontier[near] {
+				continue
+			}
+			edges = append(edges, e)
+			if !seen[far] {
+				next[far] = true
+			}
+			add(far)
+		}
+		frontier = next
+	}
+	return nodes, edges, nil
 }
 func (m *mockStoreReader) NodesByFilePath(path string) ([]types.Node, error) {
 	m.pathCh = append(m.pathCh, path)
@@ -473,8 +527,9 @@ func TestReal_Neighbors_TranslatesEdgesToCksRelations(t *testing.T) {
 	if len(m.pathCh) != 1 || m.pathCh[0] != "src.go" {
 		t.Errorf("NodesByFilePath calls = %v, want [src.go]", m.pathCh)
 	}
-	if len(m.neighCh) != 1 || m.neighCh[0].qname != "pkg.Src" {
-		t.Errorf("NeighborhoodByQname qname = %q, want pkg.Src", m.neighCh[0].qname)
+	// The walk starts from the matched node, not from its qualified name.
+	if len(m.neighCh) != 1 || len(m.neighCh[0].ids) != 1 || m.neighCh[0].ids[0] != "S" {
+		t.Errorf("walk calls = %+v, want one walk from node S", m.neighCh)
 	}
 	n := out[0]
 	if n.Relation != contract.RelationCalls {
@@ -684,8 +739,8 @@ func TestReal_Neighbors_CalledByReversesDirection(t *testing.T) {
 	if !walk.rev {
 		t.Errorf("reverse should be true for called_by")
 	}
-	if walk.qname != "pkg.X" {
-		t.Errorf("walk qname = %q, want pkg.X", walk.qname)
+	if len(walk.ids) != 1 || walk.ids[0] != "X" {
+		t.Errorf("walk starts = %v, want node X", walk.ids)
 	}
 }
 

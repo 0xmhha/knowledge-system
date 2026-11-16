@@ -919,6 +919,21 @@ func (s *pgStore) NeighborhoodByQname(qname string, depth int, reverse bool, edg
 	if err != nil {
 		return nil, nil, err
 	}
+	return s.neighborhoodFrom(roots, depth, reverse, edgeTypes)
+}
+
+// NeighborhoodByIDs is NeighborhoodByQname started from the given node ids
+// only. Unknown ids are ignored.
+func (s *pgStore) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	roots, err := s.NodesByIDs(ids)
+	if err != nil {
+		return nil, nil, err
+	}
+	return s.neighborhoodFrom(roots, depth, reverse, edgeTypes)
+}
+
+func (s *pgStore) neighborhoodFrom(roots []types.Node, depth int, reverse bool, edgeTypes []string) ([]types.Node, []types.Edge, error) {
+	var err error
 	seen := map[string]types.Node{}
 	for _, r := range roots {
 		seen[r.ID] = r

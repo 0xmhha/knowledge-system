@@ -87,27 +87,14 @@ func intentToRelations(intent contract.Intent) []contract.Relation {
 
 // intentToHops returns the graph traversal depth for the given Intent.
 //
-// Intents fall into two groups:
-//
-//   - "Trace" intents (BugFix, Refactor, ArchExplain, Concurrency, Security)
-//     need depth=2: direct neighbors plus one more hop to capture causal
-//     chains (caller-of-caller, callee-of-callee, etc.).
-//   - "Surface" intents (FeatureAdd, TestAdd, DocsUpdate, QAReview, Unknown)
-//     stay at depth=1: extra hops dilute the signal with marginally
-//     relevant context.
-//
-// Depth=3 was considered for Security but rejected: cost grows
-// exponentially with fan-out, and signal-to-noise drops fast beyond
-// 2 hops. Per-Intent depth tuning may be revisited after evaluation.
-func intentToHops(intent contract.Intent) int {
-	switch intent {
-	case contract.IntentBugFix,
-		contract.IntentRefactor,
-		contract.IntentArchExplain,
-		contract.IntentConcurrencySafety,
-		contract.IntentSecurity:
-		return 2
-	default:
-		return 1
-	}
+// Every intent walks three hops (2026-11-16, user decision: one hop says
+// almost nothing about where a problem comes from, and at least three hops
+// are needed). The cost that kept depth at one or two is now bounded in the
+// walk itself: ckgclient.Neighbors expands at most neighborFrontierCap nodes
+// per hop, records each neighbour's hop so the expander's
+// score / (1 + distance) discounts far neighbours, and shares
+// NeighborsPerSeed between the hops so direct neighbours cannot crowd out
+// the farther ones.
+func intentToHops(contract.Intent) int {
+	return 3
 }
