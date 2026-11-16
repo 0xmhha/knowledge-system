@@ -155,7 +155,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&filesFrom, "files-from", "",
 		"path to JSON file with {include, exclude} glob patterns; restricts which files reach the parsers")
 	cmd.Flags().StringVar(&scopePath, "scope", "",
-		"build scope JSON from buildscope: read only the Go files it lists, type-checked with its GOOS, GOARCH, cgo and tags (other languages are discovered as before)")
+		"build scope JSON from `ckg scope`: read only the files it lists, Go type-checked with its GOOS, GOARCH, cgo and tags; without a scope every file of the tree is read")
 	cmd.Flags().StringSliceVar(&filesFromMain, "files-from-main", nil,
 		"Go main package(s) (e.g. ./cmd/gstable; repeatable or comma-separated); generates the include/exclude filter in-memory from `go list -deps` of the module-local closure. Mutually exclusive with --files-from")
 	cmd.Flags().StringSliceVar(&solInclude, "sol-include", nil,

@@ -31,9 +31,9 @@ flow_corpus: domain-knowledge/flow-corpus/corpus.jsonl
 # A build that cannot resolve them fails rather than shipping a corpus without
 # the project's own documentation.
 code_root: ${CKS_CODE_ROOT}
-# Derived build scope (cmd/filelist-gen): the setup plan derives
-# <out>/files-from.json from this config first and passes it to both engine
-# builds. Datasets built this way start the derived-scope lineage
-# (docs/design/filelist-gen.md §5) — their digests are not comparable to
-# curated-scope datasets.
+# Build profile: the setup plan extracts <out>/build-scope.json from it with
+# `ckg scope` first, and both engine builds read only the files it lists.
+# cks setup --build-goos/--build-goarch/--build-cgo/--build-tags override the
+# profile for a build with other options; --build-binary checks the scope
+# against a built binary.
 filelist: filelist.yaml

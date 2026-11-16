@@ -562,3 +562,26 @@ func TestBuildSourceScopeChangesDatasetRecipe(t *testing.T) {
 		t.Fatal("source exception did not change default recipe")
 	}
 }
+
+// TestConfiguredInputDigestCoversBuildOptions: other build options give
+// another scope, so they must give another input digest; the binaries named
+// only for the check do not change it.
+func TestConfiguredInputDigestCoversBuildOptions(t *testing.T) {
+	digest := func(b BuildOptions) string {
+		t.Helper()
+		d, err := ConfiguredInputDigest(Options{BuildOptions: b})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return d
+	}
+	none := digest(BuildOptions{})
+	tagged := digest(BuildOptions{Tags: []string{"ckzg"}, TagsSet: true})
+	cleared := digest(BuildOptions{TagsSet: true})
+	if none == tagged || tagged == cleared || none == cleared {
+		t.Errorf("digests do not follow the options: %s %s %s", none, tagged, cleared)
+	}
+	if digest(BuildOptions{Tags: []string{"ckzg"}, TagsSet: true, Binaries: []string{"/b/gstable"}}) != tagged {
+		t.Error("a checked binary changed the digest")
+	}
+}

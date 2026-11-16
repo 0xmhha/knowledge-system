@@ -310,6 +310,7 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 			EmbedModel:       cfg.Backends.CKV.EmbedModel,
 			OllamaURL:        cfg.Backends.CKV.OllamaURL,
 			CKGPolicyFile:    cfg.Backends.CKG.PolicyFile,
+			CKGBuildProfile:  cfg.Backends.CKG.BuildProfile,
 			DomainProjectDir: cfg.Domain.ProjectDir,
 			DomainCorpusDir:  cfg.Domain.CorpusDir,
 		},

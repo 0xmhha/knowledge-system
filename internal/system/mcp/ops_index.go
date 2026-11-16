@@ -34,6 +34,9 @@ type IndexConfig struct {
 	EmbedModel    string // ckv --model-name (paired with --embedder=ollama)
 	OllamaURL     string // CKV_OLLAMA_ENDPOINT for the ckv subprocess (optional)
 	CKGPolicyFile string // ckg --policy-file (governed_by edges); "" omits the flag
+	// CKGBuildProfile is the build profile `ckg scope` extracts the scope
+	// with before the build; "" builds from every file.
+	CKGBuildProfile string
 	// Channel ②: DomainProjectDir is the cks domain-knowledge project dir
 	// to export before building; DomainCorpusDir is the export output AND
 	// the ckv --docs root. Both empty disables channel ② (no corpus step).
@@ -177,7 +180,18 @@ func handleOpsIndex(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mc
 		if ic.CKGPolicyFile != "" {
 			args = append(args, "--policy-file", ic.CKGPolicyFile)
 		}
-		if err := indexRunner(ctx, ic.CKGBinary, args, nil); err != nil {
+		// The scope is extracted first, every time, so the graph follows
+		// the current build of the tree; a failed extraction stops the
+		// build rather than falling back to every file.
+		var scopeErr error
+		if ic.CKGBuildProfile != "" {
+			scope := filepath.Join(ckgOut, "build-scope.json")
+			scopeErr = indexRunner(ctx, ic.CKGBinary, []string{"scope", "--src", ic.SourceRoot, "--profile", ic.CKGBuildProfile, "--out", scope}, nil)
+			args = append(args, "--scope", scope)
+		}
+		if scopeErr != nil {
+			resp.CKG.Error = "build scope: " + scopeErr.Error()
+		} else if err := indexRunner(ctx, ic.CKGBinary, args, nil); err != nil {
 			resp.CKG.Error = err.Error()
 		} else {
 			resp.CKG.OK = true

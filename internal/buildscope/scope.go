@@ -9,10 +9,18 @@
 // own repository; its output is a versioned JSON document.
 package buildscope
 
-import "sort"
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"sort"
+)
 
-// SchemaVersion is the version of the Scope JSON document.
-const SchemaVersion = 1
+// SchemaVersion is the version of the Scope JSON document. Version 2 made the
+// file list complete for every language: a graph built from a scope reads the
+// listed files and nothing else, so non-Go files enter it through the
+// profile's extra_globs instead of being discovered.
+const SchemaVersion = 2
 
 // File roles.
 const (
@@ -29,16 +37,43 @@ type Scope struct {
 	Toolchains  []Toolchain `json:"toolchains"`
 	Target      Target      `json:"target"`
 	EntryPoints []string    `json:"entry_points"`
-	// Files are compiled by the configuration (production) or belong to one of
-	// its packages as tests (test). Paths are slash-separated, relative to Root.
+	// Profile identifies the build profile the scope was extracted with; nil
+	// when it was extracted from command-line options alone.
+	Profile *ProfileRef `json:"profile,omitempty"`
+	// Files are compiled by the configuration (production), belong to one of
+	// its packages as tests (test), or were added by the profile's
+	// extra_globs (production). Paths are slash-separated, relative to Root.
 	Files []File `json:"files"`
 	// Ignored lists files in the configuration's packages that its build
 	// constraints exclude, so a caller can tell "excluded" from "not seen".
-	Ignored        []File   `json:"ignored,omitempty"`
-	OutsideModules []Module `json:"outside_modules,omitempty"`
+	Ignored []File `json:"ignored,omitempty"`
+	// EmbedFiles are the main-module files the build embeds (go:embed); the
+	// graph does not read them, inclusions are checked against them.
+	EmbedFiles []string `json:"embed_files,omitempty"`
+	// Inclusions are the profile's exceptions: files outside the build that
+	// belong to the scope, with the reason and the link to the build.
+	Inclusions     []InclusionRecord `json:"inclusions,omitempty"`
+	OutsideModules []Module          `json:"outside_modules,omitempty"`
 	// Problems are load errors the build tool reported; a scope with problems
-	// may be incomplete.
+	// may be incomplete, so extraction fails on them unless told otherwise.
 	Problems []string `json:"problems,omitempty"`
+	// CheckedBinaries are built binaries whose recorded build settings were
+	// compared with Target and EntryPoints and matched.
+	CheckedBinaries []CheckedBinary `json:"checked_binaries,omitempty"`
+}
+
+// ProfileRef names a build profile by path and content.
+type ProfileRef struct {
+	Path   string `json:"path"`
+	SHA256 string `json:"sha256"`
+}
+
+// CheckedBinary is a binary the scope was checked against.
+type CheckedBinary struct {
+	Path string `json:"path"`
+	// Package is the main package the binary records.
+	Package string `json:"package"`
+	SHA256  string `json:"sha256"`
 }
 
 // Toolchain records the tool a language is built with.
@@ -70,6 +105,20 @@ type File struct {
 	// Package is the language-level unit the file belongs to (the Go import
 	// path; external test files carry the "_test" suffix).
 	Package string `json:"package"`
+	// IncludedBy is the id of the profile inclusion that added the file;
+	// empty for a file the build itself compiles or tests.
+	IncludedBy string `json:"included_by,omitempty"`
+}
+
+// InclusionRecord is what one profile inclusion added to the scope.
+type InclusionRecord struct {
+	ID     string `json:"id"`
+	Reason string `json:"reason"`
+	Files  int    `json:"files"`
+	// LinkedBy names the build outputs that tie the inclusion to the build
+	// (embedded files it was checked against); empty when it has none and
+	// rests on its reason alone.
+	LinkedBy []string `json:"linked_by,omitempty"`
 }
 
 // Module is a module the configuration uses from outside the repository.
@@ -94,7 +143,36 @@ func sortScope(s *Scope) {
 	}
 	byPath(s.Files)
 	byPath(s.Ignored)
+	sort.Strings(s.EmbedFiles)
 	sort.Slice(s.OutsideModules, func(i, j int) bool { return s.OutsideModules[i].Path < s.OutsideModules[j].Path })
 	sort.Strings(s.EntryPoints)
 	sort.Strings(s.Problems)
+}
+
+// Write stores s as indented JSON at path, through a temporary file and a
+// rename so a reader never sees half a scope; "-" writes to standard output.
+func Write(path string, s *Scope) error {
+	raw, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		return err
+	}
+	raw = append(raw, '\n')
+	if path == "-" {
+		_, err := os.Stdout.Write(raw)
+		return err
+	}
+	if dir := filepath.Dir(path); dir != "" {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+	}
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, raw, 0o644); err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		_ = os.Remove(tmp)
+		return err
+	}
+	return nil
 }

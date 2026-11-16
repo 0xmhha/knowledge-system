@@ -76,23 +76,34 @@ func TestBuildPlan_Shape(t *testing.T) {
 		t.Error("missing Src not rejected")
 	}
 
-	// FilelistConfig prepends the derivation step and scopes both builds.
-	p3, err := BuildPlan(Options{Src: "/s", Out: "/o", FilelistConfig: "/p/filelist.yaml"})
+	// FilelistConfig prepends the scope extraction and both builds read
+	// exactly the scope's files; the run's build options reach the extraction.
+	p3, err := BuildPlan(Options{Src: "/s", Out: "/o", FilelistConfig: "/p/filelist.yaml",
+		BuildOptions: BuildOptions{GOOS: "linux", Tags: []string{"ckzg", "x"}, TagsSet: true, Binaries: []string{"/b/gstable"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p3.Steps[0].ID != "filelist-derive" {
-		t.Fatalf("step[0] = %q, want filelist-derive", p3.Steps[0].ID)
+	if p3.Steps[0].ID != "build-scope" {
+		t.Fatalf("step[0] = %q, want build-scope", p3.Steps[0].ID)
 	}
 	d := strings.Join(p3.Steps[0].Cmd, " ")
-	if !strings.Contains(d, "cks filelist --src /s --config /p/filelist.yaml --out /o/files-from.json") {
-		t.Errorf("derive cmd = %q", d)
+	if d != "ckg scope --src /s --profile /p/filelist.yaml --out /o/build-scope.json --goos linux --tags=ckzg,x --binary /b/gstable" {
+		t.Errorf("scope cmd = %q", d)
 	}
-	for _, i := range []int{1, 2} { // graph-build, vector-build
-		c := strings.Join(p3.Steps[i].Cmd, " ")
-		if !strings.Contains(c, "--files-from /o/files-from.json") {
-			t.Errorf("step %s missing --files-from: %q", p3.Steps[i].ID, c)
+	for i, want := range map[int]string{1: "--scope /o/build-scope.json", 2: "--files-from /o/build-scope.json"} {
+		if c := strings.Join(p3.Steps[i].Cmd, " "); !strings.Contains(c, want) {
+			t.Errorf("step %s missing %q: %q", p3.Steps[i].ID, want, c)
 		}
+	}
+	// Without a profile there is no scope: both builds read every file, and
+	// build options have nothing to apply to.
+	for _, st := range p.Steps {
+		if strings.Contains(strings.Join(st.Cmd, " "), "build-scope.json") {
+			t.Errorf("unscoped plan step %s reads a scope", st.ID)
+		}
+	}
+	if _, err := BuildPlan(Options{Src: "/s", Out: "/o", BuildOptions: BuildOptions{TagsSet: true}}); err == nil {
+		t.Error("build options without a profile not rejected")
 	}
 }
 

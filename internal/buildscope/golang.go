@@ -33,6 +33,19 @@ type GoConfig struct {
 	EntryPoints []string
 	// GoBinary is the go command to run; "go" from PATH when empty.
 	GoBinary string
+	// SkipTests leaves the test files of the configuration's packages out.
+	SkipTests bool
+	// PackageSets are main-module package patterns that belong to the scope
+	// without being imported by an entry point, for example an integration
+	// test package. Their own files are added, not their dependencies, and
+	// each file records the set that added it.
+	PackageSets []PackageSet
+}
+
+// PackageSet is a named group of package patterns.
+type PackageSet struct {
+	ID       string
+	Patterns []string
 }
 
 // goListPkg is the part of `go list -json` output the extractor reads.
@@ -44,6 +57,7 @@ type goListPkg struct {
 	CgoFiles       []string
 	SFiles         []string
 	IgnoredGoFiles []string
+	EmbedFiles     []string
 	TestGoFiles    []string
 	XTestGoFiles   []string
 	Module         *goListModule
@@ -103,23 +117,59 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 	}
 	scope.Target.GOOS, scope.Target.GOARCH, scope.Target.CGOEnabled = goos, goarch, cgo
 
-	args := []string{"list", "-e", "-deps", "-json"}
-	if len(cfg.Tags) > 0 {
-		args = append(args, "-tags", strings.Join(cfg.Tags, ","))
+	seenModule := map[string]bool{}
+	seenFile := map[string]bool{}
+	list := func(deps bool, patterns []string, set string) error {
+		args := []string{"list", "-e", "-json"}
+		if deps {
+			args = append(args, "-deps")
+		}
+		if len(cfg.Tags) > 0 {
+			args = append(args, "-tags", strings.Join(cfg.Tags, ","))
+		}
+		args = append(args, patterns...)
+		out, err := run(ctx, goPath, root, env, args...)
+		if err != nil {
+			return err
+		}
+		// Only the entry points' build embeds files into the outputs.
+		return addPackages(scope, root, out, packageListing{skipTests: cfg.SkipTests, set: set, embeds: deps}, seenModule, seenFile)
 	}
-	args = append(args, cfg.EntryPoints...)
-	out, err := run(ctx, goPath, root, env, args...)
-	if err != nil {
+	if err := list(true, cfg.EntryPoints, ""); err != nil {
 		return nil, err
 	}
-	seenModule := map[string]bool{}
+	for _, ps := range cfg.PackageSets {
+		if err := list(false, ps.Patterns, ps.ID); err != nil {
+			return nil, err
+		}
+	}
+	if len(scope.Files) == 0 {
+		return nil, fmt.Errorf("buildscope: go list found no main-module files for %v in %s", cfg.EntryPoints, root)
+	}
+	sortScope(scope)
+	return scope, nil
+}
+
+// packageListing says how one `go list` result enters the scope.
+type packageListing struct {
+	skipTests bool
+	// set is recorded as IncludedBy of the files it adds; "" for the build.
+	set string
+	// embeds records the packages' go:embed files in scope.EmbedFiles.
+	embeds bool
+}
+
+// addPackages adds the main-module files of a `go list -json` stream to
+// scope and records the outside modules and load errors it reports. seen*
+// keep a module or file that two listings return from being added twice.
+func addPackages(scope *Scope, root string, out []byte, l packageListing, seenModule, seenFile map[string]bool) error {
 	dec := json.NewDecoder(bytes.NewReader(out))
 	for {
 		var p goListPkg
 		if err := dec.Decode(&p); errors.Is(err, io.EOF) {
-			break
+			return nil
 		} else if err != nil {
-			return nil, fmt.Errorf("buildscope: parse go list output: %w", err)
+			return fmt.Errorf("buildscope: parse go list output: %w", err)
 		}
 		if p.Error != nil {
 			scope.Problems = append(scope.Problems, p.ImportPath+": "+p.Error.Err)
@@ -140,23 +190,40 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 		}
 		add := func(list *[]File, names []string, role, pkg string) {
 			for _, n := range names {
-				*list = append(*list, File{
-					Path: filepath.ToSlash(filepath.Join(rel, n)), Language: languageOf(n), Role: role, Package: pkg,
-				})
+				path := filepath.ToSlash(filepath.Join(rel, n))
+				key := role + " " + path
+				if list == &scope.Ignored {
+					key = "ignored " + path
+				}
+				if seenFile[key] {
+					continue
+				}
+				seenFile[key] = true
+				f := File{Path: path, Language: languageOf(n), Role: role, Package: pkg}
+				if list == &scope.Files {
+					f.IncludedBy = l.set
+				}
+				*list = append(*list, f)
 			}
 		}
 		add(&scope.Files, p.GoFiles, RoleProduction, p.ImportPath)
 		add(&scope.Files, p.CgoFiles, RoleProduction, p.ImportPath)
 		add(&scope.Files, p.SFiles, RoleProduction, p.ImportPath)
-		add(&scope.Files, p.TestGoFiles, RoleTest, p.ImportPath)
-		add(&scope.Files, p.XTestGoFiles, RoleTest, p.ImportPath+"_test")
+		if !l.skipTests {
+			add(&scope.Files, p.TestGoFiles, RoleTest, p.ImportPath)
+			add(&scope.Files, p.XTestGoFiles, RoleTest, p.ImportPath+"_test")
+		}
 		add(&scope.Ignored, p.IgnoredGoFiles, RoleProduction, p.ImportPath)
+		if l.embeds {
+			for _, e := range p.EmbedFiles {
+				path := filepath.ToSlash(filepath.Join(rel, e))
+				if !seenFile["embed "+path] {
+					seenFile["embed "+path] = true
+					scope.EmbedFiles = append(scope.EmbedFiles, path)
+				}
+			}
+		}
 	}
-	if len(scope.Files) == 0 {
-		return nil, fmt.Errorf("buildscope: go list found no main-module files for %v in %s", cfg.EntryPoints, root)
-	}
-	sortScope(scope)
-	return scope, nil
 }
 
 func languageOf(name string) string {

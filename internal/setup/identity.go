@@ -396,6 +396,13 @@ func ConfiguredInputDigest(o Options) (string, error) {
 			return "", fmt.Errorf("hash %s input: %w", in.role, err)
 		}
 	}
+	// The run's build options change the scope, so they change the dataset
+	// as much as the profile does. Binaries named for the check do not.
+	if b := o.BuildOptions; b.set() {
+		canon := fmt.Sprintf("goos=%s goarch=%s cgo=%s tags_set=%t tags=%s", b.GOOS, b.GOARCH, b.CGO, b.TagsSet, strings.Join(b.Tags, ","))
+		sum := sha256.Sum256([]byte(canon))
+		entries = append(entries, inputFile{Role: "build-options", SHA256: hex.EncodeToString(sum[:])})
+	}
 	for _, bin := range []struct{ role, path string }{
 		{"engine-ckg", o.GraphBin}, {"engine-ckv", o.VectorBin}, {"orchestrator-cks", o.CksBin},
 	} {
