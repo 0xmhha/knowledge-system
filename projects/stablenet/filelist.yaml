@@ -1,21 +1,26 @@
-# Build-scope derivation config for the stablenet knowledge dataset.
-# Consumed by `cks filelist` (design: docs/design/filelist-gen.md):
+# Build profile of the stablenet knowledge dataset: the options of the build
+# the graph follows and the files outside the Go build that belong to it.
+# The scope is extracted from it before every graph build
+# (docs/graph/CKG-STRUCTURE.md section 1.1):
 #
-#   cks filelist --src <go-stablenet checkout> \
-#     --config projects/stablenet/filelist.yaml --out <dataset>/files-from.json
+#   ckg scope --src <go-stablenet checkout> \
+#     --profile projects/stablenet/filelist.yaml --out <dataset>/build-scope.json
+#   ckg build --src <go-stablenet checkout> --scope <dataset>/build-scope.json ...
 #
-# The derived list = dependency closure of build_roots (+ their tests)
-# + extra packages/globs below, resolved against the git-tracked tree
-# under the pinned build context. Changing anything here changes the
-# dataset scope — datasets record config_sha256 in provenance.
+# cks setup runs the same two steps when its config names this file. Options
+# of a build that differs (--goos/--goarch/--cgo/--tags on ckg scope,
+# --build-* on cks setup) override the values below for that run.
+# Changing anything here changes the dataset scope.
 
 # Deployment target context (R9). go list file sets are build-constraint
 # sensitive; the scope is what ships: linux/amd64, cgo on.
+# Tags are the ones the go-stablenet Makefile target gstable builds with: build/ci.go doInstall adds
+# urfave_cli_no_docs, and ckzg on every builder but Ubuntu trusty.
 build_context:
   goos: linux
   goarch: amd64
   cgo: true
-  tags: []
+  tags: [urfave_cli_no_docs, ckzg]
 
 # Shipped binaries whose dependency closures define the core scope (R4).
 build_roots:
@@ -25,21 +30,36 @@ build_roots:
 # Tests of every package in the closure (R2).
 include_package_tests: true
 
-# go:embed files of closure packages (compiled contract artifacts).
-# Off: the .sol sources below are the readable representation; the
-# artifacts are derived binaries.
+# go:embed files of closure packages (compiled contract artifacts) stay out:
+# the .sol sources below are the readable representation, the artifacts are
+# derived binaries. The scope still lists them as embed_files.
 include_embed_files: false
 
-# Out-of-graph packages that belong to the scope (R3): the system-contract
-# end-to-end tests and the solc compile tooling. Resolved via go list —
-# unresolvable patterns fail the derivation.
-extra_packages:
-  - ./systemcontracts/test
-  - ./systemcontracts/compile/...
-
-# Non-Go sources in scope (R3): Solidity system-contract sources,
-# including their test contracts. Matched against git-tracked files only.
-extra_globs:
-  - "systemcontracts/**/*.sol"
+# Exceptions: code the gstable build does not compile that belongs to the
+# scope because the compiled code cannot be understood without it. Each needs
+# an id and a reason; linked_by names what the build must still produce, so
+# extraction fails once the reason is gone. Files they add carry the id as
+# included_by in the scope.
+inclusions:
+  - id: system-contracts
+    reason: >
+      The governance and native-coin contracts deployed at genesis.
+      systemcontracts/contracts.go embeds their compiled bytecode
+      (go:embed artifacts/v1/*), built from solidity/v1 by
+      systemcontracts/compile, and the Go code calls them by address.
+      Their test contracts are kept as usage examples.
+    files:
+      - "systemcontracts/**/*.sol"
+    linked_by:
+      embed:
+        - "systemcontracts/artifacts/v1/*"
+  - id: system-contract-tooling
+    reason: >
+      The end-to-end tests of the system contracts and the solc tooling
+      that compiles them into the embedded artifacts; no shipped binary
+      imports these packages.
+    go_packages:
+      - ./systemcontracts/test
+      - ./systemcontracts/compile/...
 
 exclude_globs: []

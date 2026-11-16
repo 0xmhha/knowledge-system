@@ -300,3 +300,18 @@ func TestGlobToRegexp(t *testing.T) {
 		}
 	}
 }
+
+// TestRun_RefusesInclusions: a profile with inclusions is for ckg scope;
+// reading it here would drop the inclusions' files without a word.
+func TestRun_RefusesInclusions(t *testing.T) {
+	repo := fixtureRepo(t)
+	cfg := filepath.Join(t.TempDir(), "filelist.yaml")
+	body := "build_context: {goos: linux, goarch: amd64}\nbuild_roots: [./cmd/app]\ninclusions:\n  - {id: a, reason: r, files: [x]}\n"
+	if err := os.WriteFile(cfg, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	err := run(repo, cfg, filepath.Join(t.TempDir(), "out.json"), false, false, false)
+	if err == nil || !strings.Contains(err.Error(), "ckg scope") {
+		t.Fatalf("want a refusal pointing at ckg scope, got %v", err)
+	}
+}

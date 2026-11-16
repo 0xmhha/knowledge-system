@@ -158,6 +158,11 @@ type CKGConfig struct {
 	// `ckg build --policy-file` so governed_by edges are rebuilt with the
 	// index; empty omits the flag (no governance enrichment).
 	PolicyFile string `yaml:"policy_file"`
+	// BuildProfile is the project's build profile (filelist.yaml). When set,
+	// cks.ops.index runs `ckg scope` with it before `ckg build` and builds
+	// from that scope, so the graph reads only the files the build compiles;
+	// empty builds from every file of the tree.
+	BuildProfile string `yaml:"build_profile"`
 }
 
 // CKVConfig is the ckv client connection profile.

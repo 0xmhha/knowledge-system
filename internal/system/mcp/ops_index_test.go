@@ -362,3 +362,42 @@ func TestHandleOpsIndex_SinceCommitIsNeverAnOption(t *testing.T) {
 		}
 	}
 }
+
+// TestHandleOpsIndex_CKGBuildProfileScopesBuild: with a build profile the
+// scope is extracted first and the build reads it; a failed extraction stops
+// the build instead of falling back to every file.
+func TestHandleOpsIndex_CKGBuildProfileScopesBuild(t *testing.T) {
+	calls := withStubRunner(t, "")
+	d := Deps{Index: IndexConfig{
+		CKGBinary: "ckg-bin", CKGDataPath: "/d/ckg/graph.db", SourceRoot: "/src", CKGBuildProfile: "/p/filelist.yaml",
+	}}
+	if _, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "full"})); err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 2 {
+		t.Fatalf("calls = %v", *calls)
+	}
+	if got := strings.Join((*calls)[0].args, " "); got != "scope --src /src --profile /p/filelist.yaml --out /d/ckg/build-scope.json" {
+		t.Errorf("scope call = %q", got)
+	}
+	if got := strings.Join((*calls)[1].args, " "); !strings.Contains(got, "build --src /src --out /d/ckg --force") || !strings.Contains(got, "--scope /d/ckg/build-scope.json") {
+		t.Errorf("build call = %q", got)
+	}
+
+	var built bool
+	orig := indexRunner
+	indexRunner = func(_ context.Context, _ string, args, _ []string) error {
+		if args[0] == "scope" {
+			return errors.New("load errors")
+		}
+		built = true
+		return nil
+	}
+	t.Cleanup(func() { indexRunner = orig })
+	if _, err := handleOpsIndex(context.Background(), d, callToolReq(map[string]any{"mode": "full"})); err != nil {
+		t.Fatal(err)
+	}
+	if built {
+		t.Error("the graph was built although the scope extraction failed")
+	}
+}

@@ -43,9 +43,27 @@ func Load(path string) (*FilterList, error) {
 	if err != nil {
 		return nil, fmt.Errorf("filterlist: read %s: %w", path, err)
 	}
-	var fl FilterList
-	if err := json.Unmarshal(raw, &fl); err != nil {
+	// A build scope (`ckg scope` output) is accepted too, so the vector
+	// build can read the same file list as the graph build: its files become
+	// the include list.
+	var doc struct {
+		FilterList
+		SchemaVersion int `json:"schema_version"`
+		Files         []struct {
+			Path string `json:"path"`
+		} `json:"files"`
+	}
+	if err := json.Unmarshal(raw, &doc); err != nil {
 		return nil, fmt.Errorf("filterlist: parse %s: %w", path, err)
+	}
+	fl := doc.FilterList
+	if doc.SchemaVersion > 0 && len(fl.Include) == 0 {
+		if len(doc.Files) == 0 {
+			return nil, fmt.Errorf("filterlist: build scope %s lists no files", path)
+		}
+		for _, f := range doc.Files {
+			fl.Include = append(fl.Include, f.Path)
+		}
 	}
 	return &fl, nil
 }

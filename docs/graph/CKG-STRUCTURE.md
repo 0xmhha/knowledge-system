@@ -12,7 +12,10 @@ as read in the code or inferred.
 ```mermaid
 flowchart LR
   SRC[project source] --> BUILD[ckg build<br/>cmd/graph/build.go]
-  SCOPE[build scope JSON<br/>cmd/buildscope] --> BUILD
+  PROF[build profile + this build's options] --> SC[ckg scope<br/>cmd/graph/scope_cmd.go]
+  SRC --> SC
+  SC --> SCOPE[build scope JSON]
+  SCOPE --> BUILD
   BUILD --> BP[internal/graph/buildpipe]
   BP --> DET[detect, filterlist]
   BP --> PARSE[parse: golang, typescript,<br/>solidity, proto]
@@ -30,24 +33,72 @@ process through `ckgclient.NewReal`, not over MCP or HTTP.
 
 ### 1.1 Where the build scope JSON comes from
 
-`ckg build` does not make the scope; a separate command does, and `--scope` is optional (without it Go files are
-discovered by walking the tree, as for the other languages).
+The scope is extracted before the graph is built, every time, from the options the build at hand uses; the graph
+then reads exactly the files the scope lists. Without a scope every file of the tree is read.
 
 ```
-go run ./cmd/buildscope -root <go-stablenet> -config gstable-linux-amd64 \
-  -goos linux -goarch amd64 -cgo 1 ./cmd/gstable > scope-linux.json
-ckg build --src <go-stablenet> --scope scope-linux.json --out <graph dir> --no-cache
+ckg scope --src <go-stablenet> --profile projects/stablenet/filelist.yaml \
+  [--goos linux --goarch amd64 --cgo 1 --tags urfave_cli_no_docs,ckzg] [--binary build/bin/gstable] \
+  --out <dataset>/build-scope.json
+ckg build --src <go-stablenet> --scope <dataset>/build-scope.json --out <graph dir> --no-cache
 ```
 
-`internal/buildscope.ExtractGo` runs the go command with the configuration's `GOOS`, `GOARCH`, `CGO_ENABLED` and
-tags (`GOWORK=off`): `go env` for the effective target, `go version` and a sha256 of the go binary for the toolchain,
-and `go list -e -deps -json <entry points>` for the build. Every main-module package the entry points reach gives its
-`GoFiles`, `CgoFiles` and `SFiles` (role production), `TestGoFiles` and `XTestGoFiles` (role test) and
-`IgnoredGoFiles` (excluded by build constraints); every other module becomes an outside module with its version and
-directory; `go list` errors go to `problems`. `ckg build --scope` keeps only the Go files the scope lists (production
-and test), type-checks them with the scope's target, compares the loaded modules with the scope's, and still walks the
-tree for Solidity, TypeScript and Proto files. The scope records the toolchain that made it but the build does not
-check it: a scope made with go1.26.8 builds with whatever go is on `PATH`.
+The profile (`projects/<pack>/filelist.yaml`) holds the project's usual build: `build_context` (goos, goarch, cgo,
+tags), `build_roots` (the entry packages), `include_package_tests`, `inclusions` and `exclude_globs`; unknown keys are
+an error. A flag given to `ckg scope` overrides the profile for that run (`--tags`, even empty, replaces the tags;
+`--entry` replaces the roots; `--include` adds globs as the inclusion `command-line`), so a build with other options
+gets the scope of that build. `cmd/buildscope` runs the same extraction (`internal/buildscope.ExtractProject`).
+
+`inclusions` is the one place for exceptions: code the build does not compile that belongs to the scope because the
+compiled code cannot be understood without it, such as the system contracts of an EVM chain. Each entry has an `id`,
+a `reason`, `files` (globs) or `go_packages` (main-module patterns whose own files are added), an optional `exclude`,
+and an optional `linked_by.embed`, globs of files the build must embed:
+
+```yaml
+inclusions:
+  - id: system-contracts
+    reason: genesis contracts; contracts.go embeds their bytecode and the Go code calls them by address
+    files: ["systemcontracts/**/*.sol"]
+    linked_by: {embed: ["systemcontracts/artifacts/v1/*"]}
+  - id: system-contract-tooling
+    reason: their end-to-end tests and the solc tooling; no shipped binary imports them
+    go_packages: [./systemcontracts/test, ./systemcontracts/compile/...]
+```
+
+Extraction fails when an inclusion has no id or reason, when one of its globs matches no file, when it adds nothing
+the build does not already have, and when the build no longer embeds a file its `linked_by` names, so an exception
+cannot outlive its reason unnoticed. An inclusion without `linked_by` rests on its reason alone. Every file an
+inclusion adds carries its id as `included_by`; the scope lists each inclusion with its reason, file count and link,
+and the files the build embeds as `embed_files`. The older `extra_packages` and `extra_globs` keys still work as the
+inclusions of those names, without a reason and without the match check. `cks filelist` refuses a profile with
+`inclusions`.
+
+The go command decides the Go files: `ExtractGo` runs it with the effective `GOOS`, `GOARCH`, `CGO_ENABLED` and tags
+(`GOWORK=off`): `go env` for the target, `go version` and a sha256 of the go binary for the toolchain, `go list -e
+-deps -json <entry points>` for the build and `go list -e -json <extra packages>` for the packages the profile adds.
+Every main-module package gives its `GoFiles`, `CgoFiles` and `SFiles` (role production), its `TestGoFiles` and
+`XTestGoFiles` (role test, unless the profile turns tests off), its `IgnoredGoFiles` and, for the build, its
+`EmbedFiles`; every other module becomes an outside module. The inclusions then add their files, and `exclude_globs`
+remove files from the whole scope. With the options go-stablenet's Makefile target gstable uses, this list is exactly the set of main-module files the compiler
+receives: 673 of 673 on darwin/arm64 (recorded with `-toolexec`) and 675 of 675 on linux/amd64 (`go build -n`).
+
+The extraction fails instead of writing a doubtful scope: when the go command reports load errors (a missing module
+leaves packages out; `--allow-problems` keeps the scope anyway) and when a `--binary` was built with other options.
+The binary check reads `go version -m` and compares its `GOOS`, `GOARCH`, `CGO_ENABLED`, the set of `-tags` and its
+main package with the scope's target and entry points. The scope records the profile's sha256 and every binary that
+matched.
+
+`ckg build --scope` reads only the files the scope lists, of every language, type-checks the Go files with the
+scope's target and compares the loaded modules with the scope's. `cks setup` with a `filelist:` profile runs `ckg
+scope` as its first step (`--build-goos`, `--build-goarch`, `--build-cgo`, `--build-tags`, `--build-binary` pass this
+run's options) and gives the scope to `ckg build --scope` and `ckv build --files-from`; the options are part of the
+dataset's input digest. `cks.ops.index` does the same when `backends.ckg.build_profile` is set. The scope records the
+toolchain that made it, but the build does not check it.
+
+The scope stops at the compiler. The linker keeps only the functions reachable from `main`: built with
+`-ldflags=-dumpdep` and inlining off, gstable keeps 7,205 of the graph's 9,498 production functions and methods
+(75.9%); the graph still holds the other 2,293. Files compiled into the binary without being Go source, such as the
+22 `go:embed` files and the C sources cgo includes, are not listed either.
 
 ## 2. Build: entry and cache decision
 
@@ -61,7 +112,7 @@ sequenceDiagram
   U->>U: --at-commit: git worktree add (temporary source)
   U->>U: graph.db exists and no --force/--no-cache: print and stop
   U->>U: logger: <out>/logs/build-<time>.jsonl and stderr
-  U->>S: --scope: GOOS, GOARCH, cgo, tags, outside modules, Go file list
+  U->>S: --scope: GOOS, GOARCH, cgo, tags, outside modules, the file list
   U->>R: Options
   R->>D: detect.Walk + detect.GoFilesFor + filter
   D-->>R: files per language
@@ -203,7 +254,10 @@ rewritten in the store, no PR history and no lock propagation. Evaluation graphs
 ### 5.1 What the stored tables hold on go-stablenet
 
 Measured on a cold build of go-stablenet 6e41d966 with the linux/amd64 scope (191,860 nodes, 265,620 edges; the
-source copy has no git history, so `node_prs`, `node_commits` and the Commit and Hunk nodes are empty).
+source copy has no git history, so `node_prs`, `node_commits` and the Commit and Hunk nodes are empty). That scope
+was schema 1, made without the tags go-stablenet's gstable target uses, and its build still walked the tree for Solidity,
+TypeScript, JavaScript and Proto files; a scope from the stablenet profile lists only the Solidity sources its
+`system-contracts` inclusion names, so the JavaScript findings below do not arise in it.
 
 Consistent:
 

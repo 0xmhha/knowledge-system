@@ -259,3 +259,26 @@ func TestFilterPaths(t *testing.T) {
 		}
 	}
 }
+
+// TestLoad_BuildScope: a build scope document is read as an include list of
+// exactly its files, so the vector build indexes what the graph build read.
+func TestLoad_BuildScope(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "build-scope.json")
+	doc := `{"schema_version": 2, "files": [{"path": "core/a.go", "language": "go"}, {"path": "c/T.sol", "language": "sol"}]}`
+	if err := os.WriteFile(p, []byte(doc), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	f, err := Load(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !f.Allow("core/a.go") || !f.Allow("c/T.sol") || f.Allow("core/b.go") {
+		t.Errorf("scope filter = %+v", f)
+	}
+	if err := os.WriteFile(p, []byte(`{"schema_version": 2, "files": []}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Load(p); err == nil {
+		t.Error("an empty scope must not read as allow-everything")
+	}
+}

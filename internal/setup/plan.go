@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -83,12 +84,16 @@ type Options struct {
 	// verification, which needs both).
 	SkipVector bool
 
-	// FilelistConfig is an optional filelist-gen config (a pack's
-	// filelist.yaml). When set, the plan first derives the build-scope file
-	// list into Out/files-from.json and passes it to both engine builds via
-	// --files-from, so the dataset scope is computed — not curated — and its
-	// provenance ships with the dataset.
+	// FilelistConfig is an optional build profile (a pack's filelist.yaml).
+	// When set, the plan first extracts the build scope into
+	// Out/build-scope.json with `ckg scope`, using the profile and
+	// BuildOptions, and both engine builds read exactly the files it lists
+	// (ckg --scope, ckv --files-from). Unset, both builds read every file.
 	FilelistConfig string
+	// BuildOptions are the options of the build this dataset follows; set
+	// fields override the profile's, so a build with other tags or another
+	// target gets the scope of that build.
+	BuildOptions BuildOptions
 
 	// DomainKnowledge is a project's domain-knowledge directory (project.yaml,
 	// subsystems.yaml, entries/). When set, the plan re-derives the three
@@ -122,6 +127,42 @@ type Options struct {
 	CksBin string
 }
 
+// BuildOptions are per-run build options for the scope extraction.
+type BuildOptions struct {
+	GOOS, GOARCH string
+	CGO          string // "0", "1" or "" (the profile's)
+	Tags         []string
+	TagsSet      bool // Tags replaces the profile's tags, even when empty
+	// Binaries are built binaries the scope is checked against.
+	Binaries []string
+}
+
+// set reports whether any option changes the extracted scope.
+func (b BuildOptions) set() bool {
+	return b.GOOS != "" || b.GOARCH != "" || b.CGO != "" || b.TagsSet
+}
+
+// scopeArgs are the `ckg scope` flags of the options.
+func (b BuildOptions) scopeArgs() []string {
+	var a []string
+	if b.GOOS != "" {
+		a = append(a, "--goos", b.GOOS)
+	}
+	if b.GOARCH != "" {
+		a = append(a, "--goarch", b.GOARCH)
+	}
+	if b.CGO != "" {
+		a = append(a, "--cgo", b.CGO)
+	}
+	if b.TagsSet {
+		a = append(a, "--tags="+strings.Join(b.Tags, ","))
+	}
+	for _, bin := range b.Binaries {
+		a = append(a, "--binary", bin)
+	}
+	return a
+}
+
 type KnowledgeInput struct {
 	Role string
 	Path string
@@ -131,10 +172,10 @@ type KnowledgeInput struct {
 func (o Options) GraphDir() string  { return filepath.Join(o.Out, "graph") }
 func (o Options) VectorDir() string { return filepath.Join(o.Out, "vector") }
 
-// FilesFromPath is where a derived build-scope list lands (and is read from)
-// when FilelistConfig is set — inside the dataset, next to the indexes, so
-// the scope provenance travels with the data.
-func (o Options) FilesFromPath() string { return filepath.Join(o.Out, "files-from.json") }
+// ScopePath is where the extracted build scope lands (and is read from) when
+// FilelistConfig is set — inside the dataset, next to the indexes, so the
+// scope and the options it was extracted with travel with the data.
+func (o Options) ScopePath() string { return filepath.Join(o.Out, "build-scope.json") }
 
 // derivedRoot is where the domain artifacts land. They are project-level, not
 // source-tree-level: the same entries describe every checkout of the project,
@@ -273,20 +314,19 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 		}
 	}
 	if o.FilelistConfig != "" {
-		// The filelist derivation is a cks subcommand too, so the same
-		// binary that orchestrates the build performs it.
-		cksBin := o.CksBin
-		if cksBin == "" {
-			cksBin = "cks"
-		}
+		// The scope comes first: the graph and vector builds read only the
+		// files it lists. The graph engine extracts it, so the go command
+		// it type-checks with is the one that listed the files.
 		steps = append(steps, Step{
-			ID:    "filelist-derive",
-			Title: "Derive the build-scope file list",
-			Cmd: []string{cksBin, "filelist",
+			ID:    "build-scope",
+			Title: "Extract the build scope",
+			Cmd: append([]string{graphBin, "scope",
 				"--src", o.Src,
-				"--config", o.FilelistConfig,
-				"--out", o.FilesFromPath()},
+				"--profile", o.FilelistConfig,
+				"--out", o.ScopePath()}, o.BuildOptions.scopeArgs()...),
 		})
+	} else if o.BuildOptions.set() || len(o.BuildOptions.Binaries) > 0 {
+		return Plan{}, fmt.Errorf("setup: build options need a build profile (filelist)")
 	}
 
 	graphCmd := []string{graphBin, "build", "--src", o.Src, "--out", o.GraphDir()}
@@ -303,7 +343,7 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 			"--source-mode", o.SourceMode)
 	}
 	if o.FilelistConfig != "" {
-		graphCmd = append(graphCmd, "--files-from", o.FilesFromPath())
+		graphCmd = append(graphCmd, "--scope", o.ScopePath())
 	}
 	if o.PolicyFile != "" {
 		graphCmd = append(graphCmd, "--policy-file", o.PolicyFile)
@@ -339,7 +379,7 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 				"--source-mode", o.SourceMode)
 		}
 		if o.FilelistConfig != "" {
-			vectorCmd = append(vectorCmd, "--files-from", o.FilesFromPath())
+			vectorCmd = append(vectorCmd, "--files-from", o.ScopePath())
 		}
 		if o.VectorBuildSources != "" {
 			vectorCmd = append(vectorCmd, "--build-sources", o.VectorBuildSources)

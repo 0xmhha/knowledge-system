@@ -52,6 +52,9 @@ type Config struct {
 	ExtraPackages       []string `yaml:"extra_packages"`
 	ExtraGlobs          []string `yaml:"extra_globs"`
 	ExcludeGlobs        []string `yaml:"exclude_globs"`
+	// Inclusions is read only to refuse a profile that uses it: this tool
+	// predates them, and ignoring them would drop their files silently.
+	Inclusions []yaml.Node `yaml:"inclusions"`
 }
 
 // Provenance records how the scope was computed (design §4.3).
@@ -136,6 +139,9 @@ func run(src, configPath, outPath string, check, allowDirty, strict bool) error 
 	var cfg Config
 	if err := yaml.Unmarshal(cfgBytes, &cfg); err != nil {
 		return fmt.Errorf("%s: %w", configPath, err)
+	}
+	if len(cfg.Inclusions) > 0 {
+		return fmt.Errorf("%s uses inclusions, which cks filelist does not read; extract the scope with ckg scope --profile %s", configPath, configPath)
 	}
 	if cfg.BuildContext.GOOS == "" || cfg.BuildContext.GOARCH == "" {
 		return fmt.Errorf("%s: build_context.goos and build_context.goarch are required (the derivation must not inherit the invoking machine's context)", configPath)

@@ -224,13 +224,21 @@ func runSetup(args []string) (result error) {
 	fs.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
 	fs.StringVar(&o.SemanticCorpus, "semantic-corpus", "", "reviewed semantic Markdown corpus directory from cks semantic export-text")
 	fs.StringArrayVar(&o.DocumentCorpora, "document-corpus", nil, "ordinary Markdown corpus directory to retain and index (repeatable; no semantic approval implied)")
-	fs.StringVar(&o.FilelistConfig, "filelist", "", "filelist config; derives <out>/files-from.json and scopes both engine builds")
+	fs.StringVar(&o.FilelistConfig, "filelist", "", "build profile (filelist.yaml); extracts <out>/build-scope.json first and both engine builds read only its files")
+	fs.StringVar(&o.BuildOptions.GOOS, "build-goos", "", "GOOS of the build the dataset follows (overrides the profile)")
+	fs.StringVar(&o.BuildOptions.GOARCH, "build-goarch", "", "GOARCH of the build the dataset follows (overrides the profile)")
+	fs.StringVar(&o.BuildOptions.CGO, "build-cgo", "", "CGO_ENABLED of the build the dataset follows, 0 or 1 (overrides the profile)")
+	buildTags := fs.String("build-tags", "", "comma-separated build tags of the build the dataset follows; given, even empty, it replaces the profile's tags")
+	fs.Func("build-binary", "built binary the scope is checked against (repeatable)", func(v string) error {
+		o.BuildOptions.Binaries = append(o.BuildOptions.Binaries, v)
+		return nil
+	})
 	fs.StringVar(&o.DomainKnowledge, "domain-knowledge", "", "project domain-knowledge dir; re-derives the corpus, governance policy and glossary before the builds")
 	fs.StringVar(&o.DerivedDir, "derived-dir", "", "where the derived domain artifacts land (default: generated/ beside domain-knowledge)")
 	fs.StringVar(&o.CodeRoot, "code-root", "", "working tree the project's authoritative_docs resolve against")
 	fs.StringVar(&o.GlossaryFile, "glossary-file", "", "committed alias glossary; checked against the domain entries")
 	fs.StringVar(&o.FlowCorpus, "flow-corpus", "", "curated flow-corpus JSONL embedded with the vector index")
-	fs.StringVar(&o.CksBin, "cks-bin", "", "cks CLI for the domain/filelist steps (default: this executable)")
+	fs.StringVar(&o.CksBin, "cks-bin", "", "cks CLI for the domain steps (default: this executable)")
 	fs.BoolVar(&o.SkipVector, "skip-vector", false, "build only the graph index")
 	progress := fs.String("progress", "text", "progress output: text (stderr) or json (one event per line on stdout)")
 	// Blue-green reindex (reindex-migration-design §4/§5). --out is the dataset
@@ -243,6 +251,19 @@ func runSetup(args []string) (result error) {
 	holdForReview := fs.Bool("hold-for-review", false, "gate and retain the version without changing current; use for external patch review")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "build-tags" {
+			o.BuildOptions.TagsSet = true
+			for _, t := range strings.Split(*buildTags, ",") {
+				if t = strings.TrimSpace(t); t != "" {
+					o.BuildOptions.Tags = append(o.BuildOptions.Tags, t)
+				}
+			}
+		}
+	})
+	if c := o.BuildOptions.CGO; c != "" && c != "0" && c != "1" {
+		return fmt.Errorf("--build-cgo must be 0 or 1")
 	}
 	if *holdForReview && (*version == "" || *rollback != "") {
 		return fmt.Errorf("--hold-for-review requires a new --version build")
