@@ -342,8 +342,9 @@ Increment 1 is done (2026-11-16):
   on the new graph: 0 misresolved, 0 unexpected edges, 0 missing declarations, static calls 27,148 of 27,163.
 - Found on the way: `ckg build` type-checks with the module cache of its environment, not the module directories the
   scope lists. Built with a different cache, the same source gave 849 instead of 208 bare-name references and six
-  fewer edges, and nothing in the log said why, because type-loading errors are not logged yet (the "Type loading"
-  row of [the flow page](./BUILD-AND-QUERY-FLOW.md) section 4).
+  fewer edges, and nothing in the log said why. The build and `ckg verify` now report load errors and compare the
+  loaded modules with the scope's ([the flow page](./BUILD-AND-QUERY-FLOW.md) section 7, step 3); the build still
+  uses the environment's module cache, which gives the same code when the cache is intact.
 
 ## 10. Open points and proposed defaults
 

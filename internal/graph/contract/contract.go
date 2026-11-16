@@ -189,6 +189,9 @@ type Unit struct {
 	// records.
 	UnresolvedCounts  map[string]int
 	UnresolvedSamples map[string][]string
+	// LoadErrors is the number of errors the toolchain reported while
+	// loading the sources; records of such a unit can miss references.
+	LoadErrors int
 }
 
 // SymbolID joins a language and a compiler identity; empty identity gives an

@@ -20,6 +20,7 @@ func ToUnit(rg *parse.ResolvedGraph, layer func(file string) contract.Layer) (co
 		Refs:              make([]contract.Ref, 0, len(rg.Edges)),
 		UnresolvedCounts:  rg.Unresolved,
 		UnresolvedSamples: rg.UnresolvedSamples,
+		LoadErrors:        rg.LoadErrors,
 	}
 	for i := range rg.Nodes {
 		d, err := declOf(&rg.Nodes[i], layer)
@@ -46,6 +47,7 @@ func FromUnit(u contract.Unit) *parse.ResolvedGraph {
 		Edges:             make([]types.Edge, 0, len(u.Refs)),
 		Unresolved:        u.UnresolvedCounts,
 		UnresolvedSamples: u.UnresolvedSamples,
+		LoadErrors:        u.LoadErrors,
 	}
 	for _, d := range u.Decls {
 		rg.Nodes = append(rg.Nodes, types.Node{

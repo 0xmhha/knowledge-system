@@ -50,6 +50,10 @@ type Truth struct {
 	// CallsOutsideFuncs counts static calls in package-level initialisers.
 	// They have no enclosing function and are not compared.
 	CallsOutsideFuncs int
+	// Load is what the go command reported while loading the truth's
+	// packages; Modules compares the outside modules with the scope's.
+	Load    detect.LoadProblems
+	Modules detect.ModuleCheck
 }
 
 // loadPackages loads the packages under srcRoot with full type information.
@@ -57,7 +61,8 @@ type Truth struct {
 var loadPackages = func(srcRoot string, b *detect.GoBuild) ([]*packages.Package, error) {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedSyntax |
-			packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports | packages.NeedDeps,
+			packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports | packages.NeedDeps |
+			packages.NeedModule,
 		Dir:        srcRoot,
 		Tests:      true,
 		Env:        b.Env(),
@@ -81,7 +86,10 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	if err != nil {
 		return nil, err
 	}
-	t := &Truth{Decls: map[string]Decl{}}
+	// The truth comes from the same go command as the graph. When it cannot
+	// load a package, both lose the same references and agree, so the
+	// problems are reported with the comparison.
+	t := &Truth{Decls: map[string]Decl{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}

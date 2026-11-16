@@ -536,6 +536,7 @@ func runCold(opt Options, log *slog.Logger,
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
 	m.UnresolvedRefsCount = unresolvedTotal(resolved)
+	m.GoLoadErrorsCount = goLoadErrors(resolved)
 	// buildManifestSkeleton computes EnrichDigest from g, which is code-only, so
 	// it is always "" here. Recompute it over the overlay actually injected into
 	// the store so the manifest pins the enrichment (empty when none was applied).

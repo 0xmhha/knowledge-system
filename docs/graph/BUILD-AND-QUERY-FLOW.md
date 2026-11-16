@@ -79,7 +79,7 @@ Levels: `ERROR`, `WARN`, `INFO` (operation default), `DEBUG` (development), `TRA
 | Scope | configuration id, GOOS/GOARCH/cgo/tags, file counts by role | excluded files | — |
 | Cache decision | path taken and why (schema, version, build configuration, files changed) | changed and removed files | — |
 | Discovery | files per language, after the filter | files the filter dropped | — |
-| Type loading | packages loaded, seconds, type errors | packages with errors and the first error | — |
+| Type loading | packages reached, packages with errors, errors by kind, seconds; with a scope, its outside modules matched, at another version, from another directory, not loaded (`WARN` with the first N errors when there are errors or other versions) | modules from another directory or not loaded | — |
 | Parse | files parsed, failures, seconds | failed files and errors | — |
 | Resolve | references resolved, unresolved by reason (outside the build, dynamic, no node) | first N unresolved per reason | every reference and its target |
 | Duplicate node ids | `WARN`: how many ids were produced twice, with the first N pairs (qualified name, file) | — | — |
@@ -102,8 +102,8 @@ Rules:
 ## 5. Levels by area
 
 `CKG_LOG_LEVEL` (and `CKV_LOG_LEVEL`, and a CKS equivalent) takes a default level and per-area overrides, for example
-`CKG_LOG_LEVEL=info,resolve=debug,mcp=trace`. Areas: `scope`, `cache`, `discovery`, `parse`, `resolve`, `contract`,
-`graph`, `passes`, `persist`, `mcp`, `compose`. `--verbose` stays a shortcut for `debug` everywhere.
+`CKG_LOG_LEVEL=info,resolve=debug,mcp=trace`. Areas: `scope`, `cache`, `discovery`, `load`, `parse`, `resolve`,
+`contract`, `graph`, `passes`, `persist`, `mcp`, `compose`. `--verbose` stays a shortcut for `debug` everywhere.
 
 | Mode | Default | Where |
 |---|---|---|
@@ -137,5 +137,15 @@ decision D10; JSON lines keep that move cheap.
    references (outside the graph 26,864, no target 19,127, bare name 208) and one duplicate node id, which was a
    defect: a package-level `var testBlockchainsLock sync.Mutex` got a Variable and a Mutex node with one id. Mutex
    node ids now carry the node kind (schema 1.26) and the warning is gone.
-3. MCP request records with a request id in `ckg mcp`; the same id passed through CKS.
-4. Keep this page and the code in step: a stage that changes updates its row here.
+3. Type loading. Done (2026-11-16): `go packages loaded` (area `load`) after go/packages loads the Go packages,
+   cold and incremental, and the manifest's `go_load_errors_count`. `ckg verify` reports the same for the truth's load
+   (`load` in the report), because graph and truth come from the same go command: a package it cannot load is
+   missing from both, and the comparison agrees. On go-stablenet 6e41d966 with an empty module cache the build lost
+   every outside module (4,719 errors, 3,726 instead of 208 bare-name references) and `ckg verify` still reported 0
+   misresolved and 0 unexpected edges; the load record and the report's `load` now show it. With the scope's module
+   cache, `gstable-linux-amd64` built on macOS arm64 has 19 errors in 10 packages: cgo cannot run for linux/amd64 on
+   this host, so packages that import `C` (`crypto/secp256k1` of the repository, `net`, `os/user`, pebble, zstd,
+   blst, usb) are type-checked without it; `darwin/arm64` has one (`golang.org/x/tools/internal/tokeninternal`, an
+   old x/tools that refuses newer Go releases).
+4. MCP request records with a request id in `ckg mcp`; the same id passed through CKS.
+5. Keep this page and the code in step: a stage that changes updates its row here.

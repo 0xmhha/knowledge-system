@@ -3,6 +3,7 @@ package verify
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"io"
 )
 
@@ -19,6 +20,20 @@ type Report struct {
 	CallsOutsideFuncs int             `json:"calls_outside_funcs"`
 	Unexpected        UnexpectedStats `json:"unexpected_edges"`
 	LocalDeclNodes    LocalDeclStats  `json:"unmatched_decl_nodes"`
+	// Load is what the go command reported while loading the truth. Graph
+	// and truth come from the same go command, so a package it cannot load
+	// is missing from both and the counts above cannot show it.
+	Load LoadStats `json:"load"`
+}
+
+// LoadStats reports the truth's package load.
+type LoadStats struct {
+	detect.LoadProblems
+	// Module counts against the build scope; zero without a scope.
+	ModulesMatched      int      `json:"modules_matched,omitempty"`
+	ModulesOtherVersion []string `json:"modules_other_version,omitempty"`
+	ModulesOtherDir     []string `json:"modules_other_dir,omitempty"`
+	ModulesNotLoaded    []string `json:"modules_not_loaded,omitempty"`
 }
 
 // DeclStats compares package-level declarations.
@@ -101,6 +116,11 @@ func (r Report) WriteText(w io.Writer) error {
 	p("calls in package-level initialisers (not checked): %d\n", r.CallsOutsideFuncs)
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
+	p("go load: %d packages, %d with errors, %d errors %v\n", r.Load.Packages, r.Load.WithErrors, r.Load.Errors(), r.Load.ByKind)
+	if r.Load.ModulesMatched+len(r.Load.ModulesOtherVersion)+len(r.Load.ModulesOtherDir)+len(r.Load.ModulesNotLoaded) > 0 {
+		p("scope modules: matched %d, other version %d, other directory %d, not loaded %d\n", r.Load.ModulesMatched,
+			len(r.Load.ModulesOtherVersion), len(r.Load.ModulesOtherDir), len(r.Load.ModulesNotLoaded))
+	}
 	section := func(head string, items []string) {
 		if len(items) == 0 {
 			return
@@ -120,5 +140,15 @@ func (r Report) WriteText(w io.Writer) error {
 	section("unexpected call edges", r.Unexpected.CallSamples)
 	section("unexpected type-ref edges", r.Unexpected.TypeRefSamples)
 	section("declaration nodes with no package-level declaration", r.LocalDeclNodes.Samples)
+	section("go load errors", r.Load.Samples)
+	section("scope modules loaded at another version", r.Load.ModulesOtherVersion)
+	section("scope modules loaded from another directory", firstN(r.Load.ModulesOtherDir, 20))
 	return nil
+}
+
+func firstN(s []string, n int) []string {
+	if len(s) > n {
+		return s[:n]
+	}
+	return s
 }

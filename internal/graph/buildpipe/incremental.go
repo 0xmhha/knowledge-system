@@ -344,6 +344,7 @@ func runIncremental(opt Options, log *slog.Logger,
 
 	m := buildManifestSkeleton(opt, goCount, tsCount, solCount, protoCount, g, pkgTree, parseErrs)
 	m.UnresolvedRefsCount = unresolvedTotal(resolved)
+	m.GoLoadErrorsCount = goLoadErrors(resolved)
 	// buildManifestSkeleton computes EnrichDigest from the code-only g (always
 	// ""); recompute it from the overlay re-applied above so the manifest pin
 	// tracks the enrichment (empty when none is configured). Mirrors pipeline.go.
@@ -610,7 +611,10 @@ func hasCached(m map[string][]string, lang string) bool {
 func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
 	p := gop.New(srcRoot)
+	loadStart := time.Now()
+	loadErrs := 0
 	if pkgs, err := detect.GoPackagesFor(srcRoot, detect.ModeTypes, goBuild); err == nil {
+		loadErrs = logGoLoad(log, pkgs, goBuild, time.Since(loadStart).Seconds())
 		p.SetPackages(pkgs)
 	} else {
 		log.Warn("Go packages typed-load failed; concurrency falls back to AST-only", "err", err)
@@ -718,6 +722,9 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 		wfEdges := gop.EmitFieldWriteEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, wfEdges...)
 		log.Debug("writes_field emitted (incremental)", "count", len(wfEdges))
+	}
+	if rg != nil {
+		rg.LoadErrors = loadErrs
 	}
 	return rg, dirtyPending, errs, err
 }

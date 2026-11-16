@@ -42,6 +42,19 @@ type GoBuild struct {
 	// CGOEnabled is "1" or "0"; empty keeps the go command's default.
 	CGOEnabled string
 	Tags       []string
+	// Modules are the outside modules the build scope records; the build and
+	// the verifier compare them with what the go command loads. They are not
+	// part of Key: the same configuration can be read from another module
+	// cache.
+	Modules []ModuleUse
+}
+
+// ScopeModules returns the scope's outside modules (nil for host defaults).
+func (b *GoBuild) ScopeModules() []ModuleUse {
+	if b == nil {
+		return nil
+	}
+	return b.Modules
 }
 
 // Env returns the environment packages.Load runs the go command with (nil for

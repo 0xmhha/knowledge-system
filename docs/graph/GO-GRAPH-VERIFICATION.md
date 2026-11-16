@@ -33,6 +33,12 @@ first, and the second have no enclosing function.
 
 The canonical id format is reimplemented in the verifier, not imported from the parser, so the two can disagree.
 
+The truth comes from the same go command as the graph. A package it cannot load or type-check (a missing or broken
+module, cgo that cannot run for the configuration) is missing from both, and the comparison agrees, so the report
+carries the load as well: packages reached, packages with errors, errors by kind with samples, and with `--scope`
+the outside modules matched, at another version, from another directory or not loaded (`load` in JSON, `go load`
+in text). A clean comparison with load errors is not a clean graph.
+
 ## Results
 
 go-stablenet, graphs of the 11 evaluation base commits built with `ckg build --files-from-main ./cmd/gstable`
@@ -189,7 +195,14 @@ scope's GOOS, GOARCH, cgo setting and tags; `ckg verify --scope` type-checks the
 | darwin/arm64 | 986 | 0.9987 | 0.9955 | 0.5598 | 0, 0, 0 | 0, 0 | 0 |
 
 Without a scope the graph holds every package of the module (1,418 Go files on this commit) with the host's build
-constraints. Type-reference recall stays the open item (D5 in the roadmap).
+constraints.
+
+Load errors (2026-11-16, built and verified on macOS arm64 with the scope's module cache): linux/amd64 has 19 errors
+in 10 packages, because cgo cannot run for linux/amd64 on this host and packages that import `C` (the repository's
+`crypto/secp256k1`, `net`, `os/user`, pebble, zstd, blst, usb) are type-checked without it; darwin/arm64 has one
+(`golang.org/x/tools/internal/tokeninternal`). With an empty module cache every outside module is lost (4,719
+errors) while misresolved and unexpected stay 0, which is why the load is part of the report. A linux/amd64 graph
+without cgo errors needs a Linux host or a cross C compiler. Type-reference recall stays the open item (D5 in the roadmap).
 
 ## Order of fixes (proposed)
 
