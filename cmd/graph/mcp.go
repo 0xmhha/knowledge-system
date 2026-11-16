@@ -25,7 +25,7 @@ func newMCPCmd() *cobra.Command {
 		Use:   "mcp",
 		Short: "Run the MCP stdio server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, cleanup, err := newLogger(rootVerbose, rootLogFile)
+			_, cleanup, err := newLogger(rootVerbose, serverLogFile(rootLogFile, "mcp"))
 			if err != nil {
 				return fmt.Errorf("init logger: %w", err)
 			}

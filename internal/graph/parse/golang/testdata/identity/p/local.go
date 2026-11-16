@@ -1,5 +1,7 @@
 package p
 
+import "sync"
+
 // pair is the package-level type.
 type pair struct{ k string }
 
@@ -12,3 +14,6 @@ func Lit() int {
 
 // Pkg uses the package-level pair.
 func Pkg(p pair) string { return p.k }
+
+// mu is a package-level mutex: one Variable node and one Mutex node.
+var mu sync.Mutex

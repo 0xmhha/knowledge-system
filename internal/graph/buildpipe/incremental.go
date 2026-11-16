@@ -235,6 +235,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	parts = append(parts, &parse.ResolvedGraph{Edges: reloadedFromDB})
 	parts = append(parts, resolved...)
 
+	warnDuplicateNodeIDs(log, parts)
 	g, err := graph.Build(parts)
 	if err != nil {
 		return persist.Manifest{}, fmt.Errorf("graph.Build: %w", err)
@@ -342,6 +343,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	}
 
 	m := buildManifestSkeleton(opt, goCount, tsCount, solCount, protoCount, g, pkgTree, parseErrs)
+	m.UnresolvedRefsCount = unresolvedTotal(resolved)
 	// buildManifestSkeleton computes EnrichDigest from the code-only g (always
 	// ""); recompute it from the overlay re-applied above so the manifest pin
 	// tracks the enrichment (empty when none is configured). Mirrors pipeline.go.
@@ -403,6 +405,7 @@ func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached
 			return nil, nil, 0, false, nil, fmt.Errorf("go incremental: %w", err)
 		}
 		parseErrs += n
+		logResolveSummary(log, "go", rg)
 		resolved = append(resolved, rg)
 		dirtyPending = append(dirtyPending, pending...)
 	}

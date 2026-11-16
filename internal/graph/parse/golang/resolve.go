@@ -98,7 +98,20 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 			}
 			if !ok {
-				continue // V0: drop unresolved edges to avoid foreign-key violations.
+				// No node to point at: the edge is dropped (an edge needs both
+				// endpoints), but the reason is counted so missing edges can be
+				// explained (docs/graph/BUILD-AND-QUERY-FLOW.md).
+				switch {
+				case pr.TargetCanonicalID != "":
+					out.CountUnresolved(parse.UnresolvedOutsideGraph, pr.TargetCanonicalID, pr.HintFile, pr.Line)
+				case pr.TargetQName == "":
+					out.CountUnresolved(parse.UnresolvedNoTarget, string(pr.EdgeType), pr.HintFile, pr.Line)
+				case typed && !strings.Contains(pr.TargetQName, "."):
+					out.CountUnresolved(parse.UnresolvedBareName, pr.TargetQName, pr.HintFile, pr.Line)
+				default:
+					out.CountUnresolved(parse.UnresolvedNoMatch, pr.TargetQName, pr.HintFile, pr.Line)
+				}
+				continue
 			}
 			src := pr.SrcID
 			if parentID, ok := callSiteParent[src]; ok {

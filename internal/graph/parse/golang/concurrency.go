@@ -173,7 +173,10 @@ func (v *declVisitor) scanFuncBodyForMutexLocals(fd *ast.FuncDecl) {
 func (v *declVisitor) emitMutexNode(name, qname, subKind string, startPos, endPos token.Pos) string {
 	startLn, startBy := v.pos(startPos)
 	endLn, endBy := v.pos(endPos)
-	id := v.declID(qname, startBy)
+	// The node kind is part of the id key: a package-level `var mu
+	// sync.Mutex` is also a Variable node with the same qualified name and
+	// start byte, and sharing one id made graph.Build keep only one of them.
+	id := v.declID("mutex:"+qname, startBy)
 	conf := types.ConfExtracted
 	if v.typesInfo == nil {
 		conf = types.ConfInferred

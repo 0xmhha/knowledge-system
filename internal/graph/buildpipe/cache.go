@@ -170,7 +170,11 @@ import (
 // same name (crypto/bn256/google and crypto/bn256/cloudflare, two package
 // main) no longer share node ids; call sites find their function by span, not
 // by qualified name. Stored node ids change, so force a cold rebuild.
-const SchemaVersion = "1.25"
+//
+// 1.26 (2026-11-16): Mutex node ids carry the node kind, so a package-level
+// `var mu sync.Mutex` keeps both its Variable and its Mutex node (they shared
+// one id and graph.Build kept one). Stored node ids change.
+const SchemaVersion = "1.26"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

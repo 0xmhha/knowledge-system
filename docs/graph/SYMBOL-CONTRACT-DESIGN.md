@@ -285,6 +285,35 @@ Reused: the Go parser's go/types analyses (calls, uses_type, implements, concurr
 frontends' declaration code, the verifier's comparison rules, the store's tables. Order and gates follow D5 and D11:
 the Go frontend is moved first and must meet the D11 numbers on the go-stablenet base commits before the next step.
 
+### 9.1 Remaining increments of step 3 (Go frontend on the contract)
+
+Done: node ids by file and no name lookups (#152), build scope into `ckg build` and `ckg verify` (#153), the build
+configuration in the manifest and macOS CI (#154). What separates the Go code from the contract today:
+
+| Gap | Today | Contract |
+|---|---|---|
+| Unresolved references | `Resolve` drops them (`resolve.go`, "drop unresolved edges"); the manifest has `unresolved_refs_count` but nothing sets it | `Unresolved` records with a reason, counted |
+| Layer | `nodes.is_test` is computed after the build from the path (`testpath.IsTest` in `buildpipe/review_index.go`) | the frontend sets the layer from the scope's file role |
+| Confidence | `EXTRACTED`, `INFERRED`, `AMBIGUOUS` | `certain`, `static_may`, `observed` |
+| Records | `types.Node` with 40 fields, language-specific markers among them | `Decl` with the common fields and `Note` for language attributes |
+| Frontend boundary | the pipeline calls the Go parser, Resolve and seven post-passes directly | `Frontend.Load(scope, config)` returns a `Unit` |
+
+Increments, each with tests and a `ckg verify` run on go-stablenet, smallest first:
+
+1. **Contract types and a Go adapter.** A package with `Decl`, `Ref`, `Unresolved`, layer and confidence, and an
+   adapter that turns the Go pipeline's resolved graph into records and back. The graph built through the records
+   must equal the graph built today (same node and edge sets), so the change is shape only.
+2. **Unresolved records.** `Resolve` records each reference it cannot bind with a reason (target outside the build,
+   dynamic call, no node) instead of dropping it; the manifest's `unresolved_refs_count` is set and the records are
+   stored, so missing edges can be counted per reason.
+3. **Layer from the scope.** With `--scope`, a file's role sets the layer of its declarations; without a scope the
+   path rule stays. `nodes.is_test` becomes the stored form of the layer (D6 then switches search to it in step 5).
+4. **Frontend interface for Go.** The Go parser, Resolve and the post-passes move behind `Frontend.Load`; the
+   pipeline consumes `Unit` records for Go. The other languages keep their current path until step 8.
+
+Confidence values are mapped in increment 1 (`EXTRACTED` to `certain`, `INFERRED` to `static_may`); `AMBIGUOUS`
+edges become `Unresolved` records in increment 2.
+
 ## 10. Open points and proposed defaults
 
 | Point | Proposed default | Why | Settled when |
