@@ -16,7 +16,7 @@ this repository. This pack carries curated or generated project inputs. Each sou
 | `validate/` | Go tests that load this pack's data through the engine loaders | `go test ./projects/...` |
 | `scripts/` | dataset build helpers carrying stablenet parameters | operators |
 | `setup.yaml` | dataset build parameters for `cks setup --config` | `cks setup` |
-| `filelist.yaml` | build-scope derivation config (build roots, pinned build context, extra packages/globs) | `cks filelist` → `--files-from` list |
+| `filelist.yaml` | build profile (build roots, build options, extra packages/globs) | `ckg scope` → `build-scope.json` → `ckg build --scope` |
 | `mcp.yaml.example` | fused-server config template — copy to `mcp.yaml` (gitignored; endpoints stay out of git) and fill deployment values | `cks mcp --config` |
 | `generated/` (untracked) | derived outputs (domain corpus, engine policy views) — rebuild with the domain tools | build outputs |
 
