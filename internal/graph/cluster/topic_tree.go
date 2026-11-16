@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
@@ -132,6 +133,7 @@ func BuildTopicTree(g *graph.Graph, gammas []float64, seed int64) *TopicTree {
 				Members: ids,
 			})
 		}
+		uniqueLabels(comms)
 		tt.Resolutions = append(tt.Resolutions, Resolution{
 			Gamma:       gamma,
 			Communities: comms,
@@ -139,6 +141,36 @@ func BuildTopicTree(g *graph.Graph, gammas []float64, seed int64) *TopicTree {
 		tt.NodeToComm = append(tt.NodeToComm, nodeMap)
 	}
 	return tt
+}
+
+// uniqueLabels makes the labels of one resolution distinct by numbering
+// repeats in community order: "core — Hub", "core — Hub (2)", ... The store
+// keys a community by its label (topic_tree has no community id column, and
+// the HTTP viewer derives the community id from the label), so two
+// communities named after members with the same name were merged: the
+// second one's member list replaced the first one's, and those nodes lost
+// their topic.
+func uniqueLabels(comms []Community) {
+	seen := make(map[string]int, len(comms))
+	taken := make(map[string]bool, len(comms))
+	for _, c := range comms {
+		taken[c.Label] = true
+	}
+	for i, c := range comms {
+		seen[c.Label]++
+		if seen[c.Label] == 1 {
+			continue
+		}
+		for n := seen[c.Label]; ; n++ {
+			l := fmt.Sprintf("%s (%d)", c.Label, n)
+			if !taken[l] {
+				comms[i].Label = l
+				taken[l] = true
+				seen[c.Label] = n
+				break
+			}
+		}
+	}
 }
 
 // splitProblemCommunities runs a second Leiden pass on each community

@@ -82,6 +82,9 @@ type StoreReader interface {
 
 	// Traversal
 	NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
+	// NeighborhoodByIDs walks like NeighborhoodByQname but starts only from
+	// the given node ids, for callers that already hold the exact node.
+	NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
 	SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error)
 
 	// Search

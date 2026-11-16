@@ -180,7 +180,12 @@ import (
 // first member. Stored topic labels change; force a cold rebuild so an
 // unchanged source tree does not keep the old labels through the all-cached
 // short circuit.
-const SchemaVersion = "1.27"
+//
+// 1.28 (2026-11-16): communities of one resolution get distinct topic labels
+// (repeats are numbered), so topic_tree keeps every member; before, a
+// community whose label repeated another's replaced its members. Stored
+// topic rows change.
+const SchemaVersion = "1.28"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

@@ -114,6 +114,8 @@ type storeReader interface {
 	FindByCanonicalID(canonicalID string) (types.Node, bool, error)
 	NodesByFilePath(path string) ([]types.Node, error)
 	NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
+	// NeighborhoodByIDs walks from the given node ids only.
+	NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error)
 	SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error)
 	// Impact/evidence seam: surface ckg's pkg/impact + pkg/evidence + GetNodePRs through
 	// the same store.Reader the adapter already holds, so mocks stay injectable.
@@ -177,6 +179,9 @@ func (a *realStoreReader) NodesByFilePath(path string) ([]types.Node, error) {
 }
 func (a *realStoreReader) NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
 	return a.r.NeighborhoodByQname(qname, depth, reverse, edgeTypes...)
+}
+func (a *realStoreReader) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	return a.r.NeighborhoodByIDs(ids, depth, reverse, edgeTypes...)
 }
 func (a *realStoreReader) SubgraphByQname(qname string, depth int) ([]types.Node, []types.Edge, error) {
 	return a.r.SubgraphByQname(qname, depth)
@@ -424,19 +429,28 @@ func (r *Real) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]
 	return out, nil
 }
 
-// Neighbors resolves the source Citation to a ckg qualified name via
-// NodesByFilePath + StartLine match, then walks NeighborhoodByQname to
-// gather the requested relations. Edges whose ckg EdgeType has no cks
-// Relation analog are dropped (rather than guessed) so downstream
+// neighborFrontierCap bounds how many nodes one hop of Neighbors expands.
+// A walk of three hops from a hub (a function with hundreds of callers)
+// would otherwise read a large part of the graph; the nodes kept are the
+// ones with the highest PageRank.
+const neighborFrontierCap = 200
+
+// Neighbors resolves the source Citation to the one ckg node at that file
+// and span, then walks from it hop by hop over the requested relations, so
+// every returned edge carries the hop it was found at (Distance 1 for direct
+// neighbours, 2 for their neighbours, ...). Edges whose ckg EdgeType has no
+// cks Relation analog are dropped (rather than guessed) so downstream
 // consumers never see a misclassified relation.
 //
-// Direction handling: when opts.Relations contains RelationCalledBy,
-// the traversal uses ckg's reverse=true argument — the only way ckg
-// surfaces inbound edges in NeighborhoodByQname's signature. If callers
-// mix forward + reverse relations in one call, this implementation
-// performs two ckg queries and concatenates; this version keeps it simple by
-// supporting a single direction per call (mixed direction yields an
-// error to make the limitation explicit).
+// Each neighbour node is listed once per relation, at its shortest distance.
+// When MaxTotal caps the result, the cap is shared between the hops (unused
+// slots of one hop go to the others), so a hub with many direct neighbours
+// does not push every farther hop out of the answer; within a hop the
+// neighbours with the highest PageRank come first.
+//
+// Direction handling: when opts.Relations contains RelationCalledBy, the
+// walk follows edges backwards (callers). Mixing forward and reverse
+// relations in one call is rejected; callers that need both make two calls.
 func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts NeighborsOpts) ([]contract.Neighbor, error) {
 	if !src.IsValid() {
 		return nil, errors.New("ckgclient: invalid source citation")
@@ -449,13 +463,13 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 		depth = 1
 	}
 
-	// Resolve the source citation to a qname.
+	// Resolve the source citation to its node.
 	cands, err := r.s.NodesByFilePath(src.File)
 	if err != nil {
 		return nil, fmt.Errorf("ckgclient: NodesByFilePath: %w", err)
 	}
-	qname := matchQname(cands, src)
-	if qname == "" {
+	seed, ok := matchNode(cands, src)
+	if !ok {
 		return nil, fmt.Errorf("%w: no node at %s:%d-%d", ErrSeedUnresolved, src.File, src.StartLine, src.EndLine)
 	}
 
@@ -469,94 +483,209 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 	// concrete method pkg.T.M, callers that reach it through an interface are
 	// recorded as `invokes` edges to the INTERFACE method pkg.I.M, not the
 	// concrete method — so a reverse walk from the concrete method alone misses
-	// every interface-dispatched caller. Union the concrete seed with the
-	// same-named method on each interface T implements. Mirrors
+	// every interface-dispatched caller. Start also from the same-named method
+	// on each interface T implements. Mirrors
 	// ckg/pkg/mcphandlers.reverseCallersUnion; no-op for forward walks and for
 	// seeds with no Type.Method shape / no implements edges.
-	seeds := []string{qname}
+	nodeByID := map[string]types.Node{seed.ID: seed}
+	frontier := []string{seed.ID}
 	if reverse {
-		seeds = append(seeds, r.interfaceMethodSeeds(qname)...)
+		for _, q := range r.interfaceMethodSeeds(seed.QualifiedName) {
+			ns, err := r.s.FindSymbol(q, true)
+			if err != nil {
+				continue
+			}
+			for _, n := range ns {
+				if _, dup := nodeByID[n.ID]; !dup {
+					nodeByID[n.ID] = n
+					frontier = append(frontier, n.ID)
+				}
+			}
+		}
 	}
-	nodeByID := make(map[string]types.Node)
-	edgeSeen := make(map[string]struct{})
-	edges := make([]types.Edge, 0)
-	for _, sd := range seeds {
-		ns, es, err := r.s.NeighborhoodByQname(sd, depth, reverse, edgeTypes...)
+	visited := make(map[string]bool, len(frontier))
+	for _, id := range frontier {
+		visited[id] = true
+	}
+
+	type found struct {
+		edge     types.Edge
+		rel      contract.Relation
+		far      types.Node
+		distance int
+	}
+	var hops [][]found
+	listed := map[string]bool{} // far node id | relation
+	for hop := 1; hop <= depth && len(frontier) > 0; hop++ {
+		ns, es, err := r.s.NeighborhoodByIDs(frontier, 1, reverse, edgeTypes...)
 		if err != nil {
-			return nil, fmt.Errorf("ckgclient: NeighborhoodByQname: %w", err)
+			return nil, fmt.Errorf("ckgclient: NeighborhoodByIDs: %w", err)
 		}
 		for _, n := range ns {
-			if _, ok := nodeByID[n.ID]; ok {
-				continue
+			if _, ok := nodeByID[n.ID]; !ok {
+				nodeByID[n.ID] = n
 			}
-			nodeByID[n.ID] = n
 		}
+		var level []found
+		var next []types.Node
+		reachedNow := map[string]bool{} // far nodes first reached at this hop
 		for _, e := range es {
-			k := e.Src + "|" + e.Dst + "|" + string(e.Type)
-			if _, ok := edgeSeen[k]; ok {
+			srcN, srcOK := nodeByID[e.Src]
+			dstN, dstOK := nodeByID[e.Dst]
+			if !srcOK || !dstOK {
 				continue
 			}
-			edgeSeen[k] = struct{}{}
-			edges = append(edges, e)
+			// The walk's far end: the caller on a reverse walk, the callee
+			// otherwise. Edge orientation stays the graph's.
+			far := dstN
+			if reverse {
+				far = srcN
+			}
+			// Already reached at a shorter distance (the seed, a cycle).
+			if visited[far.ID] && !reachedNow[far.ID] {
+				continue
+			}
+			rel, ok := relationFromEdgeType(e.Type, reverse)
+			// uses_type is only returned to callers that asked for it, so the
+			// default and intent-driven walks keep their existing edge set.
+			if rel == contract.RelationUsesType && !containsRelation(opts.Relations, contract.RelationUsesType) {
+				ok = false
+			}
+			if !ok {
+				continue
+			}
+			// Edges anchored on structural pseudo nodes (file → import:*,
+			// file → top-level symbol) are file plumbing, not the symbol
+			// relations a neighbour list is for; they are neither listed nor
+			// walked through.
+			if isStructuralQname(srcN.QualifiedName) || isStructuralQname(dstN.QualifiedName) {
+				continue
+			}
+			// ExcludeTests judges the neighbour, never the seed: a test seed
+			// keeps its production callers, and a test neighbour is neither
+			// listed nor walked through.
+			if opts.ExcludeTests && testpath.IsTest(far.FilePath) {
+				continue
+			}
+			if !visited[far.ID] {
+				visited[far.ID] = true
+				reachedNow[far.ID] = true
+				next = append(next, far)
+			}
+			key := far.ID + "|" + string(rel)
+			if listed[key] {
+				continue
+			}
+			listed[key] = true
+			level = append(level, found{edge: e, rel: rel, far: far, distance: hop})
+		}
+		sort.SliceStable(level, func(i, j int) bool { return byImportance(level[i].far, level[j].far) })
+		hops = append(hops, level)
+
+		sort.SliceStable(next, func(i, j int) bool { return byImportance(next[i], next[j]) })
+		if len(next) > neighborFrontierCap {
+			next = next[:neighborFrontierCap]
+		}
+		frontier = frontier[:0]
+		for _, n := range next {
+			frontier = append(frontier, n.ID)
 		}
 	}
+
+	counts := make([]int, len(hops))
+	for i, level := range hops {
+		counts[i] = len(level)
+	}
+	take := shareCap(counts, opts.MaxTotal)
 
 	commit, _ := r.commit()
-	byID := nodeByID
-
-	out := make([]contract.Neighbor, 0, len(edges))
-	for _, e := range edges {
-		rel, ok := relationFromEdgeType(e.Type, reverse)
-		// uses_type is only returned to callers that asked for it, so the
-		// default and intent-driven walks keep their existing edge set.
-		if rel == contract.RelationUsesType && !containsRelation(opts.Relations, contract.RelationUsesType) {
-			ok = false
+	var out []contract.Neighbor
+	for i, level := range hops {
+		for _, f := range level[:take[i]] {
+			out = append(out, contract.Neighbor{
+				Source:   nodeToCitation(nodeByID[f.edge.Src], commit),
+				Target:   nodeToCitation(nodeByID[f.edge.Dst], commit),
+				Relation: f.rel,
+				Distance: f.distance,
+			})
 		}
-		if !ok {
-			continue
-		}
-		srcN, srcOK := byID[e.Src]
-		dstN, dstOK := byID[e.Dst]
-		if !srcOK || !dstOK {
-			continue
-		}
-		// Drop edges anchored on structural pseudo nodes (file → import:*,
-		// file → top-level symbol): they are file plumbing, not the symbol
-		// relations a neighbor list is for, and they crowd out calls edges
-		// under the MaxTotal cap.
-		if isStructuralQname(srcN.QualifiedName) || isStructuralQname(dstN.QualifiedName) {
-			continue
-		}
-		// Exclude the neighbour, never the seed. Edge orientation is the
-		// graph's, not the walk's — a calls edge runs caller → callee whichever
-		// way we traversed it, and the direction is carried in the relation
-		// instead. So the endpoint the caller does not already have is srcN on
-		// a reverse (callers) walk and dstN on a forward one. Testing dstN
-		// unconditionally checks the seed when reversed, which makes
-		// exclude_tests a no-op for a production seed and drops every
-		// neighbour when the seed itself lives in a test.
-		if opts.ExcludeTests {
-			neighbour := dstN
-			if reverse {
-				neighbour = srcN
-			}
-			if testpath.IsTest(neighbour.FilePath) {
-				continue
-			}
-		}
-		if opts.MaxTotal > 0 && len(out) >= opts.MaxTotal {
-			break
-		}
-		out = append(out, contract.Neighbor{
-			Source:   nodeToCitation(srcN, commit),
-			Target:   nodeToCitation(dstN, commit),
-			Relation: rel,
-			Distance: 1, // Single-hop neighbor distance; depth>1 returns
-			// nodes/edges flattened by ckg, but ckg does not annotate per-edge
-			// hop count. Refine with BFS when depth>1 becomes a real use case.
-		})
 	}
 	return out, nil
+}
+
+// byImportance orders nodes by PageRank, highest first, then by qualified
+// name and id so equal scores keep one order.
+func byImportance(a, b types.Node) bool {
+	if a.PageRank != b.PageRank {
+		return a.PageRank > b.PageRank
+	}
+	if a.QualifiedName != b.QualifiedName {
+		return a.QualifiedName < b.QualifiedName
+	}
+	return a.ID < b.ID
+}
+
+// shareCap splits limit between groups of the given sizes: equal shares,
+// the share a small group cannot use going to the others, earlier groups
+// first on a remainder. limit <= 0 takes every item.
+func shareCap(counts []int, limit int) []int {
+	take := make([]int, len(counts))
+	if limit <= 0 {
+		copy(take, counts)
+		return take
+	}
+	for limit > 0 {
+		active := 0
+		for i, c := range counts {
+			if take[i] < c {
+				active++
+			}
+		}
+		if active == 0 {
+			break
+		}
+		share := max(limit/active, 1)
+		for i, c := range counts {
+			if limit == 0 {
+				break
+			}
+			add := min(share, c-take[i], limit)
+			if add > 0 {
+				take[i] += add
+				limit -= add
+			}
+		}
+	}
+	return take
+}
+
+// hopDistances returns, for each node reached from seeds over edges taken
+// in either direction, its distance in hops (seeds are 0).
+func hopDistances(seeds []string, edges []types.Edge) map[string]int {
+	adj := map[string][]string{}
+	for _, e := range edges {
+		adj[e.Src] = append(adj[e.Src], e.Dst)
+		adj[e.Dst] = append(adj[e.Dst], e.Src)
+	}
+	dist := make(map[string]int, len(seeds))
+	queue := make([]string, 0, len(seeds))
+	for _, s := range seeds {
+		if _, ok := dist[s]; !ok {
+			dist[s] = 0
+			queue = append(queue, s)
+		}
+	}
+	for len(queue) > 0 {
+		id := queue[0]
+		queue = queue[1:]
+		for _, n := range adj[id] {
+			if _, ok := dist[n]; !ok {
+				dist[n] = dist[id] + 1
+				queue = append(queue, n)
+			}
+		}
+	}
+	return dist
 }
 
 // reverseSeeds returns the seeds a reverse-reachability question must start
@@ -1026,6 +1155,15 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	if seedID != "" {
 		kept[seedID] = true
 	}
+	var seedIDs []string
+	for _, n := range nodes {
+		for _, sd := range seeds {
+			if n.QualifiedName == sd {
+				seedIDs = append(seedIDs, n.ID)
+			}
+		}
+	}
+	dist := hopDistances(seedIDs, edges)
 	neighbors := make([]contract.Neighbor, 0, limit)
 	for _, e := range edges {
 		if len(neighbors) >= limit {
@@ -1043,11 +1181,18 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		if opts.ExcludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath)) {
 			continue
 		}
+		d := 1
+		if ds, ok := dist[e.Src]; ok {
+			d = ds + 1
+		}
+		if dd, ok := dist[e.Dst]; ok && dd+1 < d {
+			d = dd + 1
+		}
 		neighbors = append(neighbors, contract.Neighbor{
 			Source:   nodeToCitation(srcN, commit),
 			Target:   nodeToCitation(dstN, commit),
 			Relation: rel,
-			Distance: 1,
+			Distance: d,
 		})
 		kept[e.Src] = true
 		kept[e.Dst] = true
@@ -1186,9 +1331,19 @@ func nodeToCitation(n types.Node, commit string) contract.Citation {
 }
 
 // matchQname picks the qname from candidates that best matches the
-// citation's line range. Exact start+end match wins; otherwise the
-// first candidate fully containing the citation's range is used.
+// citation's line range; see matchNode.
 func matchQname(cands []types.Node, src contract.Citation) string {
+	n, ok := matchNode(cands, src)
+	if !ok {
+		return ""
+	}
+	return n.QualifiedName
+}
+
+// matchNode picks the candidate that best matches the citation's line
+// range. Exact start+end match wins; otherwise the first candidate fully
+// containing the citation's range is used.
+func matchNode(cands []types.Node, src contract.Citation) (types.Node, bool) {
 	// Structural pseudo nodes span whole files, so any containment tier
 	// below would swallow every citation and resolve it to a node whose
 	// edges are file plumbing (imports/defines), not symbol semantics —
@@ -1210,12 +1365,12 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 	// not turn a function seed into an isolated return statement.
 	for _, n := range real {
 		if declaredSymbol(n.Type) && n.StartLine == src.StartLine && n.EndLine == src.EndLine {
-			return n.QualifiedName
+			return n, true
 		}
 	}
 	for _, n := range real {
 		if n.StartLine == src.StartLine && n.EndLine == src.EndLine {
-			return n.QualifiedName
+			return n, true
 		}
 	}
 	// 2. Citation contains node — ckv chunks start at the DOC COMMENT
@@ -1235,7 +1390,7 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 		}
 	}
 	if bestIdx != -1 {
-		return real[bestIdx].QualifiedName
+		return real[bestIdx], true
 	}
 	// 3. Node contains citation — smallest containing range, so an inner
 	// symbol beats an enclosing type (first-found order was arbitrary).
@@ -1249,9 +1404,9 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 		}
 	}
 	if bestIdx != -1 {
-		return real[bestIdx].QualifiedName
+		return real[bestIdx], true
 	}
-	return ""
+	return types.Node{}, false
 }
 
 // isStructuralQname reports whether q names a structural pseudo node

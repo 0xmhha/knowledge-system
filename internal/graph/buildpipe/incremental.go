@@ -157,11 +157,11 @@ func runIncremental(opt Options, log *slog.Logger,
 	goCount, tsCount, solCount, protoCount int,
 	filter *filterlist.FilterList) (persist.Manifest, error) {
 	log.Info(decisions.FormatLogLine())
-	store, err := openStore(opt.OutDir, opt.DBDSN)
+	store, commit, discard, err := openUpdateStore(opt.OutDir, opt.DBDSN)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
-	defer func() { _ = store.Close() }()
+	defer discard()
 	if err := store.Migrate(); err != nil {
 		return persist.Manifest{}, err
 	}
@@ -358,6 +358,10 @@ func runIncremental(opt Options, log *slog.Logger,
 		return persist.Manifest{}, err
 	}
 	if err := writeManifestJSON(filepath.Join(opt.OutDir, "manifest.json"), m); err != nil {
+		return persist.Manifest{}, err
+	}
+	// Replace graph.db with the updated copy (see openUpdateStore).
+	if err := commit(); err != nil {
 		return persist.Manifest{}, err
 	}
 	log.Info("incremental build complete",
@@ -571,11 +575,11 @@ type TopicTreeForPersist = persist.TopicTreeInput
 func runShortCircuit(opt Options, log *slog.Logger, decisions CacheDecisions,
 	old *persist.Manifest, goCount, tsCount, solCount, protoCount int) (persist.Manifest, error) {
 	log.Info(decisions.FormatLogLine() + " (no source changes; manifest timestamp refreshed)")
-	store, err := openStore(opt.OutDir, opt.DBDSN)
+	store, commit, discard, err := openUpdateStore(opt.OutDir, opt.DBDSN)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
-	defer func() { _ = store.Close() }()
+	defer discard()
 	// Old manifest fields stay; bump timestamp + recompute staleness.
 	m := *old
 	m.BuildTimestamp = time.Now().UTC().Format(time.RFC3339)
@@ -587,6 +591,9 @@ func runShortCircuit(opt Options, log *slog.Logger, decisions CacheDecisions,
 		return persist.Manifest{}, err
 	}
 	if err := writeManifestJSON(filepath.Join(opt.OutDir, "manifest.json"), m); err != nil {
+		return persist.Manifest{}, err
+	}
+	if err := commit(); err != nil {
 		return persist.Manifest{}, err
 	}
 	return m, nil

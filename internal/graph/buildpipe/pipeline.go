@@ -7,10 +7,12 @@ package buildpipe
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"maps"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
@@ -128,11 +130,6 @@ type Options struct {
 	// wipes graph.db at start. Use when the cache is suspect, or for clean
 	// benchmark runs.
 	NoCache bool
-	// RebuildMetrics forces PageRank/Leiden recompute even when the cache
-	// would otherwise reuse them. The pipeline ALWAYS recomputes when any file
-	// is dirty (see Run below) — this flag is the explicit operator escape
-	// for the "all-cached but I want fresh metrics" case.
-	RebuildMetrics bool
 	// DBDSN is an optional PostgreSQL DSN (e.g. "postgres://user:pass@host/db").
 	// When set, the build persists to PostgreSQL instead of a local SQLite file.
 	// OutDir is still used for manifest.json; --no-cache and incremental work the
@@ -631,13 +628,100 @@ func removeSQLiteFiles(path string) {
 	_ = os.Remove(path + "-shm")
 }
 
-// openStore opens the backing store for read/write (incremental / short-circuit
-// paths). When dbDsn is set, routes to PostgreSQL; otherwise SQLite.
-func openStore(outDir, dbDsn string) (persist.Store, error) {
+// openUpdateStore opens the store an incremental or short-circuit build
+// updates, and returns a commit func to call on success and a discard func
+// to call otherwise (both may be called; the second call does nothing).
+//
+// For SQLite the build updates a copy, graph.db.building, and commit renames
+// it over graph.db, as a cold build does. Readers open graph.db with
+// immutable=1, which assumes the file is never written while they hold it;
+// updating graph.db in place broke that for `ckg watch` or a second build
+// running next to `ckg mcp`, `ckg api` or CKS. The copy costs one file copy
+// (about a second for a 270 MB graph).
+//
+// When dbDsn is set the store is a PostgreSQL database updated in place;
+// commit and discard close it.
+func openUpdateStore(outDir, dbDsn string) (persist.Store, func() error, func(), error) {
 	if dbDsn != "" {
-		return persist.OpenPostgres(dbDsn)
+		store, err := persist.OpenPostgres(dbDsn)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		var once sync.Once
+		closeOnce := func() error {
+			var err error
+			once.Do(func() { err = store.Close() })
+			return err
+		}
+		return store, closeOnce, func() { _ = closeOnce() }, nil
 	}
-	return persist.Open(filepath.Join(outDir, "graph.db"))
+	dbPath := filepath.Join(outDir, "graph.db")
+	tmpPath := dbPath + ".building"
+	removeSQLiteFiles(tmpPath) // clear artifacts from an aborted prior build
+	if err := copyFile(dbPath, tmpPath); err != nil {
+		return nil, nil, nil, fmt.Errorf("copy graph.db for update: %w", err)
+	}
+	// A WAL left by an older in-place build belongs to the copy too.
+	if st, err := os.Stat(dbPath + "-wal"); err == nil && st.Size() > 0 {
+		if err := copyFile(dbPath+"-wal", tmpPath+"-wal"); err != nil {
+			removeSQLiteFiles(tmpPath)
+			return nil, nil, nil, fmt.Errorf("copy graph.db-wal for update: %w", err)
+		}
+	}
+	store, err := persist.Open(tmpPath)
+	if err != nil {
+		removeSQLiteFiles(tmpPath)
+		return nil, nil, nil, err
+	}
+	done := false
+	commit := func() error {
+		if done {
+			return nil
+		}
+		done = true
+		if err := store.Close(); err != nil {
+			removeSQLiteFiles(tmpPath)
+			return fmt.Errorf("close updated store before rename: %w", err)
+		}
+		if err := os.Rename(tmpPath, dbPath); err != nil {
+			removeSQLiteFiles(tmpPath)
+			return fmt.Errorf("rename %s -> graph.db: %w", filepath.Base(tmpPath), err)
+		}
+		_ = os.Remove(dbPath + "-wal")
+		_ = os.Remove(dbPath + "-shm")
+		return nil
+	}
+	discard := func() {
+		if done {
+			return
+		}
+		done = true
+		_ = store.Close()
+		removeSQLiteFiles(tmpPath)
+	}
+	return store, commit, discard, nil
+}
+
+// copyFile copies src to dst, creating or truncating dst, and syncs it.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = in.Close() }()
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(out, in); err != nil {
+		_ = out.Close()
+		return err
+	}
+	if err := out.Sync(); err != nil {
+		_ = out.Close()
+		return err
+	}
+	return out.Close()
 }
 
 // persistColdArtifacts performs the bulk-insert phase of a cold rebuild.

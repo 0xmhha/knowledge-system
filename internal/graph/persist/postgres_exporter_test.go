@@ -62,6 +62,9 @@ func (m *mockStoreReader) QueryEdgesForNodes(_ []string) ([]types.Edge, error) {
 func (m *mockStoreReader) NeighborhoodByQname(_ string, _ int, _ bool, _ ...string) ([]types.Node, []types.Edge, error) {
 	return nil, nil, nil
 }
+func (m *mockStoreReader) NeighborhoodByIDs(_ []string, _ int, _ bool, _ ...string) ([]types.Node, []types.Edge, error) {
+	return nil, nil, nil
+}
 func (m *mockStoreReader) SubgraphByQname(_ string, _ int) ([]types.Node, []types.Edge, error) {
 	return nil, nil, nil
 }

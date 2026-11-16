@@ -410,6 +410,22 @@ func (s *sqliteStore) NeighborhoodByQname(qname string, depth int, reverse bool,
 	if err != nil {
 		return nil, nil, err
 	}
+	return s.neighborhoodFrom(roots, depth, reverse, edgeTypes)
+}
+
+// NeighborhoodByIDs is NeighborhoodByQname started from the given node ids
+// only, so a caller that knows the exact node (a canonical id seed, a node
+// matched by file and span) does not also walk from every node sharing its
+// qualified name. Unknown ids are ignored.
+func (s *sqliteStore) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	roots, err := s.NodesByIDs(ids)
+	if err != nil {
+		return nil, nil, err
+	}
+	return s.neighborhoodFrom(roots, depth, reverse, edgeTypes)
+}
+
+func (s *sqliteStore) neighborhoodFrom(roots []types.Node, depth int, reverse bool, edgeTypes []string) ([]types.Node, []types.Edge, error) {
 	seen := map[string]types.Node{}
 	for _, r := range roots {
 		seen[r.ID] = r
