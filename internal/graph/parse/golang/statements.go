@@ -107,13 +107,7 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 			// is skipped — the FuncLit body has no resolvable target
 			// qname and the existing parent-attribution path already
 			// covers field touches inside it.
-			if s.Call != nil {
-				if lit, isFuncLit := s.Call.Fun.(*ast.FuncLit); isFuncLit {
-					v.emitCallsInFuncLit(parentID, parentQname, lit)
-				} else {
-					v.pending = append(v.pending, v.parsePendingFromCall(parentID, s.Call))
-				}
-			}
+			v.emitGoCall(parentID, parentQname, s)
 			return false // goroutine body handled by emitGoroutineChannelEdges; prevent double-walk
 		case *ast.SendStmt:
 			chanName := channelVarName(s.Chan)
@@ -320,20 +314,79 @@ func (v *declVisitor) isConversion(fun ast.Expr) bool {
 // so channel and lock edges are not emitted twice; without this, every call in
 // a goroutine literal was missing from the graph (276 of the 306 missing
 // function-literal calls on go-stablenet).
+//
+// The literal's control statements (if, for, range, switch, return) get
+// their nodes too (schema 1.32), so the statement links inside a goroutine
+// have the same shape as elsewhere; a go statement inside the literal gets
+// its Goroutine node and spawns edge.
 func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.FuncLit) {
 	if lit == nil || lit.Body == nil {
 		return
 	}
 	ast.Inspect(lit.Body, func(n ast.Node) bool {
-		c, ok := n.(*ast.CallExpr)
-		if !ok {
-			return true
+		switch s := n.(type) {
+		case *ast.IfStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeIfStmt, "", s.Pos(), s.End())
+		case *ast.ForStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeLoopStmt, "for", s.Pos(), s.End())
+		case *ast.RangeStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeLoopStmt, "range", s.Pos(), s.End())
+		case *ast.SwitchStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeSwitchStmt, "", s.Pos(), s.End())
+		case *ast.TypeSwitchStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeSwitchStmt, "type", s.Pos(), s.End())
+		case *ast.ReturnStmt:
+			v.appendLogicBlockPos(parentID, parentQname, types.NodeReturnStmt, "", s.Pos(), s.End())
+		case *ast.GoStmt:
+			gid := v.appendLogicBlockPos(parentID, parentQname, types.NodeGoroutine, "", s.Pos(), s.End())
+			v.edges = append(v.edges, types.Edge{Src: parentID, Dst: gid, Type: types.EdgeSpawns, Count: 1,
+				Confidence: types.ConfExtracted})
+			v.emitGoCall(parentID, parentQname, s)
+			return false
+		case *ast.CallExpr:
+			v.emitCallSite(parentID, parentQname, s)
 		}
-		id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", c.Pos(), c.End())
-		v.pending = append(v.pending, v.parsePendingFromCall(id, c))
-		v.maybeEmitInvokesSelfLoop(parentID, c)
 		return true
 	})
+}
+
+// emitCallSite records one call of the enclosing function: a CallSite node,
+// the pending calls or invokes ref, and the dispatch self-loop.
+func (v *declVisitor) emitCallSite(parentID, parentQname string, c *ast.CallExpr) {
+	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", c.Pos(), c.End())
+	v.pending = append(v.pending, v.parsePendingFromCall(id, c))
+	v.maybeEmitInvokesSelfLoop(parentID, c)
+}
+
+// emitGoCall records what a go statement runs: the literal's body, or the
+// named function as a call of the enclosing function, and the calls in its
+// arguments and in the function expression, which the go statement
+// evaluates itself (go e.refresh(load(3)) calls load).
+func (v *declVisitor) emitGoCall(parentID, parentQname string, s *ast.GoStmt) {
+	if s.Call == nil {
+		return
+	}
+	calls := func(n ast.Node) {
+		ast.Inspect(n, func(x ast.Node) bool {
+			switch c := x.(type) {
+			case *ast.FuncLit:
+				v.emitCallsInFuncLit(parentID, parentQname, c)
+				return false
+			case *ast.CallExpr:
+				v.emitCallSite(parentID, parentQname, c)
+			}
+			return true
+		})
+	}
+	if lit, isFuncLit := s.Call.Fun.(*ast.FuncLit); isFuncLit {
+		v.emitCallsInFuncLit(parentID, parentQname, lit)
+	} else {
+		v.pending = append(v.pending, v.parsePendingFromCall(parentID, s.Call))
+		calls(s.Call.Fun)
+	}
+	for _, a := range s.Call.Args {
+		calls(a)
+	}
 }
 
 // isBuiltinCall reports whether c.Fun is a Go builtin (len, cap, make, append,

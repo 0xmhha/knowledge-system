@@ -149,7 +149,7 @@ sequenceDiagram
   G->>G: go/packages typed load, log "go packages loaded" (area load)
   G->>G: Pass 1: ParseFile per file, 8 workers
   G->>G: Pass 2: Resolve pending references
-  G->>G: post-passes: implements, uses_type, instantiates, promoted methods, writes_field
+  G->>G: post-passes: implements, uses_type, instantiates, promoted methods, value uses
   G->>C: resolved graph, "resolve summary", through contract records
   C->>O: runTSPipeline, runSolPipeline, runProtoPipeline (parse + name-based Resolve)
   C->>C: warnDuplicateNodeIDs (area graph)
@@ -187,14 +187,20 @@ sequenceDiagram
   V->>V: bind by canonical id (typed) or qualified name, count the rest by reason
   V-->>R: resolved graph
   R->>X: go/types packages, nodes
-  X-->>R: implements, extends, uses_type, instantiates, promoted Method nodes, writes_field
+  X-->>R: implements, extends, uses_type, instantiates, promoted Method nodes, reads_field, writes_field, references
   R->>K: resolved graph
   K-->>R: Decl and Ref records, turned back into the graph that goes on
 ```
 
 Node ids come from `parse.NodeID(language, file, qualified name, start byte)`; call sites find their enclosing
 function by byte span. Resolve binds a typed reference only by its canonical id and counts what it drops
-(`outside_graph`, `no_target`, `bare_name`, `no_match`). The TypeScript, Solidity and Proto frontends resolve by name
+(`outside_graph`, `no_target`, `bare_name`, `no_match`). Since schema 1.36 a call, interface call or type use whose
+target is outside the build (standard library, a module dependency) points at an `External` node instead of being
+dropped: one node per symbol (`external.go`), shared by all users, with its package in `attrs.external` (import path,
+package name, `std` or the module path, module version) and the go/types signature. Only a root package's own
+symbols without a node (files outside the build scope) still count as `outside_graph`. On go-stablenet `0bf2f4d1`:
+1,411 External nodes, 35,729 edges to them (calls 29,146, uses_type 5,542, invokes 1,041), `outside_graph` 31,253 to
+453, build time unchanged (44 s). The TypeScript, Solidity and Proto frontends resolve by name
 and count nothing yet.
 
 ### 3.2 Derived passes
@@ -232,7 +238,13 @@ sequenceDiagram
   I->>I: rename graph.db.building to graph.db
 ```
 
-Known differences from a cold build (roadmap D10, measured on go-stablenet): duplicate `uses_type` edges, missing
+External nodes have `file_path` `(external)`: no per-file delete reaches them, and `reloadCachedEdges` reloads all of
+them as cached, so a changed file that calls `time.Now` does not insert the shared node again (INSERT OR REPLACE would
+cascade away every cached caller's edge to it). An External node that loses its last user stays until a cold build,
+and a module version changed in `go.mod` without a source change is not rewritten.
+
+Known differences from a cold build (roadmap D10, measured on go-stablenet): the package's `contains` edge to a cached
+file of the same package when another of its files changed, duplicate `uses_type` edges, missing
 `extends`, `http_calls`, `implements` and `imports` edges, two cross-file calls missing, scores of cached nodes not
 rewritten in the store, no PR history and no lock propagation. Evaluation graphs are built with `--no-cache`.
 
@@ -275,7 +287,7 @@ Not connected, or connected only to its parent:
 | AwaitPoint nodes without a parent | 54 | the TS frontend links them to their function by `awaits` only |
 | Package nodes | 139 | roots; packages are linked to their files, not to each other |
 | Import nodes linked only to their file | 6,870 | an import names a package, but no edge goes from the Import node to that Package node, so package dependencies cannot be walked |
-| Variables and Constants linked only to their file | 7,392 and 1,522 | no edge records where a variable or constant is read or written (`writes_field` covers struct fields only; 4,098 of 6,848 Field nodes have no access edge) |
+| Variables and Constants linked only to their file | 7,392 and 1,522 | measured before schema 1.29; since then value uses are edges (below) |
 | Go functions and methods with no callee in the graph | 4,478 of 9,507 production ones | calls into the standard library and outside modules are counted (`outside_graph`), not stored |
 | statement nodes | 96,149 call sites, all if, loop, return and switch nodes | leaves under their function; calls are lifted to the function, so a statement says where, not what |
 
@@ -288,10 +300,59 @@ Wrong:
   function by name and line, which one-line files with names like `i` and `a` cannot tell apart: 4,485 call sites
   keep their own `calls` edge to an unrelated function. The three vendored `*.min.js` files hold 21,757 of the
   graph's 191,860 nodes.
-- `references` edges do not exist in the graph, yet `RelationReferences` maps to them in CKS (`planTraversal`), so
-  intents that ask for references (feature, refactor, concurrency, security) get nothing from that relation.
+- Before schema 1.29, `references` edges did not exist, yet `RelationReferences` maps to them in CKS
+  (`planTraversal`), so intents that ask for references (feature, refactor, concurrency, security) got nothing from
+  that relation. Since 1.29 (`parse/golang/value_access.go`) a Go function, or a package-level initializer, has
+  `references` to each package-level variable and constant it uses (`dispatch_kind` read or write), `reads_field`
+  and `writes_field` to each struct field (literal fields and promoted fields included); each edge carries the
+  first use's line and the number of uses. Since 1.30 there is one edge per use line, as for `calls`, with `count`
+  the uses on that line; before, 72,663 later use lines were dropped (41,365 `reads_field`, 18,298 `writes_field`,
+  13,000 `references`). On go-stablenet at `0bf2f4d1b` that adds 39,895 edges (253,973 to
+  293,868; graph.db 299 MB to 308 MB): 18,784 `reads_field`, 14,603 `writes_field` (3,762 before), 10,270
+  `references`. CKS still maps only `RelationReferences` to `references`; field edges are not mapped.
 - 1,507 self loops: 1,402 `invokes` placeholders for calls through function values, 73 recursive `calls`, and 32
   `timeout_path` or `cancellation_path` edges from a function to itself.
+- Before schema 1.31 a call through an interface stopped at the interface method: the 3,793 `invokes` edges with
+  `dispatch_kind=interface_method` on go-stablenet at `0bf2f4d1b` had no edge on to an implementation, and a call
+  through a function value stopped at its own function. Since 1.31 (`parse/golang/dispatch.go`, decision D3) the Go
+  frontend builds SSA and runs VTA and adds `dispatches_to` (confidence `INFERRED`): from an interface method to each
+  implementation whose values reach one of its calls (1,697 edges; 3,715 of the 3,793 interface calls now reach an
+  implementation), and from a function that calls a function value to the functions the value can hold, with the line
+  (636 `func_value`, 1,026 `closure`, the latter pointing at the declaration that contains the literal). A
+  type-hierarchy link would give 2,129 interface edges; 1,605 are shared, VTA drops 524 whose types never reach a
+  call and adds 92 the `implements` edges miss. SSA is built for every package without errors of its own: the
+  linux/amd64 cgo build fails to type-check `runtime/cgo` on macOS, and go/packages marks every package that imports
+  it as ill-typed (362 of 469). The pass takes about 2 s of a 38 s build; graph.db grows by 0.5 MB; `ckg verify` is
+  unchanged.
+- Before schema 1.32 the statement nodes of a Go body (19,348 IfStmt, 4,555 LoopStmt, 414 SwitchStmt, 16,430
+  ReturnStmt, 97,755 CallSite, 424 Goroutine on go-stablenet) had only a `contains` edge from their function, and
+  sends and receives on a channel that was not a local `make` pointed at a placeholder `CallSite`. Since 1.32:
+  - `parse/golang/statement_links.go` adds `site_calls` (a call site or goroutine to what it calls, 48,608),
+    `cond_reads` (a condition to the fields, variables and constants it reads, 11,135), `cond_calls` (to the
+    functions it calls, 6,859), `body_writes` (a statement to the values its then, else, loop body, case or goroutine
+    writes outside any nested statement, 2,697) and `encloses` (a statement to the statements directly inside it,
+    62,229). Example: `AnzeonTipEnv.SetCurrentBlock` writes `currentState` only in the branches of the `if` on line
+    56, which lies in the then branch of the `if` on line 54, whose condition reads `currentBlock` and `Header.Root`.
+  - `parse/golang/dispatch.go` follows each channel value in SSA back to its make site, field or package-level
+    variable, through phis, conversions, local cells, closure bindings, parameters (to every caller's argument in
+    the VTA call graph) and results; it adds `sends_to` and `recvs_from` with the line and confidence `INFERRED`,
+    `dispatch_kind` make, field or global. On go-stablenet 2,043 of the 2,870 sends and receives reach a channel (1,388 edges: 879 to fields, 509 to make sites); the others come from values the pass does not follow, such as map and slice elements and interface method results. The pass-one
+    edges stay. The SSA pass now includes every method of every named type and their function literals, which
+    `ssautil.AllFunctions` leaves out when nothing reaches them.
+  - Edges 325,745 to 458,661, graph.db 314 MB to 338 MB, build 38 s, peak memory unchanged.
+  - Since 1.34: `flows_to` joins the names of one channel (a make site to the field or variable it is stored in, 452
+    edges), channel origins follow cells a closure captures by reference (2,377 of 2,870 operations reach a channel),
+    and `dispatches_to` of kind `type_hierarchy` (418 edges) adds the implementations go/types allows that the value
+    flow did not link. Queries show the value-flow targets first: `find_callees` uses type-hierarchy targets only for
+    an interface method without value-flow ones, `search_code` lines read "may run A, B; 3 more by type" (the
+    type hierarchy's names only when the value flow has none: "may run by type C, D"), and `investigate` writes
+    "may run (by type)". `investigate` guard notes give the innermost condition with its source line and the ones
+    around it by line ("[then of L56 if …; in then of L54]"). Observed against a test run (`docs/graph/GO-GRAPH-VERIFICATION.md`):
+    interface calls 1.000, function-value calls 0.987, channel pairs 0.891.
+  - The five statement-link types stay out of PageRank (`score/score.go`): `site_calls` repeats the function-level
+    calls and the others describe a body, so declaration ranks, and the `search_code` order that uses them, do not move.
+    Since 1.35 the type-hierarchy `dispatches_to` edges stay out too (a replay showed them reordering 13 of 214
+    `search_code` answers). External nodes (1.36) stay out of PageRank and of the topic tree.
 
 ## 6. Query surfaces
 
@@ -314,7 +375,7 @@ sequenceDiagram
     H-->>A: not_found
   end
   H->>H: interface method seeds (1-hop implements)
-  H->>Q: NeighborhoodByIDs(canonical seed) or NeighborhoodByQname(seed), depth <= 5, reverse, calls + invokes
+  H->>Q: NeighborhoodByIDs(canonical seed) or NeighborhoodByQname(seed), depth <= 5, reverse, calls + invokes + dispatches_to
   Q->>S: hop by hop: edges by src/dst index, then NodesByIDs
   S-->>Q: nodes, edges (AMBIGUOUS Commit/Hunk nodes removed)
   Q-->>H: subgraph
@@ -324,9 +385,13 @@ sequenceDiagram
 | Tool | Seed | Reads and walk | Limits |
 |---|---|---|---|
 | `find_symbol` | name (exact by default) | `FindSymbol` | 100 rows, no order |
-| `find_callers`, `find_callees` | `resolveSeed` | reverse or forward neighborhood over `calls`, `invokes`; callers add interface method seeds | depth 0 to 5, no node cap |
+| `find_callers`, `find_callees` | `resolveSeed` | reverse or forward neighborhood over `calls`, `invokes`, `dispatches_to`; callers add the interface methods whose `dispatches_to` reach the seed (when none does, the interfaces of its receiver type that declare the method); callees add the implementations of each interface method reached, at the same depth. `find_callers` on a field, variable or constant answers as `find_references`, with a note | depth 0 to 5, no node cap |
+| `find_references` | `resolveSeed` | users of a field, package-level variable or constant over `reads_field`, `writes_field`, `references`: name, file, line, uses, access; writers first, production before tests | `limit` (100), reports `truncated` |
 | `get_subgraph` | `resolveSeed` | forward and reverse walks, all edge types | depth 5, no node cap |
-| `search_text` | text | FTS (or substring for non-ASCII) | `top_k` |
+| `search_text` | text | FTS (or substring for non-ASCII); names joined by a vertical bar become an OR of prefixes, other regular expressions are answered by `search_code` | `top_k` |
+| `search_code` | RE2 pattern | regex over the stored source of every declaration (functions, methods, types, package-level constants and variables; Solidity contracts, functions, modifiers, events), loaded once per server from `blobs`; hits grouped per innermost declaration and ranked by distinct alternatives matched, production before tests, match count, PageRank; each matched line lists the calls and value uses resolved on it, an interface call or a function-value call with the code it may run (`dispatches_to`, at most 4 names); `expand` attaches callers, callees or users | `limit` (15, max 100), 3 lines per hit, totals and `truncated` |
+| `investigate` | words (`\|`, commas or spaces; regex input is read as words: `[Ss]ig` gives both spellings, `A\w*B` is one name pattern) | per word: the declarations it names (case folded when none match exactly), every declaration holding it as a word or inside its name, and a breadth-first walk both ways over `calls`, `invokes`, `dispatches_to`, value uses, `uses_type`, `instantiates`, `implements`, `spawns` to 3 hops; joins (what two or more words reach, earlier investigations of the session included). Index loaded once per server from all nodes, blobs and those edges. Response in layers: cards of what the words name, cards of the declarations holding them (name holds a word first, then closeness of the other words, then words held), joins, first hops, words inside longer names. Function cards list every line that calls, writes or holds a word, with its uses and the conditions each write runs under (`body_writes`, `encloses`); value cards list writers (with those conditions) and readers line by line, and for a channel its senders and receivers; type cards list fields, methods, fields of that type, creators and users. Cards shown earlier in the session are named, not repeated | `budget` characters (24000, max 400000); each layer starts with a share (25, 40, 12, 15, 8 %) and passes what it leaves to the next; full cards when everything fits, otherwise compact cards of at most an eighth of the room; the footer names what was left out |
+| `investigate_open` | investigation id and part | the full card of any declaration, the joins, the hop 1 to 3 lists of a word, the words inside longer names, or `rest` (what the last response left out) | `budget`, `from` for the next page |
 | `get_context_for_task` | task text | `smartctx.BuildContext`: search 100, expand hops (frontier 200 per hop), rank 0.5 BM25 + 0.3 PageRank + 0.2 usage, bodies for the top 5, summaries | `budget_tokens` (8000), reports `trimmed` |
 | `impact_of_change` | exact qualified name or file | `impact.Compute`: reverse walk, grouped into callers, interface impact, type users, distributed, concurrent, other | depth 1 to 5, no cap |
 | `concurrency_impact` | exact qualified name | spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock, both directions | depth 1 to 5, `max_total` |

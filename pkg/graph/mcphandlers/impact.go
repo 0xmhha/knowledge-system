@@ -24,7 +24,7 @@ func RegisterImpactOfChange(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("impact_of_change",
 		mcp.WithDescription(
-			"Reverse-dependency closure for a symbol or file. Returns nodes/edges grouped by impact category "+
+			"What breaks if this symbol or file changes: reverse-dependency closure. Returns nodes/edges grouped by impact category "+
 				"(callers, interface_impact, type_users, distributed, concurrent, other_refs). "+
 				"If results look empty for a Go concrete-method seed, retry with the interface method qname "+
 				"(Go's call graph binds invocations to the interface, not the concrete receiver).",

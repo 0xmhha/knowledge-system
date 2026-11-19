@@ -114,9 +114,22 @@ const (
 	// and an optional remediation hint. See pkg/security for the
 	// YAML loader.
 	NodeSecurityPattern NodeType = "SecurityPattern"
+
+	// NodeExternal (schema 1.36): a function or method the build calls but
+	// does not contain (standard library, a module dependency, a package
+	// outside the build scope). One node per symbol, shared by every caller,
+	// so "what calls time.AfterFunc" is one lookup. External carries the
+	// package (import path, name, module, version); SubKind is func, method
+	// or interface_method; Signature is the go/types signature. FilePath is
+	// ExternalFilePath, not a file of the repository.
+	NodeExternal NodeType = "External"
 )
 
-// AllNodeTypes returns all 35 node types in a stable order.
+// ExternalFilePath is the file_path of every External node. It names no file
+// of the repository, so per-file deletes and reloads never touch these nodes.
+const ExternalFilePath = "(external)"
+
+// AllNodeTypes returns all 38 node types in a stable order.
 // NOTE: identifier names are stable; positional indices are load-bearing
 // only for tests that snapshot the full slice (TestAllNodeTypes_Stable).
 // NodeMutex was inserted at index 24 to keep the concurrency family
@@ -137,6 +150,8 @@ const (
 // governance/protocol policy metadata loaded from an external YAML.
 // NodeSecurityPattern (schema 1.15) is appended at index 36 —
 // security risk pattern annotations loaded from an external YAML.
+// NodeExternal (schema 1.36) is appended at index 37 — symbols the build
+// calls but does not contain.
 func AllNodeTypes() []NodeType {
 	return []NodeType{
 		NodePackage, NodeFile, NodeStruct, NodeInterface, NodeClass,
@@ -152,6 +167,7 @@ func AllNodeTypes() []NodeType {
 		NodeAwaitPoint,
 		NodePolicy,
 		NodeSecurityPattern,
+		NodeExternal,
 	}
 }
 
@@ -170,6 +186,8 @@ func AllNodeTypes() []NodeType {
 //   - Path-only nodes (Import, Export) — their FTS columns carry
 //     module paths, so a query like "Vault" matches every import of
 //     contracts/Vault even when the consumer wanted the class itself.
+//   - External nodes — code outside the build; a search for repository
+//     symbols should not return time.Now.
 //
 // search_text (pkg/mcphandlers + internal/persist.SearchFTS) uses
 // IsSymbol as the default whitelist when SearchFTSOptions.NodeKinds
@@ -181,7 +199,8 @@ func (t NodeType) IsSymbol() bool {
 	case NodeIfStmt, NodeLoopStmt, NodeCallSite, NodeReturnStmt, NodeSwitchStmt,
 		NodeAwaitPoint,
 		NodeCommit, NodeHunk,
-		NodeImport, NodeExport:
+		NodeImport, NodeExport,
+		NodeExternal:
 		return false
 	default:
 		return true
@@ -424,9 +443,44 @@ const (
 	// modifying X can read "what security patterns does X exhibit?"
 	// as a single edge-type lookup on src.
 	EdgeHasSecurityPattern EdgeType = "has_security_pattern"
+	// Schema 1.31 (runtime links, design decision D3): a dynamic call's
+	// possible targets, from the Go frontend's SSA + VTA pass.
+	// dispatch_kind "interface_method": interface method -> each
+	// implementation whose values reach a call of it; "func_value": the
+	// function that calls a function value -> each function that value can
+	// hold, with the line of the call. Confidence INFERRED (static_may).
+	EdgeDispatchesTo EdgeType = "dispatches_to"
+	// Schema 1.32 (statement links): what happens inside a function, from
+	// the statement nodes (IfStmt, LoopStmt, SwitchStmt, ReturnStmt,
+	// CallSite, Goroutine) of the Go frontend. Line is the line of the use;
+	// dispatch_kind names the part of the statement it lies in.
+	//   site_calls   CallSite or Goroutine -> the function, method or
+	//                interface method it calls (dispatch_kind static or
+	//                interface_method)
+	//   cond_reads   IfStmt, LoopStmt, SwitchStmt -> a field, package-level
+	//                variable or constant its condition (init, condition,
+	//                post, range expression, tag, case expressions) reads
+	//   cond_calls   the same -> a function its condition calls
+	//   body_writes  IfStmt, LoopStmt, SwitchStmt, Goroutine -> a value its
+	//                body writes outside any statement nested in it
+	//                (dispatch_kind then, else, body, case, go)
+	//   encloses     a statement -> each statement directly inside it
+	//                (dispatch_kind cond, then, else, body, case, go)
+	EdgeSiteCalls  EdgeType = "site_calls"
+	EdgeCondReads  EdgeType = "cond_reads"
+	EdgeCondCalls  EdgeType = "cond_calls"
+	EdgeBodyWrites EdgeType = "body_writes"
+	EdgeEncloses   EdgeType = "encloses"
+	// Schema 1.34 (channel aliases): flows_to from a channel's identity (its
+	// make site, a field or a package-level variable) to a field or
+	// variable the channel is stored in, with the line of the store
+	// (dispatch_kind chan, confidence INFERRED). One channel has several
+	// names; sends_to and recvs_from point at the name each operation uses,
+	// and flows_to joins the names.
+	EdgeFlowsTo EdgeType = "flows_to"
 )
 
-// AllEdgeTypes returns all 43 edge types in stable order.
+// AllEdgeTypes returns all 50 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -436,6 +490,9 @@ const (
 // policy queries can run as a single edge-type filter).
 // EdgeHasSecurityPattern is appended at index 42 (schema 1.15 —
 // code symbol → SecurityPattern node loaded from YAML).
+// EdgeDispatchesTo is appended at index 43 (schema 1.31 — runtime links).
+// The five statement-link types are appended at indices 44-48 (schema 1.32).
+// EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -454,6 +511,9 @@ func AllEdgeTypes() []EdgeType {
 		EdgeUsesFor,
 		EdgeGovernedBy,
 		EdgeHasSecurityPattern,
+		EdgeDispatchesTo,
+		EdgeSiteCalls, EdgeCondReads, EdgeCondCalls, EdgeBodyWrites, EdgeEncloses,
+		EdgeFlowsTo,
 	}
 }
 

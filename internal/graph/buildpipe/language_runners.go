@@ -204,6 +204,12 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 		// slice so the cold path persists them via InsertPendingRefs (q4=A).
 		usesEdges, usesPending := gop.EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, usesEdges...)
+		// Types outside the build (time.Timer, big.Int) get External nodes
+		// (schema 1.36). The refs stay pending as well, so an incremental
+		// build that re-resolves the file binds them again.
+		extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+		rg.Nodes = append(rg.Nodes, extNodes...)
+		rg.Edges = append(rg.Edges, extEdges...)
 		log.Debug("uses_type emitted", "edges", len(usesEdges), "pending", len(usesPending))
 		// Anchor the pending refs to the file the SRC node was defined in,
 		// so the partial-rebuild path's PendingRefsByFilePath query reaches
@@ -247,10 +253,28 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 		rg.Edges = append(rg.Edges, promEdges...)
 		log.Debug("promoted methods emitted", "nodes", len(promNodes))
 
-		// Defect E: writes_field edges (function -> struct field it assigns).
-		wfEdges := gop.EmitFieldWriteEdges(p.Pkgs(), rg.Nodes)
-		rg.Edges = append(rg.Edges, wfEdges...)
-		log.Debug("writes_field emitted", "count", len(wfEdges))
+		// Value uses: reads_field / writes_field (function -> struct field) and
+		// references (function or initializer -> package-level var/const).
+		vaEdges := gop.EmitValueAccessEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, vaEdges...)
+		log.Debug("value access edges emitted", "count", len(vaEdges))
+
+		// Runtime links: interface methods and function values to the code
+		// they can run (SSA + VTA, design decision D3).
+		dEdges, dst := gop.EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, dEdges...)
+		log.Info("dispatch edges emitted", "interface_method", dst.InterfaceEdges, "func_value", dst.FuncValueEdges,
+			"packages", dst.Packages, "ssa_packages", dst.SSAPackages, "own_errors", dst.OwnErrors, "build_panics", dst.BuildPanics,
+			"channel_ops", dst.ChannelOps, "channel_linked", dst.ChannelLinked, "channel_aliases", dst.ChannelAliases,
+			"type_hierarchy", dst.TypeHierarchy,
+			"dynamic_sites", dst.DynamicSites, "no_node", dst.NoNode, "ssa_functions", dst.Functions,
+			"ssa_seconds", dst.SSASeconds, "vta_seconds", dst.VTASeconds)
+
+		// Statement links: conditions, guarded writes, nesting, call sites.
+		sEdges, sst := gop.EmitStatementEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, sEdges...)
+		log.Info("statement edges emitted", "edges", len(sEdges), "functions", sst.Functions,
+			"statements_without_node", sst.NoNode, "calls_without_node", sst.Unresolved)
 	}
 	if rg != nil {
 		rg.LoadErrors = loadErrs

@@ -11,10 +11,13 @@
 // # Tool catalogue
 //
 //	find_symbol          resolve a qname / name to nodes
-//	find_callers         reverse call graph over calls + invokes edges
+//	find_callers         reverse call graph over calls + invokes edges (value uses for a field, var or const)
 //	find_callees         forward call graph over calls + invokes edges
+//	find_references      who reads or writes a field, package-level var or const
 //	get_subgraph         bidirectional BFS rooted at qname
 //	search_text          FTS5 search with AND/OR mode + language pushdown
+//	search_code          regex over production declaration bodies, grouped by declaration, with resolve, expand and the tests that use each hit
+//	search_test_code     the same over test code (_test.go files and testdata)
 //	impact_of_change     reverse-dependency closure (broader than callers)
 //	get_context_for_task smart 1-shot: BM25 -> 1-hop -> score-fuse -> pack
 //	evidence_for_intent  EvidencePack assembler over commit/hunk corpus

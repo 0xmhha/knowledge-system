@@ -20,7 +20,8 @@ func RegisterConcurrencyImpact(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("concurrency_impact",
 		mcp.WithDescription(
-			"Concurrency blast radius for a symbol: modules that affect or are affected by it via "+
+			"Use for data races, deadlocks and goroutine, channel or lock questions. "+
+				"Concurrency blast radius for a symbol: modules that affect or are affected by it via "+
 				"goroutine/channel/lock edges (spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock). "+
 				"Seed a Channel/Mutex/Field node to recover producer<->consumer or lock-sharing peers; a function "+
 				"seed reaches its own goroutine and the channel it writes, but not the peer across the channel.",

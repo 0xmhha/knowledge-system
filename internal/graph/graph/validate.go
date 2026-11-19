@@ -104,12 +104,12 @@ func Sanitize(g *Graph, report *ValidationReport) int {
 	}
 	drop := make(map[edgeKey]struct{}, len(report.DanglingEdges))
 	for _, d := range report.DanglingEdges {
-		drop[edgeKey{d.Edge.Type, d.Edge.Src, d.Edge.Dst, d.Edge.Line}] = struct{}{}
+		drop[edgeKey{d.Edge.Type, d.Edge.Src, d.Edge.Dst, d.Edge.Line, d.Edge.DispatchKind}] = struct{}{}
 	}
 	kept := g.Edges[:0]
 	dropped := 0
 	for _, e := range g.Edges {
-		if _, bad := drop[edgeKey{e.Type, e.Src, e.Dst, e.Line}]; bad {
+		if _, bad := drop[edgeKey{e.Type, e.Src, e.Dst, e.Line, e.DispatchKind}]; bad {
 			dropped++
 			continue
 		}

@@ -3,6 +3,7 @@ package mcphandlers
 import (
 	"sort"
 	"strings"
+	"sync"
 
 	mcp "github.com/mark3labs/mcp-go/mcp"
 
@@ -20,6 +21,148 @@ import (
 // specifics; a top-level function (no receiver segment) or a type implementing
 // nothing yields no extra seeds.
 func interfaceMethodSeeds(reader store.Reader, methodQname string) []string {
+	return implementsSeeds(reader, methodQname)
+}
+
+// dispatchSeeds returns the interface methods whose dispatches_to edges
+// reach the seed: value-flow links (schema 1.31, SSA + VTA) first, then
+// type-hierarchy links (schema 1.34), so a method no analysed value reaches,
+// for example an exported method only outside callers use, keeps its
+// interface callers. Graphs without either fall back to implementsSeeds.
+// source says which one answered: "dispatches_to", "type_hierarchy",
+// "implements" or "" when none gave a seed.
+func dispatchSeeds(reader store.Reader, seed seedRef) (seeds []string, source string) {
+	if hasDispatch(reader) {
+		ns, es, err := seed.neighborhood(reader, 1, true, string(types.EdgeDispatchesTo))
+		if err == nil {
+			own := map[string]bool{}
+			for _, id := range seed.IDs {
+				own[id] = true
+			}
+			if len(own) == 0 {
+				for _, n := range ns {
+					if n.QualifiedName == seed.QName {
+						own[n.ID] = true
+					}
+				}
+			}
+			name := map[string]string{}
+			for _, n := range ns {
+				name[n.ID] = n.QualifiedName
+			}
+			// Value-flow links first; the type hierarchy (schema 1.34) when
+			// no value of the receiver's type was seen reaching an interface.
+			for _, kind := range []string{"interface_method", "type_hierarchy"} {
+				seen := map[string]bool{}
+				for _, e := range es {
+					if e.Type != types.EdgeDispatchesTo || e.DispatchKind != kind || !own[e.Dst] || seen[name[e.Src]] || name[e.Src] == "" {
+						continue
+					}
+					seen[name[e.Src]] = true
+					seeds = append(seeds, name[e.Src])
+				}
+				if len(seeds) > 0 {
+					sort.Strings(seeds)
+					if kind == "type_hierarchy" {
+						return seeds, "type_hierarchy"
+					}
+					return seeds, "dispatches_to"
+				}
+			}
+		}
+	}
+	if seeds = implementsSeeds(reader, seed.QName); len(seeds) > 0 {
+		return seeds, "implements"
+	}
+	return nil, ""
+}
+
+var dispatchGraphs sync.Map // store.Reader -> bool
+
+// hasDispatch reports whether the graph holds runtime links (schema 1.31).
+func hasDispatch(reader store.Reader) bool {
+	if v, ok := dispatchGraphs.Load(reader); ok {
+		return v.(bool)
+	}
+	es, err := reader.QueryEdgesByType(string(types.EdgeDispatchesTo))
+	has := err == nil && len(es) > 0
+	dispatchGraphs.Store(reader, has)
+	return has
+}
+
+// withDispatchTargets adds, for every interface method the walk reached
+// through an invokes edge, the implementations its dispatches_to edges name,
+// without counting that step as a hop: a call through an interface reaches
+// the implementation at the same depth as a static call reaches its callee.
+func withDispatchTargets(reader store.Reader, nodes []types.Node, edges []types.Edge) ([]types.Node, []types.Edge, int) {
+	have := map[string]bool{}
+	for _, n := range nodes {
+		have[n.ID] = true
+	}
+	var ifaces []string
+	seen := map[string]bool{}
+	for _, e := range edges {
+		if e.Type == types.EdgeInvokes && e.DispatchKind == "interface_method" && have[e.Dst] && !seen[e.Dst] {
+			seen[e.Dst] = true
+			ifaces = append(ifaces, e.Dst)
+		}
+	}
+	if len(ifaces) == 0 {
+		return nodes, edges, 0
+	}
+	ns, es, err := reader.NeighborhoodByIDs(ifaces, 1, false, string(types.EdgeDispatchesTo))
+	if err != nil {
+		return nodes, edges, 0
+	}
+	// Value-flow targets of an interface method hide its type-hierarchy
+	// ones; a method with no value-flow target keeps the type hierarchy's.
+	flow := map[string]bool{}
+	for _, e := range es {
+		if e.DispatchKind == "interface_method" {
+			flow[e.Src] = true
+		}
+	}
+	keep := map[string]bool{}
+	var kept []types.Edge
+	for _, e := range es {
+		if e.DispatchKind == "type_hierarchy" && flow[e.Src] {
+			continue
+		}
+		keep[e.Dst] = true
+		kept = append(kept, e)
+	}
+	es = kept
+	var ns2 []types.Node
+	for _, n := range ns {
+		if keep[n.ID] {
+			ns2 = append(ns2, n)
+		}
+	}
+	ns = ns2
+	edgeSeen := map[string]bool{}
+	for _, e := range edges {
+		edgeSeen[e.Src+"|"+e.Dst+"|"+string(e.Type)] = true
+	}
+	added := 0
+	for _, n := range ns {
+		if !have[n.ID] {
+			have[n.ID] = true
+			nodes = append(nodes, n)
+			added++
+		}
+	}
+	for _, e := range es {
+		if k := e.Src + "|" + e.Dst + "|" + string(e.Type); !edgeSeen[k] {
+			edgeSeen[k] = true
+			edges = append(edges, e)
+		}
+	}
+	return nodes, edges, added
+}
+
+// implementsSeeds is the type-hierarchy bridge: the same-named method on
+// each interface the seed's receiver type implements.
+func implementsSeeds(reader store.Reader, methodQname string) []string {
 	dot := strings.LastIndex(methodQname, ".")
 	if dot <= 0 || dot == len(methodQname)-1 {
 		return nil // no `Type.Method` shape → nothing to bridge
@@ -37,31 +180,60 @@ func interfaceMethodSeeds(reader store.Reader, methodQname string) []string {
 			ifaceIDs[e.Dst] = struct{}{}
 		}
 	}
+	var ifaces []string
+	for _, n := range nodes {
+		if _, ok := ifaceIDs[n.ID]; ok && n.Type == types.NodeInterface {
+			ifaces = append(ifaces, n.ID)
+		}
+	}
+	if len(ifaces) == 0 {
+		return nil
+	}
+	// Keep only interfaces that declare the method: a type that implements
+	// Lifecycle does not make every one of its methods a Lifecycle method.
+	members, _, err := reader.NeighborhoodByIDs(ifaces, 1, false, string(types.EdgeDefines))
+	if err != nil {
+		return nil
+	}
 	var seeds []string
 	seen := map[string]struct{}{}
-	for _, n := range nodes {
-		if _, ok := ifaceIDs[n.ID]; !ok || n.Type != types.NodeInterface {
+	for _, m := range members {
+		if m.Type != types.NodeMethod || leafOf(m.QualifiedName) != methodShort {
 			continue
 		}
-		mq := n.QualifiedName + "." + methodShort
-		if _, dup := seen[mq]; dup {
+		if _, dup := seen[m.QualifiedName]; dup {
 			continue
 		}
-		seen[mq] = struct{}{}
-		seeds = append(seeds, mq)
+		seen[m.QualifiedName] = struct{}{}
+		seeds = append(seeds, m.QualifiedName)
 	}
 	sort.Strings(seeds) // deterministic for prompt-cache stability
 	return seeds
+}
+
+func leafOf(q string) string {
+	if i := strings.LastIndex(q, "."); i >= 0 {
+		return q[i+1:]
+	}
+	return q
 }
 
 // reverseCallersUnion walks the reverse call graph from `resolved` AND from every
 // interface method it satisfies (the interface-dispatch bridge), unioning the
 // nodes/edges. Dedups nodes by ID and edges by (src,dst,type).
 func reverseCallersUnion(reader store.Reader, resolved seedRef, depth int) ([]types.Node, []types.Edge, error) {
+	return reverseCallersUnionTraced(reader, resolved, depth, nil)
+}
+
+// reverseCallersUnionTraced is reverseCallersUnion with a trace record of the
+// interface seeds and where they came from.
+func reverseCallersUnionTraced(reader store.Reader, resolved seedRef, depth int, t *callTrace) ([]types.Node, []types.Edge, error) {
 	seeds := []seedRef{resolved}
-	for _, q := range interfaceMethodSeeds(reader, resolved.QName) {
+	ifaces, source := dispatchSeeds(reader, resolved)
+	for _, q := range ifaces {
 		seeds = append(seeds, seedRef{QName: q})
 	}
+	t.add("interface_seeds", map[string]any{"source": source, "seeds": ifaces})
 	nodeByID := map[string]types.Node{}
 	edgeSeen := map[string]struct{}{}
 	var edges []types.Edge
@@ -100,7 +272,11 @@ func textResult(payload any) *mcp.CallToolResult {
 // Without this filter the BFS would also walk contains/defines and
 // return the file holding a method as one of its "callers" —
 // semantically wrong and noisy for LLM consumers.
-var callEdgeTypes = []string{"calls", "invokes"}
+//
+// dispatches_to (schema 1.31) carries a dynamic call on to the code it can
+// run: from an interface method to its implementations, and from a function
+// that calls a function value to the functions the value can hold.
+var callEdgeTypes = []string{"calls", "invokes", "dispatches_to"}
 
 // seedRef is a resolved traversal seed: the qualified name reported back to
 // the caller and, when the seed named one exact node (a canonical id), that

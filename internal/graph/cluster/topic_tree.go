@@ -67,7 +67,9 @@ func BuildTopicTree(g *graph.Graph, gammas []float64, seed int64) *TopicTree {
 	participants := make([]int, 0, len(g.Nodes))
 	idx := make(map[string]int, len(g.Nodes))
 	for i, n := range g.Nodes {
-		if n.Type == types.NodeCommit || n.Type == types.NodeHunk {
+		// External nodes (schema 1.36) are code outside the build; a shared
+		// time.Now would pull unrelated packages into one community.
+		if n.Type == types.NodeCommit || n.Type == types.NodeHunk || n.Type == types.NodeExternal {
 			continue
 		}
 		idx[n.ID] = len(participants)

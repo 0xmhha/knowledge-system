@@ -185,7 +185,66 @@ import (
 // (repeats are numbered), so topic_tree keeps every member; before, a
 // community whose label repeated another's replaced its members. Stored
 // topic rows change.
-const SchemaVersion = "1.28"
+//
+// 1.29 (2026-11-17): Go value uses. EmitValueAccessEdges replaces
+// EmitFieldWriteEdges: reads_field and writes_field (now also composite
+// literal fields and promoted fields, with line and count) and references
+// from a function or package-level initializer to the package-level
+// variables and constants it uses (dispatch_kind read or write). New edges;
+// force a cold rebuild.
+//
+// 1.30 (2026-11-17): one value edge per use line. reads_field, writes_field
+// and references had one edge per (source, value, access) with the first
+// line; they now have one per line, as calls do, with count the uses on that
+// line. Edges change; force a cold rebuild.
+//
+// 1.31 (2026-11-18): runtime links (design decision D3). dispatches_to from
+// an interface method to each implementation whose values reach one of its
+// calls, and from a function that calls a function value to each function
+// the value can hold, from SSA + VTA in the Go frontend. New edges; force a
+// cold rebuild.
+//
+// 1.32 (2026-11-18): statement links and channel links (design decision
+// D3 and the user's 2026-11-18 instruction that both be supported).
+// site_calls, cond_reads, cond_calls, body_writes and encloses connect the
+// statement nodes of a Go function body; sends_to and recvs_from gain edges
+// from SSA to the channel a send or receive operates on (make site, field or
+// package-level variable), followed through parameters, closures, stores
+// and returns. The SSA pass now covers every method body, not only those
+// AllFunctions reaches. New edges; force a cold rebuild.
+//
+// 1.33 (2026-11-18): fixes found by ckg verify's statement-link check. The
+// statements of a goroutine's function literal get nodes, and the calls in a
+// go statement's arguments get call sites and calls edges (static call
+// recall on go-stablenet 0.9997 to 1.0000); an init function's value uses
+// and statement links stay with the init of their own file (all init
+// functions of a package share one canonical id); a write in a condition is
+// no longer a cond_reads; a call of an interface method through a struct
+// that embeds the interface is interface_method. Nodes and edges change;
+// force a cold rebuild.
+//
+// 1.34 (2026-11-18): channel aliases and type-hierarchy dispatch, from the
+// recall ckg verify --observed measured. flows_to joins the names of one
+// channel (a make site and the field or variable it is stored in);
+// dispatches_to of kind type_hierarchy adds, for each invoked interface
+// method, the implementations go/types allows that the value flow did not
+// link (reflection, values kept in standard-library containers); a channel
+// a closure captures by reference is followed through the cell it points
+// to. New edges; force a cold rebuild.
+//
+// 1.35 (2026-11-18): type-hierarchy dispatches_to edges stay out of
+// PageRank, as the statement links do. A replay of recorded calls showed
+// them reordering search_code hits (13 of 214 answers): they say what
+// go/types allows, not a dependency the analysis found. Scores change;
+// force a cold rebuild. Bumped from "1.35" to "1.36" for External nodes:
+// calls, interface calls and type uses whose target is outside the build
+// (standard library, dependencies) now point at one External node per
+// symbol instead of being dropped; pre-1.36 DBs have none.
+// Bumped from "1.36" to "1.37": value-use edges (reads_field, writes_field,
+// references) counted every use twice in packages with in-package tests,
+// whose production files were walked again through the test variant; counts
+// change, so force a cold rebuild.
+const SchemaVersion = "1.37"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

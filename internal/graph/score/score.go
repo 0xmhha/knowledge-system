@@ -43,6 +43,19 @@ func Compute(g *graph.Graph) {
 	pageRank(g, 0.85, 30)
 }
 
+// statementLink are the edges inside a function body (schema 1.32). They
+// stay out of PageRank: site_calls repeats the function-level calls, and
+// the others describe how a body is built, not how declarations depend on
+// each other, so counting them would move declaration ranks for no reason.
+var statementLink = map[types.EdgeType]bool{
+	types.EdgeSiteCalls: true, types.EdgeCondReads: true, types.EdgeCondCalls: true,
+	types.EdgeBodyWrites: true, types.EdgeEncloses: true,
+}
+
+// Type-hierarchy dispatch candidates (dispatches_to, kind type_hierarchy)
+// stay out of PageRank for the same reason: they say what go/types allows,
+// not a dependency the analysis found.
+
 // isMetaNodeType mirrors buildpipe.isMetaNodeType — kept duplicated to
 // avoid a buildpipe→score package cycle. Update both when a future schema
 // adds another meta-node family.
@@ -62,7 +75,10 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 	participants := make([]int, 0, len(g.Nodes))
 	idx := make(map[string]int, len(g.Nodes))
 	for i, nd := range g.Nodes {
-		if isMetaNodeType(nd.Type) {
+		// External nodes (schema 1.36) stay out: time.Now would collect rank
+		// from every caller and pass none back, and how that changes the
+		// order of repository symbols has not been measured.
+		if isMetaNodeType(nd.Type) || nd.Type == types.NodeExternal {
 			continue
 		}
 		idx[nd.ID] = len(participants)
@@ -81,6 +97,9 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 		}
 		di, ok := idx[e.Dst]
 		if !ok {
+			continue
+		}
+		if statementLink[e.Type] || e.Type == types.EdgeDispatchesTo && e.DispatchKind == "type_hierarchy" {
 			continue
 		}
 		out[si] = append(out[si], di)

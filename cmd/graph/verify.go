@@ -9,10 +9,11 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/verify"
+	"github.com/0xmhha/knowledge-system/internal/graph/verify/observe"
 )
 
 func newVerifyCmd() *cobra.Command {
-	var src, graph, format, scopePath string
+	var src, graph, format, scopePath, observed string
 	var samples int
 	cmd := &cobra.Command{
 		Use:   "verify",
@@ -40,6 +41,13 @@ func newVerifyCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if observed != "" {
+				obs, err := observe.Compare(observed, store, samples)
+				if err != nil {
+					return err
+				}
+				report.Observed = &obs
+			}
 			out := cmd.OutOrStdout()
 			switch format {
 			case "json":
@@ -56,6 +64,7 @@ func newVerifyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&graph, "graph", ".ckg", "graph directory holding graph.db")
 	cmd.Flags().StringVar(&format, "format", "text", "text or json")
 	cmd.Flags().IntVar(&samples, "samples", 20, "examples listed per category")
+	cmd.Flags().StringVar(&observed, "observed", "", "directory of ckg observe records (obs-*.jsonl) from a test run; compares the calls and channel operations that ran with the runtime links")
 	cmd.Flags().StringVar(&scopePath, "scope", "", "build scope JSON the graph was built with; the truth is type-checked with its GOOS, GOARCH, cgo and tags")
 	return cmd
 }

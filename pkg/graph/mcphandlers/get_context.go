@@ -23,7 +23,9 @@ import (
 func RegisterGetContextForTask(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("get_context_for_task",
-		mcp.WithDescription("Smart 1-shot retrieval: BM25 -> 1-hop expand -> score -> diversify -> pack. "+
+		mcp.WithDescription("One-call context for a task described in words: the best-matching code bodies and their neighbours. "+
+			"Matches the words against symbol names, signatures and doc comments only (not bodies), so results can be loosely related; to search the code itself use search_code. "+
+			"Pipeline: BM25 -> 1-hop expand -> score -> diversify -> pack. "+
 			"Optionally folds PR breadcrumbs (include_recent_prs) and reverse-dep impact "+
 			"(include_impact) into the same response so coding agents avoid extra round-trips."),
 		mcp.WithString("task_description", mcp.Required()),

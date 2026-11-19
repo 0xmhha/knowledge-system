@@ -3,8 +3,10 @@ package verify
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"io"
+
+	"github.com/0xmhha/knowledge-system/internal/graph/detect"
+	"github.com/0xmhha/knowledge-system/internal/graph/verify/observe"
 )
 
 // Report is the result of one verification run.
@@ -19,7 +21,13 @@ type Report struct {
 	DynamicCallSites  int             `json:"dynamic_call_sites"`
 	CallsOutsideFuncs int             `json:"calls_outside_funcs"`
 	Unexpected        UnexpectedStats `json:"unexpected_edges"`
-	LocalDeclNodes    LocalDeclStats  `json:"unmatched_decl_nodes"`
+	// Statements compares the statement links (schema 1.32) by edge type;
+	// nil for a graph without them.
+	Statements map[string]StmtRelStats `json:"statement_links,omitempty"`
+	// Observed compares a test run's records with the runtime links; nil
+	// without --observed.
+	Observed       *observe.Report `json:"observed,omitempty"`
+	LocalDeclNodes LocalDeclStats  `json:"unmatched_decl_nodes"`
 	// Load is what the go command reported while loading the truth. Graph
 	// and truth come from the same go command, so a package it cannot load
 	// is missing from both and the counts above cannot show it.
@@ -116,6 +124,17 @@ func (r Report) WriteText(w io.Writer) error {
 	p("calls in package-level initialisers (not checked): %d\n", r.CallsOutsideFuncs)
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
+	if r.Statements == nil {
+		p("statement links: none in this graph\n")
+	}
+	for _, rel := range stmtRels {
+		s, ok := r.Statements[string(rel)]
+		if !ok {
+			continue
+		}
+		p("statement links %s: truth %d, matched %d, missing %d, no statement node %d, endpoint missing %d, unexpected %d, given to an outer statement %d, recall %.4f, precision %.4f\n",
+			rel, s.Truth, s.Matched, s.Missing, s.NoStatementNode, s.EndpointMissing, s.Unexpected, s.OuterStatement, s.Recall(), s.Precision())
+	}
 	p("go load: %d packages, %d with errors, %d errors %v\n", r.Load.Packages, r.Load.WithErrors, r.Load.Errors(), r.Load.ByKind)
 	if r.Load.ModulesMatched+len(r.Load.ModulesOtherVersion)+len(r.Load.ModulesOtherDir)+len(r.Load.ModulesNotLoaded) > 0 {
 		p("scope modules: matched %d, other version %d, other directory %d, not loaded %d\n", r.Load.ModulesMatched,
@@ -140,6 +159,29 @@ func (r Report) WriteText(w io.Writer) error {
 	section("unexpected call edges", r.Unexpected.CallSamples)
 	section("unexpected type-ref edges", r.Unexpected.TypeRefSamples)
 	section("declaration nodes with no package-level declaration", r.LocalDeclNodes.Samples)
+	for _, rel := range stmtRels {
+		if s, ok := r.Statements[string(rel)]; ok {
+			section("missing "+string(rel), s.MissingSamples)
+			section("unexpected "+string(rel), s.UnexpectedSamples)
+		}
+	}
+	if o := r.Observed; o != nil {
+		p("\nobserved run: %d records\n", o.Records)
+		for _, x := range []struct {
+			name string
+			s    observe.PairStats
+		}{{"interface calls (method, implementation)", o.Interface}, {"function-value calls (caller, line, callee)", o.FuncValue},
+			{"channel operations linked to a channel", o.ChannelOps}, {"sender-receiver pairs joined by a channel", o.ChannelPairs}} {
+			p("  %s: observed %d, in graph %d, recall %.4f\n", x.name, x.s.Observed, x.s.InGraph, x.s.Recall())
+		}
+		p("  interface calls linked only by the type hierarchy: %d\n", o.InterfaceByTypeOnly)
+		p("  sender-receiver pairs not joined: both linked to different channel nodes %d, one not linked %d\n", o.ChannelPairsDisjoint, o.ChannelPairsUnlinked)
+		p("  dispatches_to edges that ran: %d of %d\n", o.DispatchObserved, o.DispatchEdges)
+		section("observed interface calls the graph lacks", o.Interface.MissingSamples)
+		section("observed function-value calls the graph lacks", o.FuncValue.MissingSamples)
+		section("observed channel operations without a channel edge", o.ChannelOps.MissingSamples)
+		section("observed sender-receiver pairs the graph does not join", o.ChannelPairs.MissingSamples)
+	}
 	section("go load errors", r.Load.Samples)
 	section("scope modules loaded at another version", r.Load.ModulesOtherVersion)
 	section("scope modules loaded from another directory", firstN(r.Load.ModulesOtherDir, 20))

@@ -38,7 +38,7 @@ const DepthCap = 5
 //   - changed_in / blame — git history. A commit that previously touched the
 //     seed does not need to be "examined" when the seed changes again.
 var (
-	edgesCallers     = []string{"calls", "invokes"}
+	edgesCallers     = []string{"calls", "invokes", "dispatches_to"}
 	edgesInterface   = []string{"implements", "extends"}
 	edgesTypeUsers   = []string{"uses_type", "instantiates", "reads_field", "writes_field", "reads_mapping", "writes_mapping"}
 	edgesDistributed = []string{"listens_on", "handles_message", "rpc_calls", "binds_to"}

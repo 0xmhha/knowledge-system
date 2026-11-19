@@ -1,6 +1,8 @@
 package golang_test
 
 import (
+	"fmt"
+	"sort"
 	"testing"
 
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
@@ -368,5 +370,81 @@ func TestResolveCrossFileCall(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("expected edge b.Hello -calls-> a.Greet")
+	}
+}
+
+// TestValueAccessEdges: every use of a field, package-level variable or
+// constant links its user to the value, with the access kind, so an agent can
+// follow a value to the code that reads or sets it.
+func TestValueAccessEdges(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/resolve")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	id := map[string]string{}
+	for _, n := range g.Nodes {
+		if _, dup := id[n.QualifiedName]; !dup {
+			id[n.QualifiedName] = n.ID
+		}
+	}
+	type key struct{ src, dst, typ, kind string }
+	got := map[key]types.Edge{}
+	for _, e := range g.Edges {
+		switch e.Type {
+		case types.EdgeReadsField, types.EdgeWritesField, types.EdgeReferences:
+			got[key{e.Src, e.Dst, string(e.Type), e.DispatchKind}] = e
+		}
+	}
+	want := []struct{ src, dst, typ, kind string }{
+		{"coll1.setCurrent", "coll1.current", "references", "write"},
+		{"coll1.incCurrent", "coll1.current", "references", "write"},
+		{"coll1.incCurrent", "coll1.current", "references", "read"},
+		{"coll1.readCurrent", "coll1.current", "references", "read"},
+		{"coll1.readCurrent", "coll1.Limit", "references", "read"},
+		{"coll1.register", "coll1.Registry", "references", "write"},
+		{"coll1.Limit", "coll1.slot", "references", "read"},
+		{"coll1.Registry", "coll1.Limit", "references", "read"},
+		{"coll1.newOuter", "coll1.Outer.Name", "writes_field", ""},
+		{"coll1.depth", "coll1.Inner.Depth", "reads_field", ""},
+		{"coll1.bump", "coll1.Inner.Depth", "writes_field", ""},
+		{"coll1.getBox", "coll1.Box.Val", "reads_field", ""},
+		{"coll1.setBox", "coll1.Box.Val", "writes_field", ""},
+	}
+	for _, w := range want {
+		if id[w.src] == "" || id[w.dst] == "" {
+			t.Errorf("missing node %q or %q", w.src, w.dst)
+			continue
+		}
+		e, ok := got[key{id[w.src], id[w.dst], w.typ, w.kind}]
+		if !ok {
+			t.Errorf("missing %s -%s(%s)-> %s", w.src, w.typ, w.kind, w.dst)
+			continue
+		}
+		if e.Line == 0 || e.FilePath == "" {
+			t.Errorf("%s -> %s has no site: file %q line %d", w.src, w.dst, e.FilePath, e.Line)
+		}
+	}
+	// Every use line has its own edge, so a reader of the edges sees all the
+	// places a function touches a value, not only the first one.
+	var bumpLines []int
+	for _, e := range g.Edges {
+		if e.Type == types.EdgeWritesField && e.Src == id["coll1.bump"] && e.Dst == id["coll1.Inner.Depth"] {
+			bumpLines = append(bumpLines, e.Line)
+			if e.Count != 1 {
+				t.Errorf("bump writes Depth once on line %d, count = %d", e.Line, e.Count)
+			}
+		}
+	}
+	sort.Ints(bumpLines)
+	if fmt.Sprint(bumpLines) != "[35 36]" {
+		t.Errorf("bump writes Depth on lines 35 and 36, edges on lines %v", bumpLines)
+	}
+	for _, bad := range []key{
+		{id["coll1.getBox"], id["coll1.Box.Val"], "writes_field", ""},
+		{id["coll1.readCurrent"], id["coll1.current"], "references", "write"},
+	} {
+		if _, ok := got[bad]; ok {
+			t.Errorf("unexpected edge %+v", bad)
+		}
 	}
 }

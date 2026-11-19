@@ -351,6 +351,33 @@ Increment 1 is done (2026-11-16):
   loaded modules with the scope's ([the flow page](./BUILD-AND-QUERY-FLOW.md) section 7, step 3); the build still
   uses the environment's module cache, which gives the same code when the cache is intact.
 
+### 9.2 Step 6, first increment: runtime links for interfaces and function values (schema 1.31)
+
+Done (2026-11-18, user instruction: an accurate graph first, so that calls through interfaces do not stop):
+`parse/golang/dispatch.go` builds SSA for the loaded packages and runs VTA; it emits `dispatches_to` with
+`static_may` confidence (stored `INFERRED`) from an interface method to each implementation whose values reach one of
+its calls, and from a function that calls a function value to each function the value can hold. Query side:
+`find_callers`, `find_callees`, `search_code` line uses and expansion, `impact_of_change` and `investigate` follow
+the edges. Not done in this increment: goroutine and channel links, edges from a call site rather than from the
+interface method, and a verifier for dynamic calls (`ckg verify` still counts them as "not checked"); the rule that
+a method no analysed value reaches keeps its type-hierarchy callers is a default of this increment.
+
+### 9.3 Step 6, second increment: statement links and channel links (schema 1.32)
+
+Done (2026-11-18, user instruction: "둘다 지원해야해. 현재 문제만을 위한 작업을 할수는 없어"): statement edges inside a
+Go body (`site_calls`, `cond_reads`, `cond_calls`, `body_writes`, `encloses`) from go/types, and channel sends and
+receives linked by SSA to the channel they operate on. `investigate` cards show the conditions around each write and a
+channel's senders and receivers. Not done: removing the pass-one channel placeholders, statement nodes inside goroutine
+literals other than call sites, reads guarded by a condition (only writes are), and a verifier for either.
+
+### 9.4 Step 6, third increment: verification and the fixes it led to (schema 1.33, 1.34)
+
+`ckg verify` checks the statement links against a truth computed another way; `ckg observe` and
+`ckg verify --observed` check the runtime links against a test run (option C of D3 as the precision check). The checks
+led to schema 1.33 (builder fixes) and 1.34: channel aliases (`flows_to`), closure cells in channel origins, and the
+type hierarchy as a marked, weaker `dispatches_to` layer (D3 addendum of 2026-11-18). Open: channels made outside the
+module have no node; `event.Feed`-style reflection stays out of reach of the static analysis.
+
 ## 10. Open points and proposed defaults
 
 | Point | Proposed default | Why | Settled when |

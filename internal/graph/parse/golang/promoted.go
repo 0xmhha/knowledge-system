@@ -45,6 +45,13 @@ func EmitPromotedMethods(pkgs []*packages.Package, nodes []types.Node) ([]types.
 	// same name. The qname stays the fallback for nodes without a canonical id.
 	byCanonical := make(map[string]types.Node, len(nodes))
 	for _, n := range nodes {
+		// External nodes (schema 1.36) are code outside the build; a method
+		// they declare is not in-module, so it is not promoted (the bound
+		// above). Indexing them added 79 promoted methods on go-stablenet,
+		// such as ecies.PublicKey.ScalarMult from crypto/elliptic.
+		if n.Type == types.NodeExternal {
+			continue
+		}
 		if _, dup := byQname[n.QualifiedName]; !dup {
 			byQname[n.QualifiedName] = n
 		}

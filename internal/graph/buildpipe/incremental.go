@@ -173,6 +173,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// implements/extends are emitted by the Go post-Resolve pass with empty
 	// FilePath, so the per-file CASCADE in step (2) does not remove them —
 	// they must be dropped here or every incremental build duplicates rows.
+	// dispatches_to (schema 1.31) has no FilePath for the same reason.
 	//
 	// http_calls (schema 1.9): rebuilt every incremental pass. cached
 	// client files are reloaded into memory by reloadCachedEdges (with
@@ -184,7 +185,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// AMBIGUOUS placeholder). Without this cycle, a dirty file ADDING a
 	// server Endpoint would leave cached AMBIGUOUS http_calls edges
 	// stranded — review-flagged behaviour, now fixed.
-	for _, t := range []string{"changed_in", "blame", "binds_to", "implements", "extends", "http_calls"} {
+	for _, t := range []string{"changed_in", "blame", "binds_to", "implements", "extends", "http_calls", "dispatches_to"} {
 		if err := store.DeleteEdgesByType(t); err != nil {
 			return persist.Manifest{}, fmt.Errorf("clear %s: %w", t, err)
 		}
@@ -222,7 +223,7 @@ func runIncremental(opt Options, log *slog.Logger,
 		return persist.Manifest{}, err
 	}
 
-	reloadedFromDB, cachedNodeIDs, err := reloadCachedEdges(store, cachedByLang)
+	reloadedFromDB, externalNodes, cachedNodeIDs, err := reloadCachedEdges(store, cachedByLang)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -232,7 +233,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// duplicates (ID == 0). Without this ordering, fresh dups slip past the
 	// ID==0 filter at persist time and get re-INSERTed, doubling rows.
 	parts := make([]*parse.ResolvedGraph, 0, len(resolved)+1)
-	parts = append(parts, &parse.ResolvedGraph{Edges: reloadedFromDB})
+	parts = append(parts, &parse.ResolvedGraph{Nodes: externalNodes, Edges: reloadedFromDB})
 	parts = append(parts, resolved...)
 
 	warnDuplicateNodeIDs(log, parts)
@@ -463,19 +464,32 @@ func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached
 // either cascade-deleted (dirty src) or will be re-emitted by Resolve from
 // the dirty side (dirty dst). Edges that need re-emission from the cached
 // side are handled by reverse-reference invalidation (reverseDirty).
-func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([]types.Edge, map[string]bool, error) {
+//
+// External nodes (schema 1.36) belong to no file: they are shared by every
+// file that calls the symbol. All of them are reloaded and count as cached,
+// so a dirty file that also calls time.Now does not insert the node again
+// (INSERT OR REPLACE would delete it and, by cascade, every cached caller's
+// edge to it), and the cached callers' edges to them are reloaded.
+func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([]types.Edge, []types.Node, map[string]bool, error) {
 	reloaded := []types.Edge{}
 	cachedNodeIDs := map[string]bool{}
+	externals, err := store.NodesByFilePath(types.ExternalFilePath)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("reload external nodes: %w", err)
+	}
+	for _, n := range externals {
+		cachedNodeIDs[n.ID] = true
+	}
 	for _, paths := range cachedByLang {
 		for _, p := range paths {
 			es, err := store.EdgesByFilePath(p)
 			if err != nil {
-				return nil, nil, fmt.Errorf("reload edges for %s: %w", p, err)
+				return nil, nil, nil, fmt.Errorf("reload edges for %s: %w", p, err)
 			}
 			reloaded = append(reloaded, es...)
 			ns, err := store.NodesByFilePath(p)
 			if err != nil {
-				return nil, nil, fmt.Errorf("reload nodes for %s: %w", p, err)
+				return nil, nil, nil, fmt.Errorf("reload nodes for %s: %w", p, err)
 			}
 			for _, n := range ns {
 				cachedNodeIDs[n.ID] = true
@@ -483,7 +497,7 @@ func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([
 		}
 	}
 	if len(cachedNodeIDs) == 0 {
-		return reloaded, cachedNodeIDs, nil
+		return reloaded, externals, cachedNodeIDs, nil
 	}
 	ids := make([]string, 0, len(cachedNodeIDs))
 	for id := range cachedNodeIDs {
@@ -491,7 +505,7 @@ func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([
 	}
 	xEdges, err := store.QueryEdgesForNodes(ids)
 	if err != nil {
-		return nil, nil, fmt.Errorf("reload cross-file edges: %w", err)
+		return nil, nil, nil, fmt.Errorf("reload cross-file edges: %w", err)
 	}
 	seenID := map[int64]bool{}
 	for _, e := range reloaded {
@@ -509,7 +523,7 @@ func reloadCachedEdges(store persist.Store, cachedByLang map[string][]string) ([
 		reloaded = append(reloaded, e)
 		seenID[e.ID] = true
 	}
-	return reloaded, cachedNodeIDs, nil
+	return reloaded, externals, cachedNodeIDs, nil
 }
 
 // persistIncrementalArtifacts handles the incremental-path inserts: nodes
@@ -680,6 +694,10 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 		// refs already live in DB and get reloaded above.
 		usesEdges, usesPending := gop.EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, usesEdges...)
+		// Types outside the build get External nodes, as on the cold path.
+		extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+		rg.Nodes = append(rg.Nodes, extNodes...)
+		rg.Edges = append(rg.Edges, extEdges...)
 		log.Debug("uses_type emitted (incremental)", "edges", len(usesEdges), "pending", len(usesPending))
 		if len(usesPending) > 0 {
 			// Anchor pending refs to the file owning each SRC node; only
@@ -725,10 +743,20 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 		rg.Edges = append(rg.Edges, promEdges...)
 		log.Debug("promoted methods emitted (incremental)", "nodes", len(promNodes))
 
-		// Defect E: writes_field edges — same wiring as cold path.
-		wfEdges := gop.EmitFieldWriteEdges(p.Pkgs(), rg.Nodes)
-		rg.Edges = append(rg.Edges, wfEdges...)
-		log.Debug("writes_field emitted (incremental)", "count", len(wfEdges))
+		// Value uses (reads_field / writes_field / references) — same wiring as cold path.
+		vaEdges := gop.EmitValueAccessEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, vaEdges...)
+		log.Debug("value access edges emitted (incremental)", "count", len(vaEdges))
+
+		// Runtime links — same wiring as cold path; dropped by type in step (1).
+		dEdges, dst := gop.EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, dEdges...)
+		log.Debug("dispatch edges emitted (incremental)", "interface_method", dst.InterfaceEdges, "func_value", dst.FuncValueEdges)
+
+		// Statement links — same wiring as cold path; per-file FilePath, so
+		// dirty files' rows go with the CASCADE and cached rows win dedup.
+		sEdges, _ := gop.EmitStatementEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, sEdges...)
 	}
 	if rg != nil {
 		rg.LoadErrors = loadErrs

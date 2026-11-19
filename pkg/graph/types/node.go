@@ -150,6 +150,9 @@ type Node struct {
 	// enters fallback / receive on certain edge paths) so security
 	// tooling can pick either signal.
 	HasSelfDelegatecallDead bool `json:"has_self_delegatecall_dead,omitempty"`
+	// External: the package of an External node (schema 1.36). Nil for
+	// every other node.
+	External *ExternalPackage `json:"external,omitempty"`
 	// HasHighLevelSelfCall: true when a
 	// callable performs a *typed* self-call — `this.foo()`,
 	// `MyContract(address(this)).foo()`, or `IFoo(address(this)).bar()`
@@ -171,4 +174,17 @@ type Node struct {
 	// when nil so existing payloads (HTTP / MCP / chunked export)
 	// stay byte-identical until a caller asks for breadcrumbs.
 	RecentPRs []PRRef `json:"recent_prs,omitempty"`
+}
+
+// ExternalPackage names the package an External node belongs to.
+//   - Path: import path ("time", "github.com/holiman/uint256").
+//   - Name: package name, the default local name in importing files.
+//   - Module: "std" for the standard library, else the module path.
+//   - Version: module version ("v1.2.4"); empty for std and for a module
+//     without a version (the main module, a directory replace).
+type ExternalPackage struct {
+	Path    string `json:"path"`
+	Name    string `json:"name"`
+	Module  string `json:"module"`
+	Version string `json:"version,omitempty"`
 }

@@ -68,6 +68,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 		sort.Strings(qnames)
 	}
+	extAdded := map[string]bool{}
 	for _, r := range results {
 		for _, pr := range r.Pending {
 			conf := types.ConfExtracted
@@ -95,6 +96,17 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 							break
 						}
 					}
+				}
+			}
+			if !ok && pr.TargetCanonicalID != "" {
+				// A function or method outside the build (standard library,
+				// a dependency): point at its External node.
+				if n, found := p.ExternalTarget(pr.TargetCanonicalID); found {
+					if !extAdded[n.ID] {
+						extAdded[n.ID] = true
+						out.Nodes = append(out.Nodes, n)
+					}
+					id, ok = n.ID, true
 				}
 			}
 			if !ok {
@@ -188,8 +200,11 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	// don't have a node in this graph become PendingRefs (q4=A); LoadAndResolve
 	// drops the pending side because tests don't replay them, but the
 	// production buildpipe path persists them via runGoPipeline.
-	usesEdges, _ := EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
+	usesEdges, usesPending := EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, usesEdges...)
+	extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+	rg.Nodes = append(rg.Nodes, extNodes...)
+	rg.Edges = append(rg.Edges, extEdges...)
 	// instantiates edges (Function/Method → Type). Walks each
 	// function body for composite literals and `new(T)` calls.
 	rg.Edges = append(rg.Edges, EmitInstantiatesEdges(p.Pkgs(), rg.Nodes)...)
@@ -199,8 +214,14 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	promNodes, promEdges := EmitPromotedMethods(p.Pkgs(), rg.Nodes)
 	rg.Nodes = append(rg.Nodes, promNodes...)
 	rg.Edges = append(rg.Edges, promEdges...)
-	// Defect E: writes_field edges (function -> struct field it assigns).
-	rg.Edges = append(rg.Edges, EmitFieldWriteEdges(p.Pkgs(), rg.Nodes)...)
+	// Value uses: reads_field / writes_field and references (see value_access.go).
+	rg.Edges = append(rg.Edges, EmitValueAccessEdges(p.Pkgs(), rg.Nodes)...)
+	// Runtime links: dispatches_to from SSA + VTA (see dispatch.go).
+	dispatch, _ := EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, dispatch...)
+	// Statement links: what happens inside a function (see statement_links.go).
+	stmtEdges, _ := EmitStatementEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, stmtEdges...)
 	return rg, nil
 }
 

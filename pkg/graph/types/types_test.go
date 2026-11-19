@@ -8,13 +8,13 @@ import (
 )
 
 func TestAllNodeTypes_Count(t *testing.T) {
-	if got, want := len(types.AllNodeTypes()), 37; got != want {
+	if got, want := len(types.AllNodeTypes()), 38; got != want {
 		t.Fatalf("AllNodeTypes count = %d, want %d", got, want)
 	}
 }
 
 func TestAllEdgeTypes_Count(t *testing.T) {
-	if got, want := len(types.AllEdgeTypes()), 43; got != want {
+	if got, want := len(types.AllEdgeTypes()), 50; got != want {
 		t.Fatalf("AllEdgeTypes count = %d, want %d", got, want)
 	}
 }
@@ -26,6 +26,7 @@ func TestAllNodeTypes_Contains(t *testing.T) {
 		types.NodeAwaitPoint,
 		types.NodePolicy,
 		types.NodeSecurityPattern,
+		types.NodeExternal,
 	}
 	have := make(map[types.NodeType]struct{}, len(types.AllNodeTypes()))
 	for _, n := range types.AllNodeTypes() {
@@ -51,6 +52,9 @@ func TestAllEdgeTypes_Contains(t *testing.T) {
 		types.EdgeUsesFor,
 		types.EdgeGovernedBy,
 		types.EdgeHasSecurityPattern,
+		types.EdgeDispatchesTo,
+		types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
+		types.EdgeFlowsTo,
 	}
 	have := make(map[types.EdgeType]struct{}, len(types.AllEdgeTypes()))
 	for _, e := range types.AllEdgeTypes() {
@@ -93,6 +97,7 @@ func TestAllNodeTypes_Stable(t *testing.T) {
 		types.NodeAwaitPoint,
 		types.NodePolicy,
 		types.NodeSecurityPattern,
+		types.NodeExternal,
 	}
 	if !reflect.DeepEqual(types.AllNodeTypes(), want) {
 		t.Fatalf("AllNodeTypes order changed:\n got=%v\nwant=%v", types.AllNodeTypes(), want)
@@ -123,6 +128,9 @@ func TestAllEdgeTypes_Stable(t *testing.T) {
 		types.EdgeUsesFor,
 		types.EdgeGovernedBy,
 		types.EdgeHasSecurityPattern,
+		types.EdgeDispatchesTo,
+		types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
+		types.EdgeFlowsTo,
 	}
 	if !reflect.DeepEqual(types.AllEdgeTypes(), want) {
 		t.Fatalf("AllEdgeTypes order changed:\n got=%v\nwant=%v", types.AllEdgeTypes(), want)

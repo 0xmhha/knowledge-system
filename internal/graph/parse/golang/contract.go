@@ -68,6 +68,7 @@ func FromUnit(u contract.Unit) *parse.ResolvedGraph {
 			Complexity:    d.Complexity,
 			Confidence:    d.Confidence.Stored(),
 			SubKind:       d.SubKind,
+			External:      d.External,
 		})
 	}
 	for _, r := range u.Refs {
@@ -99,6 +100,7 @@ func declOf(n *types.Node, layer func(string) contract.Layer) (contract.Decl, er
 	rest.FilePath, rest.Language, rest.Visibility, rest.Signature, rest.DocComment, rest.SubKind = "", "", "", "", "", ""
 	rest.StartLine, rest.EndLine, rest.StartByte, rest.EndByte, rest.Complexity = 0, 0, 0, 0, 0
 	rest.Confidence = ""
+	rest.External = nil
 	// Scores are not frontend output: score.Compute sets them at the end of
 	// every build. Nodes an incremental build reloads from the store still
 	// hold the previous build's scores; they are not carried, so a reloaded
@@ -131,6 +133,7 @@ func declOf(n *types.Node, layer func(string) contract.Layer) (contract.Decl, er
 		Visibility:    n.Visibility,
 		Complexity:    n.Complexity,
 		Confidence:    conf,
+		External:      n.External,
 	}, nil
 }
 

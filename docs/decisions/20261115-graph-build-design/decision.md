@@ -94,6 +94,13 @@ from the vector stage on, pack measurements on go-stablenet (development set) an
 - 질문 26 [defined]: D3: runtime links. A SSA plus VTA value flow / B CHA type hierarchy / C runtime traces from tests
   - 답: ssa 적용은 그것대로 필요하긴 한데, 이것은 go언어의 경우에서만 동작해야하고, 이것과 별도로, 실제 빌드 바이너리에 포함되는 파일리스트 추출 기능은 따로 필요해 보여. 그리고, 언어별 특징을 고려해서 공통된 형태의 지점들을 추상화하고, 추상화된 부분을 언어별로 구현체를 만들도록 하고, ssa와 같은 기능은 그 내부에 포함되는 구조가 되도록 해줘.
 
+- Addendum 2026-11-18 (user instruction, after `ckg verify --observed` measured interface-call recall 0.931 with the
+  misses reached through reflection and standard-library containers):
+  - 답: 추천 C와 H 모두 해야 할것 같아. 대상이 서로 달라. C는 채널이고, H 는 interface 라서.
+  - Effect: VTA stays the source of `dispatches_to` (`interface_method`); type-hierarchy candidates are added as a
+    separate, marked kind (`type_hierarchy`) for the implementations VTA did not link, and queries show them after the
+    value-flow ones or only when there are none. Option B is thus kept as a weaker, labelled layer, not as the source.
+
 ### D4. History knowledge: commits and PRs as node attributes, as nodes and edges, or both; split with the vector store (decided)
 - 질문 7: user instruction 2026-11-15
   - 답: 형상관리 툴(git, svn) 기반의 프로젝트는 타임 축 기준으로 스냅샷된 코드들이라고 볼수있다. ... 코드를 변경 하도록 요청한 커밋은 상태 변경 요청(transaction)으로 볼 수 있으며, 그것에는 어떤 의도가 있는지를 커밋 메시지나 pr의 내용에 존재할 수 있고, 없다면, 변경 요청 코드로 부터 의도를 유추할 수 있다. ... 관련 코드 노드에 담을 것인가, 아니면 git 의 코어 구조 처럼 상태 변화 요청도 노드 엣지로 구성해서 deck 의 형태로 그래프에 같이 연결할 것인가? 이것은 무엇이 정답이 될지는 모른다. ... 현재는 이 정보를 vector db 에 넣고 있다. ... 효율의 측면에서 봤을때, 나의 예상보다는 효과가 적어서, 그래프 db 에도 추가하여 테스트 해보는것을 검토해볼 필요가 있다.

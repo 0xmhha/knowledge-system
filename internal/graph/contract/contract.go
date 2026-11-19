@@ -87,7 +87,9 @@ const (
 	KindService     Kind = "service"
 	KindStatement   Kind = "statement"
 	KindConcurrency Kind = "concurrency"
-	KindOther       Kind = "other"
+	// KindExternal: a symbol the build uses but does not contain (schema 1.36).
+	KindExternal Kind = "external"
+	KindOther    Kind = "other"
 )
 
 // KindOf returns the common kind of a stored node type.
@@ -117,6 +119,8 @@ func KindOf(t types.NodeType) Kind {
 		return KindStatement
 	case types.NodeGoroutine, types.NodeChannel, types.NodeMutex:
 		return KindConcurrency
+	case types.NodeExternal:
+		return KindExternal
 	}
 	return KindOther
 }
@@ -151,6 +155,8 @@ type Decl struct {
 	Visibility    string
 	Complexity    int
 	Confidence    Confidence
+	// External names the package of an External declaration; nil otherwise.
+	External *types.ExternalPackage
 }
 
 // Ref is one reference from a declaration to another.

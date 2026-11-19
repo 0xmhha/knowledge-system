@@ -13,6 +13,7 @@ cousins:
 |---|---|---|
 | `find_callers` | `depth=2` | reverse BFS over `calls` + `invokes` edges |
 | `find_callees` | `depth=2` | forward BFS over `calls` + `invokes` edges |
+| `find_references` | 1 (fixed) | the users of a field, variable or constant over `reads_field`, `writes_field`, `references` |
 | `impact_of_change` | `depth=2` | reverse-dependency closure (broader than callers) |
 
 ## Decision

@@ -204,6 +204,77 @@ in 10 packages, because cgo cannot run for linux/amd64 on this host and packages
 errors) while misresolved and unexpected stay 0, which is why the load is part of the report. A linux/amd64 graph
 without cgo errors needs a Linux host or a cross C compiler. Type-reference recall stays the open item (D5 in the roadmap).
 
+### Statement links and runtime links (2026-11-18)
+
+`ckg verify` also checks the statement links of schema 1.32 (`internal/graph/verify/statements.go`). The truth is
+computed another way than the build: one flat walk keeps the stack of syntax nodes above each node and reads the
+innermost control statement and its part (cond, then, else, body, case, go) off that stack; the build walks body
+regions recursively. A fact is matched, missing, has a statement without a node, has a value or callee without a
+node, or (a graph edge) is unexpected or given to an outer statement because the inner one has no node.
+
+go-stablenet `0bf2f4d1`, linux/amd64 scope, after the fixes below (schema 1.33):
+
+| link | truth | matched | missing | unexpected | endpoint without node |
+|---|---|---|---|---|---|
+| `site_calls` | 47,806 | 47,798 | 0 | 0 | 8 |
+| `cond_reads` | 11,392 | 11,211 | 0 | 0 | 181 |
+| `cond_calls` | 6,958 | 6,955 | 0 | 0 | 3 |
+| `body_writes` | 2,721 | 2,702 | 0 | 0 | 19 |
+| `encloses` | 52,869 | 52,869 | 0 | 0 | 0 |
+
+The first run found, and the fixes removed:
+- all init functions of a package share one canonical id, and the statement and value-use passes took the first
+  file's init node for every init;
+- the statements of a goroutine's function literal had no nodes (980 `encloses` facts without a node, 525 edges given
+  to the goroutine instead), and the calls in a go statement's arguments had neither call sites nor `calls` edges
+  (static call recall 0.9997 to 1.0000, interface calls 0.9997 to 1.0000);
+- a write in a condition (`if w.v, err = f(); ...`) was recorded as `cond_reads`;
+- a call of an interface method through a struct that embeds the interface was `static`;
+- in the verifier: methods of alias types (no canonical id) were skipped, and a function literal passed as an
+  argument of a go statement was taken for the goroutine's body.
+
+Runtime links are checked by observation (`internal/graph/verify/observe`, decision D3 option C as the precision
+check). `ckg observe --src S --scope F --out COPY` copies the tree and inserts, on the same line, a call at the start
+of every function body that records the caller, call line and callee, and a call before every channel operation on a
+named channel that records the channel pointer; `ckg verify --observed DIR` compares the records of a test run in
+the copy. Observation shows what ran, so it measures recall, not precision.
+
+go-stablenet `0bf2f4d1`, tests (`-short`) of consensus/wbft, core/txpool, eth/gasprice, miner, event, core/types,
+core/vm, rpc, eth/fetcher, eth/protocols/eth, p2p/enode, trie, core/state on macOS arm64: 960 files instrumented
+(3 cgo files left out), 22 of 23 packages passed (the failing miner test passes three times alone, in the plain and
+the instrumented copy), 210,669 records.
+
+| observed | observed | in graph | recall |
+|---|---|---|---|
+| interface calls (interface method, implementation) | 693 | 645 | 0.931 |
+| function-value calls (caller, line, callee) | 472 | 466 | 0.987 |
+| channel operations linked to some channel | 545 | 401 | 0.736 |
+| sender and receiver joined by one channel node | 1,396 | 123 | 0.088 |
+
+First run (schema 1.33). 1,111 of the 3,359 `dispatches_to` edges ran. What the samples show:
+- interface calls the graph lacks are reached through reflection (rlp builds `Encoder` and `Decoder` values with
+  `reflect`) or through code without SSA bodies (a `log.Logger` kept in an `atomic.Value`);
+- 677 of the 1,273 unjoined channel pairs have both operations linked, to two nodes for one channel: its make site
+  and the field it is stored in; 596 have one operation not linked (channels from interface method results, from
+  `event.Feed`, which uses `reflect.Select`, or through outside code).
+
+Second run (schema 1.34, user decision to do both fixes): the runtime package now keeps every channel it records
+alive, because the first run's pairs mixed channels whose address the garbage collector had given to a later
+channel (1,396 observed pairs fell to 267). The graph gained `flows_to` between the names of one channel (452 edges),
+channel origins through cells a closure captures by reference, and `dispatches_to` of kind `type_hierarchy` (418
+edges) for implementations the value flow did not link. All 23 test packages passed; 597,204 records.
+
+| observed | observed | in graph | recall |
+|---|---|---|---|
+| interface calls | 693 | 693 | 1.000 (48 only by the type hierarchy) |
+| function-value calls | 473 | 467 | 0.987 |
+| channel operations linked to some channel | 544 | 495 | 0.910 |
+| sender and receiver joined by one channel | 267 | 238 | 0.891 |
+
+The channel operations left are on channels made outside the module (`time.Timer.C`, `context` channels), which have
+no node, and on `event.Feed` channels, which it handles through `reflect.Select`. The statement-link check stays at 0
+missing and 0 unexpected.
+
 ## Order of fixes (proposed)
 
 By expected effect on retrieval, cheapest first:

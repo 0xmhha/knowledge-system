@@ -830,7 +830,7 @@ func extractBlobs(root string, nodes []types.Node) map[string][]byte {
 	blobs := map[string][]byte{}
 	cache := map[string][]byte{}
 	for _, n := range nodes {
-		if n.Type == types.NodePackage {
+		if n.Type == types.NodePackage || n.Type == types.NodeExternal {
 			continue
 		}
 		if isMetaNodeType(n.Type) {

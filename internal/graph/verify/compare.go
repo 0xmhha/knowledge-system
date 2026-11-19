@@ -80,6 +80,9 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	r.CallsOutsideFuncs = truth.CallsOutsideFuncs
 	r.Unexpected = unexpected(truth, calls, typeEdges, declNode, opts.Samples)
 	r.LocalDeclNodes = localDeclNodes(nodes, declNode, opts.Samples)
+	if r.Statements, err = compareStatements(truth.Stmts, nodes, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
 	return r, nil
 }
 

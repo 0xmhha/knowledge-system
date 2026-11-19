@@ -20,7 +20,7 @@ import (
 // safety filter and registers every tool — no per-tool wiring here
 // any more (the eight register* calls moved to pkg/mcphandlers).
 func Run(ctx context.Context, store persist.StoreReader) error {
-	s := server.NewMCPServer("ckg", "0.1.0")
+	s := server.NewMCPServer("ckg", "0.1.0", server.WithInstructions(mcphandlers.Instructions()))
 	mcphandlers.RegisterAll(s, store)
 	if err := server.ServeStdio(s); err != nil {
 		return fmt.Errorf("mcp serve stdio: %w", err)

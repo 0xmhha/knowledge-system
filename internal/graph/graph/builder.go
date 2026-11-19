@@ -20,6 +20,10 @@ type edgeKey struct {
 	Type     types.EdgeType
 	Src, Dst string
 	Line     int
+	// Kind is the edge's dispatch_kind. A references edge carries the access
+	// (read or write), and a function that reads and writes a variable on one
+	// line (x = x + 1) has both edges with the same line.
+	Kind string
 }
 
 // Build merges per-language ResolvedGraphs, deduplicating nodes by ID
@@ -49,7 +53,7 @@ func Build(parts []*parse.ResolvedGraph) (*Graph, error) {
 			byID[n.ID] = n
 		}
 		for _, e := range p.Edges {
-			k := edgeKey{e.Type, e.Src, e.Dst, e.Line}
+			k := edgeKey{e.Type, e.Src, e.Dst, e.Line, e.DispatchKind}
 			if seenEdge[k] {
 				continue
 			}

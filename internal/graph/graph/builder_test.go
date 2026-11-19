@@ -65,6 +65,25 @@ func TestBuildEdgeDedup_DifferentLineKept(t *testing.T) {
 	}
 }
 
+// TestBuildEdgeDedup_AccessKindKept: a read and a write of one variable on
+// one line are two references edges that differ only in dispatch_kind.
+func TestBuildEdgeDedup_AccessKindKept(t *testing.T) {
+	f := n("aaaaaaaaaaaaaaaa", "a.f", types.NodeFunction)
+	v := n("bbbbbbbbbbbbbbbb", "a.v", types.NodeVariable)
+	g, err := graph.Build([]*parse.ResolvedGraph{
+		{Nodes: []types.Node{f, v}, Edges: []types.Edge{
+			{Src: f.ID, Dst: v.ID, Type: types.EdgeReferences, Line: 3, DispatchKind: "write", Count: 1, Confidence: types.ConfExtracted},
+			{Src: f.ID, Dst: v.ID, Type: types.EdgeReferences, Line: 3, DispatchKind: "read", Count: 1, Confidence: types.ConfExtracted},
+		}},
+	})
+	if err != nil {
+		t.Fatalf("Build: %v", err)
+	}
+	if len(g.Edges) != 2 {
+		t.Errorf("read and write edges merged: got %d, want 2", len(g.Edges))
+	}
+}
+
 func TestBuildDedupAndValidate(t *testing.T) {
 	a := n("aaaaaaaaaaaaaaaa", "a.A", types.NodeFunction)
 	b := n("bbbbbbbbbbbbbbbb", "b.B", types.NodeFunction)

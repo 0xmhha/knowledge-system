@@ -41,6 +41,10 @@ type Parser struct {
 	// EmitImplementsEdges) can iterate package scopes. Same lifetime as
 	// fileIndex — both populated by SetPackages, both nil in AST-only mode.
 	pkgs []*packages.Package
+	// ext indexes the functions, methods and types the build uses but does
+	// not contain (External nodes, schema 1.36). Built on first use.
+	ext     *externalIndex
+	extOnce sync.Once
 	// funcFieldTouchesMu guards funcFieldTouches across the parallel
 	// parseConcurrent worker pool. ParseFile is called from many goroutines;
 	// each worker merges its declVisitor's per-file touches into the parser
@@ -85,6 +89,7 @@ func (p *Parser) SetPackages(pkgs []*packages.Package) {
 	}
 	p.fileIndex = buildFileIndex(pkgs)
 	p.pkgs = pkgs
+	p.ext, p.extOnce = nil, sync.Once{}
 }
 
 // Pkgs returns the loaded packages slice registered by SetPackages, or nil

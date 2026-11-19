@@ -50,6 +50,8 @@ type Truth struct {
 	// CallsOutsideFuncs counts static calls in package-level initialisers.
 	// They have no enclosing function and are not compared.
 	CallsOutsideFuncs int
+	// Stmts are the statement links of every function body (statements.go).
+	Stmts map[StmtFact]bool
 	// Load is what the go command reported while loading the truth's
 	// packages; Modules compares the outside modules with the scope's.
 	Load    detect.LoadProblems
@@ -89,7 +91,7 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	// The truth comes from the same go command as the graph. When it cannot
 	// load a package, both lose the same references and agree, so the
 	// problems are reported with the comparison.
-	t := &Truth{Decls: map[string]Decl{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
+	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}
@@ -109,7 +111,7 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 			}
 			seenFile[rel] = true
 			w := fileWalker{t: t, info: pkg.TypesInfo, fset: pkg.Fset, rel: rel, root: absRoot, scope: scope,
-				static: static, iface: iface, typeRefs: typeRefs}
+				static: static, iface: iface, typeRefs: typeRefs, stmt: t.Stmts}
 			w.walk(f)
 		}
 	}
@@ -160,6 +162,7 @@ type fileWalker struct {
 	static   pairSet
 	iface    pairSet
 	typeRefs pairSet
+	stmt     map[StmtFact]bool
 }
 
 func (w *fileWalker) walk(f *ast.File) {
@@ -168,6 +171,11 @@ func (w *fileWalker) walk(f *ast.File) {
 		case *ast.FuncDecl:
 			cid := w.declare(d.Name)
 			if cid == "" {
+				// No canonical id (a method of an alias type): its statement
+				// links are keyed by file and line, so they are still checked.
+				if d.Body != nil {
+					w.statements(d)
+				}
 				continue
 			}
 			if d.Body == nil {
@@ -177,6 +185,7 @@ func (w *fileWalker) walk(f *ast.File) {
 				continue
 			}
 			w.relations(cid, d)
+			w.statements(d)
 		case *ast.GenDecl:
 			for _, spec := range d.Specs {
 				w.genSpec(spec)
