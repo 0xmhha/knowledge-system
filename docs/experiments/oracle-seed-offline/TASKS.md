@@ -12,7 +12,7 @@
 | 2 | 문항의 증상 문장(id와 질문만)을 받는다 | done | 2026-11-20. 문항 파일을 가진 다른 컴퓨터의 세션이 보냈다. [data/questions-symptom.json](./data/questions-symptom.json) |
 | 3 | blind 출발 심볼을 고르고 `data/seeds-blind.json`으로 커밋한다 | done | 2026-11-20. 11문항, 심볼 24개. sym-55, sym-75, sym-77은 완전한 blind가 아니다. [data/seeds-blind.json](./data/seeds-blind.json) |
 | 4 | 기준 커밋, 수정 커밋, core 라벨, 재생 도구를 받는다 | done | 2026-11-20. 11문항의 기준·수정 커밋(부모 관계 11/11 확인), core 라벨 전사본([data/oracle-relayed.json](./data/oracle-relayed.json)), 파일 sha256. 재생 스크립트는 다른 컴퓨터에 있다 |
-| 5 | core 라벨을 사람이 검토하고 수용한다 | todo | 4번 뒤 |
+| 5 | core 라벨을 사람이 검토하고 수용한다 | doing | 2026-11-20. 검토표를 만들었다([tools/review_sheet.py](./tools/review_sheet.py), 출력은 `knowledge-data/agent-eval/runs/20261120-oracle-seed-core-review/core-label-review.md`). 사용자의 결정을 기다린다. [연구일지 08](../research-log/2026-11-20-08-promoted-nodes-and-review-sheet.md) |
 | 6 | near 출발 심볼을 고른다 | todo | 4번 뒤 |
 | 7 | 빠진 기준 커밋 9개의 cold 그래프를 빌드한다 | done | 2026-11-20. `knowledge-data/agent-eval/runs/20261120-ks-4f02a749-oracle-seed-graphs`. 그래프마다 32~35초, 약 345MB, 오류 0. 경로는 [data/base-commits.json](./data/base-commits.json) |
 | 7a | 출발 심볼에서 grep과 graph 후보를 뽑는 오프라인 실행기를 쓴다 | done | 2026-11-20. [runner](./runner/doc.go). 단위 테스트 5개 통과. sym-74 한 문항으로 시험 실행(약 3초). 구현 선택은 DESIGN 4장과 [연구일지 06](../research-log/2026-11-20-06-offline-runner.md) |
