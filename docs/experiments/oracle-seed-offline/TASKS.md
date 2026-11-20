@@ -9,9 +9,9 @@
 | # | 작업 | 상태 | 막힌 이유 또는 결과 |
 |---|---|---|---|
 | 1 | 설계 문서와 기록 규칙을 저장소에 넣는다 | done | 2026-11-20. [README](../README.md), [DESIGN.md](./DESIGN.md) |
-| 2 | 문항의 증상 문장(id와 질문만)을 받는다 | blocked | 문항 파일이 사용자의 다른 컴퓨터에 있다. 2026-11-20에 그 컴퓨터의 세션에 요청했다. 답이 올지는 보장되지 않는다 |
-| 3 | blind 출발 심볼을 고르고 `data/seeds-blind.json`으로 커밋한다 | blocked | 2번을 기다린다 |
-| 4 | 기준 커밋, 수정 커밋, core 라벨, 재생 도구를 받는다 | blocked | 3번 커밋 뒤에 요청한다 |
+| 2 | 문항의 증상 문장(id와 질문만)을 받는다 | done | 2026-11-20. 문항 파일을 가진 다른 컴퓨터의 세션이 보냈다. [data/questions-symptom.json](./data/questions-symptom.json) |
+| 3 | blind 출발 심볼을 고르고 `data/seeds-blind.json`으로 커밋한다 | done | 2026-11-20. 11문항, 심볼 24개. sym-55, sym-75, sym-77은 완전한 blind가 아니다. [data/seeds-blind.json](./data/seeds-blind.json) |
+| 4 | 기준 커밋, 수정 커밋, core 라벨, 재생 도구를 받는다 | blocked | 3번 커밋 뒤 2026-11-20에 요청했다. 답을 기다린다 |
 | 5 | core 라벨을 사람이 검토하고 수용한다 | todo | 4번 뒤 |
 | 6 | near 출발 심볼을 고른다 | todo | 4번 뒤 |
 | 7 | 빠진 기준 커밋 9개의 cold 그래프를 빌드한다 | todo | 4번 뒤. sym-55, sym-77의 그래프는 `knowledge-data/agent-eval/runs/20261120-ks-4f02a749-graphs`에 있다 |

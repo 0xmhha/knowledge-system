@@ -1,0 +1,204 @@
+{
+  "picked_by": "Claude (claude-opus-5-5), at the user's instruction, 2026-11-20",
+  "rule": "Read the symptom prompt only. No git history, fix commits, diffs, oracle or core labels. Symbols were located by grep over the go-stablenet tree at 8d7930a48a31601f4456fb34d526dd4a573d38e4 (2026-03-05), a pre-fix tree for at least one question. A seed that does not exist at a question's base commit is dropped, not replaced.",
+  "frozen": "Do not edit after commit. Corrections go to a new file.",
+  "seeds": [
+    {
+      "id": "sym-55",
+      "seeds": [
+        {
+          "symbol": "startNewRound",
+          "kind": "method",
+          "file": "consensus/wbft/core/core.go"
+        },
+        {
+          "symbol": "newRoundChangeTimer",
+          "kind": "method",
+          "file": "consensus/wbft/core/core.go"
+        },
+        {
+          "symbol": "roundChangeSet",
+          "kind": "type",
+          "file": "consensus/wbft/core/roundchange.go"
+        }
+      ],
+      "blind": false,
+      "blind_note": "The 11-20 report says broad round|Round name searches did best on this question, so the round-change area was known before picking."
+    },
+    {
+      "id": "sym-58",
+      "seeds": [
+        {
+          "symbol": "SetupGenesisBlockWithOverride",
+          "kind": "function",
+          "file": "core/genesis.go"
+        },
+        {
+          "symbol": "CheckCompatible",
+          "kind": "method",
+          "file": "params/config.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-67",
+      "seeds": [
+        {
+          "symbol": "ActivePrecompiles",
+          "kind": "function",
+          "file": "core/vm/contracts.go"
+        },
+        {
+          "symbol": "PrecompiledContractsAnzeon",
+          "kind": "variable",
+          "file": "core/vm/contracts.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-70",
+      "seeds": [
+        {
+          "symbol": "DeriveFields",
+          "kind": "method",
+          "file": "core/types/receipt.go"
+        },
+        {
+          "symbol": "EffectiveGasPrice",
+          "kind": "field",
+          "file": "core/types/receipt.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-74",
+      "seeds": [
+        {
+          "symbol": "ValidateTransaction",
+          "kind": "function",
+          "file": "core/txpool/validation.go"
+        },
+        {
+          "symbol": "txMaxSize",
+          "kind": "constant",
+          "file": "core/txpool/legacypool/legacypool.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-77",
+      "seeds": [
+        {
+          "symbol": "SetGasTip",
+          "kind": "method",
+          "file": "core/txpool/txpool.go"
+        },
+        {
+          "symbol": "SetGasTipUpdater",
+          "kind": "method",
+          "file": "core/blockchain.go"
+        }
+      ],
+      "blind": false,
+      "blind_note": "The 11-20 report walks through this question in detail."
+    },
+    {
+      "id": "sym-56",
+      "seeds": [
+        {
+          "symbol": "splitAndTrim",
+          "kind": "function",
+          "file": "systemcontracts/gov_base.go"
+        },
+        {
+          "symbol": "initializeAnzeonGenesis",
+          "kind": "function",
+          "file": "core/genesis.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-63",
+      "seeds": [
+        {
+          "symbol": "proposeBurn",
+          "kind": "solidity function",
+          "file": "systemcontracts/solidity/v1/GovMinter.sol"
+        },
+        {
+          "symbol": "cancelProposal",
+          "kind": "solidity function",
+          "file": "systemcontracts/solidity/abstracts/GovBase.sol"
+        },
+        {
+          "symbol": "GetSystemContractsTransition",
+          "kind": "function",
+          "file": "systemcontracts/systemcontracts.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-69",
+      "seeds": [
+        {
+          "symbol": "DefaultStableNetMainnetGenesisBlock",
+          "kind": "function",
+          "file": "core/genesis.go"
+        },
+        {
+          "symbol": "DefaultStableNetTestnetGenesisBlock",
+          "kind": "function",
+          "file": "core/genesis.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-73",
+      "seeds": [
+        {
+          "symbol": "initializeAnzeonGenesis",
+          "kind": "function",
+          "file": "core/genesis.go"
+        },
+        {
+          "symbol": "SetBlacklisted",
+          "kind": "method",
+          "file": "core/state/statedb.go"
+        },
+        {
+          "symbol": "SetAuthorized",
+          "kind": "method",
+          "file": "core/state/statedb.go"
+        }
+      ],
+      "blind": true,
+      "blind_note": ""
+    },
+    {
+      "id": "sym-75",
+      "seeds": [
+        {
+          "symbol": "checkMessage",
+          "kind": "method",
+          "file": "consensus/wbft/core/backlog.go"
+        }
+      ],
+      "blind": false,
+      "blind_note": "Before picking, the picker had seen the subject of go-stablenet commit 0bf2f4d1, which names a fix to next-sequence message drops in the future-view check."
+    }
+  ]
+}
