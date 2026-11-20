@@ -1,0 +1,37 @@
+{
+  "source": "Relayed on 2026-11-20 by the local knowledge-system session, which got the mapping from the other machine's session. Not yet checked against questions.jsonl.",
+  "file_sha256_prefix": {
+    "questions.jsonl": "b5d062c4",
+    "oracle.jsonl": "d04042fd"
+  },
+  "bases": [
+    {
+      "id": "sym-55",
+      "base": "8d7930a48a31601f4456fb34d526dd4a573d38e4",
+      "base_date": "2026-03-05",
+      "fix": null,
+      "graph": "knowledge-data/agent-eval/runs/20261120-ks-4f02a749-graphs/graphs/8d7930a48a31601f4456fb34d526dd4a573d38e4/graph.db",
+      "nodes": 179386,
+      "edges": 488531,
+      "seeds_present_at_base": "3/3"
+    },
+    {
+      "id": "sym-77",
+      "base": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "base_date": "2026-04-22",
+      "fix": null,
+      "graph": "knowledge-data/agent-eval/runs/20261120-ks-4f02a749-graphs/graphs/0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8/graph.db",
+      "nodes": 182056,
+      "edges": 496787,
+      "seeds_present_at_base": "2/2"
+    }
+  ],
+  "graph_build": {
+    "ckg": "knowledge-system 4f02a749, bin/ckg.real in the same run folder",
+    "schema": "1.37"
+  },
+  "cautions": [
+    "Graph folders are shared with another session's three-arm run: open graph.db read-only and never rebuild in place.",
+    "uses_type edges and Policy nodes store absolute paths; compare by qname or repo-relative file, not raw edge payload."
+  ]
+}
