@@ -1,29 +1,85 @@
 {
-  "source": "Relayed on 2026-11-20 by the local knowledge-system session, which got the mapping from the other machine's session. Not yet checked against questions.jsonl.",
-  "file_sha256_prefix": {
-    "questions.jsonl": "b5d062c4",
-    "oracle.jsonl": "d04042fd"
-  },
+  "source": "Base and fix commits relayed on 2026-11-20 by the other machine's session (base from questions.jsonl base_commit; fix = child of base whose subject matches the oracle fix_title). Each fix's parent was checked to equal its base with git rev-parse in go-stablenet: 11/11.",
   "bases": [
     {
       "id": "sym-55",
       "base": "8d7930a48a31601f4456fb34d526dd4a573d38e4",
       "base_date": "2026-03-05",
-      "fix": null,
+      "fix": "ad0122af042d49022052a9783b3086d40d308db8",
       "graph": "knowledge-data/agent-eval/runs/20261120-ks-4f02a749-graphs/graphs/8d7930a48a31601f4456fb34d526dd4a573d38e4/graph.db",
       "nodes": 179386,
       "edges": 488531,
       "seeds_present_at_base": "3/3"
     },
     {
+      "id": "sym-58",
+      "base": "db7c4b43cc63b322d54d59dd1633f7398402c745",
+      "fix": "ac572e72bc1da9f73e17857d59ae5c5fec6ebd24",
+      "seeds_present_at_base": "2/2"
+    },
+    {
+      "id": "sym-67",
+      "base": "c37ae123a15cb6417e94bf3943bfa2647ebff6b8",
+      "fix": "9a5c62ae7b67b408ff328051efd408990416ee15",
+      "seeds_present_at_base": "2/2",
+      "note": "PrecompiledContractsAnzeon is a var declaration (contracts.go:127); the first automatic check missed it, a word search found it."
+    },
+    {
+      "id": "sym-70",
+      "base": "aa28927fb12048a59ac34608702eef5e1be90931",
+      "fix": "c55bf2a86e21a12bb72126ac6eb05c1974e594b8",
+      "seeds_present_at_base": "2/2"
+    },
+    {
+      "id": "sym-74",
+      "base": "319b84d113c5e34b35bdc24899e3b0b9609dd751",
+      "fix": "e5a6e9e14c1e1d225c341b55798f31cd07b0bfcd",
+      "seeds_present_at_base": "2/2"
+    },
+    {
       "id": "sym-77",
       "base": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
       "base_date": "2026-04-22",
-      "fix": null,
+      "fix": "98f05c2a0c161ac67a1d50f254ca4847c8fac2a5",
       "graph": "knowledge-data/agent-eval/runs/20261120-ks-4f02a749-graphs/graphs/0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8/graph.db",
       "nodes": 182056,
       "edges": 496787,
       "seeds_present_at_base": "2/2"
+    },
+    {
+      "id": "sym-56",
+      "base": "6e41d966316b51a4e7f17b1ab82f5e5c293e2f33",
+      "fix": "2e046947466f1160d12f1c80afe51d37b5c0c3dd",
+      "seeds_present_at_base": "0/2",
+      "seeds_missing_at_base": [
+        "splitAndTrim",
+        "initializeAnzeonGenesis"
+      ],
+      "note": "Both seeds are absent at the base (2026-02-11). The tree used for picking (8d7930a4, 2026-03-05) is later than this fix, so the picks may come from code the fix added. Dropped per the seed rule; sym-56 has no usable blind seed."
+    },
+    {
+      "id": "sym-63",
+      "base": "ad0122af042d49022052a9783b3086d40d308db8",
+      "fix": "bf17c9607a6b893ea85e6301e1cdb02d55b218de",
+      "seeds_present_at_base": "3/3"
+    },
+    {
+      "id": "sym-69",
+      "base": "88fe52145e9dc07d6bad2b861468bcbbd271de60",
+      "fix": "aa28927fb12048a59ac34608702eef5e1be90931",
+      "seeds_present_at_base": "2/2"
+    },
+    {
+      "id": "sym-73",
+      "base": "8b895799e320ce762d441b39448ca27499b4a348",
+      "fix": "319b84d113c5e34b35bdc24899e3b0b9609dd751",
+      "seeds_present_at_base": "3/3"
+    },
+    {
+      "id": "sym-75",
+      "base": "e5a6e9e14c1e1d225c341b55798f31cd07b0bfcd",
+      "fix": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "seeds_present_at_base": "1/1"
     }
   ],
   "graph_build": {
@@ -33,5 +89,9 @@
   "cautions": [
     "Graph folders are shared with another session's three-arm run: open graph.db read-only and never rebuild in place.",
     "uses_type edges and Policy nodes store absolute paths; compare by qname or repo-relative file, not raw edge payload."
-  ]
+  ],
+  "file_sha256": {
+    "questions.jsonl": "b5d062c4f0c3386744e109903b3e191a471a1e7c42aff67b9b9839e05aab4a76",
+    "oracle.jsonl": "d04042fd9ece0327c0a64356ecf88aff52e320b399d2d8c705ae7ddf8bb9b35f"
+  }
 }
