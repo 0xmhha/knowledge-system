@@ -16,7 +16,7 @@
 | 6 | near 출발 심볼을 고른다 | todo | 4번 뒤 |
 | 7 | 빠진 기준 커밋 9개의 cold 그래프를 빌드한다 | done | 2026-11-20. `knowledge-data/agent-eval/runs/20261120-ks-4f02a749-oracle-seed-graphs`. 그래프마다 32~35초, 약 345MB, 오류 0. 경로는 [data/base-commits.json](./data/base-commits.json) |
 | 7a | 출발 심볼에서 grep과 graph 후보를 뽑는 오프라인 실행기를 쓴다 | done | 2026-11-20. [runner](./runner/doc.go). 단위 테스트 5개 통과. sym-74 한 문항으로 시험 실행(약 3초). 구현 선택은 DESIGN 4장과 [연구일지 06](../research-log/2026-11-20-06-offline-runner.md) |
-| 8 | 같은 입력을 두 번 돌려 출력이 같은지 확인한다 | todo | |
+| 8 | 같은 입력을 두 번 돌려 출력이 같은지 확인한다 | done | 2026-11-20. 11문항 전부를 두 번 돌려 출력 12개 파일의 sha256이 모두 같았다. 확인 중 출발 심볼 처리 결함 2개를 찾아 고쳤다(`1791abc5`). `knowledge-data/agent-eval/runs/20261120-ks-1791abc5-oracle-seed-determinism`. [연구일지 07](../research-log/2026-11-20-07-determinism-check.md) |
 | 9 | 결정 A 비교(grep 대 graph)를 돌린다 | todo | |
 | 10 | 실험 1(정답까지의 거리)을 돌린다 | todo | |
 | 11 | 1단계 보고서 `REPORT.md`를 쓴다 | todo | |
