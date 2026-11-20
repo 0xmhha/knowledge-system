@@ -15,7 +15,7 @@
 | 5 | core 라벨을 사람이 검토하고 수용한다 | todo | 4번 뒤 |
 | 6 | near 출발 심볼을 고른다 | todo | 4번 뒤 |
 | 7 | 빠진 기준 커밋 9개의 cold 그래프를 빌드한다 | done | 2026-11-20. `knowledge-data/agent-eval/runs/20261120-ks-4f02a749-oracle-seed-graphs`. 그래프마다 32~35초, 약 345MB, 오류 0. 경로는 [data/base-commits.json](./data/base-commits.json) |
-| 7a | 출발 심볼에서 grep과 graph 후보를 뽑는 오프라인 실행기를 쓴다 | todo | 기존 재생 스크립트는 기록된 에이전트 호출을 다시 돌리는 도구라 이 실험에 맞지 않는다 |
+| 7a | 출발 심볼에서 grep과 graph 후보를 뽑는 오프라인 실행기를 쓴다 | done | 2026-11-20. [runner](./runner/doc.go). 단위 테스트 5개 통과. sym-74 한 문항으로 시험 실행(약 3초). 구현 선택은 DESIGN 4장과 [연구일지 06](../research-log/2026-11-20-06-offline-runner.md) |
 | 8 | 같은 입력을 두 번 돌려 출력이 같은지 확인한다 | todo | |
 | 9 | 결정 A 비교(grep 대 graph)를 돌린다 | todo | |
 | 10 | 실험 1(정답까지의 거리)을 돌린다 | todo | |
