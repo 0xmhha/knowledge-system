@@ -79,27 +79,77 @@ type resolvedSeed struct {
 	Nodes []loc `json:"nodes"`
 }
 
-// resolveSeeds finds, for every seed, the declaration nodes in the seed's file
-// whose name is the seed symbol. A symbol can name several nodes (methods of
-// different receivers); all of them are kept and listed.
+// isSeedType reports whether a node can stand for a seed. A seed may name a
+// struct field (sym-70 picks Receipt.EffectiveGasPrice), which is not a
+// candidate kind but is a valid place to start a walk.
+func isSeedType(t types.NodeType) bool {
+	return declTypes[t] || t == types.NodeField
+}
+
+// resolveSeeds finds, for every seed, the nodes in the seed's file whose name
+// is the seed symbol. A symbol can name several nodes (fields of different
+// structs); all of them are kept. Nodes that share one span are kept once:
+// ckg stamps a promoted method with the embedded type's file and span (for
+// example logger.dummyStatedb.SetBlacklisted at core/state/statedb.go), and
+// stage 3 resolves a citation by span anyway. Among nodes with one span the
+// one with a canonical id, then the lowest id, is kept.
 func resolveSeeds(fn *fileNodes, seeds []seedRef) ([]resolvedSeed, []types.Node, error) {
 	var out []resolvedSeed
 	var nodes []types.Node
+	taken := map[loc]bool{}
 	for _, s := range seeds {
 		ns, err := fn.get(s.File)
 		if err != nil {
 			return nil, nil, err
 		}
 		rs := resolvedSeed{seedRef: s}
-		for _, n := range sortedByLine(ns) {
-			if declTypes[n.Type] && n.Name == s.Symbol {
-				rs.Nodes = append(rs.Nodes, nodeLoc(n))
+		for _, n := range seedOrder(ns) {
+			if !isSeedType(n.Type) || n.Name != s.Symbol {
+				continue
+			}
+			l := nodeLoc(n)
+			rs.Nodes = append(rs.Nodes, l)
+			if !taken[l] {
+				taken[l] = true
 				nodes = append(nodes, n)
 			}
 		}
+		rs.Nodes = uniqueLocs(rs.Nodes)
 		out = append(out, rs)
 	}
 	return out, nodes, nil
+}
+
+// seedOrder sorts a copy of ns by start line, end line, canonical id first,
+// then node id, so the node kept for a shared span is always the same.
+func seedOrder(ns []types.Node) []types.Node {
+	out := append([]types.Node(nil), ns...)
+	sort.Slice(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		if a.StartLine != b.StartLine {
+			return a.StartLine < b.StartLine
+		}
+		if a.EndLine != b.EndLine {
+			return a.EndLine < b.EndLine
+		}
+		if ac, bc := a.CanonicalID != "", b.CanonicalID != ""; ac != bc {
+			return ac
+		}
+		return a.ID < b.ID
+	})
+	return out
+}
+
+func uniqueLocs(ls []loc) []loc {
+	seen := map[loc]bool{}
+	out := ls[:0]
+	for _, l := range ls {
+		if !seen[l] {
+			seen[l] = true
+			out = append(out, l)
+		}
+	}
+	return out
 }
 
 // resolvedGold is a core oracle location with the graph node it maps to.

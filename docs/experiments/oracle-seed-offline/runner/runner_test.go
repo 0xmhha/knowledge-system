@@ -60,6 +60,33 @@ func TestMatchOracle(t *testing.T) {
 	}
 }
 
+type fakeFiles map[string][]types.Node
+
+func TestResolveSeedsFieldAndSharedSpan(t *testing.T) {
+	promoted := node("a1", types.NodeMethod, "SetBlacklisted", 434, 439)
+	canon := node("b2", types.NodeMethod, "SetBlacklisted", 434, 439)
+	canon.CanonicalID = "state.(*StateDB).SetBlacklisted"
+	fn := &fileNodes{cache: fakeFiles{"a.go": {
+		promoted, canon,
+		node("f1", types.NodeField, "EffectiveGasPrice", 71, 71),
+		node("f2", types.NodeField, "EffectiveGasPrice", 88, 88),
+	}}}
+	seeds := []seedRef{
+		{Symbol: "SetBlacklisted", File: "a.go"},
+		{Symbol: "EffectiveGasPrice", File: "a.go"},
+	}
+	rs, nodes, err := resolveSeeds(fn, seeds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rs[0].Nodes) != 1 || len(rs[1].Nodes) != 2 {
+		t.Fatalf("got %d and %d seed locations, want 1 and 2", len(rs[0].Nodes), len(rs[1].Nodes))
+	}
+	if len(nodes) != 3 || nodes[0].ID != "b2" {
+		t.Errorf("got %d nodes, first %q; want 3 with the canonical node b2 first", len(nodes), nodes[0].ID)
+	}
+}
+
 func TestMeasure(t *testing.T) {
 	l := func(s int) *loc { return &loc{File: "a.go", StartLine: s, EndLine: s + 1} }
 	cands := make([]candidate, 0, 12)
