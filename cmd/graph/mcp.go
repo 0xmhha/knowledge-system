@@ -28,6 +28,7 @@ func newMCPCmd() *cobra.Command {
 	var maxResultChars int
 	var noInstructions bool
 	var toolTextFile string
+	var nameAsBoth, reasonTail bool
 	cmd := &cobra.Command{
 		Use:   "mcp",
 		Short: "Run the MCP stdio server",
@@ -52,6 +53,7 @@ func newMCPCmd() *cobra.Command {
 			}
 			mcphandlers.SetSearchCodeDir(resultDir)
 			mcphandlers.SetSearchCodeMaxResultChars(maxResultChars)
+			mcphandlers.SetSearchCodeOptions(nameAsBoth, reasonTail)
 			// One record per tool call (area "mcp"), so an answer can be traced
 			// to the call and arguments that produced it.
 			opts := []server.ServerOption{
@@ -103,6 +105,8 @@ func newMCPCmd() *cobra.Command {
 	cmd.Flags().StringVar(&resultDir, "result-dir", "", "folder where a search_code result larger than one response is saved as a JSON file; the response then holds only its path (default: $CKG_SEARCH_CODE_DIR; empty sends an index instead). The agent must be allowed to read it")
 	cmd.Flags().IntVar(&maxResultChars, "max-result-chars", 0, "declare to the client (Claude Code _meta anthropic/maxResultSizeChars) the largest search_code result it should give the model inline; 0 declares none")
 	cmd.Flags().BoolVar(&noInstructions, "no-instructions", false, "do not send the server guide (instructions) in the MCP handshake; for measuring what the guide changes")
+	cmd.Flags().BoolVar(&nameAsBoth, "name-as-both", false, "answer search_code in=name with in=both: name matches first, then body matches")
+	cmd.Flags().BoolVar(&reasonTail, "reason-tail", false, "give search_code a reasons argument; graph neighbours of the hits that hold a reason word are listed after the hits under related")
 	cmd.Flags().StringVar(&toolTextFile, "tool-text", "", "JSON file with the server guide and tool definitions another ckg build sent (instructions, tools by name); the server sends those texts instead of its own and hides tools the file does not list. For measuring what tool text changes, with behaviour held the same")
 	_ = cmd.MarkFlagRequired("graph")
 	return cmd

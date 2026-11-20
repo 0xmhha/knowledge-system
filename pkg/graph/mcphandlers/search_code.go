@@ -69,6 +69,26 @@ var searchCodeMaxResultChars int
 // the client; 0 or less declares none.
 func SetSearchCodeMaxResultChars(n int) { searchCodeMaxResultChars = max(n, 0) }
 
+// searchCodeNameAsBoth answers in=name with in=both: name matches first,
+// then body matches. Agents that started with in=name got only declarations
+// whose name matches, and in recorded sessions those starts went with low
+// recall (sym-77: 16 sessions 0.22 against 0.65 for body starts); replaying
+// the recorded in=name calls as in=both put 24 instead of 8 cores in the
+// result (runs/20261119-ks-1e1003c0-offline2/d16).
+var searchCodeNameAsBoth bool
+
+// searchCodeReasons enables the reasons argument: words for why the pattern
+// is searched. The graph neighbours of the hits whose source or name holds
+// one of them are listed after the hits, under related (offline: present
+// cores 74 to 168 on the tune split, 22 to 45 on holdout, with the hits'
+// ranks unchanged; runs/20261119-ks-1e1003c0-offline2/d18).
+var searchCodeReasons bool
+
+// SetSearchCodeOptions turns the two options on or off.
+func SetSearchCodeOptions(nameAsBoth, reasons bool) {
+	searchCodeNameAsBoth, searchCodeReasons = nameAsBoth, reasons
+}
+
 // SetSearchCodePageBytes changes the part size for clients whose output limit
 // differs (MAX_MCP_OUTPUT_TOKENS) and for runs that need results split. A
 // value of 0 or less keeps the current size.
@@ -96,6 +116,8 @@ type codeDecl struct {
 type codeIndex struct {
 	decls  []codeDecl
 	byFile map[string][]int // indexes into decls
+	idOnce sync.Once
+	byID   map[string]int // node id -> index into decls, see byNodeID
 }
 
 // buildCodeIndex loads every searchable declaration and its source.
@@ -208,12 +230,12 @@ type codeSearchSide struct {
 
 func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, side codeSearchSide, about string) {
 	reader = safeReader(reader)
-	tool := nsTool(name,
+	params := []mcp.ToolOption{
 		mcp.WithReadOnlyHintAnnotation(true),
-		mcp.WithDescription(about+
-			"A result too large for one response comes as an index: every matched declaration in one short row with its matched line numbers and the uses on them, without code; ask for the code of the ones you choose with ids=[qname, ...] (the server guide explains every key). "+
-			"Each matched line lists the calls and value uses the graph resolved on it (resolve), and expand=[\"callers\",\"callees\",\"references\"] attaches the next hop. "+
-			"Use it as you would grep: enumerate the names and code shapes you expect (\"Flush|flush|Writer\", \"sql\\\\.Open\\\\(\", \"func \\\\(.*\\\\) \\\\w*Render\\\\w*\\\\(\"). "+
+		mcp.WithDescription(about +
+			"A result too large for one response comes as an index: every matched declaration in one short row with its matched line numbers and the uses on them, without code; ask for the code of the ones you choose with ids=[qname, ...] (the server guide explains every key). " +
+			"Each matched line lists the calls and value uses the graph resolved on it (resolve), and expand=[\"callers\",\"callees\",\"references\"] attaches the next hop. " +
+			"Use it as you would grep: enumerate the names and code shapes you expect (\"Flush|flush|Writer\", \"sql\\\\.Open\\\\(\", \"func \\\\(.*\\\\) \\\\w*Render\\\\w*\\\\(\"). " +
 			"Covers the build's files as of the last graph build; packages outside the build and uncommitted edits are not searched."),
 		mcp.WithString("pattern", mcp.Required(), mcp.Description("RE2 regular expression; | separates alternatives. With fixed=true, a literal string.")),
 		mcp.WithBoolean("fixed", mcp.Description("treat pattern as a literal string")),
@@ -226,7 +248,11 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 		mcp.WithNumber("context", mcp.Description("lines of context around each matched line (0 to 3, default 0)")),
 		mcp.WithArray("ids", mcp.Description("qname (or canonical_id) of declarations to return in full: their matched lines with code, uses and expansion. Use it after a result that came as an index"), mcp.WithStringItems()),
 		mcp.WithNumber("page", mcp.Description("part to return when a result asked for with ids is still too large for one response (default 1)")),
-	)
+	}
+	if searchCodeReasons {
+		params = append(params, mcp.WithArray("reasons", mcp.Description("words for why you search: the behaviour or mechanism the problem is about, as words or identifier parts (\"retry\", \"expire\", \"cache\"). Declarations next to the hits in the graph (callers, callees, values read or written) whose source or name holds one of them are listed after the hits, under related"), mcp.WithStringItems()))
+	}
+	tool := nsTool(name, params...)
 	if searchCodeMaxResultChars > 0 {
 		tool.Meta = &mcp.Meta{AdditionalFields: map[string]any{"anthropic/maxResultSizeChars": searchCodeMaxResultChars}}
 	}
@@ -235,10 +261,18 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 		if err != nil {
 			return nil, err
 		}
+		in := req.GetString("in", "body")
+		if searchCodeNameAsBoth && in == "name" {
+			in = "both"
+		}
+		var reasons []string
+		if searchCodeReasons {
+			reasons = req.GetStringSlice("reasons", nil)
+		}
 		out, err := searchCode(reader, index, searchCodeArgs{
 			pattern: req.GetString("pattern", ""), fixed: req.GetBool("fixed", false),
 			ignoreCase: req.GetBool("ignore_case", false), word: req.GetBool("word", false),
-			in: req.GetString("in", "body"), path: req.GetString("path", ""), tests: side.tests,
+			in: in, path: req.GetString("path", ""), tests: side.tests, reasons: reasons,
 			expand: req.GetStringSlice("expand", nil), resolve: req.GetBool("resolve", true),
 			context: int(req.GetFloat("context", 0)), only: req.GetStringSlice("ids", nil), trace: traceFrom(ctx),
 		})
@@ -267,6 +301,7 @@ type searchCodeArgs struct {
 	limit             int        // declarations to return; 0 returns all
 	linesPerHit       int        // matched lines shown per declaration; 0 shows all
 	only              []string   // canonical ids (or qnames) to return in full; empty returns all
+	reasons           []string   // words for why the pattern is searched; adds related neighbours
 	trace             *callTrace // nil unless the call is traced
 }
 
@@ -542,6 +577,11 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 		a.trace.add("search_code.expand", map[string]any{"cut": cut})
 	}
 	out["hits"] = rows
+	if len(a.reasons) > 0 && len(a.only) == 0 && len(ids) > 0 {
+		related, words := reasonNeighbours(reader, idx, ids, a.reasons)
+		out["related"] = related
+		a.trace.add("search_code.related", map[string]any{"reasons": words, "related": len(related)})
+	}
 	if len(shownExt) > 0 {
 		out["packages"] = externalPackageList(shownExt)
 	}
@@ -1149,4 +1189,198 @@ func rankBefore(da, db codeDecl, a, b *codeHit) bool {
 		return a.matches > b.matches
 	}
 	return da.node.PageRank > db.node.PageRank
+}
+
+// reasonEdges link a declaration to its graph neighbours for reasons:
+// calls either way and value reads and writes either way.
+var reasonEdges = map[types.EdgeType]bool{
+	types.EdgeCalls: true, types.EdgeInvokes: true, types.EdgeReadsField: true,
+	types.EdgeWritesField: true, types.EdgeReferences: true,
+}
+
+// reasonWords lowercases the reasons, drops words shorter than 3 characters
+// and duplicates.
+func reasonWords(reasons []string) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, r := range reasons {
+		w := strings.ToLower(strings.TrimSpace(r))
+		if len(w) < 3 || seen[w] {
+			continue
+		}
+		seen[w] = true
+		out = append(out, w)
+	}
+	return out
+}
+
+// wordsIn returns the reason words text holds, case-insensitively. A reason
+// of several words ("round change") also matches the identifier forms
+// roundChange and round_change, which plain substring matching missed: in the
+// I3 agent run (runs/20261120-ks-i3opts) "round change" matched 0 rows.
+func wordsIn(text string, words []string) []string {
+	t := strings.ToLower(text)
+	var got []string
+	for _, w := range words {
+		for _, form := range reasonForms(w) {
+			if strings.Contains(t, form) {
+				got = append(got, w)
+				break
+			}
+		}
+	}
+	return got
+}
+
+// reasonForms is a lowercased reason as written, and for a reason of several
+// words (split on spaces, hyphens and underscores) also joined with nothing
+// and with underscores.
+func reasonForms(w string) []string {
+	parts := strings.FieldsFunc(w, func(r rune) bool { return r == ' ' || r == '-' || r == '_' })
+	if len(parts) < 2 {
+		return []string{w}
+	}
+	return []string{w, strings.Join(parts, " "), strings.Join(parts, ""), strings.Join(parts, "_")}
+}
+
+// reasonNeighbours lists the declarations next to the hits in the graph
+// (production code, not hits themselves) whose source or qualified name holds
+// a reason word. Each row says which words it holds and through which hit it
+// was reached. Order: more distinct reason words in the declaration's source
+// plus in the names of its own neighbours, then higher PageRank. The hits are
+// not reordered: related comes after them.
+func reasonNeighbours(reader store.Reader, idx *codeIndex, hitIDs []string, reasons []string) ([]map[string]any, []string) {
+	words := reasonWords(reasons)
+	out := []map[string]any{}
+	if len(words) == 0 {
+		return out, words
+	}
+	byID := idx.byNodeID()
+	isHit := make(map[string]bool, len(hitIDs))
+	for _, id := range hitIDs {
+		isHit[id] = true
+	}
+	edges, err := reader.QueryEdgesForNodes(hitIDs)
+	if err != nil {
+		return out, words
+	}
+	type cand struct {
+		decl int
+		via  []map[string]any
+	}
+	cands := map[string]*cand{}
+	var order []string
+	addVia := func(other, hit string, t types.EdgeType, outward bool) {
+		if isHit[other] {
+			return
+		}
+		di, ok := byID[other]
+		if !ok || idx.decls[di].test {
+			return
+		}
+		c, ok := cands[other]
+		if !ok {
+			c = &cand{decl: di}
+			cands[other] = c
+			order = append(order, other)
+		}
+		dir := "from"
+		if outward {
+			dir = "to"
+		}
+		c.via = append(c.via, map[string]any{"hit": idx.decls[byID[hit]].node.QualifiedName, "edge": string(t), "dir": dir})
+	}
+	for _, e := range edges {
+		if !reasonEdges[e.Type] || e.Src == e.Dst {
+			continue
+		}
+		if isHit[e.Src] {
+			addVia(e.Dst, e.Src, e.Type, true)
+		}
+		if isHit[e.Dst] {
+			addVia(e.Src, e.Dst, e.Type, false)
+		}
+	}
+	if len(order) == 0 {
+		return out, words
+	}
+	// Names of each candidate's own neighbours, for the score.
+	nb := map[string][]string{}
+	if es, err := reader.QueryEdgesForNodes(order); err == nil {
+		var ids []string
+		for _, e := range es {
+			if !reasonEdges[e.Type] {
+				continue
+			}
+			if _, ok := cands[e.Src]; ok {
+				nb[e.Src] = append(nb[e.Src], e.Dst)
+				ids = append(ids, e.Dst)
+			}
+			if _, ok := cands[e.Dst]; ok {
+				nb[e.Dst] = append(nb[e.Dst], e.Src)
+				ids = append(ids, e.Src)
+			}
+		}
+		name := map[string]string{}
+		if ns, err := reader.NodesByIDs(ids); err == nil {
+			for _, n := range ns {
+				name[n.ID] = n.QualifiedName
+			}
+		}
+		for id, list := range nb {
+			names := make([]string, 0, len(list))
+			for _, x := range list {
+				names = append(names, name[x])
+			}
+			nb[id] = names
+		}
+	}
+	type row struct {
+		id    string
+		own   []string
+		score int
+	}
+	var rows []row
+	for _, id := range order {
+		d := idx.decls[cands[id].decl]
+		own := wordsIn(d.node.QualifiedName+"\n"+strings.Join(d.lines, "\n"), words)
+		if len(own) == 0 {
+			continue
+		}
+		near := map[string]bool{}
+		for _, w := range wordsIn(strings.Join(nb[id], "\n"), words) {
+			near[w] = true
+		}
+		rows = append(rows, row{id: id, own: own, score: len(own) + len(near)})
+	}
+	sort.SliceStable(rows, func(i, j int) bool {
+		if rows[i].score != rows[j].score {
+			return rows[i].score > rows[j].score
+		}
+		return idx.decls[cands[rows[i].id].decl].node.PageRank > idx.decls[cands[rows[j].id].decl].node.PageRank
+	})
+	for _, r := range rows {
+		n := idx.decls[cands[r.id].decl].node
+		m := map[string]any{"qname": n.QualifiedName, "type": string(n.Type), "file": n.FilePath,
+			"start_line": n.StartLine, "end_line": n.EndLine, "reason_matched": r.own, "via": cands[r.id].via}
+		if n.Signature != "" {
+			m["signature"] = n.Signature
+		}
+		if n.CanonicalID != "" {
+			m["canonical_id"] = n.CanonicalID
+		}
+		out = append(out, m)
+	}
+	return out, words
+}
+
+// byNodeID maps node id to the index of its declaration, built once.
+func (x *codeIndex) byNodeID() map[string]int {
+	x.idOnce.Do(func() {
+		x.byID = make(map[string]int, len(x.decls))
+		for i, d := range x.decls {
+			x.byID[d.node.ID] = i
+		}
+	})
+	return x.byID
 }

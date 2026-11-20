@@ -28,8 +28,22 @@ func Instructions() string {
 		"{change_history}", ToolName("change_history"),
 		"{value_dependencies}", ToolName("value_dependencies"),
 	)
-	return r.Replace(instructionsTemplate + "\n\n" + strings.ReplaceAll(searchCodeManual, "^", "`"))
+	manual := searchCodeManual
+	if searchCodeReasons {
+		manual += "\n" + searchCodeReasonsManual
+	}
+	if searchCodeNameAsBoth {
+		manual += "\n" + searchCodeNameAsBothManual
+	}
+	return r.Replace(instructionsTemplate + "\n\n" + strings.ReplaceAll(manual, "^", "`"))
 }
+
+// searchCodeReasonsManual explains the reasons argument and the related key;
+// it is sent only when the server has the option on.
+const searchCodeReasonsManual = `- Reasons: give {search_code} reasons, the words for why you search (the behaviour or mechanism the problem is about), next to the pattern. The result then has ^related^ after ^hits^: declarations next to the hits in the graph whose source or name holds a reason word, each with ^qname^, ^type^, ^file^, ^start_line^, ^end_line^, ^signature^, ^canonical_id^, ^reason_matched^ (the reason words it holds) and ^via^ (the hits it is next to: ^hit^, ^edge^ and ^dir^, "to" when the hit reaches it, "from" when it reaches the hit). The hits keep their order; related lists more reason words first. A related declaration may not match the pattern at all: that is how code the pattern missed gets in.`
+
+// searchCodeNameAsBothManual says what in=name returns with the option on.
+const searchCodeNameAsBothManual = `- in=name also returns body matches: name matches come first, then declarations whose body matches.`
 
 const instructionsTemplate = `This server is a code graph of one repository: every function, method, type, field, variable and constant of the files the build compiles (Go, Solidity), and the edges between them — calls, interface dispatch, reads and writes of fields and package-level values, type uses, goroutines, channels and locks, and the merged PRs that changed each symbol. Every result carries file and line; read the code there to confirm.
 

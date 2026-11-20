@@ -411,3 +411,101 @@ func TestSearchCodeOrderKeys(t *testing.T) {
 		t.Error("a name match no longer comes first")
 	}
 }
+
+// TestSearchCodeNameAsBoth: with the option on, in=name also returns body
+// matches, name matches first; off, in=name returns name matches only.
+func TestSearchCodeNameAsBoth(t *testing.T) {
+	store := newFixtureStore(t)
+	defer SetSearchCodeOptions(false, false)
+	SetSearchCodeOptions(false, false)
+	name := callTool(t, store, "search_code", map[string]any{"pattern": `fire`, "in": "name"})
+	SetSearchCodeOptions(true, false)
+	both := callTool(t, store, "search_code", map[string]any{"pattern": `fire`, "in": "name"})
+	if len(hitNames(both)) <= len(hitNames(name)) {
+		t.Fatalf("in=name as both returned %v, name only %v", hitNames(both), hitNames(name))
+	}
+	seenBody := false
+	for _, r := range both["hits"].([]any) {
+		h := r.(map[string]any)
+		if h["name_match"] == nil {
+			seenBody = true
+		} else if seenBody {
+			t.Errorf("name match %v after a body match", h["qname"])
+		}
+	}
+	if !strings.Contains(Instructions(), "in=name also returns body matches") {
+		t.Error("guide does not say in=name returns body matches")
+	}
+}
+
+// TestSearchCodeReasons: with the option on, reasons add related rows: graph
+// neighbours of the hits that hold a reason word, after the hits, with the
+// hits unchanged. Fixture: clock.arm calls clock.fire inside a closure and
+// clock.disarm; searching "AfterFunc" hits arm, and the reason "fire" reaches
+// clock.fire through arm.
+func TestSearchCodeReasons(t *testing.T) {
+	store := newFixtureStore(t)
+	defer SetSearchCodeOptions(false, false)
+	SetSearchCodeOptions(false, false)
+	plain := callTool(t, store, "search_code", map[string]any{"pattern": `AfterFunc`, "reasons": []any{"fire"}})
+	if plain["related"] != nil {
+		t.Fatal("reasons used while the option is off")
+	}
+	SetSearchCodeOptions(false, true)
+	out := callTool(t, store, "search_code", map[string]any{"pattern": `AfterFunc`, "reasons": []any{"fire", "x"}})
+	if strings.Join(hitNames(out), ",") != strings.Join(hitNames(plain), ",") {
+		t.Errorf("hits changed: %v vs %v", hitNames(out), hitNames(plain))
+	}
+	var found map[string]any
+	for _, r := range asSlice(out["related"]) {
+		m := r.(map[string]any)
+		if m["qname"] == "coll1.clock.fire" {
+			found = m
+		}
+		for _, h := range hitNames(out) {
+			if m["qname"] == h {
+				t.Errorf("related repeats hit %s", h)
+			}
+		}
+	}
+	if found == nil {
+		t.Fatalf("clock.fire not related: %v", out["related"])
+	}
+	if rm := asSlice(found["reason_matched"]); len(rm) != 1 || rm[0] != "fire" {
+		t.Errorf("reason_matched = %v (short words must be dropped)", found["reason_matched"])
+	}
+	if v := asSlice(found["via"]); len(v) == 0 || v[0].(map[string]any)["hit"] != "coll1.clock.arm" {
+		t.Errorf("via = %v, want coll1.clock.arm", found["via"])
+	}
+	s := server.NewMCPServer("t", "0")
+	RegisterAll(s, store)
+	if _, ok := s.GetTool("search_code").Tool.InputSchema.Properties["reasons"]; !ok {
+		t.Error("reasons argument missing with the option on")
+	}
+	for _, key := range []string{"related", "reason_matched", "via"} {
+		if !strings.Contains(Instructions(), "`"+key+"`") {
+			t.Errorf("guide does not explain %q", key)
+		}
+	}
+}
+
+// TestReasonWordForms: a reason of several words matches its identifier
+// forms; a one-word reason matches as a substring, ignoring case.
+func TestReasonWordForms(t *testing.T) {
+	cases := []struct {
+		text, reason string
+		want         bool
+	}{
+		{"func (c *core) sendRoundChange()", "round change", true},
+		{"var round_change_timer", "round change", true},
+		{"// start a round change", "round-change", true},
+		{"func roundTimer()", "round change", false},
+		{"func expireTimer()", "expire", true},
+	}
+	for _, c := range cases {
+		got := len(wordsIn(c.text, reasonWords([]string{c.reason}))) == 1
+		if got != c.want {
+			t.Errorf("wordsIn(%q, %q) = %v, want %v", c.text, c.reason, got, c.want)
+		}
+	}
+}
