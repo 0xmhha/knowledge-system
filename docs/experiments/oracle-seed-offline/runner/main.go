@@ -21,6 +21,16 @@ const armGrep = "grep"
 // summaryFile is the per-run measure table.
 const summaryFile = "summary.json"
 
+// runMode names what the runner computes.
+type runMode string
+
+const (
+	// modeCompare ranks grep and graph candidates (decision A).
+	modeCompare runMode = "compare"
+	// modeDistance finds the shortest seed-to-gold paths (experiment 1).
+	modeDistance runMode = "distance"
+)
+
 // graphsSegment marks a graph directory; the runner refuses to write there.
 const graphsSegment = string(filepath.Separator) + "graphs" + string(filepath.Separator)
 
@@ -31,6 +41,7 @@ type config struct {
 	root    string // the directory that holds knowledge-data
 	outDir  string
 	only    map[string]bool
+	mode    runMode
 }
 
 func main() {
@@ -57,6 +68,17 @@ func run(ctx context.Context, args []string) error {
 		if len(cfg.only) > 0 && !cfg.only[q.ID] {
 			continue
 		}
+		if cfg.mode == modeDistance {
+			dr, err := runDistance(cfg, q)
+			if err != nil {
+				return fmt.Errorf("question %s: %w", q.ID, err)
+			}
+			if err := writeJSON(filepath.Join(cfg.outDir, q.ID+".json"), dr); err != nil {
+				return err
+			}
+			slog.Info("question done", "id", q.ID, "gold", len(dr.Gold))
+			continue
+		}
 		res, err := runQuestion(ctx, cfg, q)
 		if err != nil {
 			return fmt.Errorf("question %s: %w", q.ID, err)
@@ -69,6 +91,9 @@ func run(ctx context.Context, args []string) error {
 			"grep_candidates", res.Measures[armGrep].Candidates,
 			"graph_candidates", res.Measures[string(variantUncapped)].Candidates)
 	}
+	if cfg.mode == modeDistance {
+		return nil
+	}
 	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
 }
 
@@ -78,6 +103,7 @@ func parseFlags(args []string) (config, error) {
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A) or distance (experiment 1)")
 	if err := fs.Parse(args); err != nil {
 		return config{}, err
 	}
@@ -91,7 +117,11 @@ func parseFlags(args []string) (config, error) {
 	if strings.Contains(absOut+string(filepath.Separator), graphsSegment) {
 		return config{}, fmt.Errorf("-out %s is inside a graph directory", absOut)
 	}
-	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}}
+	m := runMode(*mode)
+	if m != modeCompare && m != modeDistance {
+		return config{}, fmt.Errorf("-mode %q: want %s or %s", *mode, modeCompare, modeDistance)
+	}
+	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m}
 	for _, id := range strings.Split(*only, ",") {
 		if id = strings.TrimSpace(id); id != "" {
 			cfg.only[id] = true
@@ -186,6 +216,27 @@ func variantNames() []string {
 		out = append(out, string(v))
 	}
 	return out
+}
+
+// runDistance opens the question's graph and runs experiment 1 on it.
+func runDistance(cfg config, q question) (distanceResult, error) {
+	dbPath := filepath.Join(cfg.root, q.GraphDB)
+	r, err := store.OpenReadOnly(dbPath)
+	if err != nil {
+		return distanceResult{}, fmt.Errorf("open %s: %w", dbPath, err)
+	}
+	// Read-only (immutable=1): a close error loses nothing.
+	defer func() { _ = r.Close() }()
+	fn := newFileNodes(r)
+	_, seedNodes, err := resolveSeeds(fn, q.Seeds)
+	if err != nil {
+		return distanceResult{}, err
+	}
+	gold, err := resolveGold(fn, q.Core, seedNodes)
+	if err != nil {
+		return distanceResult{}, err
+	}
+	return distanceQuestion(r, fn, q, seedNodes, gold)
 }
 
 // summaryRow is one line of summary.json.

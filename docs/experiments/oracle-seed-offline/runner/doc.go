@@ -22,4 +22,10 @@
 // The runner writes one JSON file per question with both full candidate
 // lists, and summary.json with the per-question measures (reach, recall@10,
 // gold ranks, candidate counts). It never writes to a graph directory.
+//
+// With -mode distance it runs experiment 1 instead: for each core location it
+// finds the shortest path from the seeds over the graph's raw edges, up to six
+// hops, in three walks (forward edges only; both directions; both directions
+// without the structural contains, defines, imports and exports edges), and
+// records each hop's edge type, direction, node and node degree.
 package main

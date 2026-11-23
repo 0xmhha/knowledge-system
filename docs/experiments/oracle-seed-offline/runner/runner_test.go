@@ -136,3 +136,65 @@ func TestParseFlagsRefusesGraphDir(t *testing.T) {
 		t.Fatal("want an error for an -out inside a graph directory")
 	}
 }
+
+func TestShortestPathsModes(t *testing.T) {
+	// s -calls-> a -calls-> g ; s <-contains- f -contains-> g ; b -calls-> g
+	edges := []types.Edge{
+		{Src: "s", Dst: "a", Type: types.EdgeCalls},
+		{Src: "a", Dst: "g", Type: types.EdgeCalls},
+		{Src: "f", Dst: "s", Type: types.EdgeContains},
+		{Src: "f", Dst: "g", Type: types.EdgeContains},
+		{Src: "s", Dst: "a", Type: types.EdgeCalls}, // duplicate is ignored
+	}
+	adj := newAdjacency(edges)
+	if got := adj.degree["s"]; got != 2 {
+		t.Fatalf("degree(s) = %d, want 2 (duplicate edge counted once)", got)
+	}
+	target := map[string]bool{"g": true}
+	cases := []struct {
+		mode     walkMode
+		wantHops int
+		wantEdge types.EdgeType
+	}{
+		{walkForward, 2, types.EdgeCalls},
+		{walkUndirected, 2, types.EdgeCalls}, // forward arcs are tried first, so the calls path wins the tie
+		{walkUndirectedSemantic, 2, types.EdgeCalls},
+	}
+	for _, c := range cases {
+		p := shortestPaths(adj, []string{"s"}, target, c.mode)["g"]
+		if len(p) != c.wantHops || p[0].edge != c.wantEdge {
+			t.Errorf("%s: path %+v, want %d hops starting with %s", c.mode, p, c.wantHops, c.wantEdge)
+		}
+	}
+	// Only the structural route connects s to h; the semantic walk must not find it.
+	adj2 := newAdjacency([]types.Edge{
+		{Src: "f", Dst: "s", Type: types.EdgeContains},
+		{Src: "f", Dst: "h", Type: types.EdgeContains},
+	})
+	h := map[string]bool{"h": true}
+	if p := shortestPaths(adj2, []string{"s"}, h, walkUndirected)["h"]; len(p) != 2 || p[0].fwd {
+		t.Errorf("undirected: path %+v, want 2 hops, first one backwards", p)
+	}
+	if _, ok := shortestPaths(adj2, []string{"s"}, h, walkUndirectedSemantic)["h"]; ok {
+		t.Error("semantic walk crossed a structural edge")
+	}
+	if _, ok := shortestPaths(adj2, []string{"s"}, h, walkForward)["h"]; ok {
+		t.Error("forward walk went against an edge")
+	}
+}
+
+func TestShortestPathsMaxHops(t *testing.T) {
+	var edges []types.Edge
+	ids := []string{"n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7"}
+	for i := 0; i+1 < len(ids); i++ {
+		edges = append(edges, types.Edge{Src: ids[i], Dst: ids[i+1], Type: types.EdgeCalls})
+	}
+	adj := newAdjacency(edges)
+	got := shortestPaths(adj, []string{"n0"}, map[string]bool{"n6": true, "n7": true}, walkForward)
+	if len(got["n6"]) != maxHops {
+		t.Errorf("n6: %d hops, want %d", len(got["n6"]), maxHops)
+	}
+	if _, ok := got["n7"]; ok {
+		t.Errorf("n7 is %d hops away but was reached", maxHops+1)
+	}
+}
