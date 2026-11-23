@@ -198,3 +198,58 @@ func TestShortestPathsMaxHops(t *testing.T) {
 		t.Errorf("n7 is %d hops away but was reached", maxHops+1)
 	}
 }
+
+func TestChangedDecls(t *testing.T) {
+	n := func(id, name string, s, e int) types.Node {
+		return types.Node{ID: id, Name: name, Type: types.NodeFunction, FilePath: "a.go", StartLine: s, EndLine: e, CanonicalID: id}
+	}
+	promoted := n("a0", "g", 20, 30)
+	promoted.CanonicalID = ""
+	fn := &fileNodes{cache: map[string][]types.Node{"a.go": {n("f", "f", 1, 10), n("g", "g", 20, 30), promoted}}}
+	cases := []struct {
+		name string
+		hs   []hunk
+		want []string
+	}{
+		{"line inside", []hunk{{File: "a.go", Start: 5, End: 5}}, []string{"f"}},
+		{"range over two, one per location, canonical node kept", []hunk{{File: "a.go", Start: 8, End: 22}}, []string{"f", "g"}},
+		{"between declarations", []hunk{{File: "a.go", Start: 12, End: 14}}, nil},
+		{"insert inside", []hunk{{File: "a.go", Start: 5, End: 5, Insert: true}}, []string{"f"}},
+		{"insert after the end", []hunk{{File: "a.go", Start: 10, End: 10, Insert: true}}, nil},
+	}
+	for _, c := range cases {
+		got, err := changedDecls(fn, c.hs)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var ids []string
+		for _, g := range got {
+			ids = append(ids, g.ID)
+		}
+		if len(ids) != len(c.want) {
+			t.Errorf("%s: %v, want %v", c.name, ids, c.want)
+			continue
+		}
+		for i := range ids {
+			if ids[i] != c.want[i] {
+				t.Errorf("%s: %v, want %v", c.name, ids, c.want)
+			}
+		}
+	}
+}
+
+func TestSameFileArmOrder(t *testing.T) {
+	mk := func(s, e int) types.Node {
+		return types.Node{Type: types.NodeFunction, FilePath: "a.go", StartLine: s, EndLine: e}
+	}
+	got := sameFileArm([]types.Node{mk(1, 5), mk(50, 60), mk(10, 20), mk(30, 40), mk(30, 40)}, loc{"a.go", 10, 20})
+	want := []int{1, 30, 50}
+	if len(got) != len(want) {
+		t.Fatalf("got %d candidates, want %d", len(got), len(want))
+	}
+	for i, w := range want {
+		if got[i].StartLine != w || got[i].Rank != i+1 {
+			t.Errorf("rank %d: start %d, want %d", i+1, got[i].StartLine, w)
+		}
+	}
+}

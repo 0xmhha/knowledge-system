@@ -28,4 +28,8 @@
 // hops, in three walks (forward edges only; both directions; both directions
 // without the structural contains, defines, imports and exports edges), and
 // records each hop's edge type, direction, node and node degree.
+//
+// With -mode cochange it runs the experiment of DESIGN.md section 10: from each
+// declaration a fix changed, rank the fix's other changed declarations with
+// grep, graph and a same-file reference list (leave-one-out).
 package main

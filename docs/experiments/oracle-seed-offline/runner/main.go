@@ -29,7 +29,13 @@ const (
 	modeCompare runMode = "compare"
 	// modeDistance finds the shortest seed-to-gold paths (experiment 1).
 	modeDistance runMode = "distance"
+	// modeCochange ranks the other declarations of a fix from each changed
+	// declaration (DESIGN.md section 10).
+	modeCochange runMode = "cochange"
 )
+
+// cochangeFile is the input of the cochange mode, inside the data directory.
+const cochangeFile = "cochange-questions.json"
 
 // graphsSegment marks a graph directory; the runner refuses to write there.
 const graphsSegment = string(filepath.Separator) + "graphs" + string(filepath.Separator)
@@ -56,6 +62,9 @@ func run(ctx context.Context, args []string) error {
 	cfg, err := parseFlags(args)
 	if err != nil {
 		return err
+	}
+	if cfg.mode == modeCochange {
+		return runCochangeAll(ctx, cfg)
 	}
 	qs, err := loadQuestions(cfg.dataDir, cfg.files)
 	if err != nil {
@@ -98,13 +107,40 @@ func run(ctx context.Context, args []string) error {
 	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
 }
 
+// runCochangeAll runs the co-change experiment over every listed question.
+func runCochangeAll(ctx context.Context, cfg config) error {
+	qs, err := loadCochange(cfg.dataDir, cochangeFile)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(cfg.outDir, 0o755); err != nil {
+		return fmt.Errorf("create %s: %w", cfg.outDir, err)
+	}
+	rows := []cochangeSummary{}
+	for _, q := range qs {
+		if (len(cfg.only) > 0 && !cfg.only[q.ID]) || q.GraphDB == "" {
+			continue
+		}
+		res, err := runCochange(ctx, cfg, q)
+		if err != nil {
+			return fmt.Errorf("question %s: %w", q.ID, err)
+		}
+		if err := writeJSON(filepath.Join(cfg.outDir, q.ID+".json"), res); err != nil {
+			return err
+		}
+		rows = append(rows, res.summary())
+		slog.Info("question done", "id", q.ID, "changed", len(res.Changed))
+	}
+	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
+}
+
 func parseFlags(args []string) (config, error) {
 	fs := flag.NewFlagSet("runner", flag.ContinueOnError)
 	data := fs.String("data", "", "experiment data directory (seeds-blind.json, oracle-accepted.json, base-commits.json)")
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
-	mode := fs.String("mode", string(modeCompare), "compare (decision A) or distance (experiment 1)")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1) or cochange (section 10)")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
 	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
 	bases := fs.String("bases", defaultBasesFile, "base commit file name inside -data")
@@ -127,8 +163,8 @@ func parseFlags(args []string) (config, error) {
 			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
 		}
 	}
-	if m != modeCompare && m != modeDistance {
-		return config{}, fmt.Errorf("-mode %q: want %s or %s", *mode, modeCompare, modeDistance)
+	if m != modeCompare && m != modeDistance && m != modeCochange {
+		return config{}, fmt.Errorf("-mode %q: want %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange)
 	}
 	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
 	for _, id := range strings.Split(*only, ",") {
