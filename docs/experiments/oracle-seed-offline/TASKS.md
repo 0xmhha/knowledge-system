@@ -25,7 +25,7 @@
 
 | # | 작업 | 상태 | 막힌 이유 또는 결과 |
 |---|---|---|---|
-| 12 | 수정 커밋에서 문항 후보를 뽑는다 | todo | 2025-01-01 이후 제목이 `fix`로 시작하는 커밋 109개 |
+| 12 | 수정 커밋에서 문항 후보를 뽑는다 | done | 2026-11-23. 109개 중 1단계 수정 10개를 빼고, 비테스트 Go 파일 1~5개를 바꾸며 그중 하나 이상이 기존 파일인 79개를 후보로 남겼다. 이 중 24개는 로그나 에러 문자열을 바꾸고, 22개는 테스트도 바꾼다. [data/stage2-candidates.json](./data/stage2-candidates.json)(해시와 수치만), [tools/stage2_candidates.py](./tools/stage2_candidates.py). 커밋 제목이 든 표는 `knowledge-data/agent-eval/runs/20261123-oracle-seed-stage2-candidates/candidates.md` |
 | 13 | 문항마다 증상 문장, blind 출발 심볼, core 라벨을 만든다 | todo | |
 | 14 | 실험 2~4를 돌린다 | todo | |
 | 15 | 결정 A를 다시 판정하고 보고서를 고친다 | todo | |
