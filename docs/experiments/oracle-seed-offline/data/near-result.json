@@ -1,0 +1,349 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261123-ks-715d93dd-oracle-seed-near",
+ "seeds": "seeds-near.json",
+ "labels": "oracle-accepted.json",
+ "note": "upper bound with good start points; not the decision A verdict. gold_ranks: -1 = not reached; hops -1 = not within 6",
+ "questions": [
+  {
+   "id": "sym-55",
+   "grep": {
+    "candidates": 1,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 92,
+    "gold_ranks": [
+     36,
+     -1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "Core.stopTimer",
+     "forward": 2,
+     "undirected": 2,
+     "undirected_semantic": 2
+    },
+    {
+     "symbol": "Core.newRetrySendingRoundChangeTimer",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 2
+    }
+   ]
+  },
+  {
+   "id": "sym-58",
+   "grep": {
+    "candidates": 6,
+    "gold_ranks": [
+     4,
+     2
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 85,
+    "gold_ranks": [
+     4,
+     1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "MakeChain",
+     "forward": -1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    },
+    {
+     "symbol": "New",
+     "forward": -1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  },
+  {
+   "id": "sym-67",
+   "grep": {
+    "candidates": 5,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 13,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "PrecompiledContractsAnzeon",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 3
+    },
+    {
+     "symbol": "EVM.precompile",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 2
+    }
+   ]
+  },
+  {
+   "id": "sym-70",
+   "grep": {
+    "candidates": 8,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 83,
+    "gold_ranks": [
+     -1,
+     4
+    ]
+   },
+   "winner": "graph",
+   "hops": [
+    {
+     "symbol": "StateTransition.TransitionDb",
+     "forward": -1,
+     "undirected": 3,
+     "undirected_semantic": 3
+    },
+    {
+     "symbol": "Receipts.DeriveFields",
+     "forward": 1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  },
+  {
+   "id": "sym-74",
+   "grep": {
+    "candidates": 8,
+    "gold_ranks": [
+     5
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 1,
+    "gold_ranks": [
+     -1
+    ]
+   },
+   "winner": "grep",
+   "hops": [
+    {
+     "symbol": "txMaxSize",
+     "forward": -1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  },
+  {
+   "id": "sym-77",
+   "grep": {
+    "candidates": 1,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 9,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "lookup.RemotesBelowTip",
+     "forward": -1,
+     "undirected": 3,
+     "undirected_semantic": 3
+    },
+    {
+     "symbol": "AnzeonTipEnv.SetCurrentBlock",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 2
+    }
+   ]
+  },
+  {
+   "id": "sym-56",
+   "grep": {
+    "candidates": 4,
+    "gold_ranks": [
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 55,
+    "gold_ranks": [
+     3
+    ]
+   },
+   "winner": "graph",
+   "hops": [
+    {
+     "symbol": "initializeBase",
+     "forward": 1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  },
+  {
+   "id": "sym-63",
+   "grep": {
+    "candidates": 26,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 21,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "SetConfigFromChainConfig",
+     "forward": -1,
+     "undirected": 3,
+     "undirected_semantic": 3
+    },
+    {
+     "symbol": "init",
+     "forward": -1,
+     "undirected": 3,
+     "undirected_semantic": 3
+    }
+   ]
+  },
+  {
+   "id": "sym-69",
+   "grep": {
+    "candidates": 5,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 20,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "DefaultStableNetMainnetGenesisBlock",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 2
+    },
+    {
+     "symbol": "DefaultStableNetTestnetGenesisBlock",
+     "forward": -1,
+     "undirected": 2,
+     "undirected_semantic": 2
+    }
+   ]
+  },
+  {
+   "id": "sym-73",
+   "grep": {
+    "candidates": 11,
+    "gold_ranks": [
+     8,
+     1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 113,
+    "gold_ranks": [
+     6,
+     4
+    ]
+   },
+   "winner": "tie",
+   "hops": [
+    {
+     "symbol": "InjectContracts",
+     "forward": -1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    },
+    {
+     "symbol": "initializeGovCouncil",
+     "forward": 1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  },
+  {
+   "id": "sym-75",
+   "grep": {
+    "candidates": 1,
+    "gold_ranks": [
+     -1,
+     -1
+    ]
+   },
+   "graph_uncapped": {
+    "candidates": 12,
+    "gold_ranks": [
+     3,
+     4
+    ]
+   },
+   "winner": "graph",
+   "hops": [
+    {
+     "symbol": "Core.isSequenceTooFarAhead",
+     "forward": 1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    },
+    {
+     "symbol": "Core.isRoundTooFarAhead",
+     "forward": 1,
+     "undirected": 1,
+     "undirected_semantic": 1
+    }
+   ]
+  }
+ ],
+ "tally": {
+  "graph": 3,
+  "grep": 1,
+  "tie": 7
+ }
+}
