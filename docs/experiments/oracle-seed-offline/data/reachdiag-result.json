@@ -1,0 +1,118 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261123-ks-d6f0cfbc-oracle-seed-reachdiag",
+ "design": "DESIGN.md section 11, committed as d6f0cfbc before the run",
+ "from": "20261123-ks-8d596b0b-oracle-seed-cochange/run1",
+ "deterministic": "two runs, 45 files with equal sha256",
+ "summary": [
+  {
+   "set": "new, other file",
+   "pairs": 204,
+   "reasons": {
+    "S": 17,
+    "W2": 143,
+    "W4": 42,
+    "W5": 2
+   },
+   "reached_by_walk": {
+    "S": 17,
+    "W1": 15,
+    "W2": 158,
+    "W2hub": 124,
+    "W3": 44,
+    "W3hub": 40,
+    "W4": 202,
+    "W4hub": 196,
+    "W5": 204
+   },
+   "median_decls_reached": {
+    "W1": 26,
+    "W2": 1924,
+    "W2hub": 302,
+    "W3": 16,
+    "W3hub": 14,
+    "W4": 3898,
+    "W4hub": 567,
+    "W5": 16632
+   }
+  },
+  {
+   "set": "new, same file",
+   "pairs": 252,
+   "reasons": {
+    "S": 55,
+    "W1": 3,
+    "W2": 194
+   },
+   "reached_by_walk": {
+    "S": 55,
+    "W1": 58,
+    "W2": 252,
+    "W2hub": 240,
+    "W3": 132,
+    "W3hub": 132,
+    "W4": 252,
+    "W4hub": 250,
+    "W5": 252
+   },
+   "median_decls_reached": {
+    "W1": 26,
+    "W2": 1924,
+    "W2hub": 302,
+    "W3": 16,
+    "W3hub": 14,
+    "W4": 3898,
+    "W4hub": 567,
+    "W5": 16632
+   }
+  },
+  {
+   "set": "all, other file",
+   "pairs": 546,
+   "reasons": {
+    "S": 51,
+    "W1": 2,
+    "W2": 291,
+    "W3": 6,
+    "W4": 82,
+    "W5": 114
+   },
+   "reached_by_walk": {
+    "S": 51,
+    "W1": 51,
+    "W2": 342,
+    "W2hub": 234,
+    "W3": 118,
+    "W3hub": 110,
+    "W4": 432,
+    "W4hub": 372,
+    "W5": 546
+   },
+   "median_decls_reached": {
+    "W1": 24,
+    "W2": 1736,
+    "W2hub": 321,
+    "W3": 16,
+    "W3hub": 13,
+    "W4": 3855,
+    "W4hub": 569,
+    "W5": 16577
+   }
+  }
+ ],
+ "per_question_new_other_file": {
+  "questions": 11,
+  "mean_fraction_of_pairs_reached": {
+   "S": 0.145,
+   "W1": 0.137,
+   "W3": 0.339,
+   "W2hub": 0.681,
+   "W2": 0.828
+  },
+  "questions_with_a_reached_pair": {
+   "S": 6,
+   "W3": 9
+  },
+  "pairs_reached_by_W3_but_not_S_or_W1": 36,
+  "note": "W3, W2hub, W2 fractions are post hoc readings of one run; not a verdict"
+ }
+}
