@@ -27,5 +27,6 @@
 |---|---|---|---|
 | 12 | 수정 커밋에서 문항 후보를 뽑는다 | done | 2026-11-23. 109개 중 1단계 수정 10개를 빼고, 비테스트 Go 파일 1~5개를 바꾸며 그중 하나 이상이 기존 파일인 79개를 후보로 남겼다. 이 중 24개는 로그나 에러 문자열을 바꾸고, 22개는 테스트도 바꾼다. [data/stage2-candidates.json](./data/stage2-candidates.json)(해시와 수치만), [tools/stage2_candidates.py](./tools/stage2_candidates.py). 커밋 제목이 든 표는 `knowledge-data/agent-eval/runs/20261123-oracle-seed-stage2-candidates/candidates.md` |
 | 13 | 문항마다 증상 문장, blind 출발 심볼, core 라벨을 만든다 | blocked | 2026-11-23. 두 번 시험했다. 코드를 읽는 방식 10문항, 이름 목록만 보는 방식 5문항 모두에서 core 전부가 출발 심볼이었다. 이 설정으로 빌드되는 후보는 69개 중 36개다. 방법을 다시 정할 때까지 멈춘다. 연구일지 [06](../research-log/2026-11-23-06-stage2-seed-pilot.md), [07](../research-log/2026-11-23-07-stage2-names-only-pilot.md) |
+| 13a | 함께 고친 곳 찾기 실험을 설계하고 돌린다(DESIGN 10장) | done | 2026-11-23. 13번 대신 사용자가 정했다. 새 문항 15개에서 graph 7승, grep 4승, 무승부 4. 판정하지 않는다. 같은 파일 참고 방식이 둘보다 나았다. [data/cochange-result.json](./data/cochange-result.json), [연구일지 2026-11-23-08](../research-log/2026-11-23-08-cochange-result.md) |
 | 14 | 실험 2~4를 돌린다 | todo | |
 | 15 | 결정 A를 다시 판정하고 보고서를 고친다 | todo | |

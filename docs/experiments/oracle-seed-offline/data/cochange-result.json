@@ -1,0 +1,567 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261123-ks-8d596b0b-oracle-seed-cochange",
+ "design": "DESIGN.md section 10, committed as 2347d855 before the run",
+ "deterministic": "two runs, 45 files with equal sha256",
+ "primary": {
+  "questions": 15,
+  "graph": 7,
+  "grep": 4,
+  "tie": 4,
+  "decided": 11,
+  "graph_share": 0.6364,
+  "line": "at least 8 decided and 9/11 (0.818)",
+  "verdict": "none"
+ },
+ "stage1_reported_only": {
+  "questions": 11,
+  "graph": 4,
+  "grep": 2,
+  "tie": 5
+ },
+ "other_file_gold_new": {
+  "questions": 11,
+  "graph": 4,
+  "grep": 3,
+  "tie": 4
+ },
+ "pooled_pairs_new": {
+  "all": {
+   "pairs": 456,
+   "graph_uncapped": {
+    "reached": 72,
+    "top10": 54
+   },
+   "grep": {
+    "reached": 83,
+    "top10": 41
+   },
+   "same_file": {
+    "reached": 252,
+    "top10": 156
+   }
+  },
+  "other_file": {
+   "pairs": 204,
+   "graph_uncapped": {
+    "reached": 17,
+    "top10": 13
+   },
+   "grep": {
+    "reached": 28,
+    "top10": 9
+   }
+  }
+ },
+ "vs_same_file_new": {
+  "graph_uncapped": {
+   "win": 3,
+   "lose": 8,
+   "tie": 4
+  },
+  "grep": {
+   "win": 3,
+   "lose": 9,
+   "tie": 3
+  }
+ },
+ "starts": 138,
+ "graph_starts_without_candidates": 18,
+ "questions": [
+  {
+   "id": "sym-55",
+   "stage1": true,
+   "changed": 7,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.119,
+    "grep": 0.0476,
+    "same_file": 0.1429
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1429,
+    "grep": 0.1667,
+    "same_file": 0.4762
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.0714,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-58",
+   "stage1": true,
+   "changed": 7,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0.0476,
+    "same_file": 0.3333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.0952,
+    "grep": 0.4286,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0.0286,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-67",
+   "stage1": true,
+   "changed": 4,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1667,
+    "same_file": 0.3333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1667,
+    "same_file": 0.5
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.0833,
+    "grep": 0.25,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-70",
+   "stage1": true,
+   "changed": 6,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.2333,
+    "grep": 0.1,
+    "same_file": 0
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-74",
+   "stage1": true,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1667,
+    "same_file": 0.3333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.1667,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-77",
+   "stage1": true,
+   "changed": 2,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-56",
+   "stage1": true,
+   "changed": 6,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.2,
+    "grep": 0.1,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.2,
+    "grep": 0.1,
+    "same_file": 0
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.2,
+    "grep": 0.1,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-63",
+   "stage1": true,
+   "changed": 16,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.0125,
+    "grep": 0.025,
+    "same_file": 0.0375
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.0167,
+    "grep": 0.075,
+    "same_file": 0.2583
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0.0083,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-69",
+   "stage1": true,
+   "changed": 2,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 1
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "sym-73",
+   "stage1": true,
+   "changed": 8,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1607,
+    "grep": 0.0714,
+    "same_file": 0.1429
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.2857,
+    "grep": 0.0893,
+    "same_file": 0.25
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.119,
+    "grep": 0.0387,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "sym-75",
+   "stage1": true,
+   "changed": 2,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 1
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "cc-01",
+   "stage1": false,
+   "changed": 2,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-06",
+   "stage1": false,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.6667,
+    "grep": 0.3333,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.6667,
+    "grep": 0.3333,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.5,
+    "grep": 0.3333,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-07",
+   "stage1": false,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0.3333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-08",
+   "stage1": false,
+   "changed": 4,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.5,
+    "grep": 0.1667,
+    "same_file": 0.0833
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.5,
+    "grep": 0.25,
+    "same_file": 0.1667
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.375,
+    "grep": 0.1667,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-09",
+   "stage1": false,
+   "changed": 8,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1071,
+    "grep": 0.125,
+    "same_file": 0.6964
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1071,
+    "grep": 0.1786,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "cc-10",
+   "stage1": false,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.3333,
+    "grep": 0.1667,
+    "same_file": 1
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.3333,
+    "grep": 0.3333,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "cc-11",
+   "stage1": false,
+   "changed": 5,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0.1,
+    "same_file": 0.4
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1,
+    "grep": 0.3,
+    "same_file": 0.4
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0.0667,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-14",
+   "stage1": false,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.6667,
+    "grep": 0.3333,
+    "same_file": 0.3333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.6667,
+    "grep": 0.5,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.5,
+    "grep": 0.3333,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-17",
+   "stage1": false,
+   "changed": 5,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0.05,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.05,
+    "grep": 0.05,
+    "same_file": 0
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0.05,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-18",
+   "stage1": false,
+   "changed": 10,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1444,
+    "grep": 0.1222,
+    "same_file": 0.6222
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.2778,
+    "grep": 0.1778,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "cc-19",
+   "stage1": false,
+   "changed": 2,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0.5,
+    "same_file": 1
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0.5,
+    "same_file": 1
+   },
+   "mean_recall_at_10_other_file": {}
+  },
+  {
+   "id": "cc-23",
+   "stage1": false,
+   "changed": 6,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.0333,
+    "grep": 0.0333,
+    "same_file": 0.1333
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.0667,
+    "grep": 0.2333,
+    "same_file": 0.2667
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.0333,
+    "grep": 0.0417,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-24",
+   "stage1": false,
+   "changed": 14,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.0879,
+    "grep": 0.0549,
+    "same_file": 0.1868
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.0989,
+    "grep": 0.1593,
+    "same_file": 0.3846
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0.0321,
+    "grep": 0.0119,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-29",
+   "stage1": false,
+   "changed": 3,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   },
+   "mean_reach": {
+    "graph_uncapped": 0,
+    "grep": 0.3333,
+    "same_file": 0.3333
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  },
+  {
+   "id": "cc-34",
+   "stage1": false,
+   "changed": 4,
+   "mean_recall_at_10": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.0833,
+    "same_file": 0.1667
+   },
+   "mean_reach": {
+    "graph_uncapped": 0.1667,
+    "grep": 0.0833,
+    "same_file": 0.1667
+   },
+   "mean_recall_at_10_other_file": {
+    "graph_uncapped": 0,
+    "grep": 0,
+    "same_file": 0
+   }
+  }
+ ]
+}
