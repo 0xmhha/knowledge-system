@@ -36,4 +36,4 @@ docs/experiments/
 
 | 폴더 | 내용 | 상태 |
 |---|---|---|
-| [oracle-seed-offline](./oracle-seed-offline/DESIGN.md) | 출발 심볼을 고정하고 grep과 graph 탐색을 비교, 멈춤 규칙 탐색 | 설계 |
+| [oracle-seed-offline](./oracle-seed-offline/DESIGN.md) | 출발 심볼을 고정하고 grep과 graph 탐색을 비교, 멈춤 규칙 탐색 | 1단계 끝([보고서](./oracle-seed-offline/REPORT.md)), 2단계 전 |
