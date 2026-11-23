@@ -1,0 +1,326 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261123-ks-a0eb266c-oracle-seed-confirm",
+ "design": "DESIGN.md section 12, ranking fixed in dc1e9600, build change in 888608f7, all before the run",
+ "deterministic": "two runs, 34 + 34 files with equal sha256",
+ "questions": {
+  "selected": 47,
+  "graph_built": 33,
+  "not_built": {
+   "go_version_below_1.17": 8,
+   "ckg_build_hang": 6
+  },
+  "with_two_changed_declarations": 27,
+  "with_other_file_targets": 27
+ },
+ "primary": {
+  "compare": "all7/log vs grep, other-file targets",
+  "win": 5,
+  "lose": 2,
+  "tie": 20,
+  "decided": 7,
+  "sign_p_two_sided": 0.453,
+  "ties_where_both_are_zero": 18,
+  "line": "at least 12 decided and p < 0.05",
+  "verdict": "none"
+ },
+ "secondary": {
+  "all7/log vs graph_uncapped, other-file": {
+   "win": 5,
+   "lose": 8,
+   "tie": 14,
+   "decided": 13,
+   "sign_p_two_sided": 0.581
+  },
+  "graph_uncapped vs grep, other-file": {
+   "win": 8,
+   "lose": 2,
+   "tie": 17,
+   "decided": 10,
+   "sign_p_two_sided": 0.109
+  },
+  "all7/log vs grep, all targets": {
+   "win": 18,
+   "lose": 0,
+   "tie": 9,
+   "decided": 18,
+   "sign_p_two_sided": 7.63e-06
+  },
+  "all7/log vs same_file, all targets": {
+   "win": 9,
+   "lose": 6,
+   "tie": 12,
+   "decided": 15,
+   "sign_p_two_sided": 0.607
+  }
+ },
+ "mean_recall_at_10_other_file": {
+  "grep": 0.0366,
+  "graph_uncapped": 0.0955,
+  "same_file": 0.0,
+  "all7/log": 0.1101
+ },
+ "mean_reach_other_file": {
+  "grep": 0.1754,
+  "graph_uncapped": 0.1293,
+  "same_file": 0.0,
+  "all7/log": 0.4347
+ },
+ "mean_recall_at_10_all": {
+  "grep": 0.0741,
+  "graph_uncapped": 0.1426,
+  "same_file": 0.1836,
+  "all7/log": 0.263
+ },
+ "mean_reach_all": {
+  "grep": 0.2305,
+  "graph_uncapped": 0.1628,
+  "same_file": 0.2452,
+  "all7/log": 0.6085
+ },
+ "tuning_value_of_the_same_ranking": 0.2561,
+ "per_question": [
+  {
+   "id": "cf-09",
+   "changed": 8,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0667,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-10",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-11",
+   "changed": 6,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-13",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.5,
+    "graph_uncapped": 1.0,
+    "all7/log": 0.5
+   }
+  },
+  {
+   "id": "cf-15",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.3333
+   }
+  },
+  {
+   "id": "cf-16",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 1.0
+   }
+  },
+  {
+   "id": "cf-17",
+   "changed": 5,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.05,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-18",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.5,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-19",
+   "changed": 7,
+   "other_file_recall_at_10": {
+    "grep": 0.1667,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-20",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-21",
+   "changed": 7,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0238,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-22",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.5
+   }
+  },
+  {
+   "id": "cf-23",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.5,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-24",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.1667
+   }
+  },
+  {
+   "id": "cf-26",
+   "changed": 5,
+   "other_file_recall_at_10": {
+    "grep": 0.1333,
+    "graph_uncapped": 0.2333,
+    "all7/log": 0.1333
+   }
+  },
+  {
+   "id": "cf-27",
+   "changed": 4,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-28",
+   "changed": 5,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-29",
+   "changed": 5,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-30",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-31",
+   "changed": 4,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-33",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-34",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-36",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-37",
+   "changed": 11,
+   "other_file_recall_at_10": {
+    "grep": 0.126,
+    "graph_uncapped": 0.1048,
+    "all7/log": 0.3023
+   }
+  },
+  {
+   "id": "cf-42",
+   "changed": 2,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-43",
+   "changed": 3,
+   "other_file_recall_at_10": {
+    "grep": 0.0,
+    "graph_uncapped": 0.0,
+    "all7/log": 0.0
+   }
+  },
+  {
+   "id": "cf-44",
+   "changed": 10,
+   "other_file_recall_at_10": {
+    "grep": 0.0625,
+    "graph_uncapped": 0.0986,
+    "all7/log": 0.0361
+   }
+  }
+ ]
+}
