@@ -519,3 +519,36 @@ func TestExpand_CallerFromReverseWalkIsTheNeighbor(t *testing.T) {
 		t.Fatalf("Neighbors = %+v, want the caller caller.go as Target with the seed as Source", out.Neighbors)
 	}
 }
+
+// Beyond the first hop neither end of a callers edge is the seed: the edge
+// runs far caller -> nearer caller, both outside the seed. The neighbor is the
+// far caller. Reading Target there listed the nearer caller a second time and
+// dropped every caller of the last hop. Through an interface the first hop has
+// the same shape: the edge ends at the interface method, not at the seed.
+func TestExpand_FarCallersAreNeighbors(t *testing.T) {
+	t.Parallel()
+	seeds := []stage2.ScoredCitation{seed("a.go", 1, 10, 4.0)}
+	ckg := &ckgclient.Fake{NeighborEdges: []contract.Neighbor{
+		{Source: cit("near.go", 20, 40), Target: cit("a.go", 2, 10), Relation: contract.RelationCalledBy, Distance: 1},
+		{Source: cit("far.go", 50, 60), Target: cit("near.go", 20, 40), Relation: contract.RelationCalledBy, Distance: 2},
+		{Source: cit("viaiface.go", 5, 9), Target: cit("iface.go", 3, 3), Relation: contract.RelationCalledBy, Distance: 1},
+	}}
+	e, _ := New(ckg)
+	out, err := e.Expand(context.Background(), seeds, contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]int{}
+	for _, n := range out.Neighbors {
+		got[n.Edge.Target.File] = n.Edge.Distance
+	}
+	want := map[string]int{"near.go": 1, "far.go": 2, "viaiface.go": 1}
+	if len(got) != len(want) {
+		t.Errorf("neighbors %v, want %v", got, want)
+	}
+	for f, d := range want {
+		if got[f] != d {
+			t.Errorf("%s: distance %d, want %d (neighbors %v)", f, got[f], d, got)
+		}
+	}
+}
