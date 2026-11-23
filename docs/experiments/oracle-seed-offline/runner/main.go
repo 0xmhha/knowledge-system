@@ -74,7 +74,7 @@ func run(ctx context.Context, args []string) error {
 
 func parseFlags(args []string) (config, error) {
 	fs := flag.NewFlagSet("runner", flag.ContinueOnError)
-	data := fs.String("data", "", "experiment data directory (seeds-blind.json, oracle-relayed.json, base-commits.json)")
+	data := fs.String("data", "", "experiment data directory (seeds-blind.json, oracle-accepted.json, base-commits.json)")
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")

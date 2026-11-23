@@ -1,0 +1,676 @@
+{
+  "source": "Core labels after review, derived from oracle-relayed.json (which is not edited).",
+  "review": {
+    "date": "2026-11-23",
+    "reviewer": "Claude, delegated by the user (\"라벨은 우선 너가 설정한 기준으로 진행해보고, 이상하면 다시 검토하는것으로 할께.\")",
+    "criterion": "core = a location a senior engineer given the symptom must end up finding as the cause; cleanup or supporting edits stay related",
+    "method": "fix diff hunks per location (tools/review_sheet.py) and changed lines per function",
+    "changes": [
+      "sym-73 core/genesis.go InjectContracts: related -> core"
+    ]
+  },
+  "questions": [
+    {
+      "id": "sym-55",
+      "confidence": "low",
+      "review_note": "kept. stopTimer and newRetrySendingRoundChangeTimer hold the fix logic; newRoundChangeTimer and handlePreprepareMsg only add two timerMu lines each.",
+      "citations": [
+        {
+          "core": false,
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 81,
+          "end_line": 121,
+          "symbol": "Core",
+          "kind": "type",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 153,
+          "end_line": 155,
+          "symbol": "Core.IsCurrentProposal",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 315,
+          "end_line": 327,
+          "symbol": "Core.stopTimer",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 329,
+          "end_line": 383,
+          "symbol": "Core.newRoundChangeTimer",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "consensus/wbft/core/core.go",
+          "start_line": 392,
+          "end_line": 404,
+          "symbol": "Core.newRetrySendingRoundChangeTimer",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/extraseal.go",
+          "start_line": 131,
+          "end_line": 182,
+          "symbol": "Core.ProcessExtraSeal",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/preprepare.go",
+          "start_line": 109,
+          "end_line": 179,
+          "symbol": "Core.handlePreprepareMsg",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/request.go",
+          "start_line": 59,
+          "end_line": 78,
+          "symbol": "Core.checkRequestMsg",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "consensus/wbft/core/roundstate.go",
+          "start_line": 120,
+          "end_line": 125,
+          "symbol": "roundState.SetSequence",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-58",
+      "confidence": "medium",
+      "review_note": "kept. MakeChain and New load the chain config without the overrides that the engine later uses.",
+      "citations": [
+        {
+          "core": true,
+          "file": "cmd/utils/flags.go",
+          "start_line": 2094,
+          "end_line": 2152,
+          "symbol": "MakeChain",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/genesis.go",
+          "start_line": 236,
+          "end_line": 379,
+          "symbol": "SetupGenesisBlockWithOverride",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "eth/backend.go",
+          "start_line": 108,
+          "end_line": 303,
+          "symbol": "New",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-67",
+      "confidence": "medium",
+      "review_note": "kept. The new precompile sits in the Anzeon set and EVM.precompile picks the set without a fork gate.",
+      "citations": [
+        {
+          "core": true,
+          "file": "core/vm/contracts.go",
+          "start_line": 127,
+          "end_line": 141,
+          "symbol": "PrecompiledContractsAnzeon",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/vm/contracts.go",
+          "start_line": 158,
+          "end_line": 177,
+          "symbol": "init",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/vm/contracts.go",
+          "start_line": 179,
+          "end_line": 195,
+          "symbol": "ActivePrecompiles",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/vm/evm.go",
+          "start_line": 40,
+          "end_line": 58,
+          "symbol": "EVM.precompile",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-70",
+      "confidence": "high",
+      "review_note": "kept. TransitionDb and Receipts.DeriveFields carry the effective gas price change.",
+      "citations": [
+        {
+          "core": false,
+          "file": "core/blockchain.go",
+          "start_line": 2100,
+          "end_line": 2123,
+          "symbol": "BlockChain.collectLogs",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/chain_makers.go",
+          "start_line": 296,
+          "end_line": 424,
+          "symbol": "GenerateChain",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/rawdb/accessors_chain.go",
+          "start_line": 623,
+          "end_line": 661,
+          "symbol": "ReadReceipts",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/state_transition.go",
+          "start_line": 437,
+          "end_line": 589,
+          "symbol": "StateTransition.TransitionDb",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/types/receipt.go",
+          "start_line": 382,
+          "end_line": 436,
+          "symbol": "Receipts.DeriveFields",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/protocol_params.go",
+          "start_line": 222,
+          "end_line": 222,
+          "symbol": "TransferEventSig",
+          "kind": "value",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-74",
+      "confidence": "high",
+      "review_note": "kept. txMaxSize is the pool limit that rejects the transaction.",
+      "citations": [
+        {
+          "core": false,
+          "file": "core/txpool/legacypool/legacypool.go",
+          "start_line": 46,
+          "end_line": 50,
+          "symbol": "txSlotSize",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/txpool/legacypool/legacypool.go",
+          "start_line": 52,
+          "end_line": 56,
+          "symbol": "txMaxSize",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/protocol_params.go",
+          "start_line": 140,
+          "end_line": 140,
+          "symbol": "MaxCodeSize",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/protocol_params.go",
+          "start_line": 141,
+          "end_line": 141,
+          "symbol": "MaxInitCodeSize",
+          "kind": "value",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-77",
+      "confidence": "high",
+      "review_note": "kept. RemotesBelowTip and AnzeonTipEnv.SetCurrentBlock carry the refresh fix.",
+      "citations": [
+        {
+          "core": true,
+          "file": "core/txpool/legacypool/legacypool.go",
+          "start_line": 2057,
+          "end_line": 2067,
+          "symbol": "lookup.RemotesBelowTip",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "eth/gasprice/anzeon.go",
+          "start_line": 48,
+          "end_line": 63,
+          "symbol": "AnzeonTipEnv.SetCurrentBlock",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-56",
+      "confidence": "medium",
+      "review_note": "kept. The fix applies the same trim helper to every initialize* function, so initializeBase alone is an arbitrary pick; no seed resolves for this question, so it is a tie either way.",
+      "citations": [
+        {
+          "core": false,
+          "file": "consensus/wbft/config.go",
+          "start_line": 124,
+          "end_line": 151,
+          "symbol": "Config.GetSystemContracts",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/coin_adapter.go",
+          "start_line": 35,
+          "end_line": 170,
+          "symbol": "initializeCoinAdapter",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "systemcontracts/gov_base.go",
+          "start_line": 124,
+          "end_line": 325,
+          "symbol": "initializeBase",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/gov_council.go",
+          "start_line": 61,
+          "end_line": 109,
+          "symbol": "initializeGovCouncil",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/gov_master_minter.go",
+          "start_line": 58,
+          "end_line": 160,
+          "symbol": "initializeMasterMinter",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/gov_validator.go",
+          "start_line": 53,
+          "end_line": 185,
+          "symbol": "initializeValidator",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-63",
+      "confidence": "medium",
+      "review_note": "kept. The upgrade is registered in SetConfigFromChainConfig and systemcontracts init; the new GovMinter v2 file cannot be a location at the base commit.",
+      "citations": [
+        {
+          "core": false,
+          "file": "consensus/wbft/testutil.go",
+          "start_line": 30,
+          "end_line": 84,
+          "symbol": "SetConfigFromChainConfig",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/stablenet_genesis.go",
+          "start_line": 20,
+          "end_line": 232,
+          "symbol": "stableNetMainnetGenesisJson",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "eth/ethconfig/config.go",
+          "start_line": 213,
+          "end_line": 268,
+          "symbol": "SetConfigFromChainConfig",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 44,
+          "end_line": 143,
+          "symbol": "StableNetMainnetChainConfig",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 145,
+          "end_line": 254,
+          "symbol": "StableNetTestnetChainConfig",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 762,
+          "end_line": 814,
+          "symbol": "ChainConfig",
+          "kind": "type",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 835,
+          "end_line": 939,
+          "symbol": "ChainConfig.Description",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 1076,
+          "end_line": 1143,
+          "symbol": "ChainConfig.CheckConfigForkOrder",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 1145,
+          "end_line": 1217,
+          "symbol": "ChainConfig.checkCompatible",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 1392,
+          "end_line": 1405,
+          "symbol": "Rules",
+          "kind": "type",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "params/config.go",
+          "start_line": 1407,
+          "end_line": 1435,
+          "symbol": "ChainConfig.Rules",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/compile/main.go",
+          "start_line": 34,
+          "end_line": 73,
+          "symbol": "main",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "systemcontracts/contracts.go",
+          "start_line": 54,
+          "end_line": 71,
+          "symbol": "init",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/gov_minter.go",
+          "start_line": 31,
+          "end_line": 45,
+          "symbol": "SLOT_GOV_MINTER_fiatToken",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/test/contracts_wbft.go",
+          "start_line": 64,
+          "end_line": 64,
+          "symbol": "compiledWBFT",
+          "kind": "value",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/test/contracts_wbft.go",
+          "start_line": 67,
+          "end_line": 69,
+          "symbol": "init",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/test/contracts_wbft.go",
+          "start_line": 168,
+          "end_line": 246,
+          "symbol": "NewGovWBFT",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-69",
+      "confidence": "high",
+      "review_note": "kept. Refactor question; both core locations are the two default genesis constructors.",
+      "citations": [
+        {
+          "core": false,
+          "file": "cmd/devp2p/internal/ethtest/snap.go",
+          "start_line": 70,
+          "end_line": 304,
+          "symbol": "Suite.TestSnapGetAccountRange",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/genesis.go",
+          "start_line": 604,
+          "end_line": 611,
+          "symbol": "DefaultStableNetMainnetGenesisBlock",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/genesis.go",
+          "start_line": 613,
+          "end_line": 620,
+          "symbol": "DefaultStableNetTestnetGenesisBlock",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-73",
+      "confidence": "high",
+      "review_note": "InjectContracts raised to core. The symptom has two parts: the blacklist/authorized mismatch (initializeGovCouncil) and the panic with an empty alloc, which the fix resolves by moving the nil-alloc initialisation in InjectContracts ahead of GetSystemContractsTransition.",
+      "citations": [
+        {
+          "core": false,
+          "file": "core/genesis.go",
+          "start_line": 240,
+          "end_line": 250,
+          "symbol": "initializeAnzeonGenesis",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "core/genesis.go",
+          "start_line": 721,
+          "end_line": 754,
+          "symbol": "InjectContracts",
+          "kind": "func",
+          "label": "changed"
+        },
+        {
+          "core": false,
+          "file": "core/genesis.go",
+          "start_line": 783,
+          "end_line": 814,
+          "symbol": "decodePrealloc",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/mkalloc.go",
+          "start_line": 47,
+          "end_line": 51,
+          "symbol": "allocItemMisc",
+          "kind": "type",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "core/mkalloc.go",
+          "start_line": 58,
+          "end_line": 82,
+          "symbol": "makelist",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "systemcontracts/gov_council.go",
+          "start_line": 61,
+          "end_line": 109,
+          "symbol": "initializeGovCouncil",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/gov_council.go",
+          "start_line": 111,
+          "end_line": 177,
+          "symbol": "initializeAddressSet",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/systemcontracts.go",
+          "start_line": 62,
+          "end_line": 157,
+          "symbol": "GetSystemContractsTransition",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": false,
+          "file": "systemcontracts/test/helpers_edge_cases.go",
+          "start_line": 201,
+          "end_line": 267,
+          "symbol": "createGovCouncilTestEnv",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    },
+    {
+      "id": "sym-75",
+      "confidence": "high",
+      "review_note": "kept. The two boundary checks are the whole fix.",
+      "citations": [
+        {
+          "core": true,
+          "file": "consensus/wbft/core/backlog.go",
+          "start_line": 49,
+          "end_line": 53,
+          "symbol": "Core.isSequenceTooFarAhead",
+          "kind": "func",
+          "label": "model"
+        },
+        {
+          "core": true,
+          "file": "consensus/wbft/core/backlog.go",
+          "start_line": 55,
+          "end_line": 59,
+          "symbol": "Core.isRoundTooFarAhead",
+          "kind": "func",
+          "label": "model"
+        }
+      ]
+    }
+  ]
+}

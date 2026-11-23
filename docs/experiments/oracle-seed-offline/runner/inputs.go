@@ -10,7 +10,7 @@ import (
 // Input file names inside the experiment's data directory.
 const (
 	seedsFile  = "seeds-blind.json"
-	oracleFile = "oracle-relayed.json"
+	oracleFile = "oracle-accepted.json"
 	basesFile  = "base-commits.json"
 )
 
