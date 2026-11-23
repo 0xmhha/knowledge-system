@@ -76,7 +76,46 @@ type DispatchStats struct {
 // go-stablenet 362 of 469 packages. Their own syntax and types are complete,
 // so they are built here; a package whose body still cannot be built is
 // counted and left without bodies.
+//
+// Such a package can have no error of its own: the type checker stays silent
+// about a use of an invalid operand (a value whose type comes from a module
+// that is not there), and the builder panics on it. The panic leaves the
+// functions that packages share (generic instances, wrappers) unfinished, and
+// whatever needs one of them later waits for it forever. The whole program is
+// therefore dropped and built again without that package's body; every round
+// removes one body, so this ends.
 func buildSSA(pkgs []*packages.Package, st *DispatchStats) (*ssa.Program, []*ssa.Package) {
+	st.Packages = len(pkgs)
+	unbuildable := map[*packages.Package]bool{}
+	for {
+		prog, bodies, ownErrors := createSSA(pkgs, unbuildable)
+		failed := buildBodies(bodies)
+		if failed != nil {
+			unbuildable[failed] = true
+			continue
+		}
+		st.OwnErrors = ownErrors
+		st.BuildPanics = len(unbuildable)
+		st.SSAPackages = len(bodies)
+		built := make([]*ssa.Package, 0, len(bodies))
+		for _, b := range bodies {
+			built = append(built, b.ssa)
+		}
+		return prog, built
+	}
+}
+
+// packageBody is a loaded package and the SSA package made from its syntax.
+type packageBody struct {
+	loaded *packages.Package
+	ssa    *ssa.Package
+}
+
+// createSSA creates every package of the program, with syntax for the loaded
+// packages that can be built and from types only for the rest. It returns the
+// former, dependencies first, and the number of loaded packages left without
+// bodies because of their own errors or missing syntax.
+func createSSA(pkgs []*packages.Package, unbuildable map[*packages.Package]bool) (*ssa.Program, []packageBody, int) {
 	var fset *token.FileSet
 	if len(pkgs) > 0 {
 		fset = pkgs[0].Fset
@@ -86,33 +125,45 @@ func buildSSA(pkgs []*packages.Package, st *DispatchStats) (*ssa.Program, []*ssa
 	for _, p := range pkgs {
 		initial[p] = true
 	}
-	var withBodies []*ssa.Package
+	var bodies []packageBody
+	ownErrors := 0
 	packages.Visit(pkgs, nil, func(p *packages.Package) {
 		if p.Types == nil {
 			return
 		}
-		if initial[p] && len(p.Errors) == 0 && p.TypesInfo != nil && len(p.Syntax) > 0 {
-			withBodies = append(withBodies, prog.CreatePackage(p.Types, p.Syntax, p.TypesInfo, true))
+		complete := initial[p] && len(p.Errors) == 0 && p.TypesInfo != nil && len(p.Syntax) > 0
+		if complete && !unbuildable[p] {
+			bodies = append(bodies, packageBody{p, prog.CreatePackage(p.Types, p.Syntax, p.TypesInfo, true)})
 			return
 		}
-		if initial[p] {
-			st.OwnErrors++
+		if initial[p] && !complete {
+			ownErrors++
 		}
 		prog.CreatePackage(p.Types, nil, nil, true)
 	})
-	st.Packages = len(pkgs)
-	for _, sp := range withBodies {
-		func() {
-			defer func() {
-				if recover() != nil {
-					st.BuildPanics++
-				}
-			}()
-			sp.Build()
-			st.SSAPackages++
-		}()
+	return prog, bodies, ownErrors
+}
+
+// buildBodies builds the bodies in order and returns the first package whose
+// build panics, or nil. After a panic the program must not be used.
+func buildBodies(bodies []packageBody) *packages.Package {
+	for _, b := range bodies {
+		if !buildBody(b.ssa) {
+			return b.loaded
+		}
 	}
-	return prog, withBodies
+	return nil
+}
+
+// buildBody reports whether the package's bodies could be built.
+func buildBody(p *ssa.Package) (ok bool) {
+	defer func() {
+		if recover() != nil {
+			ok = false
+		}
+	}()
+	p.Build()
+	return true
 }
 
 // allBodies is every function the analysis should see: what
