@@ -1,0 +1,60 @@
+{
+ "decided": "2026-11-23, user chose option A (names-only seed picking, questions from 2-5 file fixes, five first)",
+ "rule": "eligible candidates with at least 3 changed non-test Go lines and 2..5 changed non-test Go files, sorted by files descending, date descending, fix hash; first 5. A candidate the author agent rejects is replaced by the next reserve.",
+ "pool": 27,
+ "seed_rule": "One agent per question. It gets the symptom sentence and one text file listing declaration names (kind, name, file) of the base graph without tests; no source code.",
+ "stop_line": "Widen only if at most 2 of the 5 questions have every core location among the seeds. Claude set this line before the run.",
+ "publication": "Symptom sentences and labels stay outside the repo until the run is over; the repo holds their sha256.",
+ "questions": [
+  {
+   "id": "p2-01",
+   "fix": "88efe089b154f97da2d9cacec45d72250c9c8fa1",
+   "base": "74f960333f383c0fb2125a9d222c0cb7a4caaff7",
+   "source_go_files": 5
+  },
+  {
+   "id": "p2-02",
+   "fix": "001ad61ab330acea4399a4424e41b54279b89697",
+   "base": "54792b1f251173297d42bfc3738e4202c03e610b",
+   "source_go_files": 5
+  },
+  {
+   "id": "p2-03",
+   "fix": "4d17eea018c8dd579409db30bfd27de79c4f4121",
+   "base": "a2c5f3d4f50c04a9fb278137b00eb5aaecb81ebe",
+   "source_go_files": 4
+  },
+  {
+   "id": "p2-04",
+   "fix": "54a5cbd599f0ba3ef6cc906e7e43c29beea5b761",
+   "base": "4444af086cb98ced96bd54470d982fb65106301e",
+   "source_go_files": 4
+  },
+  {
+   "id": "p2-05",
+   "fix": "c051d50beb60ed0e7be4c9263971094db29fd9b9",
+   "base": "9978930ba62380a428f67ad6ff664a6a52e4a547",
+   "source_go_files": 4
+  }
+ ],
+ "reserve": [
+  {
+   "id": "p2-06",
+   "fix": "c5764ccde9bc4a4f7126ed40563dd151e51c4d03",
+   "base": "b69d8434a5ee7d4f05d0c6147825954e4240e322",
+   "source_go_files": 4
+  },
+  {
+   "id": "p2-07",
+   "fix": "08d5525a10c42bef893fb48943770a97a77a2a2e",
+   "base": "69b0a61c40dfc303f33c77502a4706f29d8a754c",
+   "source_go_files": 4
+  },
+  {
+   "id": "p2-08",
+   "fix": "4444af086cb98ced96bd54470d982fb65106301e",
+   "base": "f4c9490f73f9f5f7a3a059ab6b55e634117407dc",
+   "source_go_files": 3
+  }
+ ]
+}
