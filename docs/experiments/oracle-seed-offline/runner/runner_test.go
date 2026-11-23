@@ -253,3 +253,51 @@ func TestSameFileArmOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestReachableWalks(t *testing.T) {
+	// a writes f, b reads f; c calls a; d calls c; a calls h, e calls h.
+	adj := newAdjacency([]types.Edge{
+		{Src: "a", Dst: "f", Type: types.EdgeWritesField},
+		{Src: "b", Dst: "f", Type: types.EdgeReadsField},
+		{Src: "c", Dst: "a", Type: types.EdgeCalls},
+		{Src: "d", Dst: "c", Type: types.EdgeCalls},
+		{Src: "a", Dst: "h", Type: types.EdgeCalls},
+		{Src: "e", Dst: "h", Type: types.EdgeCalls},
+	})
+	want := map[string]map[string]bool{
+		"W1": {"c": true, "d": true, "h": true},
+		"W2": {"c": true, "d": true, "h": true, "e": true},
+		"W3": {"f": true, "b": true},
+		"W4": {"c": true, "d": true, "h": true, "e": true, "f": true, "b": true},
+	}
+	for _, w := range diagWalks() {
+		exp, ok := want[w.name]
+		if !ok {
+			continue
+		}
+		got := reachable(adj, "a", w)
+		if len(got) != len(exp) {
+			t.Errorf("%s: reached %v, want %v", w.name, got, exp)
+		}
+		for id := range exp {
+			if !got[id] {
+				t.Errorf("%s: %s not reached", w.name, id)
+			}
+		}
+	}
+	hub := diagWalk{name: "hub", passes: []arcFilter{func(a arc) bool { return walkEdges[a.edge] }}, hops: 3, hub: 1}
+	if got := reachable(adj, "a", hub); got["e"] || got["d"] || !got["h"] {
+		t.Errorf("hub limit: reached %v; h may be listed but not walked through", got)
+	}
+}
+
+func TestShippedPairs(t *testing.T) {
+	l := func(n int) loc { return loc{"a.go", n, n} }
+	c := cochangeResult{Changed: []loc{l(1), l(2), l(3)}, Starts: []startResult{
+		{Start: l(1), Measures: map[string]armMeasure{string(variantUncapped): {GoldRanks: []int{rankNotReached, 4}}}},
+	}}
+	got := shippedPairs(c)
+	if len(got) != 1 || !got[[2]loc{l(1), l(3)}] {
+		t.Errorf("got %v", got)
+	}
+}

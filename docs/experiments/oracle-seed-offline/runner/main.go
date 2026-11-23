@@ -32,6 +32,9 @@ const (
 	// modeCochange ranks the other declarations of a fix from each changed
 	// declaration (DESIGN.md section 10).
 	modeCochange runMode = "cochange"
+	// modeReachDiag sorts the co-change pairs by the walk that reaches them
+	// (DESIGN.md section 11); it reads a cochange run through -from.
+	modeReachDiag runMode = "reachdiag"
 )
 
 // cochangeFile is the input of the cochange mode, inside the data directory.
@@ -49,6 +52,7 @@ type config struct {
 	only    map[string]bool
 	mode    runMode
 	files   inputFiles // file names inside dataDir
+	from    string     // cochange output directory the reachdiag mode reads
 }
 
 func main() {
@@ -63,8 +67,12 @@ func run(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	if cfg.mode == modeCochange {
+	switch cfg.mode {
+	case modeCochange:
 		return runCochangeAll(ctx, cfg)
+	case modeReachDiag:
+		return runDiagAll(cfg)
+	case modeCompare, modeDistance:
 	}
 	qs, err := loadQuestions(cfg.dataDir, cfg.files)
 	if err != nil {
@@ -134,13 +142,52 @@ func runCochangeAll(ctx context.Context, cfg config) error {
 	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
 }
 
+// runDiagAll sorts the pairs of a cochange run by the walk that reaches them.
+func runDiagAll(cfg config) error {
+	qs, err := loadCochange(cfg.dataDir, cochangeFile)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(cfg.outDir, 0o755); err != nil {
+		return fmt.Errorf("create %s: %w", cfg.outDir, err)
+	}
+	var all []diagResult
+	for _, q := range qs {
+		if (len(cfg.only) > 0 && !cfg.only[q.ID]) || q.GraphDB == "" {
+			continue
+		}
+		var c cochangeResult
+		if err := readJSON(filepath.Join(cfg.from, q.ID+".json"), &c); err != nil {
+			return err
+		}
+		res, err := runDiag(cfg, q, shippedPairs(c))
+		if err != nil {
+			return fmt.Errorf("question %s: %w", q.ID, err)
+		}
+		if err := writeJSON(filepath.Join(cfg.outDir, q.ID+".json"), res); err != nil {
+			return err
+		}
+		all = append(all, res)
+		slog.Info("question done", "id", q.ID, "pairs", len(res.Pairs))
+	}
+	isNew := func(r diagResult) bool { return !r.Stage1 }
+	every := func(diagResult) bool { return true }
+	rows := []diagSummary{
+		summariseDiag("new, other file", all, func(r diagResult, p diagPair) bool { return !r.Stage1 && p.OtherFile }, isNew),
+		summariseDiag("new, same file", all, func(r diagResult, p diagPair) bool { return !r.Stage1 && !p.OtherFile }, isNew),
+		summariseDiag("all, other file", all, func(_ diagResult, p diagPair) bool { return p.OtherFile }, every),
+	}
+	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
+}
+
 func parseFlags(args []string) (config, error) {
 	fs := flag.NewFlagSet("runner", flag.ContinueOnError)
 	data := fs.String("data", "", "experiment data directory (seeds-blind.json, oracle-accepted.json, base-commits.json)")
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
-	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1) or cochange (section 10)")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag (section 11)")
+	from := fs.String("from", "", "cochange output directory; required with -mode reachdiag")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
 	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
 	bases := fs.String("bases", defaultBasesFile, "base commit file name inside -data")
@@ -163,10 +210,13 @@ func parseFlags(args []string) (config, error) {
 			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
 		}
 	}
-	if m != modeCompare && m != modeDistance && m != modeCochange {
-		return config{}, fmt.Errorf("-mode %q: want %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange)
+	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag {
+		return config{}, fmt.Errorf("-mode %q: want %s, %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange, modeReachDiag)
 	}
-	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
+	if m == modeReachDiag && *from == "" {
+		return config{}, errors.New("-mode reachdiag needs -from")
+	}
+	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, from: *from, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
 	for _, id := range strings.Split(*only, ",") {
 		if id = strings.TrimSpace(id); id != "" {
 			cfg.only[id] = true

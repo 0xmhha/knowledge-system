@@ -238,3 +238,32 @@ Go 파일 수는 중앙값 2개, 90분위 23개였다. 바뀐 파일이 적은 �
 - 정리 수정이 정답에 섞인다. 큰 수정은 선언이 많아 recall@10이 낮게 나온다.
 - 함께 고친 선언이 곧 원인은 아니다. 이 실험은 원인 찾기가 아니라 수정 범위 찾기를 잰다.
 - 승격 노드 결함(6장 보고서)은 고치지 않고 잰다.
+
+---
+
+## 11. 못 닿은 이유 나누기 (2026-11-23, 쌍 단위 결과를 보기 전에 고정)
+
+10장 실험에서 다른 파일의 쌍 204개(새 문항) 중 graph는 17개에만 닿았다. 왜 못 닿았는지 나눈다. 사후 분석이며 판정선은 없다.
+
+먼저 코드로 확인한 것(`internal/system/composer/stage3/expander.go`, `internal/system/ckgclient/real.go`):
+
+- intent Unknown의 정방향 걷기는 간선 7종(calls, invokes, implements, imports, references, extends, defines)만 쓴다.
+  4장의 "정방향 간선 전부"는 틀린 설명이다. 필드, 조건, 타입 사용, 동적 호출(dispatches_to) 간선은 걷지 않는다.
+- `Neighbors`는 역방향에서도 Target에 불리는 쪽을 넣고, stage 3의 `orientFromSeed`는 출발점에 닿은 1 hop 간선만 뒤집는다.
+  그래서 마지막 hop의 호출자가 후보에서 빠진다.
+
+걷기는 원래 간선에서 다시 걷는다. 시작은 출발 선언의 노드, 최대 3 hop(W5만 6 hop), hop마다 200개 제한은 두지 않는다.
+
+| 이름 | 걷는 것 |
+|---|---|
+| S | 10장에서 나온 graph_uncapped 후보 |
+| W1 | calls, invokes, implements, references, extends, defines 정방향 3 hop, 그리고 calls와 invokes 역방향 3 hop. 두 방향은 섞지 않는다 |
+| W2 | W1의 간선을 양방향으로 섞는다 |
+| W3 | 같은 필드: 출발점이 읽거나 쓰는 필드(reads_field, writes_field)를 읽거나 쓰는 다른 선언. 2 hop |
+| W4 | imports, exports와 Package·File에서 나가는 contains를 뺀 모든 간선을 양방향으로 |
+| W5 | W4를 6 hop까지 |
+
+- 쌍마다 S → W1 → W2 → W3 → W4 → W5 순서로 처음 닿은 걷기를 이유로 적는다. 어디에도 없으면 "없음"이다.
+- 순서의 영향을 보려고 걷기마다 따로 닿은 쌍 수도 적는다.
+- 닿은 쌍만 세면 넓게 걸을수록 좋아 보인다. 그래서 출발점마다 걷기가 함께 닿는 선언(테스트가 아닌 Go 선언 위치) 수의 중앙값을 같이 적는다.
+- W2, W3, W4는 연결 수가 100을 넘는 중간 노드에서 더 걷지 않는 판(허브 제한)도 센다.

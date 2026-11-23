@@ -11,7 +11,7 @@
 //     mapped to the innermost declaration node that contains it. The score is
 //     the number of matching lines summed over the seeds.
 //   - graph: composer stage 3 (internal/system/composer/stage3) as it ships,
-//     intent Unknown (every forward edge type plus callers), three hops. The
+//     intent Unknown (seven forward edge types plus callers), three hops. The
 //     per-seed and final caps are off, so the list holds every node the walk
 //     reaches; the order is stage 3's own (1/(1+distance), then span, file,
 //     line).
@@ -32,4 +32,7 @@
 // With -mode cochange it runs the experiment of DESIGN.md section 10: from each
 // declaration a fix changed, rank the fix's other changed declarations with
 // grep, graph and a same-file reference list (leave-one-out).
+//
+// With -mode reachdiag -from <cochange output> it sorts the start-gold pairs of
+// that run by the first raw-edge walk that reaches them (DESIGN.md section 11).
 package main
