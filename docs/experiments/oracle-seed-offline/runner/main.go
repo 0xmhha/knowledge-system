@@ -37,10 +37,14 @@ const (
 	modeReachDiag runMode = "reachdiag"
 	// modeHopCurve measures reach and size per depth over the same pairs.
 	modeHopCurve runMode = "hopcurve"
+	// modeLink ranks co-changed declarations with the two-hop link scores of
+	// DESIGN.md section 12.
+	modeLink runMode = "link"
 )
 
-// cochangeFile is the input of the cochange mode, inside the data directory.
-const cochangeFile = "cochange-questions.json"
+// defaultCochangeFile is the input of the co-change modes, inside the data
+// directory.
+const defaultCochangeFile = "cochange-questions.json"
 
 // graphsSegment marks a graph directory; the runner refuses to write there.
 const graphsSegment = string(filepath.Separator) + "graphs" + string(filepath.Separator)
@@ -55,6 +59,10 @@ type config struct {
 	mode    runMode
 	files   inputFiles // file names inside dataDir
 	from    string     // cochange output directory the reachdiag mode reads
+	// questions is the co-change question file name inside dataDir; link keeps
+	// one link ranking (group/weight), empty for all.
+	questions string
+	link      string
 }
 
 func main() {
@@ -76,6 +84,8 @@ func run(ctx context.Context, args []string) error {
 		return runDiagAll(cfg, diagWalks())
 	case modeHopCurve:
 		return runDiagAll(cfg, curveWalks())
+	case modeLink:
+		return runLinkAll(cfg)
 	case modeCompare, modeDistance:
 	}
 	qs, err := loadQuestions(cfg.dataDir, cfg.files)
@@ -121,7 +131,7 @@ func run(ctx context.Context, args []string) error {
 
 // runCochangeAll runs the co-change experiment over every listed question.
 func runCochangeAll(ctx context.Context, cfg config) error {
-	qs, err := loadCochange(cfg.dataDir, cochangeFile)
+	qs, err := loadCochange(cfg.dataDir, cfg.questions)
 	if err != nil {
 		return err
 	}
@@ -148,7 +158,7 @@ func runCochangeAll(ctx context.Context, cfg config) error {
 
 // runDiagAll sorts the pairs of a cochange run by the walk that reaches them.
 func runDiagAll(cfg config, walks []diagWalk) error {
-	qs, err := loadCochange(cfg.dataDir, cochangeFile)
+	qs, err := loadCochange(cfg.dataDir, cfg.questions)
 	if err != nil {
 		return err
 	}
@@ -184,13 +194,42 @@ func runDiagAll(cfg config, walks []diagWalk) error {
 	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
 }
 
+// runLinkAll runs the link rankings over every listed question.
+func runLinkAll(cfg config) error {
+	qs, err := loadCochange(cfg.dataDir, cfg.questions)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(cfg.outDir, 0o755); err != nil {
+		return fmt.Errorf("create %s: %w", cfg.outDir, err)
+	}
+	rows := []linkRow{}
+	for _, q := range qs {
+		if (len(cfg.only) > 0 && !cfg.only[q.ID]) || q.GraphDB == "" {
+			continue
+		}
+		res, err := runLink(cfg, q)
+		if err != nil {
+			return fmt.Errorf("question %s: %w", q.ID, err)
+		}
+		if err := writeJSON(filepath.Join(cfg.outDir, q.ID+".json"), res); err != nil {
+			return err
+		}
+		rows = append(rows, res.row())
+		slog.Info("question done", "id", q.ID, "starts", len(res.Starts))
+	}
+	return writeJSON(filepath.Join(cfg.outDir, summaryFile), rows)
+}
+
 func parseFlags(args []string) (config, error) {
 	fs := flag.NewFlagSet("runner", flag.ContinueOnError)
 	data := fs.String("data", "", "experiment data directory (seeds-blind.json, oracle-accepted.json, base-commits.json)")
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
-	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag or hopcurve (section 11)")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag or hopcurve (section 11), or link (section 12)")
+	questions := fs.String("questions", defaultCochangeFile, "co-change question file name inside -data")
+	link := fs.String("link", "", "keep one link ranking, for example calls+field/log (default: all)")
 	from := fs.String("from", "", "cochange output directory; required with -mode reachdiag and hopcurve")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
 	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
@@ -209,18 +248,18 @@ func parseFlags(args []string) (config, error) {
 		return config{}, fmt.Errorf("-out %s is inside a graph directory", absOut)
 	}
 	m := runMode(*mode)
-	for _, f := range []struct{ flag, v string }{{"-seeds", *seeds}, {"-oracle", *oracle}, {"-bases", *bases}} {
+	for _, f := range []struct{ flag, v string }{{"-seeds", *seeds}, {"-oracle", *oracle}, {"-bases", *bases}, {"-questions", *questions}} {
 		if f.v == "" || filepath.Base(f.v) != f.v {
 			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
 		}
 	}
-	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag && m != modeHopCurve {
-		return config{}, fmt.Errorf("-mode %q: want %s, %s, %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange, modeReachDiag, modeHopCurve)
+	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag && m != modeHopCurve && m != modeLink {
+		return config{}, fmt.Errorf("-mode %q: unknown mode", *mode)
 	}
 	if (m == modeReachDiag || m == modeHopCurve) && *from == "" {
 		return config{}, fmt.Errorf("-mode %s needs -from", m)
 	}
-	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, from: *from, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
+	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, from: *from, questions: *questions, link: *link, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
 	for _, id := range strings.Split(*only, ",") {
 		if id = strings.TrimSpace(id); id != "" {
 			cfg.only[id] = true

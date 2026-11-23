@@ -301,3 +301,33 @@ func TestShippedPairs(t *testing.T) {
 		t.Errorf("got %v", got)
 	}
 }
+
+func TestLinkScores(t *testing.T) {
+	// a-f, b-f (shared field), a-c direct, c-d, a-h, e-h, x-h (h is a hub).
+	lg := newLinkGraph([]types.Edge{
+		{Src: "a", Dst: "f", Type: types.EdgeWritesField},
+		{Src: "b", Dst: "f", Type: types.EdgeReadsField},
+		{Src: "b", Dst: "f", Type: types.EdgeWritesField}, // same pair, counted once
+		{Src: "a", Dst: "c", Type: types.EdgeCalls},
+		{Src: "d", Dst: "c", Type: types.EdgeCalls},
+		{Src: "a", Dst: "h", Type: types.EdgeCalls},
+		{Src: "e", Dst: "h", Type: types.EdgeCalls},
+		{Src: "x", Dst: "h", Type: types.EdgeCalls},
+		{Src: "a", Dst: "z", Type: types.EdgeImplements}, // not in the group
+	}, linkGroups()[1])
+	got := lg.linkScores("a", linkWeights()[2])
+	want := map[string]float64{"f": 1, "c": 1, "h": 1, "b": 1.0 / 2, "d": 1.0 / 2, "e": 1.0 / 3, "x": 1.0 / 3}
+	if len(got) != len(want) {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	for id, w := range want {
+		if got[id] != w {
+			t.Errorf("%s: %v, want %v", id, got[id], w)
+		}
+	}
+	locs := map[string]loc{"b": {"b.go", 1, 2}, "c": {"c.go", 1, 2}, "d": {"a.go", 9, 10}, "e": {"s.go", 1, 1}}
+	cands := linkArm(got, locs, loc{"s.go", 1, 1})
+	if len(cands) != 3 || cands[0].File != "c.go" || cands[1].File != "a.go" || cands[2].Rank != 3 {
+		t.Errorf("ranking %+v", cands)
+	}
+}
