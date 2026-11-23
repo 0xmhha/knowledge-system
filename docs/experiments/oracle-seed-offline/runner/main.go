@@ -35,6 +35,8 @@ const (
 	// modeReachDiag sorts the co-change pairs by the walk that reaches them
 	// (DESIGN.md section 11); it reads a cochange run through -from.
 	modeReachDiag runMode = "reachdiag"
+	// modeHopCurve measures reach and size per depth over the same pairs.
+	modeHopCurve runMode = "hopcurve"
 )
 
 // cochangeFile is the input of the cochange mode, inside the data directory.
@@ -71,7 +73,9 @@ func run(ctx context.Context, args []string) error {
 	case modeCochange:
 		return runCochangeAll(ctx, cfg)
 	case modeReachDiag:
-		return runDiagAll(cfg)
+		return runDiagAll(cfg, diagWalks())
+	case modeHopCurve:
+		return runDiagAll(cfg, curveWalks())
 	case modeCompare, modeDistance:
 	}
 	qs, err := loadQuestions(cfg.dataDir, cfg.files)
@@ -143,7 +147,7 @@ func runCochangeAll(ctx context.Context, cfg config) error {
 }
 
 // runDiagAll sorts the pairs of a cochange run by the walk that reaches them.
-func runDiagAll(cfg config) error {
+func runDiagAll(cfg config, walks []diagWalk) error {
 	qs, err := loadCochange(cfg.dataDir, cochangeFile)
 	if err != nil {
 		return err
@@ -160,7 +164,7 @@ func runDiagAll(cfg config) error {
 		if err := readJSON(filepath.Join(cfg.from, q.ID+".json"), &c); err != nil {
 			return err
 		}
-		res, err := runDiag(cfg, q, shippedPairs(c))
+		res, err := runDiag(cfg, q, shippedPairs(c), walks)
 		if err != nil {
 			return fmt.Errorf("question %s: %w", q.ID, err)
 		}
@@ -186,8 +190,8 @@ func parseFlags(args []string) (config, error) {
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
-	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag (section 11)")
-	from := fs.String("from", "", "cochange output directory; required with -mode reachdiag")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag or hopcurve (section 11)")
+	from := fs.String("from", "", "cochange output directory; required with -mode reachdiag and hopcurve")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
 	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
 	bases := fs.String("bases", defaultBasesFile, "base commit file name inside -data")
@@ -210,11 +214,11 @@ func parseFlags(args []string) (config, error) {
 			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
 		}
 	}
-	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag {
-		return config{}, fmt.Errorf("-mode %q: want %s, %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange, modeReachDiag)
+	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag && m != modeHopCurve {
+		return config{}, fmt.Errorf("-mode %q: want %s, %s, %s, %s or %s", *mode, modeCompare, modeDistance, modeCochange, modeReachDiag, modeHopCurve)
 	}
-	if m == modeReachDiag && *from == "" {
-		return config{}, errors.New("-mode reachdiag needs -from")
+	if (m == modeReachDiag || m == modeHopCurve) && *from == "" {
+		return config{}, fmt.Errorf("-mode %s needs -from", m)
 	}
 	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, from: *from, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
 	for _, id := range strings.Split(*only, ",") {

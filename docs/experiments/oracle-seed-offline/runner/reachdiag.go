@@ -114,7 +114,7 @@ type diagResult struct {
 var diagReasons = []string{"W1", "W2", "W3", "W4", "W5"}
 
 // runDiag walks every start of one co-change question over the raw edges.
-func runDiag(cfg config, q cochangeQuestion, shipped map[[2]loc]bool) (diagResult, error) {
+func runDiag(cfg config, q cochangeQuestion, shipped map[[2]loc]bool, walks []diagWalk) (diagResult, error) {
 	res := diagResult{ID: q.ID, Stage1: q.Stage1, Pairs: []diagPair{}, Sizes: map[string][]int{}, Starts: []loc{}}
 	dbPath := filepath.Join(cfg.root, q.GraphDB)
 	r, err := store.OpenReadOnly(dbPath)
@@ -147,7 +147,6 @@ func runDiag(cfg config, q cochangeQuestion, shipped map[[2]loc]bool) (diagResul
 		kept = append(kept, e)
 	}
 	adj := newAdjacency(kept)
-	walks := diagWalks()
 	for _, s := range decls {
 		sl := nodeLoc(s)
 		res.Starts = append(res.Starts, sl)
@@ -266,4 +265,40 @@ func summariseDiag(name string, rs []diagResult, keep func(diagResult, diagPair)
 		s.Median[w] = xs[len(xs)/2]
 	}
 	return s
+}
+
+// curveHops are the depths of the hop curve.
+var curveHops = []int{1, 2, 3}
+
+// curveWalks varies depth, edge group, direction and hub limit. "both" takes
+// either direction at every hop; "apart" unions forward and caller walks that
+// never mix. They are exploratory: the pairs were already seen (section 11).
+func curveWalks() []diagWalk {
+	calls := func(t types.EdgeType) bool { return t == types.EdgeCalls || t == types.EdgeInvokes }
+	groups := []struct {
+		name string
+		in   func(types.EdgeType) bool
+	}{
+		{"calls", calls},
+		{"base", func(t types.EdgeType) bool { return walkEdges[t] }},
+		{"field", func(t types.EdgeType) bool { return fieldEdges[t] }},
+		{"calls+field", func(t types.EdgeType) bool { return calls(t) || fieldEdges[t] }},
+		{"base+field", func(t types.EdgeType) bool { return walkEdges[t] || fieldEdges[t] }},
+	}
+	var out []diagWalk
+	for _, g := range groups {
+		for _, h := range curveHops {
+			both := []arcFilter{func(a arc) bool { return g.in(a.edge) }}
+			out = append(out,
+				diagWalk{name: fmt.Sprintf("%s both h%d", g.name, h), passes: both, hops: h},
+				diagWalk{name: fmt.Sprintf("%s both h%d hub", g.name, h), passes: both, hops: h, hub: diagHubLimit})
+		}
+	}
+	for _, h := range curveHops {
+		out = append(out, diagWalk{name: fmt.Sprintf("base apart h%d", h), hops: h, passes: []arcFilter{
+			func(a arc) bool { return a.forward && walkEdges[a.edge] },
+			func(a arc) bool { return !a.forward && calls(a.edge) },
+		}})
+	}
+	return out
 }
