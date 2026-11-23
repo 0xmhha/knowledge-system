@@ -2,7 +2,7 @@
 
 설계는 [DESIGN.md](./DESIGN.md)에 있다. 작업이 끝나면 이 표의 상태와 "결과" 칸을 고치고 같은 커밋에 넣는다.
 
-상태 값: `todo`, `doing`, `blocked`, `done`.
+상태 값: `todo`, `doing`, `blocked`, `done`, `dropped`(하지 않기로 함).
 
 ## 1단계 (sym 11문항)
 
@@ -26,11 +26,22 @@
 | # | 작업 | 상태 | 막힌 이유 또는 결과 |
 |---|---|---|---|
 | 12 | 수정 커밋에서 문항 후보를 뽑는다 | done | 2026-11-23. 109개 중 1단계 수정 10개를 빼고, 비테스트 Go 파일 1~5개를 바꾸며 그중 하나 이상이 기존 파일인 79개를 후보로 남겼다. 이 중 24개는 로그나 에러 문자열을 바꾸고, 22개는 테스트도 바꾼다. [data/stage2-candidates.json](./data/stage2-candidates.json)(해시와 수치만), [tools/stage2_candidates.py](./tools/stage2_candidates.py). 커밋 제목이 든 표는 `knowledge-data/agent-eval/runs/20261123-oracle-seed-stage2-candidates/candidates.md` |
-| 13 | 문항마다 증상 문장, blind 출발 심볼, core 라벨을 만든다 | blocked | 2026-11-23. 두 번 시험했다. 코드를 읽는 방식 10문항, 이름 목록만 보는 방식 5문항 모두에서 core 전부가 출발 심볼이었다. 이 설정으로 빌드되는 후보는 69개 중 36개다. 방법을 다시 정할 때까지 멈춘다. 연구일지 [06](../research-log/2026-11-23-06-stage2-seed-pilot.md), [07](../research-log/2026-11-23-07-stage2-names-only-pilot.md) |
+| 13 | 문항마다 증상 문장, blind 출발 심볼, core 라벨을 만든다 | dropped | 2026-11-23. 두 번 시험했다. 코드를 읽는 방식 10문항, 이름 목록만 보는 방식 5문항 모두에서 core 전부가 출발 심볼이었다. 이 설정으로 빌드되는 후보는 69개 중 36개다. 함께 고친 곳 찾기(13a~13d)로 바꿨다. 연구일지 [06](../research-log/2026-11-23-06-stage2-seed-pilot.md), [07](../research-log/2026-11-23-07-stage2-names-only-pilot.md) |
 | 13a | 함께 고친 곳 찾기 실험을 설계하고 돌린다(DESIGN 10장) | done | 2026-11-23. 13번 대신 사용자가 정했다. 새 문항 15개에서 graph 7승, grep 4승, 무승부 4. 판정하지 않는다. 같은 파일 참고 방식이 둘보다 나았다. [data/cochange-result.json](./data/cochange-result.json), [연구일지 2026-11-23-08](../research-log/2026-11-23-08-cochange-result.md) |
 | 13b | 다른 파일의 정답에 못 닿은 이유를 나눈다(DESIGN 11장) | done | 2026-11-23. 경로 없는 쌍 0. 방향을 섞지 않는 것이 가장 큰 원인이고, 같은 필드 걷기는 선언 16개로 204쌍 중 44쌍에 닿았다(출하 상태 17). stage 3의 호출자 유실과 간선 7종 한정을 확인했다. [data/reachdiag-result.json](./data/reachdiag-result.json), [연구일지 2026-11-23-09](../research-log/2026-11-23-09-reach-diagnosis.md) |
 | 13c | hop마다 양방향으로 넓히는 곡선을 재고 확인용 새 자료를 찾는다 | done | 2026-11-23. 곡선은 [data/hopcurve-result.json](./data/hopcurve-result.json)(탐색용). 새 자료는 go-stablenet 2022~2024년 수정으로 정했다(모듈을 내려받지 않음). [연구일지 2026-11-23-10](../research-log/2026-11-23-10-hop-curve-and-new-data.md) |
 | 13d | 새 걷기를 go-stablenet 2022~2024년 수정으로 확인한다(DESIGN 12장) | done | 2026-11-23. 판정하지 않았다(새 걷기 5승, grep 2승, 무승부 20). 문항 47개 중 33개만 빌드됐다. [data/confirm-result.json](./data/confirm-result.json), [연구일지 2026-11-23-11](../research-log/2026-11-23-11-confirmation-result.md) |
-| 13e | 결정 A를 판정 안 됨으로 닫고 찾은 결함을 고친다 | doing | 2026-11-23. `matchNode`와 stage 3 호출자 유실을 고쳤다(브랜치 fix/graph-walk-defects). 빌드 멈춤도 재현해 고쳤다([연구일지 14](../research-log/2026-11-23-14-dispatch-hang-fix.md)). 합칠 준비를 하고([연구일지 15](../research-log/2026-11-23-15-merge-preparation.md)) 로컬 feat/ckg-value-references에 합쳤다([연구일지 16](../research-log/2026-11-23-16-merged-walk-fixes.md)). 간선 종류와 승격 노드 구조가 남았다. [연구일지 2026-11-23-12](../research-log/2026-11-23-12-ties-and-walk-fixes.md) |
-| 14 | 실험 2~4를 돌린다 | todo | |
-| 15 | 결정 A를 다시 판정하고 보고서를 고친다 | todo | |
+| 13e | 결정 A를 판정 안 됨으로 닫고 찾은 결함을 고친다 | done | 2026-11-23. `matchNode`와 stage 3 호출자 유실을 고쳤다(브랜치 fix/graph-walk-defects). 빌드 멈춤도 재현해 고쳤다([연구일지 14](../research-log/2026-11-23-14-dispatch-hang-fix.md)). 합칠 준비를 하고([연구일지 15](../research-log/2026-11-23-15-merge-preparation.md)) 로컬 feat/ckg-value-references에 합쳤다([연구일지 16](../research-log/2026-11-23-16-merged-walk-fixes.md)). 간선 종류와 승격 노드 구조는 아래 "다음 작업"으로 옮겼다. [연구일지 2026-11-23-12](../research-log/2026-11-23-12-ties-and-walk-fixes.md) |
+| 14 | 실험 2~4를 돌린다 | dropped | 2026-11-23. 증상 문항을 전제로 한 계획이다. 허브와 hop은 hop 곡선(13c)에서 일부 봤다 |
+| 15 | 결정 A를 다시 판정하고 보고서를 고친다 | dropped | 2026-11-23. 판정 안 됨으로 닫았다(13e, [REPORT.md](./REPORT.md) 11장) |
+
+## 다음 작업 (2026-11-23 검토, 추천 순서)
+
+| 순서 | 작업 | 상태 | 비고 |
+|---|---|---|---|
+| 1 | 로그 역추적 조사 | doing | [log-backtrace](../log-backtrace/DESIGN.md) |
+| 2 | 걷는 간선 설계: 필드를 더하고 빌드 밖 노드는 거치지 않게 하고, 새 자료로 확인한다 | todo | 빈 모듈 캐시로 cosmos-sdk 최신 커밋이 빌드됐다(90초, 패닉 6개를 멈춤 없이 넘김). 먼저 정답에서 지역 선언을 뺀다 |
+| 3 | stage 3 목록이 길어진 영향: 뒤 단계 토큰과 grpc-go 검색 평가 | todo | |
+| 4 | 승격 메서드를 노드 대신 간선으로 | todo | 그래프 형식 변경. 2번과 함께 하면 다시 빌드를 한 번 줄인다 |
+| 5 | `reasons`와 `search-types` | todo | 1, 2번 결과가 필요하다 |
+| 6 | 에이전트로 재기 | todo | 원격 하네스 |

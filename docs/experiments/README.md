@@ -36,4 +36,5 @@ docs/experiments/
 
 | 폴더 | 내용 | 상태 |
 |---|---|---|
-| [oracle-seed-offline](./oracle-seed-offline/DESIGN.md) | 출발 심볼을 고정하고 grep과 graph 탐색을 비교, 멈춤 규칙 탐색 | 1단계 끝([보고서](./oracle-seed-offline/REPORT.md)), 2단계 전 |
+| [oracle-seed-offline](./oracle-seed-offline/DESIGN.md) | 출발 심볼을 고정하고 grep과 graph 탐색을 비교, 멈춤 규칙 탐색 | 닫음, 결정 A는 판정 안 됨([보고서](./oracle-seed-offline/REPORT.md)) |
+| [log-backtrace](./log-backtrace/DESIGN.md) | 실패 문구에서 시작해 지금 기능으로 원인까지 이어지는지 조사 | 진행 중 |
