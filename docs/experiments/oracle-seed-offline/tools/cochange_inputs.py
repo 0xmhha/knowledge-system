@@ -5,8 +5,11 @@ the fix diff on existing non-test Go files as base-side line ranges. Hunks whose
 changed lines are all blank or // comments are dropped. Only hashes, paths and
 line numbers are written. The runner maps the lines to declarations.
 
+With --confirm it writes the questions of section 12 instead: fix commits of
+2022 to 2024 whose hunks lie in at least two files.
+
 Usage:
-    python3 -I cochange_inputs.py --repo <go-stablenet> --data <data dir> --out <json>
+    python3 -I cochange_inputs.py --repo <go-stablenet> --data <data dir> --out <json> [--confirm]
 """
 
 from __future__ import annotations
@@ -19,6 +22,10 @@ from pathlib import Path
 
 GIT_TIMEOUT_SECONDS = 60
 MIN_CHANGED_LINES = 3
+CONFIRM_SINCE = "2022-01-01"
+CONFIRM_UNTIL = "2025-01-01"
+CONFIRM_FILES = range(2, 6)
+SUBJECT_RE = re.compile(r"^fix\b|^[^:]{1,60}: fix", re.IGNORECASE)
 HUNK_RE = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@")
 
 
@@ -63,11 +70,37 @@ def hunks(repo: Path, base: str, fix: str) -> list[dict[str, int | str | bool]]:
     return out
 
 
+def confirm_rows(repo: Path) -> list[dict[str, object]]:
+    """Return the section 12 questions, oldest first."""
+    log = git(
+        repo, "log", "--no-merges", "--reverse", f"--since={CONFIRM_SINCE}", f"--until={CONFIRM_UNTIL}", "--format=%H%x09%s"
+    )
+    rows: list[dict[str, object]] = []
+    for line in log.splitlines():
+        fix, subject = line.split("\t", 1)
+        if not SUBJECT_RE.search(subject):
+            continue
+        base = git(repo, "rev-parse", f"{fix}^").strip()
+        diff_args = ("diff", "--no-renames", "--name-only", base, fix, "--", "*.go", ":!*_test.go")
+        if len(git(repo, *diff_args).splitlines()) not in CONFIRM_FILES:
+            continue
+        found = hunks(repo, base, fix)
+        if len({h["file"] for h in found}) < CONFIRM_FILES.start:
+            continue
+        rows.append({"id": f"cf-{len(rows) + 1:02d}", "stage1": False, "fix": fix, "base": base, "hunks": found})
+    return rows
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     for name in ("repo", "data", "out"):
         ap.add_argument(f"--{name}", type=Path, required=True)
+    ap.add_argument("--confirm", action="store_true")
     args = ap.parse_args()
+    if args.confirm:
+        doc = {"source": "tools/cochange_inputs.py --confirm, DESIGN.md section 12", "questions": confirm_rows(args.repo)}
+        args.out.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+        return
     bases = json.loads((args.data / "base-commits.json").read_text(encoding="utf-8"))["bases"]
     cands = json.loads((args.data / "stage2-candidates.json").read_text(encoding="utf-8"))["candidates"]
     rows = [{"id": b["id"], "stage1": True, "fix": b["fix"], "base": b["base"]} for b in bases]
