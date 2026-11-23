@@ -42,7 +42,7 @@ type config struct {
 	outDir  string
 	only    map[string]bool
 	mode    runMode
-	seeds   string // seed file name inside dataDir
+	files   inputFiles // file names inside dataDir
 }
 
 func main() {
@@ -57,7 +57,7 @@ func run(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	qs, err := loadQuestions(cfg.dataDir, cfg.seeds)
+	qs, err := loadQuestions(cfg.dataDir, cfg.files)
 	if err != nil {
 		return err
 	}
@@ -106,6 +106,8 @@ func parseFlags(args []string) (config, error) {
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
 	mode := fs.String("mode", string(modeCompare), "compare (decision A) or distance (experiment 1)")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
+	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
+	bases := fs.String("bases", defaultBasesFile, "base commit file name inside -data")
 	if err := fs.Parse(args); err != nil {
 		return config{}, err
 	}
@@ -120,13 +122,15 @@ func parseFlags(args []string) (config, error) {
 		return config{}, fmt.Errorf("-out %s is inside a graph directory", absOut)
 	}
 	m := runMode(*mode)
-	if *seeds == "" || filepath.Base(*seeds) != *seeds {
-		return config{}, fmt.Errorf("-seeds %q: want a file name inside -data", *seeds)
+	for _, f := range []struct{ flag, v string }{{"-seeds", *seeds}, {"-oracle", *oracle}, {"-bases", *bases}} {
+		if f.v == "" || filepath.Base(f.v) != f.v {
+			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
+		}
 	}
 	if m != modeCompare && m != modeDistance {
 		return config{}, fmt.Errorf("-mode %q: want %s or %s", *mode, modeCompare, modeDistance)
 	}
-	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, seeds: *seeds}
+	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
 	for _, id := range strings.Split(*only, ",") {
 		if id = strings.TrimSpace(id); id != "" {
 			cfg.only[id] = true

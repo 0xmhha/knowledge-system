@@ -10,10 +10,17 @@ import (
 // Input file names inside the experiment's data directory.
 const (
 	// defaultSeedsFile is the frozen blind seed set, the main result's input.
-	defaultSeedsFile = "seeds-blind.json"
-	oracleFile       = "oracle-accepted.json"
-	basesFile        = "base-commits.json"
+	defaultSeedsFile  = "seeds-blind.json"
+	defaultOracleFile = "oracle-accepted.json"
+	defaultBasesFile  = "base-commits.json"
 )
+
+// inputFiles names the three input files inside the data directory.
+type inputFiles struct {
+	Seeds  string
+	Oracle string
+	Bases  string
+}
 
 // seedRef is one frozen start symbol.
 type seedRef struct {
@@ -70,17 +77,17 @@ type question struct {
 // loadQuestions reads the frozen inputs and returns the questions in the
 // order of the seed file. A question missing from the oracle or base file
 // is an error: the runner must not silently skip one.
-func loadQuestions(dataDir, seedsFile string) ([]question, error) {
+func loadQuestions(dataDir string, in inputFiles) ([]question, error) {
 	var sd seedsDoc
-	if err := readJSON(filepath.Join(dataDir, seedsFile), &sd); err != nil {
+	if err := readJSON(filepath.Join(dataDir, in.Seeds), &sd); err != nil {
 		return nil, err
 	}
 	var od oracleDoc
-	if err := readJSON(filepath.Join(dataDir, oracleFile), &od); err != nil {
+	if err := readJSON(filepath.Join(dataDir, in.Oracle), &od); err != nil {
 		return nil, err
 	}
 	var bd basesDoc
-	if err := readJSON(filepath.Join(dataDir, basesFile), &bd); err != nil {
+	if err := readJSON(filepath.Join(dataDir, in.Bases), &bd); err != nil {
 		return nil, err
 	}
 
@@ -102,11 +109,11 @@ func loadQuestions(dataDir, seedsFile string) ([]question, error) {
 	for _, s := range sd.Seeds {
 		b, ok := bases[s.ID]
 		if !ok || b.base == "" || b.graph == "" {
-			return nil, fmt.Errorf("question %s: no base commit or graph in %s", s.ID, basesFile)
+			return nil, fmt.Errorf("question %s: no base commit or graph in %s", s.ID, in.Bases)
 		}
 		c, ok := core[s.ID]
 		if !ok {
-			return nil, fmt.Errorf("question %s: no core location in %s", s.ID, oracleFile)
+			return nil, fmt.Errorf("question %s: no core location in %s", s.ID, in.Oracle)
 		}
 		out = append(out, question{
 			ID: s.ID, Blind: s.Blind, Base: b.base, GraphDB: b.graph,
