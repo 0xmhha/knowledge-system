@@ -9,9 +9,10 @@ import (
 
 // Input file names inside the experiment's data directory.
 const (
-	seedsFile  = "seeds-blind.json"
-	oracleFile = "oracle-accepted.json"
-	basesFile  = "base-commits.json"
+	// defaultSeedsFile is the frozen blind seed set, the main result's input.
+	defaultSeedsFile = "seeds-blind.json"
+	oracleFile       = "oracle-accepted.json"
+	basesFile        = "base-commits.json"
 )
 
 // seedRef is one frozen start symbol.
@@ -67,9 +68,9 @@ type question struct {
 }
 
 // loadQuestions reads the frozen inputs and returns the questions in the
-// order of seeds-blind.json. A question missing from the oracle or base file
+// order of the seed file. A question missing from the oracle or base file
 // is an error: the runner must not silently skip one.
-func loadQuestions(dataDir string) ([]question, error) {
+func loadQuestions(dataDir, seedsFile string) ([]question, error) {
 	var sd seedsDoc
 	if err := readJSON(filepath.Join(dataDir, seedsFile), &sd); err != nil {
 		return nil, err

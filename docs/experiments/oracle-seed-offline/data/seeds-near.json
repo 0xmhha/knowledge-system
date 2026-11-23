@@ -1,0 +1,175 @@
+{
+  "picked_by": "Claude (claude-opus-5-5), 2026-11-23, after reading the fix diffs and the accepted labels",
+  "rule": "Near seeds: symbols next to the answer, picked with the fix diff in view, that are not core labels in oracle-accepted.json and relate directly to the symptom. They measure the upper bound when the start point is good. Main results stay with seeds-blind.json.",
+  "frozen": "Do not edit after commit. Corrections go to a new file.",
+  "seeds": [
+    {
+      "id": "sym-55",
+      "seeds": [
+        {
+          "symbol": "handlePreprepareMsg",
+          "kind": "method",
+          "file": "consensus/wbft/core/preprepare.go",
+          "why": "the fix adds timerMu around its timer restart"
+        },
+        {
+          "symbol": "SetSequence",
+          "kind": "method",
+          "file": "consensus/wbft/core/roundstate.go",
+          "why": "the fix copies the sequence it stores"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-58",
+      "seeds": [
+        {
+          "symbol": "ChainOverrides",
+          "kind": "type",
+          "file": "core/genesis.go",
+          "why": "the override struct the fix threads to the engine"
+        },
+        {
+          "symbol": "LoadChainConfig",
+          "kind": "function",
+          "file": "core/genesis.go",
+          "why": "the loader both core callers replace"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-67",
+      "seeds": [
+        {
+          "symbol": "ActivePrecompiles",
+          "kind": "function",
+          "file": "core/vm/contracts.go",
+          "why": "picks the precompile set per fork"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-70",
+      "seeds": [
+        {
+          "symbol": "ReadReceipts",
+          "kind": "function",
+          "file": "core/rawdb/accessors_chain.go",
+          "why": "reads stored receipts and derives their fields"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-74",
+      "seeds": [
+        {
+          "symbol": "txSlotSize",
+          "kind": "value",
+          "file": "core/txpool/legacypool/legacypool.go",
+          "why": "txMaxSize is defined from it"
+        },
+        {
+          "symbol": "MaxInitCodeSize",
+          "kind": "value",
+          "file": "params/protocol_params.go",
+          "why": "the creation size limit the symptom approaches"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-77",
+      "seeds": [
+        {
+          "symbol": "NewAnzeonTipEnv",
+          "kind": "function",
+          "file": "eth/gasprice/anzeon.go",
+          "why": "constructor of the tip environment the fix refreshes"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-56",
+      "seeds": [
+        {
+          "symbol": "initializeValidator",
+          "kind": "function",
+          "file": "systemcontracts/gov_validator.go",
+          "why": "parses comma-separated validator params the same way"
+        },
+        {
+          "symbol": "GetSystemContracts",
+          "kind": "method",
+          "file": "consensus/wbft/config.go",
+          "why": "passes the genesis params to the initializers"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-63",
+      "seeds": [
+        {
+          "symbol": "GetBurnBalance",
+          "kind": "function",
+          "file": "systemcontracts/gov_minter.go",
+          "why": "reads the burn deposit the symptom wants refunded"
+        },
+        {
+          "symbol": "Rules",
+          "kind": "method",
+          "file": "params/config.go",
+          "why": "fork rules where the next upgrade is switched on"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-69",
+      "seeds": [
+        {
+          "symbol": "decodePrealloc",
+          "kind": "function",
+          "file": "core/genesis.go",
+          "why": "the pattern the fix moves the default genesis to"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-73",
+      "seeds": [
+        {
+          "symbol": "initializeAddressSet",
+          "kind": "function",
+          "file": "systemcontracts/gov_council.go",
+          "why": "writes the blacklist and authorized slots"
+        },
+        {
+          "symbol": "GetSystemContractsTransition",
+          "kind": "function",
+          "file": "systemcontracts/systemcontracts.go",
+          "why": "runs the initializers on the genesis alloc"
+        }
+      ],
+      "blind": false
+    },
+    {
+      "id": "sym-75",
+      "seeds": [
+        {
+          "symbol": "isTooFarFutureMessage",
+          "kind": "method",
+          "file": "consensus/wbft/core/backlog.go",
+          "why": "the caller of both boundary checks"
+        }
+      ],
+      "blind": false
+    }
+  ]
+}
