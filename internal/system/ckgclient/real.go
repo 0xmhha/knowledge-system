@@ -1,10 +1,12 @@
 package ckgclient
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -1342,7 +1344,8 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 
 // matchNode picks the candidate that best matches the citation's line
 // range. Exact start+end match wins; otherwise the first candidate fully
-// containing the citation's range is used.
+// containing the citation's range is used. Among equally good candidates one
+// with a canonical id wins.
 func matchNode(cands []types.Node, src contract.Citation) (types.Node, bool) {
 	// Structural pseudo nodes span whole files, so any containment tier
 	// below would swallow every citation and resolve it to a node whose
@@ -1358,6 +1361,13 @@ func matchNode(cands []types.Node, src contract.Citation) (types.Node, bool) {
 		}
 		real = append(real, n)
 	}
+	// A promoted method has its own node at the declaring method's span, with
+	// no canonical id and no call edges. Every tier below keeps the first of
+	// equally good nodes, so put the declared ones first; storage order must
+	// not start a walk on the copy.
+	slices.SortStableFunc(real, func(a, b types.Node) int {
+		return cmp.Compare(canonicalRank(a), canonicalRank(b))
+	})
 
 	// 1. Exact span.
 	// A one-line function can share its exact span with ReturnStmt/CallSite.
@@ -1407,6 +1417,14 @@ func matchNode(cands []types.Node, src contract.Citation) (types.Node, bool) {
 		return real[bestIdx], true
 	}
 	return types.Node{}, false
+}
+
+// canonicalRank orders nodes that carry a canonical id before those without.
+func canonicalRank(n types.Node) int {
+	if n.CanonicalID != "" {
+		return 0
+	}
+	return 1
 }
 
 // isStructuralQname reports whether q names a structural pseudo node
