@@ -29,5 +29,6 @@
 | 13 | 문항마다 증상 문장, blind 출발 심볼, core 라벨을 만든다 | blocked | 2026-11-23. 두 번 시험했다. 코드를 읽는 방식 10문항, 이름 목록만 보는 방식 5문항 모두에서 core 전부가 출발 심볼이었다. 이 설정으로 빌드되는 후보는 69개 중 36개다. 방법을 다시 정할 때까지 멈춘다. 연구일지 [06](../research-log/2026-11-23-06-stage2-seed-pilot.md), [07](../research-log/2026-11-23-07-stage2-names-only-pilot.md) |
 | 13a | 함께 고친 곳 찾기 실험을 설계하고 돌린다(DESIGN 10장) | done | 2026-11-23. 13번 대신 사용자가 정했다. 새 문항 15개에서 graph 7승, grep 4승, 무승부 4. 판정하지 않는다. 같은 파일 참고 방식이 둘보다 나았다. [data/cochange-result.json](./data/cochange-result.json), [연구일지 2026-11-23-08](../research-log/2026-11-23-08-cochange-result.md) |
 | 13b | 다른 파일의 정답에 못 닿은 이유를 나눈다(DESIGN 11장) | done | 2026-11-23. 경로 없는 쌍 0. 방향을 섞지 않는 것이 가장 큰 원인이고, 같은 필드 걷기는 선언 16개로 204쌍 중 44쌍에 닿았다(출하 상태 17). stage 3의 호출자 유실과 간선 7종 한정을 확인했다. [data/reachdiag-result.json](./data/reachdiag-result.json), [연구일지 2026-11-23-09](../research-log/2026-11-23-09-reach-diagnosis.md) |
+| 13c | hop마다 양방향으로 넓히는 곡선을 재고 확인용 새 자료를 찾는다 | doing | 2026-11-23. 곡선은 [data/hopcurve-result.json](./data/hopcurve-result.json)(탐색용). 새 자료는 cosmos-sdk(내려받기 필요)와 knowledge-system 중에서 정한다. [연구일지 2026-11-23-10](../research-log/2026-11-23-10-hop-curve-and-new-data.md) |
 | 14 | 실험 2~4를 돌린다 | todo | |
 | 15 | 결정 A를 다시 판정하고 보고서를 고친다 | todo | |
