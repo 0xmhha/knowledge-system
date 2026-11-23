@@ -1,0 +1,450 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261123-ks-b2136037-oracle-seed-distance",
+ "labels": "oracle-accepted.json",
+ "max_hops": 6,
+ "note": "hops -1 = not reached within max_hops; degree = in+out edges of the node the hop arrives at; edge suffix <- = walked against the edge",
+ "gold": [
+  {
+   "id": "sym-55",
+   "symbol": "Core.stopTimer",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 1,
+    "path": [
+     "calls Method core.Core.stopTimer (15)"
+    ]
+   },
+   "undirected": {
+    "hops": 1,
+    "path": [
+     "calls Method core.Core.stopTimer (15)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 1,
+    "path": [
+     "calls Method core.Core.stopTimer (15)"
+    ]
+   }
+  },
+  {
+   "id": "sym-55",
+   "symbol": "Core.newRetrySendingRoundChangeTimer",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "calls Method core.Core.currentLogger (80)",
+     "calls<- Method core.Core.newRetrySendingRoundChangeTimer (28)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "calls Method core.Core.currentLogger (80)",
+     "calls<- Method core.Core.newRetrySendingRoundChangeTimer (28)"
+    ]
+   }
+  },
+  {
+   "id": "sym-56",
+   "symbol": "initializeBase",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": -1,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-58",
+   "symbol": "MakeChain",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "calls Function log.Info (445)",
+     "calls<- Function utils.MakeChain (100)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "calls Function log.Info (445)",
+     "calls<- Function utils.MakeChain (100)"
+    ]
+   }
+  },
+  {
+   "id": "sym-58",
+   "symbol": "New",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "calls Method params.ChainConfig.AnzeonEnabled (131)",
+     "calls<- Function eth.New (303)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "calls Method params.ChainConfig.AnzeonEnabled (131)",
+     "calls<- Function eth.New (303)"
+    ]
+   }
+  },
+  {
+   "id": "sym-63",
+   "symbol": "SetConfigFromChainConfig",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 3,
+    "path": [
+     "uses_type Struct params.SystemContracts (27)",
+     "uses_type<- Struct params.Upgrade (10)",
+     "instantiates<- Function ethconfig.SetConfigFromChainConfig (59)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 3,
+    "path": [
+     "uses_type Struct params.SystemContracts (27)",
+     "uses_type<- Struct params.Upgrade (10)",
+     "instantiates<- Function ethconfig.SetConfigFromChainConfig (59)"
+    ]
+   }
+  },
+  {
+   "id": "sym-63",
+   "symbol": "init",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "references Variable systemcontracts.SystemContractCodes (10)",
+     "references<- Function systemcontracts.init (19)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "references Variable systemcontracts.SystemContractCodes (10)",
+     "references<- Function systemcontracts.init (19)"
+    ]
+   }
+  },
+  {
+   "id": "sym-67",
+   "symbol": "PrecompiledContractsAnzeon",
+   "gold_is_seed": true,
+   "forward": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": 0,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-67",
+   "symbol": "EVM.precompile",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 1,
+    "path": [
+     "references<- Method vm.EVM.precompile (28)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 1,
+    "path": [
+     "references<- Method vm.EVM.precompile (28)"
+    ]
+   }
+  },
+  {
+   "id": "sym-69",
+   "symbol": "DefaultStableNetMainnetGenesisBlock",
+   "gold_is_seed": true,
+   "forward": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": 0,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-69",
+   "symbol": "DefaultStableNetTestnetGenesisBlock",
+   "gold_is_seed": true,
+   "forward": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": 0,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-70",
+   "symbol": "StateTransition.TransitionDb",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 3,
+    "path": [
+     "calls Function crypto.CreateAddress (33)",
+     "calls<- Method vm.EVM.Create (22)",
+     "calls<- Method core.StateTransition.TransitionDb (162)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 3,
+    "path": [
+     "calls Function crypto.CreateAddress (33)",
+     "calls<- Method vm.EVM.Create (22)",
+     "calls<- Method core.StateTransition.TransitionDb (162)"
+    ]
+   }
+  },
+  {
+   "id": "sym-70",
+   "symbol": "Receipts.DeriveFields",
+   "gold_is_seed": true,
+   "forward": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": 0,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-73",
+   "symbol": "InjectContracts",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 1,
+    "path": [
+     "calls Function core.InjectContracts (58)"
+    ]
+   },
+   "undirected": {
+    "hops": 1,
+    "path": [
+     "calls Function core.InjectContracts (58)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 1,
+    "path": [
+     "calls Function core.InjectContracts (58)"
+    ]
+   }
+  },
+  {
+   "id": "sym-73",
+   "symbol": "initializeGovCouncil",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 3,
+    "path": [
+     "calls Function core.InjectContracts (58)",
+     "calls Function systemcontracts.GetSystemContractsTransition (100)",
+     "calls Function systemcontracts.initializeGovCouncil (70)"
+    ]
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "uses_type TypeAlias common.Address (935)",
+     "uses_type<- Function systemcontracts.initializeGovCouncil (70)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "uses_type TypeAlias common.Address (935)",
+     "uses_type<- Function systemcontracts.initializeGovCouncil (70)"
+    ]
+   }
+  },
+  {
+   "id": "sym-74",
+   "symbol": "txMaxSize",
+   "gold_is_seed": true,
+   "forward": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected": {
+    "hops": 0,
+    "path": []
+   },
+   "undirected_semantic": {
+    "hops": 0,
+    "path": []
+   }
+  },
+  {
+   "id": "sym-75",
+   "symbol": "Core.isSequenceTooFarAhead",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 2,
+    "path": [
+     "calls Method core.Core.isTooFarFutureMessage (37)",
+     "calls Method core.Core.isSequenceTooFarAhead (12)"
+    ]
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "calls External big.Int.Sub (71)",
+     "calls<- Method core.Core.isSequenceTooFarAhead (12)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "calls External big.Int.Sub (71)",
+     "calls<- Method core.Core.isSequenceTooFarAhead (12)"
+    ]
+   }
+  },
+  {
+   "id": "sym-75",
+   "symbol": "Core.isRoundTooFarAhead",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 2,
+    "path": [
+     "calls Method core.Core.isTooFarFutureMessage (37)",
+     "calls Method core.Core.isRoundTooFarAhead (12)"
+    ]
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "calls External big.Int.Sub (71)",
+     "calls<- Method core.Core.isRoundTooFarAhead (12)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "calls External big.Int.Sub (71)",
+     "calls<- Method core.Core.isRoundTooFarAhead (12)"
+    ]
+   }
+  },
+  {
+   "id": "sym-77",
+   "symbol": "lookup.RemotesBelowTip",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": 3,
+    "path": [
+     "invokes Method txpool.SubPool.SetGasTip (5)",
+     "dispatches_to Method legacypool.LegacyPool.SetGasTip (50)",
+     "calls Method legacypool.lookup.RemotesBelowTip (15)"
+    ]
+   },
+   "undirected": {
+    "hops": 2,
+    "path": [
+     "uses_type External big.Int (632)",
+     "uses_type<- Method legacypool.lookup.RemotesBelowTip (15)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 2,
+    "path": [
+     "uses_type External big.Int (632)",
+     "uses_type<- Method legacypool.lookup.RemotesBelowTip (15)"
+    ]
+   }
+  },
+  {
+   "id": "sym-77",
+   "symbol": "AnzeonTipEnv.SetCurrentBlock",
+   "gold_is_seed": false,
+   "forward": {
+    "hops": -1,
+    "path": []
+   },
+   "undirected": {
+    "hops": 3,
+    "path": [
+     "uses_type External big.Int (632)",
+     "uses_type<- Function types.MakeSigner (81)",
+     "calls<- Method gasprice.AnzeonTipEnv.SetCurrentBlock (29)"
+    ]
+   },
+   "undirected_semantic": {
+    "hops": 3,
+    "path": [
+     "uses_type External big.Int (632)",
+     "uses_type<- Function types.MakeSigner (81)",
+     "calls<- Method gasprice.AnzeonTipEnv.SetCurrentBlock (29)"
+    ]
+   }
+  }
+ ]
+}

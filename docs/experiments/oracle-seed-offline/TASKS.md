@@ -18,7 +18,7 @@
 | 7a | 출발 심볼에서 grep과 graph 후보를 뽑는 오프라인 실행기를 쓴다 | done | 2026-11-20. [runner](./runner/doc.go). 단위 테스트 5개 통과. sym-74 한 문항으로 시험 실행(약 3초). 구현 선택은 DESIGN 4장과 [연구일지 06](../research-log/2026-11-20-06-offline-runner.md) |
 | 8 | 같은 입력을 두 번 돌려 출력이 같은지 확인한다 | done | 2026-11-20. 11문항 전부를 두 번 돌려 출력 12개 파일의 sha256이 모두 같았다. 확인 중 출발 심볼 처리 결함 2개를 찾아 고쳤다(`1791abc5`). `knowledge-data/agent-eval/runs/20261120-ks-1791abc5-oracle-seed-determinism`. [연구일지 07](../research-log/2026-11-20-07-determinism-check.md) |
 | 9 | 결정 A 비교(grep 대 graph)를 돌린다 | done | 2026-11-23. graph 2승, grep 1승, 무승부 8. 판정하지 않고 2단계로 넘어간다(graph 2/3 = 0.67, 판정선 0.818). [data/decision-a-result.json](./data/decision-a-result.json), 원자료 `knowledge-data/agent-eval/runs/20261123-ks-6f729d46-oracle-seed-decision-a`. [연구일지 2026-11-23-02](../research-log/2026-11-23-02-decision-a-first-run.md) |
-| 10 | 실험 1(정답까지의 거리)을 돌린다 | todo | |
+| 10 | 실험 1(정답까지의 거리)을 돌린다 | done | 2026-11-23. 출발 심볼이 아닌 core 15개 중 정방향으로 6 hop 안에 닿은 것은 6개(1~3 hop), 양방향은 14개(1~3 hop)다. 양방향 최단 경로 대부분은 연결이 많은 노드(`log.Info` 445, `common.Address` 935, `big.Int` 632)를 거친다. 두 번 돌려 출력이 같았다. [data/experiment1-distance.json](./data/experiment1-distance.json), [연구일지 2026-11-23-03](../research-log/2026-11-23-03-experiment1-distance.md) |
 | 11 | 1단계 보고서 `REPORT.md`를 쓴다 | todo | |
 
 ## 2단계 (문항 확장)
