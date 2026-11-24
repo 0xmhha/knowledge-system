@@ -11,10 +11,16 @@ cousins:
 
 | Tool | Default | Traversal |
 |---|---|---|
-| `find_callers` | `depth=2` | reverse BFS over `calls` + `invokes` edges |
-| `find_callees` | `depth=2` | forward BFS over `calls` + `invokes` edges |
+| `find_callers` | `depth=2` | reverse walk over `calls`, `invokes` and `dispatches_to` edges |
+| `find_callees` | `depth=2` | forward walk over `calls`, `invokes` and `dispatches_to` edges |
 | `find_references` | 1 (fixed) | the users of a field, variable or constant over `reads_field`, `writes_field`, `references` |
 | `impact_of_change` | `depth=2` | reverse-dependency closure (broader than callers) |
+
+For `find_callers` and `find_callees` a hop is a call. The step between an interface method and an implementation
+(`dispatches_to` of kind `interface_method` or `type_hierarchy`) costs none, at every hop and not only next to the seed,
+so a call through an interface reaches the implementation at the depth a static call reaches its callee. Two exceptions
+cost a hop: a function value or closure call, and an implementation only the type hierarchy allows where the value flow
+names others. `impact_of_change` still counts `dispatches_to` as a hop.
 
 ## Decision
 

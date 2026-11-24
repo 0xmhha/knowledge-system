@@ -385,7 +385,7 @@ sequenceDiagram
 | Tool | Seed | Reads and walk | Limits |
 |---|---|---|---|
 | `find_symbol` | name (exact by default) | `FindSymbol` | 100 rows, no order |
-| `find_callers`, `find_callees` | `resolveSeed` | reverse or forward neighborhood over `calls`, `invokes`, `dispatches_to`; callers add the interface methods whose `dispatches_to` reach the seed (when none does, the interfaces of its receiver type that declare the method); callees add the implementations of each interface method reached, at the same depth. `find_callers` on a field, variable or constant answers as `find_references`, with a note | depth 0 to 5, no node cap |
+| `find_callers`, `find_callees` | `resolveSeed` | reverse or forward walk over `calls`, `invokes`, `dispatches_to`, where a call is one hop and the step between an interface method and an implementation is none ([TRAVERSAL-DEPTH](TRAVERSAL-DEPTH.md)); callers also start from the interface methods whose `dispatches_to` reach the seed (when none does, the interfaces of its receiver type that declare the method). `find_callers` on a field, variable or constant answers as `find_references`, with a note | depth 0 to 5, no node cap |
 | `find_references` | `resolveSeed` | users of a field, package-level variable or constant over `reads_field`, `writes_field`, `references`: name, file, line, uses, access; writers first, production before tests | `limit` (100), reports `truncated` |
 | `get_subgraph` | `resolveSeed` | forward and reverse walks, all edge types | depth 5, no node cap |
 | `search_text` | text | FTS (or substring for non-ASCII); names joined by a vertical bar become an OR of prefixes, other regular expressions are answered by `search_code` | `top_k` |

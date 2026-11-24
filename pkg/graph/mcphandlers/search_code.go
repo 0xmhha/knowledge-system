@@ -880,8 +880,7 @@ func attachExpansion(reader store.Reader, row map[string]any, n types.Node, kind
 				row["callers"] = brief(k, ns, n.ID)
 			}
 		case "callees":
-			if ns, es, err := seed.neighborhood(reader, 1, false, callEdgeTypes...); err == nil {
-				ns, _, _ = withDispatchTargets(reader, ns, es)
+			if ns, _, err := forwardCallees(reader, seed, 1); err == nil {
 				row["callees"] = brief(k, ns, n.ID)
 			}
 		case "references":

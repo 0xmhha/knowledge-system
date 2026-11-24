@@ -49,7 +49,7 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("find_callers",
-		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to); for a field, package-level variable or constant it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
+		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to, not counted as a hop); for a field, package-level variable or constant it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
@@ -117,12 +117,10 @@ func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 		if !ok {
 			return textResult(seedNotFoundResult(q)), nil
 		}
-		nodes, edges, err := resolved.neighborhood(reader, d, false, callEdgeTypes...)
+		nodes, edges, err := forwardCallees(reader, resolved, d)
 		if err != nil {
 			return nil, err
 		}
-		nodes, edges, added := withDispatchTargets(reader, nodes, edges)
-		traceFrom(ctx).add("dispatch_targets", map[string]any{"added": added})
 		traceWalk(traceFrom(ctx), d, nodes, edges)
 		return textResult(resolved.result(map[string]any{
 			"nodes": attachBlobs(reader, nodes, incl),
