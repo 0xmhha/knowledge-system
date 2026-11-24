@@ -1,0 +1,39 @@
+{
+ "design": "REALDEFECT.md, committed as 00128a83; questions frozen in 76f40126",
+ "run": "knowledge-data/agent-eval/runs/20261124-real-defects",
+ "questions": 5,
+ "with_a_gold_in_the_five_answers": 5,
+ "zero_hit": 0,
+ "first_answer_is_gold": 5,
+ "gold_recall": {
+  "q1": "2/2",
+  "q2": "1/2",
+  "q3": "1/1",
+  "q4": "1/2",
+  "q5": "2/2"
+ },
+ "bash_calls": [
+  9,
+  5,
+  6,
+  7,
+  4
+ ],
+ "result_chars": [
+  118182,
+  24730,
+  72124,
+  83052,
+  27588
+ ],
+ "tokens_per_agent_reported": [
+  151159,
+  103568,
+  127208,
+  131117,
+  105821
+ ],
+ "memory_check": "words in commands absent from tree and prompt: none of them is a name the fix created (checked against the base, the fix and the added lines)",
+ "outside_commands": 0,
+ "verdict": "0 of 5 missed: close this path"
+}
