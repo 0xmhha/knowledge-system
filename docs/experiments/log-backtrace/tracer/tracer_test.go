@@ -103,3 +103,24 @@ func TestSitesThroughErrorValue(t *testing.T) {
 		t.Errorf("got %+v", got)
 	}
 }
+
+func TestEmitFileBaseline(t *testing.T) {
+	const fn = types.NodeFunction
+	ix := newIndex([]types.Node{
+		node("outer", fn, "a.outer", "a.go", 50, 60), node("inner", fn, "b.inner", "b.go", 40, 45),
+		node("near", fn, "b.near", "b.go", 30, 38), node("far", types.NodeStruct, "b.far", "b.go", 1, 9),
+		node("local", types.NodeVariable, "b.local", "b.go", 42, 42), node("const", types.NodeConstant, "a.c", "a.go", 47, 47),
+		node("elsewhere", fn, "c.f", "c.go", 1, 9),
+	}, nil)
+	got := newTracer(ix, nil).emitFile([][]position{{{"a.go", 55}}, {{"b.go", 41}}})
+	var ids []string
+	for i, r := range got {
+		ids = append(ids, r.ID)
+		if r.Rank != i+1 {
+			t.Errorf("%s has rank %d at place %d", r.ID, r.Rank, i+1)
+		}
+	}
+	if want := []string{"inner", "outer", "const", "near", "far"}; !slices.Equal(ids, want) {
+		t.Errorf("got %v, want %v", ids, want)
+	}
+}

@@ -10,4 +10,6 @@
 | 4 | 결과를 적는다 | done | 2026-11-24. [REPORT.md](./REPORT.md), [연구일지 2026-11-24-01](../research-log/2026-11-24-01-log-backtrace.md) |
 | 5 | 추적 규칙 1판을 고정한다 | done | 2026-11-24. [RULES.md](./RULES.md) |
 | 6 | 시제품을 만들고 6문항에서 돌려 본다(개발용 값) | done | 2026-11-24. core 8곳 중 3곳이 10위 안. [tracer](./tracer/doc.go), [data/tracer-dev.json](./data/tracer-dev.json), [연구일지 2026-11-24-02](../research-log/2026-11-24-02-message-tracer.md) |
-| 7 | 확인용 문항을 어떻게 만들지 정한다 | blocked | 사용자 결정 대기. 에이전트 없이 얻을 수 있는 후보는 go-stablenet 7개, cosmos-sdk 40개 |
+| 7 | 확인 절차를 고정한다 | done | 2026-11-24. 사용자가 2022~2024년 수정에서 에이전트 하나로 뽑기로 했다. [CONFIRM.md](./CONFIRM.md) |
+| 8 | 문항을 뽑고 검사해 고정한다 | doing | |
+| 9 | 확인을 돌리고 결과를 적는다 | todo | |

@@ -21,6 +21,7 @@ type output struct {
 	Analysed   int      `json:"functions_analysed"`
 	Total      int      `json:"candidates"`
 	Candidates []result `json:"top"`
+	Baseline   []result `json:"baseline"`
 }
 
 func main() {
@@ -65,8 +66,10 @@ func run(ctx context.Context, args []string) error {
 	t := newTracer(ix, newGraphFlow(r).lines)
 	ranked := t.run(ctx, parts)
 	out.Analysed, out.Total, out.Candidates = t.analysed, len(ranked), ranked
-	if *top > 0 && len(ranked) > *top {
-		out.Candidates = ranked[:*top]
+	out.Baseline = t.emitFile(parts)
+	if *top > 0 {
+		out.Candidates = ranked[:min(*top, len(ranked))]
+		out.Baseline = out.Baseline[:min(*top, len(out.Baseline))]
 	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", " ")
