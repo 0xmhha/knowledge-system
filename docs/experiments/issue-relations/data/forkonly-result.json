@@ -1,0 +1,497 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261124-forkonly",
+ "model": "claude-opus-5-5",
+ "tokens": "size of the context at the last message; cumulative is the sum over all messages",
+ "probe": {
+  "1-fork": {
+   "recall": 0.422,
+   "hit": 18,
+   "gold": 56,
+   "named": 28,
+   "empty": 6,
+   "any": 12
+  },
+  "1-upstream": {
+   "recall": 0.8,
+   "hit": 41,
+   "gold": 52,
+   "named": 45,
+   "empty": 0,
+   "any": 20
+  },
+  "2-fork": {
+   "recall": 0.45,
+   "hit": 20,
+   "gold": 56,
+   "named": 27,
+   "empty": 6,
+   "any": 12
+  },
+  "2-upstream": {
+   "recall": 0.85,
+   "hit": 43,
+   "gold": 52,
+   "named": 46,
+   "empty": 0,
+   "any": 20
+  }
+ },
+ "first_run_fork": {
+  "s1-grep": {
+   "f1": 1.0,
+   "tokens": 104665,
+   "cumulative": 380532,
+   "turns": 4,
+   "chars": 24310,
+   "bash": 4
+  },
+  "s1-gk": {
+   "f1": 1.0,
+   "tokens": 114184,
+   "cumulative": 393020,
+   "turns": 4,
+   "chars": 44428,
+   "bash": 5
+  },
+  "s2-grep": {
+   "f1": 1.0,
+   "tokens": 105789,
+   "cumulative": 381972,
+   "turns": 4,
+   "chars": 25486,
+   "bash": 4
+  },
+  "s2-gk": {
+   "f1": 1.0,
+   "tokens": 105005,
+   "cumulative": 383445,
+   "turns": 4,
+   "chars": 23635,
+   "bash": 4
+  },
+  "r1-grep": {
+   "f1": 1.0,
+   "tokens": 142137,
+   "cumulative": 917887,
+   "turns": 8,
+   "chars": 106109,
+   "bash": 10
+  },
+  "r1-gk": {
+   "f1": 1.0,
+   "tokens": 122961,
+   "cumulative": 507594,
+   "turns": 5,
+   "chars": 59242,
+   "bash": 7
+  },
+  "r2-grep": {
+   "f1": 1.0,
+   "tokens": 128419,
+   "cumulative": 514769,
+   "turns": 5,
+   "chars": 78057,
+   "bash": 9
+  },
+  "r2-gk": {
+   "f1": 1.0,
+   "tokens": 117870,
+   "cumulative": 391801,
+   "turns": 4,
+   "chars": 54805,
+   "bash": 5
+  },
+  "r3-grep": {
+   "f1": 1.0,
+   "tokens": 128098,
+   "cumulative": 745953,
+   "turns": 7,
+   "chars": 77319,
+   "bash": 10
+  },
+  "r3-gk": {
+   "f1": 1.0,
+   "tokens": 107914,
+   "cumulative": 381527,
+   "turns": 4,
+   "chars": 32618,
+   "bash": 5
+  },
+  "r4-grep": {
+   "f1": 1.0,
+   "tokens": 158230,
+   "cumulative": 850830,
+   "turns": 7,
+   "chars": 143013,
+   "bash": 13
+  },
+  "r4-gk": {
+   "f1": 1.0,
+   "tokens": 109782,
+   "cumulative": 486659,
+   "turns": 5,
+   "chars": 32694,
+   "bash": 5
+  }
+ },
+ "confirm_fork": {
+  "fs1-grep": {
+   "f1": 1.0,
+   "tokens": 116147,
+   "cumulative": 400198,
+   "turns": 4,
+   "chars": 45229,
+   "bash": 5
+  },
+  "fs1-gk": {
+   "f1": 1.0,
+   "tokens": 114367,
+   "cumulative": 396750,
+   "turns": 4,
+   "chars": 41336,
+   "bash": 5
+  },
+  "fs2-grep": {
+   "f1": 1.0,
+   "tokens": 100821,
+   "cumulative": 374671,
+   "turns": 4,
+   "chars": 17125,
+   "bash": 4
+  },
+  "fs2-gk": {
+   "f1": 1.0,
+   "tokens": 102023,
+   "cumulative": 377581,
+   "turns": 4,
+   "chars": 19101,
+   "bash": 4
+  },
+  "fr1-grep": {
+   "f1": 1.0,
+   "tokens": 132778,
+   "cumulative": 642763,
+   "turns": 6,
+   "chars": 88411,
+   "bash": 9
+  },
+  "fr1-gk": {
+   "f1": 1.0,
+   "tokens": 110725,
+   "cumulative": 382418,
+   "turns": 4,
+   "chars": 35300,
+   "bash": 4
+  },
+  "fr2-grep": {
+   "f1": 1.0,
+   "tokens": 124440,
+   "cumulative": 527615,
+   "turns": 5,
+   "chars": 69862,
+   "bash": 6
+  },
+  "fr2-gk": {
+   "f1": 1.0,
+   "tokens": 105276,
+   "cumulative": 378661,
+   "turns": 4,
+   "chars": 24795,
+   "bash": 5
+  },
+  "fr3-grep": {
+   "f1": 1.0,
+   "tokens": 126226,
+   "cumulative": 634866,
+   "turns": 6,
+   "chars": 74411,
+   "bash": 7
+  },
+  "fr3-gk": {
+   "f1": 1.0,
+   "tokens": 128114,
+   "cumulative": 515650,
+   "turns": 5,
+   "chars": 72575,
+   "bash": 5
+  },
+  "fr4-grep": {
+   "f1": 1.0,
+   "tokens": 131138,
+   "cumulative": 770161,
+   "turns": 7,
+   "chars": 81675,
+   "bash": 8
+  },
+  "fr4-gk": {
+   "f1": 1.0,
+   "tokens": 115450,
+   "cumulative": 389021,
+   "turns": 4,
+   "chars": 48144,
+   "bash": 5
+  }
+ },
+ "confirm_upstream": {
+  "us1-grep": {
+   "f1": 1.0,
+   "tokens": 112501,
+   "cumulative": 502842,
+   "turns": 5,
+   "chars": 34655,
+   "bash": 6
+  },
+  "us1-gk": {
+   "f1": 1.0,
+   "tokens": 123084,
+   "cumulative": 405292,
+   "turns": 4,
+   "chars": 54269,
+   "bash": 5
+  },
+  "us2-grep": {
+   "f1": 1.0,
+   "tokens": 97760,
+   "cumulative": 368830,
+   "turns": 4,
+   "chars": 10450,
+   "bash": 4
+  },
+  "us2-gk": {
+   "f1": 1.0,
+   "tokens": 97376,
+   "cumulative": 368368,
+   "turns": 4,
+   "chars": 9751,
+   "bash": 3
+  },
+  "ur1-grep": {
+   "f1": 1.0,
+   "tokens": 124290,
+   "cumulative": 524398,
+   "turns": 5,
+   "chars": 68398,
+   "bash": 7
+  },
+  "ur1-gk": {
+   "f1": 1.0,
+   "tokens": 110034,
+   "cumulative": 385634,
+   "turns": 4,
+   "chars": 33735,
+   "bash": 5
+  },
+  "ur2-grep": {
+   "f1": 1.0,
+   "tokens": 114851,
+   "cumulative": 498674,
+   "turns": 5,
+   "chars": 47059,
+   "bash": 5
+  },
+  "ur2-gk": {
+   "f1": 1.0,
+   "tokens": 105300,
+   "cumulative": 378876,
+   "turns": 4,
+   "chars": 24716,
+   "bash": 5
+  },
+  "ur3-grep": {
+   "f1": 1.0,
+   "tokens": 126262,
+   "cumulative": 526334,
+   "turns": 5,
+   "chars": 70482,
+   "bash": 7
+  },
+  "ur3-gk": {
+   "f1": 1.0,
+   "tokens": 112899,
+   "cumulative": 494449,
+   "turns": 5,
+   "chars": 41192,
+   "bash": 5
+  },
+  "ur4-grep": {
+   "f1": 1.0,
+   "tokens": 118011,
+   "cumulative": 511206,
+   "turns": 5,
+   "chars": 54808,
+   "bash": 6
+  },
+  "ur4-gk": {
+   "f1": 1.0,
+   "tokens": 107691,
+   "cumulative": 380982,
+   "turns": 4,
+   "chars": 30690,
+   "bash": 5
+  }
+ },
+ "defect": {
+  "sym-77-grep1": {
+   "recall": 1.0,
+   "first": true,
+   "answers": 5,
+   "tokens": 140997,
+   "cumulative": 649359,
+   "chars": 101989,
+   "bash": 8
+  },
+  "sym-77-grep2": {
+   "recall": 1.0,
+   "first": true,
+   "answers": 3,
+   "tokens": 142246,
+   "cumulative": 671937,
+   "chars": 104937,
+   "bash": 9
+  },
+  "sym-77-grep3": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 1,
+   "tokens": 134911,
+   "cumulative": 646440,
+   "chars": 87690,
+   "bash": 7
+  },
+  "sym-77-gk1": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 1,
+   "tokens": 163386,
+   "cumulative": 872800,
+   "chars": 150142,
+   "bash": 10
+  },
+  "sym-77-gk2": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 1,
+   "tokens": 160129,
+   "cumulative": 705920,
+   "chars": 143037,
+   "bash": 9
+  },
+  "sym-77-gk3": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 1,
+   "tokens": 159443,
+   "cumulative": 831567,
+   "chars": 143324,
+   "bash": 11
+  },
+  "sym-55-grep1": {
+   "recall": 0.5,
+   "first": false,
+   "answers": 5,
+   "tokens": 176085,
+   "cumulative": 923238,
+   "chars": 181087,
+   "bash": 12
+  },
+  "sym-55-grep2": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 3,
+   "tokens": 176548,
+   "cumulative": 752886,
+   "chars": 181608,
+   "bash": 14
+  },
+  "sym-55-grep3": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 3,
+   "tokens": 171947,
+   "cumulative": 742969,
+   "chars": 172068,
+   "bash": 13
+  },
+  "sym-55-gk1": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 5,
+   "tokens": 178329,
+   "cumulative": 745717,
+   "chars": 185648,
+   "bash": 12
+  },
+  "sym-55-gk2": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 4,
+   "tokens": 178930,
+   "cumulative": 762762,
+   "chars": 183846,
+   "bash": 12
+  },
+  "sym-55-gk3": {
+   "recall": 0.5,
+   "first": true,
+   "answers": 3,
+   "tokens": 180700,
+   "cumulative": 778724,
+   "chars": 189624,
+   "bash": 11
+  },
+  "sym-56-grep1": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 122471,
+   "cumulative": 508872,
+   "chars": 62455,
+   "bash": 7
+  },
+  "sym-56-grep2": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 119044,
+   "cumulative": 387880,
+   "chars": 56200,
+   "bash": 4
+  },
+  "sym-56-grep3": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 124011,
+   "cumulative": 393634,
+   "chars": 64703,
+   "bash": 5
+  },
+  "sym-56-gk1": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 117436,
+   "cumulative": 388045,
+   "chars": 50733,
+   "bash": 5
+  },
+  "sym-56-gk2": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 119150,
+   "cumulative": 499251,
+   "chars": 55483,
+   "bash": 6
+  },
+  "sym-56-gk3": {
+   "recall": 1.0,
+   "first": false,
+   "answers": 3,
+   "tokens": 120535,
+   "cumulative": 502789,
+   "chars": 58274,
+   "bash": 6
+  }
+ }
+}
