@@ -22,6 +22,10 @@ const (
 	curveBase      = "base"
 	curveBaseGraph = "base+graph"
 	curveBaseWide  = "base+wide"
+	// curvePackage lists the declarations of the start's directory outside its
+	// file. It uses no edge and is the control of CURVE.md section 6.
+	curvePackage     = "package"
+	curveBasePackage = "base+package"
 )
 
 // testFileSuffix marks files no arm lists.
@@ -210,6 +214,41 @@ type curveGraphData struct {
 	srcRoot string
 	link    *linkGraph
 	declLoc map[string]loc
+	// byDir holds every foldable declaration of a directory, by file and line.
+	byDir map[string][]loc
+}
+
+// packageLocs lists the declarations of the start's directory that lie in other
+// files, in file and line order.
+func packageLocs(byDir map[string][]loc, start loc) []loc {
+	out := []loc{}
+	for _, l := range byDir[filepath.Dir(start.File)] {
+		if l.File != start.File {
+			out = append(out, l)
+		}
+	}
+	return out
+}
+
+// declsByDir groups declaration locations by directory, sorted by file and line.
+func declsByDir(declLoc map[string]loc) map[string][]loc {
+	out := map[string][]loc{}
+	for _, l := range declLoc {
+		dir := filepath.Dir(l.File)
+		out[dir] = append(out[dir], l)
+	}
+	for _, ls := range out {
+		sort.Slice(ls, func(i, j int) bool {
+			if ls[i].File != ls[j].File {
+				return ls[i].File < ls[j].File
+			}
+			if ls[i].StartLine != ls[j].StartLine {
+				return ls[i].StartLine < ls[j].StartLine
+			}
+			return ls[i].EndLine > ls[j].EndLine
+		})
+	}
+	return out
 }
 
 // startLists ranks candidates from one start declaration with every single arm.
@@ -241,6 +280,9 @@ func (d curveGraphData) startLists(ctx context.Context, start types.Node) (map[s
 		if out[arm], err = d.fold.foldAll(candLocs(cs)); err != nil {
 			return nil, err
 		}
+	}
+	if out[curvePackage], err = d.fold.foldAll(packageLocs(d.byDir, sl)); err != nil {
+		return nil, err
 	}
 	return out, nil
 }
@@ -292,6 +334,7 @@ func (d curveGraphData) runStartSet(ctx context.Context, starts, gold []loc) (cu
 	single[curveBase] = alternate(single[armSameFile], single[armGrep])
 	single[curveBaseGraph] = alternate(single[armSameFile], single[armGrep], single[curveGraph])
 	single[curveBaseWide] = alternate(single[armSameFile], single[armGrep], single[curveWide])
+	single[curveBasePackage] = alternate(single[armSameFile], single[armGrep], single[curvePackage])
 	for arm, l := range single {
 		res.Arms[arm] = curveMeasure(readingList(starts, l), gold)
 	}
@@ -371,6 +414,7 @@ func runCurveGraph(ctx context.Context, cfg config, cases []curveCase) ([]curveR
 		srcRoot: filepath.Join(cfg.root, "knowledge-data", "agent-eval", "sources", cases[0].Base),
 		link:    newLinkGraph(edges, g), declLoc: goDecls(nodes),
 	}
+	d.byDir = declsByDir(d.declLoc)
 	out := make([]curveResult, 0, len(cases))
 	for _, c := range cases {
 		res, err := d.runCurveCase(ctx, c)

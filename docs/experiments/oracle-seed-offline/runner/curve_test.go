@@ -72,3 +72,15 @@ func TestCurveLinkNames(t *testing.T) {
 		t.Fatalf("got %s (%v, %v), want %s", linkArmName(g, w), errG, errW, curveLink)
 	}
 }
+
+func TestPackageLocs(t *testing.T) {
+	decls := map[string]loc{
+		"1": curveLoc("p/b.go", 5, 6), "2": curveLoc("p/a.go", 9, 9), "3": curveLoc("p/a.go", 1, 2),
+		"4": curveLoc("p/c.go", 1, 1), "5": curveLoc("q/a.go", 1, 1),
+	}
+	got := packageLocs(declsByDir(decls), curveLoc("p/b.go", 5, 6))
+	want := []loc{curveLoc("p/a.go", 1, 2), curveLoc("p/a.go", 9, 9), curveLoc("p/c.go", 1, 1)}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("packageLocs = %v, want %v", got, want)
+	}
+}
