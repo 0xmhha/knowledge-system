@@ -1,0 +1,456 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261124-hop-gate",
+ "agents": {
+  "s1": {
+   "qname": "accounts.Wallet.Contains",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 10,
+   "gold": 10,
+   "bash": 4,
+   "result_chars": 49589,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "s2": {
+   "qname": "gasprice.OracleBackend.ChainConfig",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 40,
+   "gold": 40,
+   "bash": 5,
+   "result_chars": 31834,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "s3": {
+   "qname": "types.TxData.sigHash",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 12,
+   "gold": 12,
+   "bash": 3,
+   "result_chars": 33002,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "s4": {
+   "qname": "snapshot.Iterator.Release",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 15,
+   "gold": 15,
+   "bash": 7,
+   "result_chars": 62192,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "s5": {
+   "qname": "trie.node.cache",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 13,
+   "gold": 13,
+   "bash": 4,
+   "result_chars": 27535,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "r1": {
+   "qname": "pebble.Database.Has",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 59,
+   "gold": 59,
+   "bash": 10,
+   "result_chars": 67257,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "r2": {
+   "qname": "snapshot.diffStorageIterator.Slot",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 28,
+   "gold": 28,
+   "bash": 7,
+   "result_chars": 111036,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "r3": {
+   "qname": "vm.accountManagerIsBlacklisted.Run",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 11,
+   "gold": 11,
+   "bash": 5,
+   "result_chars": 60457,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "r4": {
+   "qname": "enr.IPv4.ENRKey",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 54,
+   "gold": 54,
+   "bash": 8,
+   "result_chars": 84551,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  },
+  "r5": {
+   "qname": "state.stateObject.SetBalance",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "answers": 27,
+   "gold": 27,
+   "bash": 6,
+   "result_chars": 39297,
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "outside": [],
+   "other": [],
+   "banned": []
+  }
+ },
+ "f1_before_scorer_fix": {
+  "s1": 1.0,
+  "s2": 1.0,
+  "s3": 1.0,
+  "s4": 1.0,
+  "s5": 1.0,
+  "r1": 1.0,
+  "r2": 1.0,
+  "r3": 1.0,
+  "r4": 0.981,
+  "r5": 1.0
+ },
+ "graph_only_no_verdict": {
+  "s1": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 10,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.1,
+    "f1": 0.182,
+    "n": 1,
+    "missed": [
+     "('accounts/external/backend.go', 131)",
+     "('accounts/keystore/wallet.go', 102)",
+     "('accounts/keystore/wallet.go', 119)",
+     "('accounts/keystore/wallet.go', 132)",
+     "('accounts/keystore/wallet.go', 143)",
+     "('accounts/keystore/wallet.go', 68)",
+     "('accounts/keystore/wallet.go', 87)",
+     "('accounts/scwallet/wallet.go', 597)",
+     "('accounts/usbwallet/wallet.go', 446)"
+    ]
+   }
+  },
+  "s2": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 40,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.05,
+    "f1": 0.095,
+    "n": 2,
+    "missed": [
+     "('cmd/gstable/main.go', 350)",
+     "('eth/api_backend.go', 252)",
+     "('eth/api_backend.go', 54)",
+     "('eth/api_debug.go', 107)",
+     "('eth/filters/api.go', 154)",
+     "('eth/filters/api.go', 428)",
+     "('eth/filters/filter_system.go', 58)",
+     "('eth/tracers/api.go', 244)",
+     "('eth/tracers/api.go', 501)",
+     "('eth/tracers/api.go', 580)",
+     "('eth/tracers/api.go', 644)",
+     "('eth/tracers/api.go', 735)",
+     "('eth/tracers/api.go', 79)",
+     "('eth/tracers/api.go', 970)",
+     "('graphql/graphql.go', 1465)",
+     "('graphql/graphql.go', 420)",
+     "('graphql/graphql.go', 771)",
+     "('internal/ethapi/api.go', 1253)",
+     "('internal/ethapi/api.go', 1382)",
+     "('internal/ethapi/api.go', 1625)",
+     "('internal/ethapi/api.go', 1726)",
+     "('internal/ethapi/api.go', 173)",
+     "('internal/ethapi/api.go', 1752)",
+     "('internal/ethapi/api.go', 1760)",
+     "('internal/ethapi/api.go', 1803)",
+     "('internal/ethapi/api.go', 1840)",
+     "('internal/ethapi/api.go', 1909)",
+     "('internal/ethapi/api.go', 1922)",
+     "('internal/ethapi/api.go', 1954)",
+     "('internal/ethapi/api.go', 200)",
+     "('internal/ethapi/api.go', 2109)",
+     "('internal/ethapi/api.go', 448)",
+     "('internal/ethapi/api.go', 634)",
+     "('internal/ethapi/api.go', 708)",
+     "('internal/ethapi/api.go', 994)",
+     "('internal/ethapi/backend.go', 42)",
+     "('internal/ethapi/transaction_args.go', 109)",
+     "('internal/ethapi/transaction_args.go', 197)"
+    ]
+   }
+  },
+  "s3": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 12,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.5,
+    "f1": 0.667,
+    "n": 6,
+    "missed": [
+     "('core/types/tx_access_list.go', 137)",
+     "('core/types/tx_blob.go', 246)",
+     "('core/types/tx_dynamic_fee.go', 133)",
+     "('core/types/tx_fee_delegation.go', 159)",
+     "('core/types/tx_legacy.go', 134)",
+     "('core/types/tx_setcode.go', 235)"
+    ]
+   }
+  },
+  "s4": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 15,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.733,
+    "f1": 0.846,
+    "n": 11,
+    "missed": [
+     "('core/state/snapshot/iterator.go', 160)",
+     "('core/state/snapshot/iterator.go', 221)",
+     "('core/state/snapshot/iterator.go', 328)",
+     "('core/state/snapshot/iterator.go', 394)"
+    ]
+   }
+  },
+  "s5": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 13,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.615,
+    "f1": 0.762,
+    "n": 8,
+    "missed": [
+     "('trie/node.go', 107)",
+     "('trie/node.go', 70)",
+     "('trie/node.go', 71)",
+     "('trie/node.go', 72)",
+     "('trie/node.go', 73)"
+    ]
+   }
+  },
+  "r1": {
+   "deque": {
+    "precision": 0.983,
+    "recall": 0.983,
+    "f1": 0.983,
+    "n": 59,
+    "missed": [
+     "('cmd/gstable/snapshot.go', 43)"
+    ]
+   },
+   "current": {
+    "precision": 0.982,
+    "recall": 0.915,
+    "f1": 0.947,
+    "n": 55,
+    "missed": [
+     "('cmd/gstable/snapshot.go', 43)",
+     "('eth/downloader/beaconsync.go', 195)",
+     "('eth/downloader/downloader.go', 894)",
+     "('eth/downloader/downloader.go', 954)",
+     "('triedb/database.go', 178)"
+    ]
+   }
+  },
+  "r2": {
+   "deque": {
+    "precision": 0.818,
+    "recall": 0.964,
+    "f1": 0.885,
+    "n": 33,
+    "missed": [
+     "('cmd/gstable/snapshot.go', 43)"
+    ]
+   },
+   "current": {
+    "precision": 0.793,
+    "recall": 0.821,
+    "f1": 0.807,
+    "n": 29,
+    "missed": [
+     "('cmd/gstable/snapshot.go', 43)",
+     "('cmd/gstable/snapshot.go', 624)",
+     "('core/state/snapshot/iterator_binary.go', 203)",
+     "('core/state/snapshot/iterator_binary.go', 210)",
+     "('core/state/snapshot/iterator_fast.go', 75)"
+    ]
+   }
+  },
+  "r3": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 11,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 11,
+    "missed": []
+   }
+  },
+  "r4": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 54,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.944,
+    "f1": 0.971,
+    "n": 51,
+    "missed": [
+     "('p2p/enode/node.go', 43)",
+     "('p2p/enr/enr.go', 280)",
+     "('p2p/enr/enr.go', 291)"
+    ]
+   }
+  },
+  "r5": {
+   "deque": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n": 27,
+    "missed": []
+   },
+   "current": {
+    "precision": 1.0,
+    "recall": 0.667,
+    "f1": 0.8,
+    "n": 18,
+    "missed": [
+     "('core/evm.go', 139)",
+     "('core/state_transition.go', 267)",
+     "('core/state_transition.go', 451)",
+     "('core/state_transition.go', 667)",
+     "('core/vm/evm.go', 403)",
+     "('core/vm/instructions.go', 799)",
+     "('core/vm/instructions.go', 821)",
+     "('core/vm/native_manager.go', 165)",
+     "('core/vm/native_manager.go', 225)"
+    ]
+   }
+  }
+ },
+ "hop_counting": [
+  "forward hop 1 seeds missing something 0 /300  nodes 0-1 1663 tool also has 1663 missed 0",
+  "forward hop 2 seeds missing something 59 /300  nodes 0-1 5294 tool also has 4912 missed 382",
+  "forward hop 3 seeds missing something 97 /300  nodes 0-1 11132 tool also has 9787 missed 1345",
+  "backward hop 1 seeds missing something 39 /300  nodes 0-1 985 tool also has 928 missed 57",
+  "backward hop 2 seeds missing something 77 /300  nodes 0-1 2675 tool also has 2412 missed 263",
+  "backward hop 3 seeds missing something 114 /300  nodes 0-1 5144 tool also has 4551 missed 593",
+  "174"
+ ],
+ "real_tool_check": "seeds checked 45 bad 0 {('find_callers', 2): 15, ('find_callees', 2): 15, ('find_callers', 1): 15} emulated-missing 169 really missing in tool answer 169",
+ "hop_sizes": [
+  "forward 1 | 0-1: p50 212 p90 1333 p95 2409 max 5707 over20k 0 | uniform: p50 166 p90 1089 p95 1864 max 5617 over20k 0",
+  "forward 2 | 0-1: p50 544 p90 4933 p95 7060 max 15222 over20k 0 | uniform: p50 429 p90 3250 p95 5719 max 14985 over20k 0",
+  "forward 3 | 0-1: p50 972 p90 9264 p95 15241 max 45584 over20k 10 | uniform: p50 818 p90 7049 p95 13604 max 43534 over20k 7",
+  "forward 4 | 0-1: p50 1359 p90 17881 p95 29438 max 84407 over20k 24 | uniform: p50 1148 p90 12475 p95 20520 max 69157 over20k 16",
+  "backward 1 | 0-1: p50 310 p90 2512 p95 3773 max 14770 over20k 0 | uniform: p50 243 p90 1836 p95 2854 max 14770 over20k 0",
+  "backward 2 | 0-1: p50 1024 p90 6115 p95 8981 max 54036 over20k 6 | uniform: p50 813 p90 4704 p95 6862 max 30262 over20k 2",
+  "backward 3 | 0-1: p50 1800 p90 11722 p95 19020 max 94982 over20k 13 | uniform: p50 1425 p90 10085 p95 14727 max 53752 over20k 11",
+  "backward 4 | 0-1: p50 2962 p90 23150 p95 33306 max 132908 over20k 41 | uniform: p50 2309 p90 17110 p95 26304 max 126804 over20k 28"
+ ]
+}
