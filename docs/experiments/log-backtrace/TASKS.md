@@ -21,3 +21,4 @@
 | 15 | 큰 정답 거르기와 중간 결론 | done | 2026-11-24. grep 에이전트가 4문항 모두 F1 0.984 이상. 영향 범위 연구를 닫음. [cross-test/CONCLUSION](../cross-test/CONCLUSION.md) |
 | 16 | 실제 결함 재료 점검 | done | 2026-11-24. 문항 재료 17개. [cross-test/MATERIAL](../cross-test/MATERIAL.md) |
 | 17 | 실제 결함 5문항을 grep으로 거른다 | done | 2026-11-24. 5개 모두 정답을 찾음, 이 길을 닫음. [cross-test/REALDEFECT-RESULT](../cross-test/REALDEFECT-RESULT.md) |
+| 18 | 동작하는 graph의 읽은 양과 마감 | done | 2026-11-24. 4문항 중 1문항만 그래프를 썼다. 연구 마감. [cross-test/CONCLUSION](../cross-test/CONCLUSION.md) 6장 |
