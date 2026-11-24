@@ -35,4 +35,8 @@
 //
 // With -mode reachdiag -from <cochange output> it sorts the start-gold pairs of
 // that run by the first raw-edge walk that reaches them (DESIGN.md section 11).
+//
+// With -mode curve -from <case file> it measures the share of gold found within
+// a reading budget, for every arm and family on one ruler
+// (docs/experiments/cross-test/CURVE.md).
 package main

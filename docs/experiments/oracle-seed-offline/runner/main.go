@@ -40,6 +40,9 @@ const (
 	// modeLink ranks co-changed declarations with the two-hop link scores of
 	// DESIGN.md section 12.
 	modeLink runMode = "link"
+	// modeCurve measures every arm of the case file named by -from on one
+	// reading budget (docs/experiments/cross-test/CURVE.md).
+	modeCurve runMode = "curve"
 )
 
 // defaultCochangeFile is the input of the co-change modes, inside the data
@@ -58,7 +61,7 @@ type config struct {
 	only    map[string]bool
 	mode    runMode
 	files   inputFiles // file names inside dataDir
-	from    string     // cochange output directory the reachdiag mode reads
+	from    string     // cochange output directory (reachdiag, hopcurve) or case file (curve)
 	// questions is the co-change question file name inside dataDir; link keeps
 	// one link ranking (group/weight), empty for all.
 	questions string
@@ -86,6 +89,8 @@ func run(ctx context.Context, args []string) error {
 		return runDiagAll(cfg, curveWalks())
 	case modeLink:
 		return runLinkAll(cfg)
+	case modeCurve:
+		return runCurveAll(ctx, cfg)
 	case modeCompare, modeDistance:
 	}
 	qs, err := loadQuestions(cfg.dataDir, cfg.files)
@@ -227,10 +232,10 @@ func parseFlags(args []string) (config, error) {
 	root := fs.String("root", "", "directory that holds knowledge-data (graph paths in base-commits.json are relative to it)")
 	out := fs.String("out", "", "output directory; must not be inside a graph directory")
 	only := fs.String("only", "", "comma-separated question ids to run (default: all)")
-	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag or hopcurve (section 11), or link (section 12)")
+	mode := fs.String("mode", string(modeCompare), "compare (decision A), distance (experiment 1), cochange (section 10) or reachdiag or hopcurve (section 11), link (section 12), or curve (cross-test/CURVE.md)")
 	questions := fs.String("questions", defaultCochangeFile, "co-change question file name inside -data")
 	link := fs.String("link", "", "keep one link ranking, for example calls+field/log (default: all)")
-	from := fs.String("from", "", "cochange output directory; required with -mode reachdiag and hopcurve")
+	from := fs.String("from", "", "cochange output directory for reachdiag and hopcurve, or the case file for curve; required with these modes")
 	seeds := fs.String("seeds", defaultSeedsFile, "seed file name inside -data (seeds-blind.json or seeds-near.json)")
 	oracle := fs.String("oracle", defaultOracleFile, "oracle label file name inside -data")
 	bases := fs.String("bases", defaultBasesFile, "base commit file name inside -data")
@@ -253,10 +258,10 @@ func parseFlags(args []string) (config, error) {
 			return config{}, fmt.Errorf("%s %q: want a file name inside -data", f.flag, f.v)
 		}
 	}
-	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag && m != modeHopCurve && m != modeLink {
+	if m != modeCompare && m != modeDistance && m != modeCochange && m != modeReachDiag && m != modeHopCurve && m != modeLink && m != modeCurve {
 		return config{}, fmt.Errorf("-mode %q: unknown mode", *mode)
 	}
-	if (m == modeReachDiag || m == modeHopCurve) && *from == "" {
+	if (m == modeReachDiag || m == modeHopCurve || m == modeCurve) && *from == "" {
 		return config{}, fmt.Errorf("-mode %s needs -from", m)
 	}
 	cfg := config{dataDir: *data, root: *root, outDir: absOut, only: map[string]bool{}, mode: m, from: *from, questions: *questions, link: *link, files: inputFiles{Seeds: *seeds, Oracle: *oracle, Bases: *bases}}
