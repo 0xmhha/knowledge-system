@@ -1,6 +1,6 @@
 # 작업 목록: issue-relations
 
-검토 보고서는 [REPORT.md](./REPORT.md)에 있다. **2026-11-24에 이 연구 줄을 닫았다([E2E-RESULT](./E2E-RESULT.md) 5장). 남은 것은 6번(제품 버그)뿐이다.** 상태 값: `todo`, `doing`, `blocked`, `done`, `dropped`.
+검토 보고서는 [REPORT.md](./REPORT.md)에 있다. **2026-11-24에 이 연구 줄을 닫았다([E2E-RESULT](./E2E-RESULT.md) 5장). 6번(제품 버그)도 고쳤다.** 상태 값: `todo`, `doing`, `blocked`, `done`, `dropped`.
 
 | # | 작업 | 상태 | 결과 |
 |---|---|---|---|
@@ -9,7 +9,7 @@
 | 3 | 첫 시험을 정한다(G0, G0R 또는 둘 다) | done | 2026-11-24. 사용자가 G0R(리팩토링부터)를 골랐다 |
 | 4 | G0R: 여러 hop 변경을 grep 에이전트가 풀 수 있는가 | done | 2026-11-24. 10문항 모두 F1 1.000, 10만 자 초과 1개. 사전 표에 따라 리팩토링 쪽을 접는다. [HOPGATE](./HOPGATE.md), [결과](./HOPGATE-RESULT.md), [연구일지 2026-11-24-16](../research-log/2026-11-24-16-hop-gate-and-deque.md) |
 | 5 | 응답 자료구조를 덱으로 바꾼다(설계) | done | 2026-11-24. 사용자 제안. REPORT 6장. hop을 바로 세는 이득을 쟀다 |
-| 6 | `find_callers`, `find_callees`의 hop 세기를 고친다 | blocked | 사용자가 정한다. 고치면 모든 문항 묶음에서 다시 잰다 |
+| 6 | `find_callers`, `find_callees`의 hop 세기를 고친다 | done | 2026-11-24. 브랜치 `fix/dispatch-hop-count`에서 고쳤다(병합과 푸시 안 함). 잃은 노드 0, reach 정답 300개의 재현율 0.835에서 0.896. [연구일지 2026-11-24-22](../research-log/2026-11-24-22-hop-count-fix.md) |
 | 7 | G0: 결함의 나머지 자리를 grep 에이전트가 찾는가 | done | 2026-11-24. 사용자가 골랐다. 확인용 대신 7월 이전 27건에서 9문항. 22곳 중 20곳, 못 봐서 놓친 것 0. 결함 쪽 `relate`를 만들지 않는다. [FIXGATE](./FIXGATE.md), [결과](./FIXGATE-RESULT.md), [연구일지 2026-11-24-17](../research-log/2026-11-24-17-fix-gate-and-critique.md) |
 | 8 | 연구 방향과 방법의 비판적 검토 | done | 2026-11-24. [CRITIQUE.md](./CRITIQUE.md) |
 | 9 | 다음 방향을 정한다 | done | 2026-11-24. 사용자가 두 시험을 제안했다(10, 11번) |
