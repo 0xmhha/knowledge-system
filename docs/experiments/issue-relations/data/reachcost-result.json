@@ -1,0 +1,713 @@
+{
+ "experiment": "reach cost: grep, gopls one-step wrapper (gp), graph walk (gk)",
+ "runs": 72,
+ "model": "claude-opus-5-5",
+ "preregistration": "555d3668",
+ "tokens_by_run": {
+  "i1-grep-1": 113741,
+  "i1-grep-2": 110257,
+  "i1-grep-3": 107170,
+  "i1-gk-1": 103878,
+  "i1-gk-2": 107992,
+  "i1-gk-3": 105235,
+  "i1-gp-1": 104147,
+  "i1-gp-2": 103688,
+  "i1-gp-3": 110908,
+  "i2-grep-1": 111810,
+  "i2-grep-2": 111996,
+  "i2-grep-3": 110360,
+  "i2-gk-1": 101407,
+  "i2-gk-2": 111107,
+  "i2-gk-3": 103247,
+  "i2-gp-1": 108952,
+  "i2-gp-2": 106338,
+  "i2-gp-3": 103486,
+  "i3-grep-1": 122922,
+  "i3-grep-2": 125055,
+  "i3-grep-3": 127852,
+  "i3-gk-1": 105192,
+  "i3-gk-2": 102876,
+  "i3-gk-3": 110307,
+  "i3-gp-1": 117133,
+  "i3-gp-2": 110082,
+  "i3-gp-3": 106188,
+  "i4-grep-1": 111262,
+  "i4-grep-2": 122025,
+  "i4-grep-3": 123990,
+  "i4-gk-1": 117095,
+  "i4-gk-2": 117035,
+  "i4-gk-3": 108042,
+  "i4-gp-1": 109067,
+  "i4-gp-2": 111171,
+  "i4-gp-3": 107650,
+  "p1-grep-1": 108411,
+  "p1-grep-2": 123015,
+  "p1-grep-3": 119276,
+  "p1-gk-1": 115829,
+  "p1-gk-2": 112741,
+  "p1-gk-3": 119842,
+  "p1-gp-1": 104182,
+  "p1-gp-2": 112935,
+  "p1-gp-3": 102468,
+  "p2-grep-1": 140381,
+  "p2-grep-2": 148119,
+  "p2-grep-3": 145761,
+  "p2-gk-1": 146113,
+  "p2-gk-2": 120979,
+  "p2-gk-3": 131548,
+  "p2-gp-1": 137263,
+  "p2-gp-2": 133450,
+  "p2-gp-3": 137774,
+  "p3-grep-1": 133964,
+  "p3-grep-2": 140468,
+  "p3-grep-3": 139650,
+  "p3-gk-1": 128460,
+  "p3-gk-2": 111621,
+  "p3-gk-3": 117441,
+  "p3-gp-1": 112402,
+  "p3-gp-2": 109845,
+  "p3-gp-3": 114145,
+  "p4-grep-1": 108735,
+  "p4-grep-2": 110860,
+  "p4-grep-3": 112679,
+  "p4-gk-1": 111707,
+  "p4-gk-2": 110137,
+  "p4-gk-3": 111923,
+  "p4-gp-1": 104897,
+  "p4-gp-2": 105471,
+  "p4-gp-3": 102554
+ },
+ "f1_by_run_all_one": true,
+ "summary": {
+  "tokens gk/grep": {
+   "ratios": [
+    0.954,
+    0.923,
+    0.841,
+    0.959,
+    0.971,
+    0.902,
+    0.841,
+    1.008
+   ],
+   "median": 0.939,
+   "lower": 7
+  },
+  "tokens gp/grep": {
+   "ratios": [
+    0.945,
+    0.951,
+    0.88,
+    0.894,
+    0.873,
+    0.942,
+    0.805,
+    0.946
+   ],
+   "median": 0.918,
+   "lower": 8
+  },
+  "tokens gk/gp": {
+   "ratios": [
+    1.01,
+    0.971,
+    0.956,
+    1.073,
+    1.112,
+    0.958,
+    1.045,
+    1.065
+   ],
+   "median": 1.028,
+   "lower": 3
+  },
+  "cumulative gk/grep": {
+   "ratios": [
+    0.971,
+    0.953,
+    0.731,
+    0.937,
+    0.997,
+    0.89,
+    0.77,
+    1.006
+   ],
+   "median": 0.945,
+   "lower": 7
+  },
+  "cumulative gp/grep": {
+   "ratios": [
+    1.556,
+    0.984,
+    0.882,
+    1.119,
+    1.087,
+    1.302,
+    0.987,
+    1.189
+   ],
+   "median": 1.103,
+   "lower": 3
+  },
+  "cumulative gk/gp": {
+   "ratios": [
+    0.624,
+    0.969,
+    0.829,
+    0.837,
+    0.917,
+    0.683,
+    0.78,
+    0.847
+   ],
+   "median": 0.833,
+   "lower": 8
+  },
+  "turns gk/grep": {
+   "ratios": [
+    1.0,
+    1.0,
+    0.833,
+    1.0,
+    1.0,
+    1.0,
+    0.857,
+    1.0
+   ],
+   "median": 1.0,
+   "lower": 2
+  },
+  "turns gp/grep": {
+   "ratios": [
+    1.6,
+    1.0,
+    1.0,
+    1.167,
+    1.167,
+    1.4,
+    1.143,
+    1.2
+   ],
+   "median": 1.167,
+   "lower": 0
+  },
+  "turns gk/gp": {
+   "ratios": [
+    0.625,
+    1.0,
+    0.833,
+    0.857,
+    0.857,
+    0.714,
+    0.75,
+    0.833
+   ],
+   "median": 0.833,
+   "lower": 7
+  },
+  "chars gk/grep": {
+   "ratios": [
+    0.71,
+    0.535,
+    0.328,
+    0.742,
+    0.854,
+    0.699,
+    0.471,
+    0.947
+   ],
+   "median": 0.704,
+   "lower": 8
+  },
+  "chars gp/grep": {
+   "ratios": [
+    0.599,
+    0.537,
+    0.484,
+    0.422,
+    0.314,
+    0.729,
+    0.337,
+    0.617
+   ],
+   "median": 0.511,
+   "lower": 8
+  },
+  "chars gk/gp": {
+   "ratios": [
+    1.185,
+    0.995,
+    0.678,
+    1.759,
+    2.724,
+    0.959,
+    1.4,
+    1.535
+   ],
+   "median": 1.293,
+   "lower": 3
+  },
+  "seconds gk/grep": {
+   "ratios": [
+    0.976,
+    0.939,
+    1.205,
+    1.5,
+    1.615,
+    1.647,
+    1.39,
+    1.433
+   ],
+   "median": 1.412,
+   "lower": 2
+  },
+  "seconds gp/grep": {
+   "ratios": [
+    14.268,
+    6.939,
+    5.487,
+    9.421,
+    10.692,
+    9.294,
+    6.378,
+    7.4
+   ],
+   "median": 8.347,
+   "lower": 0
+  },
+  "seconds gk/gp": {
+   "ratios": [
+    0.068,
+    0.135,
+    0.22,
+    0.159,
+    0.151,
+    0.177,
+    0.218,
+    0.194
+   ],
+   "median": 0.168,
+   "lower": 8
+  },
+  "output gk/grep": {
+   "ratios": [
+    0.709,
+    0.745,
+    0.756,
+    0.984,
+    0.894,
+    0.844,
+    0.704,
+    1.096
+   ],
+   "median": 0.8,
+   "lower": 7
+  },
+  "output gp/grep": {
+   "ratios": [
+    0.877,
+    0.879,
+    0.946,
+    1.193,
+    1.095,
+    1.175,
+    0.681,
+    1.038
+   ],
+   "median": 0.992,
+   "lower": 4
+  },
+  "output gk/gp": {
+   "ratios": [
+    0.809,
+    0.847,
+    0.799,
+    0.824,
+    0.816,
+    0.719,
+    1.034,
+    1.056
+   ],
+   "median": 0.82,
+   "lower": 6
+  },
+  "f1 grep": 1.0,
+  "f1 runs grep": 1.0,
+  "f1 gk": 1.0,
+  "f1 runs gk": 1.0,
+  "f1 gp": 1.0,
+  "f1 runs gp": 1.0
+ },
+ "verdicts": {
+  "gk/grep repeats (<=0.93, >=7/8, F1)": "no: median 0.939, 7/8, F1 equal",
+  "gk/gp better (<=0.95, >=6/8)": "no: 1.028, 3/8",
+  "gp enough (gp/grep within 0.03 of gk/grep or lower)": "yes on final context: 0.918 vs 0.939"
+ },
+ "bootstrap95": {
+  "gk/grep": [
+   0.869,
+   0.993
+  ],
+  "gp/grep": [
+   0.866,
+   0.958
+  ],
+  "gk/gp": [
+   0.964,
+   1.075
+  ]
+ },
+ "P_gk_grep_le_093": 0.37,
+ "deviations": {
+  "i1-gp-1": [
+   "awk awk '/catalyst/' cmd/gstable/*.go cmd/utils/*.go"
+  ],
+  "i2-gk-1": [
+   "grep grep -n tracers src/cmd/gstable/*.go"
+  ],
+  "i2-gk-2": [
+   "awk awk '/tracers\\//{print FILENAME\": \"$0}' $S/src/cmd/gstable/*.go $S/src/cmd/genesis_generator/*.go $S/src/cmd/u"
+  ],
+  "i2-gk-3": [
+   "grep grep -rn 'ApplyMessage\\b\\\u0001TransitionDb\\\u0001CaptureTxEnd' src --include=*.go"
+  ],
+  "i3-gp-3": [
+   "grep grep -n -i 'getkey\\\u0001storage' accounts/keystore/*.go"
+  ],
+  "i4-gp-1": [
+   "grep grep -c . cmd/gstable/main.go"
+  ],
+  "i4-gp-3": [
+   "grep grep -n '^func' eth/protocols/eth/peer.go",
+   "grep grep -rn dispatchRequest eth --include=*.go"
+  ],
+  "p1-gk-2": [
+   "awk awk '/pruner\"/' cmd/gstable/*.go"
+  ],
+  "p2-gp-3": [
+   "grep grep -n \"^var\\",
+   "grep grep -n \"sqrt\" src/crypto/bls12381/swu.go"
+  ],
+  "p4-gk-2": [
+   "awk awk '/go:build/{print FILENAME\": \"$0}' cmd/gstable/*.go"
+  ],
+  "p4-gp-1": [
+   "awk awk -v f=$f '/go:build/{print f,$0}'"
+  ],
+  "p4-gp-2": [
+   "awk awk -v f=$f '/build/{print f\": \"$0}'"
+  ],
+  "p4-gp-3": [
+   "awk awk -v f=$f '/go:build/{print f, $0}'",
+   "awk awk -v f=$f '/^func\u0001^var [a-z]/{d=$0} /"
+  ],
+  "p4-gk-1": [
+   "reported by the run: awk name search"
+  ],
+  "p4-gk-3": [
+   "reported by the run: awk name search"
+  ],
+  "i1-gp-3": [
+   "reported by the run: awk name search"
+  ]
+ },
+ "without_deviating_runs": {
+  "gk/grep": {
+   "median": 0.928,
+   "lower": 6,
+   "questions": 6
+  },
+  "gp/grep": {
+   "median": 0.911,
+   "lower": 7,
+   "questions": 7
+  },
+  "gk/gp": {
+   "median": 1.03,
+   "lower": 2,
+   "questions": 6
+  }
+ },
+ "gp_runs_with_command_moved_to_background": 20,
+ "background_other": {
+  "grep": 1,
+  "gk": 0
+ },
+ "offline": {
+  "i1": {
+   "qname": "clique.Clique.VerifyHeaders",
+   "gold": 16,
+   "gopls": {
+    "n": 16,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 9,
+    "seconds": 0.4,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 16,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "raw": 18,
+    "seconds": 0.44,
+    "chars": 1627,
+    "extra": [],
+    "missed": []
+   }
+  },
+  "i2": {
+   "qname": "native.callTracer.CaptureTxEnd",
+   "gold": 14,
+   "gopls": {
+    "n": 14,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 5,
+    "seconds": 0.2,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 14,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "raw": 14,
+    "seconds": 0.05,
+    "chars": 1175,
+    "extra": [],
+    "missed": []
+   }
+  },
+  "i3": {
+   "qname": "keystore.DecryptKey",
+   "gold": 13,
+   "gopls": {
+    "n": 13,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 5,
+    "seconds": 0.1,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 13,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "raw": 14,
+    "seconds": 0.05,
+    "chars": 1356,
+    "extra": [],
+    "missed": []
+   }
+  },
+  "i4": {
+   "qname": "eth.Peer.dispatchRequest",
+   "gold": 22,
+   "gopls": {
+    "n": 22,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 14,
+    "seconds": 0.4,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 22,
+    "precision": 0.909,
+    "recall": 0.909,
+    "f1": 0.909,
+    "raw": 25,
+    "seconds": 0.06,
+    "chars": 2586,
+    "extra": [
+     "('eth/fetcher/block_fetcher.go', 231)",
+     "('eth/fetcher/block_fetcher.go', 333)"
+    ],
+    "missed": [
+     "('eth/handler_eth.go', 100)",
+     "('eth/handler_eth.go', 60)"
+    ]
+   }
+  },
+  "p1": {
+   "qname": "rawdb.WriteStorageSnapshot",
+   "gold": 12,
+   "gopls": {
+    "n": 12,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 9,
+    "seconds": 0.2,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 73,
+    "precision": 0.164,
+    "recall": 1.0,
+    "f1": 0.282,
+    "raw": 75,
+    "seconds": 0.08,
+    "chars": 6392,
+    "extra": [
+     "('cmd/gstable/dbcmd.go', 476)",
+     "('cmd/utils/cmd.go', 683)",
+     "('consensus/clique/snapshot.go', 101)",
+     "('core/chain_indexer.go', 480)",
+     "('core/chain_indexer.go', 509)",
+     "('core/rawdb/accessors_chain.go', 162)",
+     "('core/rawdb/accessors_chain.go', 187)",
+     "('core/rawdb/accessors_chain.go', 203)",
+     "('core/rawdb/accessors_chain.go', 219)",
+     "('core/rawdb/accessors_chain.go', 235)",
+     "('core/rawdb/accessors_chain.go', 257)",
+     "('core/rawdb/accessors_chain.go', 280)",
+     "('core/rawdb/accessors_chain.go', 394)",
+     "('core/rawdb/accessors_chain.go', 478)",
+     "('core/rawdb/accessors_chain.go', 556)"
+    ],
+    "missed": []
+   }
+  },
+  "p2": {
+   "qname": "bls12381.fe2.set",
+   "gold": 41,
+   "gopls": {
+    "n": 41,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 28,
+    "seconds": 0.5,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 41,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "raw": 42,
+    "seconds": 0.06,
+    "chars": 2696,
+    "extra": [],
+    "missed": []
+   }
+  },
+  "p3": {
+   "qname": "rlp.Split",
+   "gold": 42,
+   "gopls": {
+    "n": 42,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 25,
+    "seconds": 0.5,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 42,
+    "precision": 0.952,
+    "recall": 0.952,
+    "f1": 0.952,
+    "raw": 48,
+    "seconds": 0.07,
+    "chars": 3735,
+    "extra": [
+     "('core/types/hashing.go', 95)",
+     "('eth/protocols/eth/handlers.go', 453)"
+    ],
+    "missed": [
+     "('eth/protocols/eth/handlers.go', 355)",
+     "('eth/protocols/eth/handlers.go', 392)"
+    ]
+   }
+  },
+  "p4": {
+   "qname": "main.loadConfig",
+   "gold": 42,
+   "gopls": {
+    "n": 42,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "queries": 5,
+    "seconds": 0.1,
+    "extra": [],
+    "missed": []
+   },
+   "gk": {
+    "n": 42,
+    "precision": 0.976,
+    "recall": 0.976,
+    "f1": 0.976,
+    "raw": 42,
+    "seconds": 0.05,
+    "chars": 3278,
+    "extra": [
+     "('internal/flags/helpers.go', 78)"
+    ],
+    "missed": [
+     "('cmd/gstable/accountcmd.go', 65)"
+    ]
+   }
+  }
+ },
+ "sample_all": {
+  "seed": 20261130,
+  "pool": 5649,
+  "gopls": {
+   "n": 100,
+   "exact": 96,
+   "f1": 0.999,
+   "recall": 1.0,
+   "precision": 0.998
+  },
+  "gk": {
+   "n": 99,
+   "exact": 62,
+   "f1": 0.884,
+   "recall": 0.917,
+   "precision": 0.866
+  }
+ },
+ "sample_definitions_differ": {
+  "seed": 20261201,
+  "pool": 465,
+  "gopls": {
+   "n": 100,
+   "exact": 6,
+   "f1": 0.843,
+   "recall": 0.981,
+   "precision": 0.789
+  },
+  "gk": {
+   "n": 96,
+   "exact": 7,
+   "f1": 0.774,
+   "recall": 0.926,
+   "precision": 0.731
+  }
+ },
+ "gopls_process": [
+  "cold start+first 2.1 s; 8 walks 100 queries 2.6 s",
+  "warm start+first 1.0 s; 8 walks 100 queries 2.4 s",
+  "warm start+first 1.0 s; 8 walks 100 queries 2.4 s",
+  "cache MB 16",
+  "one-shot CLI 2.9 s"
+ ]
+}
