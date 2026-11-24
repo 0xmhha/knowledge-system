@@ -1,0 +1,68 @@
+{
+ "design": "PILOT.md, committed as 278b3a67 before the run",
+ "run": "knowledge-data/agent-eval/runs/20261124-agent-pilot",
+ "gates": {
+  "G1_answer": true,
+  "G2_countable": true,
+  "G3_graph_used": false,
+  "G4_no_outside_command": true,
+  "G5_room": false
+ },
+ "graph_arm_graph_calls": "0 in 3 of 3 runs",
+ "core_found_in_5": {
+  "sym-56": {
+   "grep": "1/1",
+   "graph": "1/1"
+  },
+  "sym-58": {
+   "grep": "2/2",
+   "graph": "2/2"
+  },
+  "sym-63": {
+   "grep": "2/2",
+   "graph": "2/2"
+  }
+ },
+ "first_answer_is_core": "0 of 6",
+ "per_run": {
+  "sym-56-grep": {
+   "bash_calls": 5,
+   "output_tokens": 2271,
+   "tool_result_chars": 48311
+  },
+  "sym-56-graph": {
+   "bash_calls": 5,
+   "output_tokens": 2308,
+   "tool_result_chars": 45998
+  },
+  "sym-58-grep": {
+   "bash_calls": 4,
+   "output_tokens": 1912,
+   "tool_result_chars": 53013
+  },
+  "sym-58-graph": {
+   "bash_calls": 4,
+   "output_tokens": 2038,
+   "tool_result_chars": 71440
+  },
+  "sym-63-grep": {
+   "bash_calls": 8,
+   "output_tokens": 2785,
+   "tool_result_chars": 79229
+  },
+  "sym-63-graph": {
+   "bash_calls": 7,
+   "output_tokens": 3194,
+   "tool_result_chars": 83454
+  }
+ },
+ "reported_total_tokens_per_agent": [
+  117290,
+  115944,
+  117934,
+  127539,
+  129861,
+  131760
+ ],
+ "memory_sign": "the name of the upgrade the sym-63 fix created, absent from all three trees, the prompts, the rules, the memory and the transcripts up to that point, appears in commands of 3 of 6 agents (sym-58-grep, sym-63-grep, sym-63-graph)"
+}
