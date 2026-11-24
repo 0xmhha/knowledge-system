@@ -9,5 +9,5 @@
 | 3 | S3을 본다 | done | 2026-11-24. 출력 지점 7개. s2-02는 4개 중 1개, p2-08은 10개 중 0개만 돌렸다. [valueprobe](./valueprobe/main.go) |
 | 4 | 결과를 적는다 | done | 2026-11-24. [REPORT.md](./REPORT.md), [연구일지 2026-11-24-01](../research-log/2026-11-24-01-log-backtrace.md) |
 | 5 | 추적 규칙 1판을 고정한다 | done | 2026-11-24. [RULES.md](./RULES.md) |
-| 6 | 시제품을 만들고 6문항에서 돌려 본다(개발용 값) | doing | |
-| 7 | 확인용 문항을 어떻게 만들지 정한다 | todo | |
+| 6 | 시제품을 만들고 6문항에서 돌려 본다(개발용 값) | done | 2026-11-24. core 8곳 중 3곳이 10위 안. [tracer](./tracer/doc.go), [data/tracer-dev.json](./data/tracer-dev.json), [연구일지 2026-11-24-02](../research-log/2026-11-24-02-message-tracer.md) |
+| 7 | 확인용 문항을 어떻게 만들지 정한다 | blocked | 사용자 결정 대기. 에이전트 없이 얻을 수 있는 후보는 go-stablenet 7개, cosmos-sdk 40개 |
