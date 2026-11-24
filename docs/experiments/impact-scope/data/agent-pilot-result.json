@@ -1,0 +1,127 @@
+{
+ "design": "DESIGN.md section 5",
+ "run": "knowledge-data/agent-eval/runs/20261124-impact-scope",
+ "questions": [
+  {
+   "stratum": "hard",
+   "kind": "field",
+   "qname": "pathdb.meta.parent",
+   "file": "triedb/pathdb/history.go",
+   "line": 196,
+   "gold": 5
+  },
+  {
+   "stratum": "hard",
+   "kind": "field",
+   "qname": "types.AccessListTx.To",
+   "file": "core/types/tx_access_list.go",
+   "line": 53,
+   "gold": 6
+  },
+  {
+   "stratum": "easy",
+   "kind": "field",
+   "qname": "legacypool.Config.PriceLimit",
+   "file": "core/txpool/legacypool/legacypool.go",
+   "line": 146,
+   "gold": 5
+  },
+  {
+   "stratum": "omit",
+   "kind": "omit",
+   "qname": "flags.DirectoryFlag.Aliases",
+   "file": "internal/flags/flags.go",
+   "line": 72,
+   "gold": 8
+  }
+ ],
+ "runs": {
+  "1-hard-grep": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 3,
+   "result_chars": 17343,
+   "out_tokens": 891
+  },
+  "1-hard-graph": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 5,
+   "result_chars": 21116,
+   "out_tokens": 1385
+  },
+  "2-hard-grep": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 4,
+   "result_chars": 29554,
+   "out_tokens": 1464
+  },
+  "2-hard-graph": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 8,
+   "result_chars": 38422,
+   "out_tokens": 2108
+  },
+  "3-easy-grep": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 3,
+   "result_chars": 15200,
+   "out_tokens": 1140
+  },
+  "3-easy-graph": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 4,
+   "result_chars": 19917,
+   "out_tokens": 1071
+  },
+  "4-omit-grep": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 2,
+   "result_chars": 12402,
+   "out_tokens": 803
+  },
+  "4-omit-graph": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "bash": 3,
+   "result_chars": 19126,
+   "out_tokens": 991
+  }
+ },
+ "gates": {
+  "G1_answer": "pass (8/8 parsed)",
+  "G2_countable": "pass",
+  "G3_graph_used": "fail: the graph server crashed in the agents sandbox and the wrapper hid it; 4 of 4 graph runs called it and received nothing",
+  "G4_no_outside_command": "pass",
+  "G5_room": "fail: the grep arm scored F1 1.0 on all four",
+  "G6_memory": "not checked"
+ },
+ "graph_reply_chars_when_fixed": {
+  "pathdb.meta.parent": 2108,
+  "types.AccessListTx.To": 7978,
+  "legacypool.Config.PriceLimit": 12602
+ },
+ "tokens_per_agent_reported": [
+  99485,
+  101156,
+  106860,
+  111009,
+  99972,
+  100868,
+  98389,
+  100855
+ ]
+}

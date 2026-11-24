@@ -1,0 +1,80 @@
+{
+ "design": "DESIGN.md, committed as 4bc48c71 before the run",
+ "run": "knowledge-data/agent-eval/runs/20261124-impact-scope",
+ "base": "8f3774015dd82e4ffef8a5a2b0d0d12a9d8a0bb7",
+ "deterministic": "two runs, equal output",
+ "summary": {
+  "field": {
+   "sampled": 300,
+   "eligible": 2845,
+   "grep": {
+    "recall": 1.0,
+    "precision": 0.3799,
+    "list_per_gold_median": 5.743421052631579,
+    "full_recall_share": 1.0
+   },
+   "hard_share": 0.5333,
+   "graph": {
+    "recall": 0.9982,
+    "precision": 0.9956,
+    "list_per_gold_median": 1.0,
+    "full_recall_share": 0.9933
+   },
+   "ambiguous": 0,
+   "calls_mean": 1,
+   "graph_unambiguous": {
+    "recall": 0.9982,
+    "precision": 0.9956,
+    "list_per_gold_median": 1.0,
+    "full_recall_share": 0.9933
+   }
+  },
+  "func": {
+   "sampled": 300,
+   "eligible": 489,
+   "grep": {
+    "recall": 1.0,
+    "precision": 0.9142,
+    "list_per_gold_median": 1.0,
+    "full_recall_share": 1.0
+   },
+   "hard_share": 0.0467,
+   "graph": {
+    "recall": 0.9332,
+    "precision": 0.9514,
+    "list_per_gold_median": 1.0,
+    "full_recall_share": 0.8733
+   },
+   "ambiguous": 0,
+   "calls_mean": 2,
+   "graph_unambiguous": {
+    "recall": 0.9332,
+    "precision": 0.9514,
+    "list_per_gold_median": 1.0,
+    "full_recall_share": 0.8733
+   }
+  },
+  "omit": {
+   "sampled": 243,
+   "eligible": 243,
+   "grep": {
+    "recall": 0.9872,
+    "precision": 0.5039,
+    "list_per_gold_median": 2.0,
+    "full_recall_share": 0.9712
+   },
+   "hard_share": 0.3333
+  },
+  "hard_share_weighted": 0.4532,
+  "population": {
+   "field": 2845,
+   "omit": 243,
+   "func": 489
+  }
+ },
+ "func_misses": {
+  "targets_with_a_miss": "38 of 300",
+  "missed": "137 package-level var, const or type declarations, 17 functions or methods"
+ },
+ "field_misses": "2 of 300 targets (4 functions)"
+}

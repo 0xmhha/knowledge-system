@@ -17,3 +17,4 @@
 | 11 | 시험 전체의 특징을 정리한다 | done | 2026-11-24. [cross-test/FINDINGS](../cross-test/FINDINGS.md). 추적 규칙은 더하지 않는다 |
 | 12 | 잣대 하나로 모든 묶음을 다시 잰다 | done | 2026-11-24. 사전 판정선은 넘었지만 사후 대조에서 남지 않는다. [cross-test/RESULT](../cross-test/RESULT.md) |
 | 13 | 에이전트 예비 시험(3문항) | done | 2026-11-24. 장비 점검에서 그래프 쓰기와 난이도 조건이 떨어졌다. [cross-test/PILOT-RESULT](../cross-test/PILOT-RESULT.md) |
+| 14 | 영향 범위 찾기(1단계 자동 비교, 2단계 에이전트 점검) | done | 2026-11-24. field는 도구가 정확하다. 에이전트 점검은 graph 조건이 동작하지 않아 판단할 수 없고, grep 조건은 4문항 모두 F1 1.0이다. [impact-scope/REPORT](../impact-scope/REPORT.md) |
