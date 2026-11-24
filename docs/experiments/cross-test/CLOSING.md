@@ -1,0 +1,33 @@
+# 마감: 남은 것, 남은 위험, 찾는 곳
+
+작성 2026-11-24. 그래프 연구(oracle-seed-offline, log-backtrace, cross-test, impact-scope)를 마감하며 한 장으로 정리한다. 결론은 [CONCLUSION](./CONCLUSION.md)에 있다.
+
+## 1. 결론 세 줄
+
+- 그래프의 내용은 대체로 맞다(필드 사용 목록 재현율 0.998, 정밀도 0.996).
+- 이번 자료에서 grep 에이전트는 위치 찾기와 영향 범위 문항을 거의 다 맞혔다. graph가 정확도나 토큰을 더 낫게 한다는 증거는 없다. 없다는 증거도 아니다.
+- 에이전트는 그래프가 있어도 스스로 잘 쓰지 않았다.
+
+## 2. 남은 위험
+
+| 위험 | 상태 |
+|---|---|
+| go-stablenet, go-wemix, go-wbft 커밋에 공개하면 안 되는 설명이 문서에 들어갔는지 | 결함의 내용은 저장소 밖에 두었다. s2-19 문항 문장의 공개 여부는 사용자가 정해야 한다(연구일지 2026-11-24-04) |
+| 저장소 히스토리의 민감정보 탐지 135,190건 | 예전 커밋이다. 새 커밋은 0건. 팀 협의와 정보보안실 문의가 필요하고, 추가 푸시는 사용자가 정한다 |
+| 로컬에만 있는 커밋과 제품 수정 | 연구 브랜치(docs 접두어의 oracle-seed-offline-experiment)와 제품 브랜치(feat 접두어의 ckg-value-references)를 푸시하지 않았다. PR 초안은 `knowledge-data/agent-eval/runs/20261123-ks-18775279-oracle-seed-regression/pr-draft.md` |
+| func의 구멍(패키지 수준 변수 초기값에서 쓰는 함수가 `find_callers`에서 빠짐) | 고치지 않았다. 시험마다 고치지 않는다는 규칙 때문 |
+| 값을 빠뜨린 곳을 찾는 도구가 없음 | 새 기능이므로 하지 않았다 |
+| 디스크 | 결함 시험의 그래프와 소스 9.3GB(`20261124-real-defects`), 에이전트 기록(`20261124-agent-transcripts`). 지울지는 사용자가 정한다 |
+
+## 3. 다시 시작할 때 볼 것
+
+1. [CONCLUSION](./CONCLUSION.md) (확인된 것과 확인 안 된 것), [FINDINGS](./FINDINGS.md) 5장(규칙: 시험마다 기능을 더하지 않는다).
+2. 마지막 연구일지: `docs/experiments/research-log/2026-11-24-13-read-size-and-close.md`.
+3. 도구: 정답을 만드는 [goldprobe](../impact-scope/goldprobe), 읽는 양을 재는 절차 [READSIZE](./READSIZE.md), 기억 흔적 검사(`20261124-real-defects/score5.py`).
+4. 장비에서 배운 것: 에이전트용 래퍼는 샌드박스 안에서 시험한다. 응답이 없으면 오류를 내게 한다. 커밋은 `cd <worktree>`로 시작한다. 정답은 사람이나 커밋보다 타입 검사기로 만든다. 문항은 시드로 고르고 해시를 커밋한 뒤 돌린다.
+
+## 4. 이어 갈 수 있는 길 (정하지 않았다)
+
+- 그래프를 쓰게 만드는 제품 쪽 변경(`docs/research/GRAPH-MCP-AGENT-EVAL-2026-11-20.md`의 D22).
+- 흩어진 큰 정답(파일 여러 개에 걸친 것)에서 읽은 양을 여러 번 재는 시험.
+- 다른 세션(chain-cb)이 모은 결함 211개에서 만든 알고리즘 후보 검토. 그 자료는 임시 폴더에 있어 사라질 수 있다.
