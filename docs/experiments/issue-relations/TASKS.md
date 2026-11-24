@@ -1,6 +1,6 @@
 # 작업 목록: issue-relations
 
-검토 보고서는 [REPORT.md](./REPORT.md)에 있다. 상태 값: `todo`, `doing`, `blocked`, `done`, `dropped`.
+검토 보고서는 [REPORT.md](./REPORT.md)에 있다. **2026-11-24에 이 연구 줄을 닫았다([E2E-RESULT](./E2E-RESULT.md) 5장). 남은 것은 6번(제품 버그)뿐이다.** 상태 값: `todo`, `doing`, `blocked`, `done`, `dropped`.
 
 | # | 작업 | 상태 | 결과 |
 |---|---|---|---|
@@ -19,4 +19,4 @@
 | 13 | go-stablenet에만 있는 코드에서 다시 견준다 | done | 2026-11-24. reach에서 `walk`가 토큰을 줄인다(12문항 중앙값 0.883, 11/12). fork 전용이라서는 아니다. signature와 결함은 이득 없음. [FORKONLY](./FORKONLY.md), [결과](./FORKONLY-RESULT.md), [연구일지 2026-11-24-19](../research-log/2026-11-24-19-fork-only.md) |
 | 14 | reach의 비용 이득을 되풀이와 gopls 대조로 확인한다 | done | 2026-11-24. 72번. gk/grep 0.939로 선 0.93에 못 미쳐 되풀이되지 않는다. gk/gp 1.028, gp/grep 0.918. [REACHCOST](./REACHCOST.md), [결과](./REACHCOST-RESULT.md), [연구일지 2026-11-24-20](../research-log/2026-11-24-20-reach-cost.md) |
 | 15 | 이 연구 줄의 다음을 정한다 | done | 2026-11-24. 사용자가 A(실패부터 모으기)를 골랐다 |
-| 16 | 실제 결함 10건을 grep 에이전트가 끝까지 고치게 하고 숨긴 테스트로 채점한다 | doing | [E2E](./E2E.md) |
+| 16 | 실제 결함 10건을 grep 에이전트가 끝까지 고치게 하고 숨긴 테스트로 채점한다 | done | 2026-11-24. 20/20 통과, 실패한 문항 0개라 정해 둔 선에 따라 이 줄을 닫는다. [E2E](./E2E.md), [결과](./E2E-RESULT.md), [연구일지 2026-11-24-21](../research-log/2026-11-24-21-e2e-fix-and-close.md) |
