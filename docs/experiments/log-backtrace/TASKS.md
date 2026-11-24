@@ -8,3 +8,6 @@
 | 2 | S1, S2를 센다 | done | 2026-11-24. [data/s1-s2.json](./data/s1-s2.json), [tools/trace_message.py](./tools/trace_message.py) |
 | 3 | S3을 본다 | done | 2026-11-24. 출력 지점 7개. s2-02는 4개 중 1개, p2-08은 10개 중 0개만 돌렸다. [valueprobe](./valueprobe/main.go) |
 | 4 | 결과를 적는다 | done | 2026-11-24. [REPORT.md](./REPORT.md), [연구일지 2026-11-24-01](../research-log/2026-11-24-01-log-backtrace.md) |
+| 5 | 추적 규칙 1판을 고정한다 | done | 2026-11-24. [RULES.md](./RULES.md) |
+| 6 | 시제품을 만들고 6문항에서 돌려 본다(개발용 값) | doing | |
+| 7 | 확인용 문항을 어떻게 만들지 정한다 | todo | |
