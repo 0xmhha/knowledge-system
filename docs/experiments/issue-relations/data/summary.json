@@ -1,0 +1,177 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261124-defect-patterns",
+ "status": "exploratory, no verdict; units created before 2026-07-01 only",
+ "units": 113,
+ "base_commits_matched": {
+  "all": 173,
+  "before_2026_07_01": 117,
+  "dropped_for_diff_mismatch": 4
+ },
+ "added_identifiers": {
+  "missing": {
+   "nothing-new": 12,
+   "no-changed-func": 6,
+   "rare": 34,
+   "new": 3,
+   "common": 4
+  },
+  "wrong": {
+   "rare": 22,
+   "no-changed-func": 6,
+   "nothing-new": 12,
+   "common": 7,
+   "new": 1
+  },
+  "extra": {
+   "no-changed-func": 2,
+   "nothing-new": 2,
+   "rare": 1,
+   "common": 1
+  }
+ },
+ "rank_of_changed_function": {
+  "missing": {
+   "best": {
+    "10": 11,
+    "50": 22,
+    "100": 25
+   },
+   "med": {
+    "10": 4,
+    "50": 15,
+    "100": 20
+   },
+   "bestn": {
+    "10": 5,
+    "50": 15,
+    "100": 19
+   },
+   "medn": {
+    "10": 3,
+    "50": 9,
+    "100": 14
+   },
+   "units": 34,
+   "union_hit": 29
+  },
+  "wrong": {
+   "best": {
+    "10": 6,
+    "50": 11,
+    "100": 14
+   },
+   "med": {
+    "10": 2,
+    "50": 8,
+    "100": 10
+   },
+   "bestn": {
+    "10": 7,
+    "50": 13,
+    "100": 15
+   },
+   "medn": {
+    "10": 2,
+    "50": 10,
+    "100": 12
+   },
+   "units": 22,
+   "union_hit": 18
+  },
+  "keys": "best/med over identifiers by identifier-set similarity; bestn/medn by same file, same package"
+ },
+ "symptom_to_family_before_2026_07_01": {
+  "top1": 64,
+  "top3": 114,
+  "largest_family": 25,
+  "units": 146
+ },
+ "relations": {
+  "value": [
+   43,
+   18,
+   26
+  ],
+  "contract": [
+   36,
+   16,
+   8
+  ],
+  "peers": [
+   30,
+   25,
+   15
+  ],
+  "entry_guard": [
+   26,
+   22,
+   14
+  ],
+  "pair_held": [
+   18,
+   14,
+   5
+  ],
+  "none": [
+   33,
+   7,
+   15
+  ],
+  "columns": [
+   "units",
+   "missing",
+   "multi-file or cross-module"
+  ],
+  "note": "counts over all product units, including those after 2026-07-01; assignment by one author"
+ },
+ "hop_one_direction": [
+  "calls forward None h2 tok p50 380 p90 2623 p95 5058 max 12338 over20k 0 | h4 tok p50 1025 p90 8212 p95 17391 max 69617 over20k 12",
+  "calls forward 50 h2 tok p50 343 p90 2623 p95 4910 max 12308 over20k 0 | h4 tok p50 656 p90 6406 p95 13207 max 69216 over20k 9",
+  "calls backward None h2 tok p50 738 p90 4704 p95 5647 max 14434 over20k 0 | h4 tok p50 2696 p90 12568 p95 15850 max 103579 over20k 12",
+  "calls backward 50 h2 tok p50 704 p90 4217 p95 5415 max 14434 over20k 0 | h4 tok p50 2154 p90 11954 p95 14411 max 60303 over20k 8",
+  "calls+value forward None h2 tok p50 591 p90 3062 p95 5758 max 14264 over20k 0 | h4 tok p50 1506 p90 9993 p95 22028 max 90892 over20k 16",
+  "calls+value forward 50 h2 tok p50 522 p90 2773 p95 4358 max 14233 over20k 0 | h4 tok p50 912 p90 6982 p95 14179 max 44894 over20k 10",
+  "calls+value backward None h2 tok p50 674 p90 4704 p95 5639 max 14434 over20k 0 | h4 tok p50 2622 p90 12272 p95 15616 max 103579 over20k 12",
+  "calls+value backward 50 h2 tok p50 645 p90 3718 p95 5406 max 13686 over20k 0 | h4 tok p50 1907 p90 11054 p95 12724 max 60303 over20k 5",
+  "all code forward None h2 tok p50 791 p90 3384 p95 5933 max 15038 over20k 0 | h4 tok p50 2059 p90 10812 p95 24678 max 98017 over20k 16",
+  "all code forward 50 h2 tok p50 599 p90 2907 p95 4367 max 15008 over20k 0 | h4 tok p50 1156 p90 7647 p95 13184 max 46390 over20k 10",
+  "all code backward None h2 tok p50 674 p90 4704 p95 5639 max 14434 over20k 0 | h4 tok p50 2622 p90 12272 p95 15616 max 103579 over20k 12",
+  "all code backward 50 h2 tok p50 645 p90 3713 p95 5406 max 13686 over20k 0 | h4 tok p50 1800 p90 10781 p95 12724 max 60303 over20k 5"
+ ],
+ "hop_all": [
+  "calls        forward  hub=None h1: n med 2 p90 10, tok med 156 p90 1018 | h2: n med 7 p90 27, tok med 380 p90 2623 | h3: n med 13 p90 61, tok med 695 p90 4914 | h4: n med 18 p90 108, tok med 1025 p90 8212",
+  "calls        forward  hub=50 h1: n med 2 p90 10, tok med 156 p90 1018 | h2: n med 6 p90 22, tok med 343 p90 2623 | h3: n med 10 p90 55, tok med 517 p90 4133 | h4: n med 12 p90 90, tok med 656 p90 6406",
+  "calls        backward hub=None h1: n med 1 p90 3, tok med 209 p90 2048 | h2: n med 3 p90 10, tok med 738 p90 4704 | h3: n med 6 p90 22, tok med 1834 p90 9022 | h4: n med 10 p90 39, tok med 2696 p90 12568",
+  "calls        backward hub=50 h1: n med 1 p90 3, tok med 209 p90 2048 | h2: n med 3 p90 10, tok med 704 p90 4217 | h3: n med 5 p90 19, tok med 1512 p90 7084 | h4: n med 8 p90 34, tok med 2154 p90 11954",
+  "calls        both     hub=None h1: n med 4 p90 12, tok med 527 p90 2463 | h2: n med 38 p90 199, tok med 7628 p90 91902 | h3: n med 268 p90 1240, tok med 56218 p90 270643 | h4: n med 1294 p90 3587, tok med 297867 p90 576645",
+  "calls        both     hub=50 h1: n med 4 p90 12, tok med 527 p90 2463 | h2: n med 26 p90 91, tok med 4282 p90 28030 | h3: n med 105 p90 455, tok med 18694 p90 89748 | h4: n med 410 p90 1517, tok med 84106 p90 290180",
+  "calls+value  forward  hub=None h1: n med 6 p90 20, tok med 250 p90 1225 | h2: n med 14 p90 60, tok med 591 p90 3062 | h3: n med 26 p90 121, tok med 1028 p90 6131 | h4: n med 38 p90 215, tok med 1506 p90 9993",
+  "calls+value  forward  hub=50 h1: n med 6 p90 20, tok med 250 p90 1225 | h2: n med 13 p90 49, tok med 522 p90 2773 | h3: n med 20 p90 89, tok med 750 p90 4800 | h4: n med 24 p90 129, tok med 912 p90 6982",
+  "calls+value  backward hub=None h1: n med 1 p90 3, tok med 207 p90 1830 | h2: n med 3 p90 10, tok med 674 p90 4704 | h3: n med 6 p90 22, tok med 1779 p90 8515 | h4: n med 10 p90 39, tok med 2622 p90 12272",
+  "calls+value  backward hub=50 h1: n med 1 p90 3, tok med 207 p90 1830 | h2: n med 3 p90 10, tok med 645 p90 3718 | h3: n med 5 p90 18, tok med 1386 p90 5846 | h4: n med 6 p90 30, tok med 1907 p90 11054",
+  "calls+value  both     hub=None h1: n med 7 p90 21, tok med 629 p90 2626 | h2: n med 84 p90 326, tok med 11315 p90 118310 | h3: n med 550 p90 2828, tok med 77695 p90 338061 | h4: n med 2910 p90 7508, tok med 405221 p90 717698",
+  "calls+value  both     hub=50 h1: n med 7 p90 21, tok med 629 p90 2626 | h2: n med 50 p90 149, tok med 6852 p90 33260 | h3: n med 228 p90 868, tok med 29717 p90 114458 | h4: n med 932 p90 2860, tok med 130666 p90 368341",
+  "all code     forward  hub=None h1: n med 8 p90 23, tok med 281 p90 1317 | h2: n med 21 p90 71, tok med 791 p90 3384 | h3: n med 40 p90 144, tok med 1503 p90 6809 | h4: n med 57 p90 252, tok med 2059 p90 10812",
+  "all code     forward  hub=50 h1: n med 8 p90 23, tok med 281 p90 1317 | h2: n med 16 p90 57, tok med 599 p90 2907 | h3: n med 26 p90 103, tok med 915 p90 5114 | h4: n med 34 p90 154, tok med 1156 p90 7647",
+  "all code     backward hub=None h1: n med 1 p90 3, tok med 207 p90 1830 | h2: n med 3 p90 10, tok med 674 p90 4704 | h3: n med 6 p90 22, tok med 1779 p90 8515 | h4: n med 10 p90 39, tok med 2622 p90 12272",
+  "all code     backward hub=50 h1: n med 1 p90 3, tok med 207 p90 1830 | h2: n med 2 p90 10, tok med 645 p90 3713 | h3: n med 4 p90 18, tok med 1308 p90 5796 | h4: n med 6 p90 29, tok med 1800 p90 10781",
+  "all code     both     hub=None h1: n med 9 p90 24, tok med 679 p90 2688 | h2: n med 178 p90 1054, tok med 23752 p90 173390 | h3: n med 1789 p90 5470, tok med 231965 p90 527453 | h4: n med 7079 p90 11504, tok med 675006 p90 898140",
+  "all code     both     hub=50 h1: n med 9 p90 24, tok med 679 p90 2688 | h2: n med 61 p90 158, tok med 8348 p90 34367 | h3: n med 291 p90 954, tok med 33519 p90 118224 | h4: n med 1164 p90 3254, tok med 144851 p90 388527"
+ ],
+ "typed_moves": [
+  "accessed_under_lock end types Counter({('Field', 'Mutex'): 1118})",
+  "field-mutex 898 fields with both locked and unlocked accessors 683 unlocked accessor functions 1955 fields >=2 locked & some unlocked write 295",
+  "calls from Variable 0 references Variable->Function/Method 0 references fn->fn 0",
+  "read field -> its writers (field users<=1000000000)  n med 2 p90 11 | tok med 246 p90 4776",
+  "same callee -> other callers (callers<=1000000000)   n med 14 p90 186 | tok med 3303 p90 95385",
+  "same caller -> other callees (caller fanout<=1000000000) n med 6 p90 34 | tok med 534 p90 5539",
+  "read field -> its writers (field users<=20)          n med 1 p90 7 | tok med 149 p90 2782",
+  "same callee -> other callers (callers<=20)           n med 4 p90 26 | tok med 922 p90 10452",
+  "same caller -> other callees (caller fanout<=20)     n med 4 p90 18 | tok med 273 p90 2352"
+ ],
+ "held_out": {
+  "product_go_units_from_2026_07_01": 57,
+  "base_matched": 49,
+  "several_functions": 16
+ }
+}
