@@ -15,3 +15,4 @@
 | 9 | 확인을 돌리고 결과를 적는다 | done | 2026-11-24. 시제품 3, 기준선 3, 무승부 3. 판정하지 않는다. [REPORT.md](./REPORT.md) 5장, [data/confirm-result.json](./data/confirm-result.json), [연구일지 2026-11-24-03](../research-log/2026-11-24-03-message-confirmation.md) |
 | 10 | 수정 PR에서 실제 에러 로그로 발견된 사례를 찾아 실험한다(사용자 요청) | done | 2026-11-24. 12문항에서 세 방식 모두 3개. 판정하지 않는다. 절차 [REALLOGS.md](./REALLOGS.md), [REPORT.md](./REPORT.md) 6장, [data/reallog-result.json](./data/reallog-result.json), [연구일지 2026-11-24-04](../research-log/2026-11-24-04-real-logs.md) |
 | 11 | 시험 전체의 특징을 정리한다 | done | 2026-11-24. [cross-test/FINDINGS](../cross-test/FINDINGS.md). 추적 규칙은 더하지 않는다 |
+| 12 | 잣대 하나로 모든 묶음을 다시 잰다 | done | 2026-11-24. 사전 판정선은 넘었지만 사후 대조에서 남지 않는다. [cross-test/RESULT](../cross-test/RESULT.md) |
