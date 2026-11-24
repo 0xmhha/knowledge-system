@@ -169,6 +169,40 @@ func TestSchemaValidator_ContextPathBadShape(t *testing.T) {
 	}
 }
 
+// A call may end at an External node (schema 1.36) and may not start at one.
+func TestSchemaValidator_ExternalCallEnds(t *testing.T) {
+	g := &graph.Graph{
+		Nodes: []types.Node{
+			validNode("f", "pkg.F", types.NodeFunction),
+			validNode("x", "time.AfterFunc", types.NodeExternal),
+			validNode("s", "pkg.S", types.NodeStruct),
+		},
+		Edges: []types.Edge{
+			{Src: "f", Dst: "x", Type: types.EdgeCalls, Line: 1, Confidence: types.ConfExtracted},
+			{Src: "f", Dst: "x", Type: types.EdgeInvokes, Line: 2, Confidence: types.ConfExtracted},
+			{Src: "x", Dst: "f", Type: types.EdgeCalls, Line: 3, Confidence: types.ConfExtracted},
+			{Src: "f", Dst: "s", Type: types.EdgeCalls, Line: 4, Confidence: types.ConfExtracted},
+		},
+	}
+	r, err := NewSchemaValidator().Validate(context.Background(), g, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]int{}
+	for _, iss := range r.Issues {
+		got[iss.Code+" "+iss.EdgeKey]++
+	}
+	for _, key := range []string{"calls-bad-src calls:x:f:3", "calls-bad-dst calls:f:s:4"} {
+		if got[key] != 1 {
+			t.Errorf("issue %q reported %d times, want once; got %v", key, got[key], got)
+		}
+		delete(got, key)
+	}
+	if len(got) != 0 {
+		t.Errorf("unexpected issues %v", got)
+	}
+}
+
 func TestSchemaValidator_ImplementsBadDst(t *testing.T) {
 	g := &graph.Graph{
 		Nodes: []types.Node{

@@ -11,6 +11,11 @@ probe:
 expected:
   symbols:
     - "service.Vault.Deposit"
+    # Calls outside the build point at External nodes (schema 1.36).
+    - "http.Error"
+    - "http.ResponseWriter.WriteHeader"
+    - "json.Decoder.Decode"
+    - "json.NewDecoder"
 scoring:
   recall_min: 1.0
   precision_min: 0.0
