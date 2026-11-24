@@ -13,3 +13,4 @@
 | 7 | 확인 절차를 고정한다 | done | 2026-11-24. 사용자가 2022~2024년 수정에서 에이전트 하나로 뽑기로 했다. [CONFIRM.md](./CONFIRM.md) |
 | 8 | 문항을 뽑고 검사해 고정한다 | done | 2026-11-24. 39개 중 문구가 있는 9개. [data/confirm-freeze.json](./data/confirm-freeze.json) |
 | 9 | 확인을 돌리고 결과를 적는다 | done | 2026-11-24. 시제품 3, 기준선 3, 무승부 3. 판정하지 않는다. [REPORT.md](./REPORT.md) 5장, [data/confirm-result.json](./data/confirm-result.json), [연구일지 2026-11-24-03](../research-log/2026-11-24-03-message-confirmation.md) |
+| 10 | 수정 PR에서 실제 에러 로그로 발견된 사례를 찾아 실험한다(사용자 요청) | doing | 절차 [REALLOGS.md](./REALLOGS.md). 351개 수정 중 로그 줄이 맞는 29개, 확인에 쓰는 13개 |
