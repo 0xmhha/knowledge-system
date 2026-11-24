@@ -1,0 +1,410 @@
+{
+ "run": "knowledge-data/agent-eval/runs/20261124-greplike",
+ "model": "claude-opus-5-5",
+ "offline": {
+  "all": {
+   "n": 600,
+   "naive": {
+    "chars": 8223117,
+    "recall": 1.0,
+    "precision": 0.557
+   },
+   "go": {
+    "chars": 4228273,
+    "recall": 1.0,
+    "precision": 0.626
+   },
+   "smart": {
+    "chars": 2390646,
+    "recall": 0.998,
+    "precision": 0.664
+   },
+   "gk": {
+    "chars": 429801,
+    "recall": 0.968,
+    "precision": 0.942
+   },
+   "gk2_chars": 794004,
+   "gk2_ambiguous": 62,
+   "gk2_smaller_than_smart": 325
+  },
+  "func": {
+   "n": 100,
+   "naive": {
+    "chars": 778037,
+    "recall": 1.0,
+    "precision": 0.609
+   },
+   "go": {
+    "chars": 471457,
+    "recall": 1.0,
+    "precision": 0.706
+   },
+   "smart": {
+    "chars": 471457,
+    "recall": 1.0,
+    "precision": 0.706
+   },
+   "gk": {
+    "chars": 74168,
+    "recall": 1.0,
+    "precision": 1.0
+   },
+   "gk2_chars": 92974,
+   "gk2_ambiguous": 3,
+   "gk2_smaller_than_smart": 73
+  },
+  "method": {
+   "n": 100,
+   "naive": {
+    "chars": 1368158,
+    "recall": 1.0,
+    "precision": 0.325
+   },
+   "go": {
+    "chars": 681852,
+    "recall": 1.0,
+    "precision": 0.365
+   },
+   "smart": {
+    "chars": 367848,
+    "recall": 1.0,
+    "precision": 0.51
+   },
+   "gk": {
+    "chars": 73018,
+    "recall": 0.96,
+    "precision": 0.861
+   },
+   "gk2_chars": 196357,
+   "gk2_ambiguous": 18,
+   "gk2_smaller_than_smart": 41
+  },
+  "field": {
+   "n": 100,
+   "naive": {
+    "chars": 4559778,
+    "recall": 1.0,
+    "precision": 0.317
+   },
+   "go": {
+    "chars": 2231354,
+    "recall": 1.0,
+    "precision": 0.357
+   },
+   "smart": {
+    "chars": 707731,
+    "recall": 0.99,
+    "precision": 0.438
+   },
+   "gk": {
+    "chars": 60164,
+    "recall": 0.85,
+    "precision": 0.821
+   },
+   "gk2_chars": 207905,
+   "gk2_ambiguous": 24,
+   "gk2_smaller_than_smart": 45
+  },
+  "const": {
+   "n": 100,
+   "naive": {
+    "chars": 58599,
+    "recall": 1.0,
+    "precision": 0.748
+   },
+   "go": {
+    "chars": 42438,
+    "recall": 1.0,
+    "precision": 0.846
+   },
+   "smart": {
+    "chars": 42438,
+    "recall": 1.0,
+    "precision": 0.846
+   },
+   "gk": {
+    "chars": 37667,
+    "recall": 1.0,
+    "precision": 0.997
+   },
+   "gk2_chars": 40940,
+   "gk2_ambiguous": 0,
+   "gk2_smaller_than_smart": 52
+  },
+  "type": {
+   "n": 100,
+   "naive": {
+    "chars": 1113808,
+    "recall": 1.0,
+    "precision": 0.538
+   },
+   "go": {
+    "chars": 621196,
+    "recall": 1.0,
+    "precision": 0.593
+   },
+   "smart": {
+    "chars": 621196,
+    "recall": 1.0,
+    "precision": 0.593
+   },
+   "gk": {
+    "chars": 143983,
+    "recall": 1.0,
+    "precision": 0.976
+   },
+   "gk2_chars": 204887,
+   "gk2_ambiguous": 17,
+   "gk2_smaller_than_smart": 62
+  },
+  "var": {
+   "n": 100,
+   "naive": {
+    "chars": 344737,
+    "recall": 1.0,
+    "precision": 0.804
+   },
+   "go": {
+    "chars": 179976,
+    "recall": 1.0,
+    "precision": 0.888
+   },
+   "smart": {
+    "chars": 179976,
+    "recall": 1.0,
+    "precision": 0.888
+   },
+   "gk": {
+    "chars": 40801,
+    "recall": 1.0,
+    "precision": 0.996
+   },
+   "gk2_chars": 50941,
+   "gk2_ambiguous": 0,
+   "gk2_smaller_than_smart": 52
+  }
+ },
+ "agents": {
+  "s1-grep": {
+   "f1": 1.0,
+   "tokens": 117633,
+   "chars": 48433,
+   "bash": 7,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "s1-gk": {
+   "f1": 1.0,
+   "tokens": 129857,
+   "chars": 100258,
+   "bash": 9,
+   "banned": [],
+   "search": [
+    "grep",
+    "grep",
+    "grep"
+   ],
+   "gk": 26
+  },
+  "s2-grep": {
+   "f1": 1.0,
+   "tokens": 100202,
+   "chars": 14378,
+   "bash": 4,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "s2-gk": {
+   "f1": 1.0,
+   "tokens": 99713,
+   "chars": 13338,
+   "bash": 3,
+   "banned": [],
+   "search": [],
+   "gk": 6
+  },
+  "s3-grep": {
+   "f1": 1.0,
+   "tokens": 103086,
+   "chars": 21025,
+   "bash": 3,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "s3-gk": {
+   "f1": 1.0,
+   "tokens": 117999,
+   "chars": 47746,
+   "bash": 5,
+   "banned": [],
+   "search": [],
+   "gk": 6
+  },
+  "r1-grep": {
+   "f1": 1.0,
+   "tokens": 120366,
+   "chars": 57912,
+   "bash": 6,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "r1-gk": {
+   "f1": 1.0,
+   "tokens": 118711,
+   "chars": 54153,
+   "bash": 5,
+   "banned": [],
+   "search": [],
+   "gk": 16
+  },
+  "r2-grep": {
+   "f1": 1.0,
+   "tokens": 129096,
+   "chars": 76225,
+   "bash": 7,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "r2-gk": {
+   "f1": 1.0,
+   "tokens": 115435,
+   "chars": 45255,
+   "bash": 7,
+   "banned": [],
+   "search": [],
+   "gk": 19
+  },
+  "r3-grep": {
+   "f1": 1.0,
+   "tokens": 115768,
+   "chars": 49468,
+   "bash": 7,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "r3-gk": {
+   "f1": 1.0,
+   "tokens": 108569,
+   "chars": 30681,
+   "bash": 6,
+   "banned": [],
+   "search": [],
+   "gk": 4
+  }
+ },
+ "defect": {
+  "gk1": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 136495,
+   "chars": 100852,
+   "bash": 8,
+   "banned": [],
+   "search": [
+    "grep"
+   ],
+   "gk": 15
+  },
+  "gk2": {
+   "ok": true,
+   "answers": 2,
+   "tokens": 138266,
+   "chars": 104512,
+   "bash": 11,
+   "banned": [],
+   "search": [
+    "grep"
+   ],
+   "gk": 6
+  },
+  "gk3": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 131646,
+   "chars": 89285,
+   "bash": 9,
+   "banned": [],
+   "search": [],
+   "gk": 5
+  },
+  "gk4": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 136137,
+   "chars": 99863,
+   "bash": 9,
+   "banned": [],
+   "search": [],
+   "gk": 9
+  },
+  "gk5": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 142702,
+   "chars": 116501,
+   "bash": 10,
+   "banned": [],
+   "search": [],
+   "gk": 8
+  },
+  "grep1": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 136861,
+   "chars": 103762,
+   "bash": 8,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "grep2": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 127850,
+   "chars": 81728,
+   "bash": 6,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "grep3": {
+   "ok": true,
+   "answers": 2,
+   "tokens": 138726,
+   "chars": 105699,
+   "bash": 8,
+   "banned": [
+    "git"
+   ],
+   "search": [],
+   "gk": 0
+  },
+  "grep4": {
+   "ok": true,
+   "answers": 2,
+   "tokens": 135132,
+   "chars": 97560,
+   "bash": 8,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  },
+  "grep5": {
+   "ok": true,
+   "answers": 1,
+   "tokens": 133281,
+   "chars": 94852,
+   "bash": 8,
+   "banned": [],
+   "search": [],
+   "gk": 0
+  }
+ }
+}
