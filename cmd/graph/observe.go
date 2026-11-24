@@ -70,7 +70,7 @@ func modulePath(goMod string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		if l := strings.TrimSpace(sc.Text()); strings.HasPrefix(l, "module ") {
