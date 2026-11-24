@@ -1,0 +1,90 @@
+{
+ "design": "DESIGN.md section 7, committed as 2bcf3a4d before the run",
+ "tokens_per_agent_reported": [
+  99705,
+  107199,
+  122844,
+  148270
+ ],
+ "grep_arm": {
+  "rawdb.table.db": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "gold": 24,
+   "answers": 24,
+   "bash": 2,
+   "result_chars": 17371,
+   "out_tokens": 1205,
+   "missed": 0,
+   "extra": 0,
+   "grep_list": 662
+  },
+  "ethapi.BlockChainAPI.b": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "gold": 20,
+   "answers": 20,
+   "bash": 3,
+   "result_chars": 27881,
+   "out_tokens": 1972,
+   "missed": 0,
+   "extra": 0,
+   "grep_list": 773
+  },
+  "bn256.gfP2.y": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "gold": 20,
+   "answers": 20,
+   "bash": 6,
+   "result_chars": 48174,
+   "out_tokens": 2301,
+   "missed": 0,
+   "extra": 0,
+   "grep_list": 156
+  },
+  "core.Genesis.Config": {
+   "precision": 1.0,
+   "recall": 0.969,
+   "f1": 0.984,
+   "gold": 32,
+   "answers": 31,
+   "bash": 9,
+   "result_chars": 112980,
+   "out_tokens": 3966,
+   "missed": 1,
+   "extra": 0,
+   "grep_list": 319
+  }
+ },
+ "graph_tool_post_hoc": {
+  "rawdb.table.db": {
+   "reply_chars": 7741,
+   "gold_found": 24,
+   "gold": 24,
+   "extra": 0
+  },
+  "ethapi.BlockChainAPI.b": {
+   "reply_chars": 9209,
+   "gold_found": 20,
+   "gold": 20,
+   "extra": 1
+  },
+  "bn256.gfP2.y": {
+   "reply_chars": 8103,
+   "gold_found": 20,
+   "gold": 20,
+   "extra": 6
+  },
+  "core.Genesis.Config": {
+   "reply_chars": 71276,
+   "gold_found": 32,
+   "gold": 32,
+   "extra": 0
+  }
+ },
+ "verdict": "all four F1 >= 0.95: close the impact-scope line"
+}
