@@ -11,19 +11,6 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// interfaceMethodSeeds returns extra find_callers seeds for the interface-dispatch
-// bridge. When the resolved seed is a concrete method `pkg.T.M`, callers that
-// reach it through an interface are recorded as `invokes` edges to the INTERFACE
-// method node (`pkg.I.M`), not to the concrete method — so a reverse walk from the
-// concrete method alone misses every interface-dispatched caller. This returns the
-// same-named method on each interface that T implements, using the `implements`
-// edges already in the graph (no reindex needed). Generalized: no language/domain
-// specifics; a top-level function (no receiver segment) or a type implementing
-// nothing yields no extra seeds.
-func interfaceMethodSeeds(reader store.Reader, methodQname string) []string {
-	return implementsSeeds(reader, methodQname)
-}
-
 // dispatchSeeds returns the interface methods whose dispatches_to edges
 // reach the seed: value-flow links (schema 1.31, SSA + VTA) first, then
 // type-hierarchy links (schema 1.34), so a method no analysed value reaches,

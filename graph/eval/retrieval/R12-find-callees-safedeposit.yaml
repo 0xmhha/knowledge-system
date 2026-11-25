@@ -14,6 +14,9 @@ probe:
 expected:
   symbols:
     - "service.Vault.Deposit"
+    # Calls outside the build point at External nodes (schema 1.36).
+    - "sync.Mutex.Lock"
+    - "sync.Mutex.Unlock"
 scoring:
   recall_min: 1.0
   precision_min: 1.0

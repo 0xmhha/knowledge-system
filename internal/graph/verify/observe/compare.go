@@ -354,7 +354,7 @@ func readRecords(dir string) ([]record, error) {
 				out = append(out, rc)
 			}
 		}
-		f.Close()
+		_ = f.Close()
 	}
 	return out, nil
 }

@@ -42,7 +42,7 @@ func TestInstrumentRunCompare(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	r, err := observe.Compare(obs, store, 10)
 	if err != nil {
 		t.Fatal(err)

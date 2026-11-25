@@ -710,7 +710,7 @@ func (r *Real) reverseSeeds(qname string) []string {
 // This returns the same-named method on each interface that T implements, using
 // the `implements` edges already in the graph (no reindex needed). Generalized:
 // a top-level function (no receiver segment) or a type implementing nothing
-// yields no extra seeds. Mirrors ckg/pkg/mcphandlers.interfaceMethodSeeds.
+// yields no extra seeds. Mirrors ckg/pkg/mcphandlers.implementsSeeds.
 func (r *Real) interfaceMethodSeeds(methodQname string) []string {
 	dot := strings.LastIndex(methodQname, ".")
 	if dot <= 0 || dot == len(methodQname)-1 {
