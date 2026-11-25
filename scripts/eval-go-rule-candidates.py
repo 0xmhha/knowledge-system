@@ -108,7 +108,8 @@ def main():
   tools=client.request('tools/list')['result']['tools'];tool=next(t for t in tools if t['name']=='flow_probe.context.rule_candidates');require(tool['annotations']['readOnlyHint']is True,'rule write annotation');(root/'tools.json').write_bytes(encode(tools))
   manual=client.tool('find_symbol',{'name':'manual-command-review','exact':True})['nodes'];require(any(n['type']=='SecurityPattern'for n in manual),'manual YAML annotation absent before analysis')
   for name,(count,truth) in CASES.items():
-   nodes=client.tool('find_symbol',{'name':name,'exact':False})['nodes'];require(len(nodes)==1,'ambiguous '+name);found[name]=nodes[0]
+   # The bare name also matches the External node of exec.CommandContext.
+   nodes=client.tool('find_symbol',{'name':'cases.'+name,'exact':True})['nodes'];require(len(nodes)==1,'ambiguous '+name);found[name]=nodes[0]
    query={'rule_pack':PACK,'function':{'node_id':nodes[0]['id'],'expected_commit':commit}}
    out=client.tool('rule_candidates',query);r=out.get('analysis');require(r is not None and r.get('rules'),'missing computed rules '+name);rules=r['rules'];require(rules['status']=='matched_bounded'and len(rules['candidates'])==count,'contract mismatch '+name+': '+str(rules))
    require(rules['origin']=='automatic'and len(rules['pack_sha256'])==64 and r['source']['commit']==commit,'pack/source provenance lost');require(not r['truncated'],'base incomplete')

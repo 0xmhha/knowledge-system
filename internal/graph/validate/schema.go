@@ -240,7 +240,9 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 					FilePath: e.FilePath,
 				})
 			}
-			if !isCallable(dst.Type) {
+			// Schema 1.36: a call to a symbol outside the build ends at an
+			// External node, which never starts one.
+			if !isCallable(dst.Type) && dst.Type != types.NodeExternal {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-dst",
 					Message:  "calls/invokes dst is not a callable kind (got " + string(dst.Type) + ")",
