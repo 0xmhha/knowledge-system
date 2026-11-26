@@ -110,10 +110,32 @@ func InFunctionBody(n types.Node, enclosers []types.Node) bool {
 // scope) and whether r holds that record. See persist.TestFiles.
 func TestFiles(r Reader) (files []string, recorded bool, err error) { return persist.TestFiles(r) }
 
+// MutexSuffix ends the seed name of a mutex: "<field or variable>#mutex".
+// See persist.MutexSuffix.
+const MutexSuffix = persist.MutexSuffix
+
+// NamedNodes leaves the Mutex node of a variable out of nodes found by name:
+// the name names the variable. See persist.NamedNodes.
+func NamedNodes(nodes []types.Node) []types.Node { return persist.NamedNodes(nodes) }
+
+// NameOf returns the name that names n alone: its qualified name, or its
+// site name when several declarations carry it. See persist.NameOf.
+func NameOf(r Reader, n types.Node) (string, error) { return persist.NameOf(r, n) }
+
+// PrintedQName is the qualified name a tool prints for n ("<name>#mutex" for
+// the Mutex node of a variable). See persist.PrintedQName.
+func PrintedQName(n types.Node) string { return persist.PrintedQName(n) }
+
 // ParseSiteName splits a site name, "<qname>@<file>:<line>", into its parts;
 // ok is false for any other name. See persist.ParseSiteName.
 func ParseSiteName(name string) (qname, file string, line int, ok bool) {
 	return persist.ParseSiteName(name)
+}
+
+// NodesInFunctions returns, by node id, which of nodes are declared inside a
+// function body (InFunctionBody). See persist.NodesInFunctions.
+func NodesInFunctions(r Reader, nodes []types.Node) (map[string]bool, error) {
+	return persist.NodesInFunctions(r, nodes)
 }
 
 // IsCallable reports whether n is a function, method, modifier or constructor

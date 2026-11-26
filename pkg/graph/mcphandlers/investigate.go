@@ -1780,11 +1780,55 @@ func (x *invIndex) cardIDs(q string) (ids []string, local, msg string) {
 		return ids, "", ""
 	}
 	n := res.Nodes[0]
-	owner := x.innermost(n)
-	if owner == "" {
-		return nil, "", fmt.Sprintf("unknown declaration %q: no card holds it", q)
+	if inFn, err := store.NodesInFunctions(x.reader, []types.Node{n}); err == nil && inFn[n.ID] {
+		if owner := x.innermost(n); owner != "" {
+			return []string{owner}, fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), ""
+		}
 	}
-	return []string{owner}, fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), ""
+	return nil, "", x.noCard(q, n)
+}
+
+// noCard answers card: for a name that resolves to a declaration with no
+// card and inside no function (a package: "filters" is the package filters):
+// it says so and lists the other declarations whose name ends in the same
+// leaf, each with its card or the declaration that holds it, so the caller
+// can open one. card:filters answered "no card holds it" and listed none.
+func (x *invIndex) noCard(q string, n types.Node) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "%q names %s %s, which has no card", q, strings.ToLower(string(n.Type)), n.QualifiedName)
+	matches, err := x.reader.FindSymbol(leafName(n.QualifiedName), false, store.FindSymbolOptions{Limit: store.FindSymbolNoLimit})
+	if err != nil {
+		return b.String()
+	}
+	inFn, err := store.NodesInFunctions(x.reader, matches)
+	if err != nil {
+		return b.String()
+	}
+	var rows []string
+	for _, m := range matches {
+		if m.ID == n.ID {
+			continue
+		}
+		// By the name that opens exactly this declaration: the site name
+		// when several declarations carry its qualified name.
+		name, err := store.NameOf(x.reader, m)
+		if err != nil {
+			name = m.QualifiedName
+		}
+		switch _, card := x.nodes[m.ID]; {
+		case card:
+			rows = append(rows, fmt.Sprintf("%s (%s, card)", name, strings.ToLower(string(m.Type))))
+		case inFn[m.ID] && x.innermost(m) != "":
+			rows = append(rows, fmt.Sprintf("%s (%s, local of %s)", name, strings.ToLower(string(m.Type)), x.nodes[x.innermost(m)].QualifiedName))
+		}
+	}
+	sort.Strings(rows)
+	if len(rows) > 0 {
+		fmt.Fprintf(&b, "; declarations with that name: %s", strings.Join(rows, ", "))
+	} else {
+		b.WriteString("; no other declaration with a card has that name")
+	}
+	return b.String()
 }
 
 // innermost returns the function, method or variable (store.IsEncloser,

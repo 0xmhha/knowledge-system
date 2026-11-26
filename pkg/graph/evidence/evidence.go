@@ -576,7 +576,7 @@ func decorateModifies(targets []types.Node) []ModifiesInfo {
 	out := make([]ModifiesInfo, 0, len(targets))
 	for _, t := range targets {
 		out = append(out, ModifiesInfo{
-			Qname:     t.QualifiedName,
+			Qname:     persist.PrintedQName(t),
 			Type:      string(t.Type),
 			FilePath:  t.FilePath,
 			StartLine: t.StartLine,

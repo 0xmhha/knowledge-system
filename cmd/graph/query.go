@@ -253,7 +253,7 @@ func renderQueryAnswer(w io.Writer, question string,
 	_, _ = fmt.Fprintf(w, "Seeds (top-%d by keyword score):\n\n", len(seeds))
 	for i, s := range seeds {
 		_, _ = fmt.Fprintf(w, "%d. **`%s`** [%s] · `%s` · %s:%d\n",
-			i+1, s.Name, s.Type, s.QualifiedName, s.FilePath, s.StartLine)
+			i+1, s.Name, s.Type, persist.PrintedQName(s), s.FilePath, s.StartLine)
 	}
 	_, _ = fmt.Fprintln(w)
 

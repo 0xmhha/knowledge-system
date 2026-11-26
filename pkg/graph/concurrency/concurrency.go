@@ -51,7 +51,7 @@ type Module struct {
 // names stay as they are (ids and stored graphs depend on them); a seed
 // names any mutex in either form, its declaring name or that name with the
 // suffix (see Analyze).
-const mutexSuffix = "#mutex"
+const mutexSuffix = store.MutexSuffix
 
 // Result is the payload cks's concurrency_impact tool consumes.
 type Result struct {
@@ -193,7 +193,7 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 			ID:        id,
 			Type:      n.Type,
 			Name:      n.Name,
-			Qname:     n.QualifiedName,
+			Qname:     store.PrintedQName(n),
 			FilePath:  n.FilePath,
 			StartLine: n.StartLine,
 			Direction: dir[id],
@@ -284,7 +284,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 			roots = append(roots, n)
 		}
 	}
-	res.Mutex = mutexes[0].QualifiedName
+	res.Mutex = store.PrintedQName(mutexes[0])
 	if len(decls) > 0 {
 		res.DeclaredBy = decls[0].QualifiedName
 	}
@@ -334,7 +334,7 @@ func sites(nodes []types.Node, edges []types.Edge, pick func(types.Edge) (string
 		if line == 0 {
 			line = n.StartLine
 		}
-		s := Site{ID: id, Qname: n.QualifiedName, File: n.FilePath, Line: line}
+		s := Site{ID: id, Qname: store.PrintedQName(n), File: n.FilePath, Line: line}
 		if !seen[s] {
 			seen[s] = true
 			out = append(out, s)
@@ -381,55 +381,35 @@ func declarationsOf(r store.Reader, mutexes []types.Node) ([]types.Node, error) 
 	return out, nil
 }
 
-// resolveSeed resolves symbol as store.ResolveName does, and accepts the
-// "#mutex" form for every mutex: a name with the suffix that resolves to
-// nothing is the declaring name of a package-level or local variable whose
-// Mutex node carries that name without the suffix, and resolves to that
-// Mutex node alone, as "pkg.T.mu#mutex" does for a field.
+// resolveSeed resolves symbol as store.ResolveName does; the resolver
+// itself answers "<variable>#mutex" with the variable's Mutex node
+// (persist.MutexSuffix).
 func resolveSeed(r store.Reader, symbol string) (store.NameResolution, error) {
-	name, err := store.ResolveName(r, symbol, "")
-	if err != nil || name.Found() || name.Ambiguous() {
-		return name, err
-	}
-	declaring, ok := strings.CutSuffix(symbol, mutexSuffix)
-	if !ok || declaring == "" {
-		return name, nil
-	}
-	alt, err := store.ResolveName(r, declaring, "")
-	if err != nil || alt.Ambiguous() {
-		// The declaring name names several declarations: its candidates
-		// are the answer, as they are for the name without the suffix.
-		return alt, err
-	}
-	if !alt.Found() {
-		return name, nil
-	}
-	var mutexes []types.Node
-	for _, n := range alt.Nodes {
-		if n.Type == types.NodeMutex {
-			mutexes = append(mutexes, n)
-		}
-	}
-	if len(mutexes) == 0 {
-		return name, nil
-	}
-	return store.NameResolution{QName: alt.QName, Nodes: mutexes, ByID: true}, nil
+	return store.ResolveName(r, symbol, "")
 }
 
-// mutexNodes returns the Mutex nodes of the fields among seeds that are
-// mutexes: for the field "pkg.T.mu" the node "pkg.T.mu#mutex".
+// mutexNodes returns the Mutex nodes of the fields and variables among
+// seeds that are mutexes: for the field "pkg.T.mu" the node "pkg.T.mu#mutex",
+// for a variable the Mutex node of its name at its place (the resolver
+// answers the variable's name with the variable alone).
 func mutexNodes(r store.Reader, seeds []types.Node) ([]types.Node, error) {
 	var out []types.Node
 	for _, n := range seeds {
-		if n.Type != types.NodeField {
+		var name string
+		switch n.Type {
+		case types.NodeField:
+			name = n.QualifiedName + mutexSuffix
+		case types.NodeVariable, types.NodeLocalVariable:
+			name = n.QualifiedName
+		default:
 			continue
 		}
-		nodes, err := r.FindSymbol(n.QualifiedName+mutexSuffix, true, store.FindSymbolOptions{})
+		nodes, err := r.FindSymbol(name, true, store.FindSymbolOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("mutex node of %s: %w", n.QualifiedName, err)
 		}
 		for _, m := range nodes {
-			if m.Type == types.NodeMutex {
+			if m.Type == types.NodeMutex && (n.Type == types.NodeField || m.FilePath == n.FilePath && m.StartLine == n.StartLine) {
 				out = append(out, m)
 			}
 		}

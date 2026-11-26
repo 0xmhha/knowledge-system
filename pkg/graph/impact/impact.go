@@ -421,7 +421,7 @@ func nodeToImpactEntry(store persist.StoreReader, n types.Node, includeBlobs boo
 		"id":          n.ID,
 		"type":        n.Type,
 		"name":        n.Name,
-		"qname":       n.QualifiedName,
+		"qname":       persist.PrintedQName(n),
 		"file":        n.FilePath,
 		"line":        n.StartLine,
 		"confidence":  n.Confidence,
@@ -434,7 +434,7 @@ func nodeToImpactEntry(store persist.StoreReader, n types.Node, includeBlobs boo
 		*warnings = append(*warnings, map[string]any{
 			"code":    "missing-citation",
 			"node_id": n.ID,
-			"qname":   n.QualifiedName,
+			"qname":   persist.PrintedQName(n),
 		})
 	}
 	if includeBlobs {
@@ -451,7 +451,7 @@ func seedSummary(n types.Node) map[string]any {
 		"id":         n.ID,
 		"type":       n.Type,
 		"name":       n.Name,
-		"qname":      n.QualifiedName,
+		"qname":      persist.PrintedQName(n),
 		"file_path":  n.FilePath,
 		"start_line": n.StartLine,
 	}

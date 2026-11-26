@@ -323,6 +323,8 @@ func (s seedRef) subgraph(reader store.Reader, depth int) ([]types.Node, []types
 	for _, n := range merged {
 		nodes = append(nodes, n)
 	}
+	// Map order differs on every call; the answer must not.
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
 	return nodes, append(fwdE, revE...), nil
 }
 
@@ -445,7 +447,7 @@ func attachBlobs(reader store.Reader, nodes []types.Node, include bool) []map[st
 			"id":          n.ID,
 			"type":        n.Type,
 			"name":        n.Name,
-			"qname":       n.QualifiedName,
+			"qname":       store.PrintedQName(n),
 			"file":        n.FilePath,
 			"line":        n.StartLine,
 			"end_line":    n.EndLine,

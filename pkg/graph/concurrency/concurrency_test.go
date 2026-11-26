@@ -162,9 +162,10 @@ func TestAnalyze_LockSeed_ExcludesReleasesLock(t *testing.T) {
 		t.Fatal("seed pkg.Touch should resolve")
 	}
 	mods := qnames(res.Modules)
-	mu, ok := mods["pkg.State.mu"]
+	// A Mutex node is printed by the name that opens it (store.PrintedQName).
+	mu, ok := mods["pkg.State.mu#mutex"]
 	if !ok {
-		t.Fatalf("expected pkg.State.mu in modules, got %+v", res.Modules)
+		t.Fatalf("expected pkg.State.mu#mutex in modules, got %+v", res.Modules)
 	}
 	if mu.Direction != "affected_by" {
 		t.Errorf("mu direction = %q, want affected_by", mu.Direction)
@@ -369,9 +370,9 @@ func TestAnalyze_MutexSeedForms(t *testing.T) {
 	}{
 		{[]string{"pkg.State.mu", "pkg.State.mu#mutex"}, "pkg.State.mu#mutex", "pkg.State.mu",
 			[]string{"pkg.State.Add:36"}, []string{"pkg.State.outerMu#mutex"}, []string{"pkg.State.Add", "pkg.State.balance"}},
-		{[]string{"pkg.registry", "pkg.registry#mutex"}, "pkg.registry", "pkg.registry",
+		{[]string{"pkg.registry", "pkg.registry#mutex"}, "pkg.registry#mutex", "pkg.registry",
 			[]string{"pkg.Scan:11"}, nil, []string{"pkg.Scan"}},
-		{[]string{"pkg.Guard.made", "pkg.Guard.made#mutex"}, "pkg.Guard.made", "pkg.Guard.made",
+		{[]string{"pkg.Guard.made", "pkg.Guard.made#mutex"}, "pkg.Guard.made#mutex", "pkg.Guard.made",
 			[]string{"pkg.Guard:42"}, nil, []string{"pkg.Guard"}},
 	} {
 		var first []byte
@@ -432,14 +433,17 @@ func TestAnalyze_LocalDeclaredTwice(t *testing.T) {
 		edge("n_fn", "n_bm", types.EdgeAcquiresLock, 10),
 	}}
 	want := []string{"pkg.F.mu@c.go:3", "pkg.F.mu@c.go:9"}
-	for _, seed := range []string{"pkg.F.mu", "pkg.F.mu#mutex"} {
+	for seed, cands := range map[string][]string{"pkg.F.mu": want, "pkg.F.mu#mutex": {"pkg.F.mu#mutex@c.go:3", "pkg.F.mu#mutex@c.go:9"}} {
 		res, err := concurrency.Analyze(r, seed, concurrency.Options{Depth: 1})
 		if err != nil {
 			t.Fatalf("Analyze(%s): %v", seed, err)
 		}
-		if !res.Ambiguous || !reflect.DeepEqual(res.Candidates, want) {
-			t.Errorf("Analyze(%s): ambiguous %v candidates %v, want %v", seed, res.Ambiguous, res.Candidates, want)
+		if !res.Ambiguous || !reflect.DeepEqual(res.Candidates, cands) {
+			t.Errorf("Analyze(%s): ambiguous %v candidates %v, want %v", seed, res.Ambiguous, res.Candidates, cands)
 		}
+	}
+	if res, err := concurrency.Analyze(r, "pkg.F.mu#mutex@c.go:9", concurrency.Options{Depth: 1}); err != nil || res.Mutex != "pkg.F.mu#mutex" || len(res.LockedBy) != 1 || res.LockedBy[0].Line != 10 {
+		t.Errorf("Analyze(pkg.F.mu#mutex@c.go:9) = %+v, %v", res, err)
 	}
 	res, err := concurrency.Analyze(r, want[1], concurrency.Options{Depth: 1})
 	if err != nil || len(res.LockedBy) != 1 || res.LockedBy[0].Line != 10 {

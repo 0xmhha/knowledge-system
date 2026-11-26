@@ -50,10 +50,13 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 		if err != nil {
 			return nil, err
 		}
-		// A site name, the form of the candidates of a qualified name that
-		// several declarations carry, names one declaration: the resolver
-		// every tool shares answers it.
-		if _, _, _, site := store.ParseSiteName(name); site && len(matches) == 0 {
+		// A name names what the seed tools resolve it to: a mutex
+		// variable's name the variable, not its Mutex node. A site name and
+		// "<variable>#mutex" (each also with the other) carry no node of
+		// their own; the resolver every tool shares answers them.
+		matches = store.NamedNodes(matches)
+		_, _, _, site := store.ParseSiteName(name)
+		if len(matches) == 0 && (site || strings.Contains(name, store.MutexSuffix)) {
 			res, err := store.ResolveName(reader, name, lang)
 			if err != nil {
 				return nil, err

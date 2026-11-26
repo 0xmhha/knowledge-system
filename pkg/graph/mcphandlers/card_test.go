@@ -188,3 +188,94 @@ func TestFindCallers_ValueWithFilters(t *testing.T) {
 		t.Errorf("with a test reader: all %v, tests excluded %v, want %v", all, noTests, plain)
 	}
 }
+
+// TestMutexVariableIsAValue: the name of a mutex variable names the
+// variable, so find_callers answers with its readers and writers, as for any
+// variable and as for a mutex field, and the #mutex form names the Mutex
+// node. downloader.testBlockchainsLock was answered with its two nodes.
+func TestMutexVariableIsAValue(t *testing.T) {
+	s, err := persist.Open(filepath.Join(t.TempDir(), "graph.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	if err := s.Migrate(); err != nil {
+		t.Fatal(err)
+	}
+	const file = "dl/dl.go"
+	nodes := []types.Node{
+		{ID: "mv00000000000001", Type: types.NodeVariable, Name: "chainsLock", QualifiedName: "dl.chainsLock", CanonicalID: "ex/dl.chainsLock", FilePath: file, StartLine: 5, EndLine: 5},
+		{ID: "mv00000000000002", Type: types.NodeMutex, Name: "chainsLock", QualifiedName: "dl.chainsLock", FilePath: file, StartLine: 5, EndLine: 5},
+		{ID: "mv00000000000003", Type: types.NodeFunction, Name: "newChain", QualifiedName: "dl.newChain", CanonicalID: "ex/dl.newChain", FilePath: file, StartLine: 10, EndLine: 14},
+	}
+	for i := range nodes {
+		nodes[i].Language, nodes[i].Confidence = "go", types.ConfExtracted
+	}
+	edges := []types.Edge{
+		{Src: "mv00000000000003", Dst: "mv00000000000001", Type: types.EdgeReferences, DispatchKind: "read", Line: 11, Count: 1, Confidence: types.ConfExtracted},
+		{Src: "mv00000000000003", Dst: "mv00000000000002", Type: types.EdgeAcquiresLock, Line: 11, Count: 1, Confidence: types.ConfExtracted},
+	}
+	if err := s.InsertNodes(nodes); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.InsertEdges(edges); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range []map[string]any{
+		{"qname": "dl.chainsLock"}, {"qname": "chainsLock"}, {"qname": "ex/dl.chainsLock"},
+		{"qname": "dl.chainsLock", "direct": true}, {"qname": "dl.chainsLock", "tests": "exclude"},
+	} {
+		out := callTool(t, s, "find_callers", args)
+		if got := rowNames(out, "users"); len(got) != 1 || got[0] != "dl.newChain" {
+			t.Errorf("find_callers %v: users %v (nodes %v), want dl.newChain", args, got, rowNames(out, "nodes"))
+		}
+	}
+	// find_symbol follows the same rule: the name is the variable, #mutex
+	// its Mutex node (it returned both nodes, and nothing for #mutex).
+	for name, want := range map[string]string{"dl.chainsLock": "Variable", "dl.chainsLock#mutex": "Mutex"} {
+		out := callTool(t, s, "find_symbol", map[string]any{"name": name})
+		ns := asSlice(out["nodes"])
+		if len(ns) != 1 || ns[0].(map[string]any)["type"] != want {
+			t.Errorf("find_symbol(%s) = %v, want one %s", name, out["nodes"], want)
+		}
+	}
+	conc := callTool(t, s, "concurrency_impact", map[string]any{"seed_qname": "dl.chainsLock#mutex"})
+	// The mutex is printed by the name that opens it.
+	if conc["mutex"] != "dl.chainsLock#mutex" || conc["declared_by"] != "dl.chainsLock" {
+		t.Errorf("concurrency_impact #mutex: %v", conc)
+	}
+	sub := callTool(t, s, "get_subgraph", map[string]any{"seed_qname": "dl.chainsLock#mutex"})
+	if sub["not_found"] == true || sub["ambiguous"] == true {
+		t.Errorf("get_subgraph #mutex: %v", sub)
+	}
+}
+
+// TestCard_NameOfNoCard: a name that resolves to a declaration without a
+// card (a package: "filters" is the package filters, and also the leaf of
+// two fields and a local) lists the declarations of that name and what
+// each has: a card, or the declaration that holds it. card:filters said
+// "no card holds it".
+func TestCard_NameOfNoCard(t *testing.T) {
+	s := toolStore(t)
+	pkg := types.Node{ID: "pk00000000000001", Type: types.NodePackage, Name: "abi", QualifiedName: "abi", FilePath: fxNamesFile,
+		StartLine: 1, EndLine: 1, Language: "go", Confidence: types.ConfExtracted}
+	field := types.Node{ID: "pk00000000000002", Type: types.NodeField, Name: "abi", QualifiedName: "abi.Config.abi", CanonicalID: "ex/abi.Config.abi",
+		FilePath: fxNamesFile, StartLine: 40, EndLine: 40, Language: "go", Confidence: types.ConfExtracted}
+	local := types.Node{ID: "pk00000000000003", Type: types.NodeLocalVariable, Name: "abi", QualifiedName: "abi.TestPack.abi",
+		FilePath: fxNamesFile, StartLine: 22, EndLine: 22, Language: "go", Confidence: types.ConfExtracted}
+	again := local
+	again.ID, again.StartLine, again.EndLine = "pk00000000000004", 26, 26
+	if err := s.InsertNodes([]types.Node{pkg, field, local, again}); err != nil {
+		t.Fatal(err)
+	}
+	srv := newInvServer(t, s)
+	callTextOn(t, srv, "investigate", map[string]any{"words": "Pack"})
+	got := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:abi"})
+	want := []string{`"abi" names package abi, which has no card; declarations with that name: ` +
+		"abi.Config.abi (field, card), abi.TestPack.abi@" + fxNamesFile + ":22 (localvariable, local of abi.TestPack), abi.TestPack.abi@" + fxNamesFile + ":26 (localvariable, local of abi.TestPack)"}
+	for _, w := range want {
+		if !strings.Contains(got, w) {
+			t.Errorf("card:abi lacks %q:\n%s", w, got)
+		}
+	}
+}

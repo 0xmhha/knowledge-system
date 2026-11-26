@@ -1521,7 +1521,7 @@ func attachExpansion(reader store.Reader, row map[string]any, n types.Node, kind
 			if len(out) == searchCodeExpandCap {
 				continue
 			}
-			out = append(out, map[string]any{"qname": x.QualifiedName, "file": x.FilePath, "line": x.StartLine})
+			out = append(out, map[string]any{"qname": store.PrintedQName(x), "file": x.FilePath, "line": x.StartLine})
 		}
 		return out
 	}
@@ -2030,7 +2030,7 @@ func reasonNeighbours(reader store.Reader, idx *codeIndex, hitIDs []string, reas
 	})
 	for _, r := range rows {
 		n := idx.decls[cands[r.id].decl].node
-		m := map[string]any{"qname": n.QualifiedName, "type": string(n.Type), "file": n.FilePath,
+		m := map[string]any{"qname": store.PrintedQName(n), "type": string(n.Type), "file": n.FilePath,
 			"start_line": n.StartLine, "end_line": n.EndLine, "reason_matched": r.own, "via": cands[r.id].via}
 		if n.Signature != "" {
 			m["signature"] = n.Signature

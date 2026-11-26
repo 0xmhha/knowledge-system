@@ -155,7 +155,7 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 		if file == "" {
 			file = src.FilePath
 		}
-		row := map[string]any{"qname": src.QualifiedName, "type": string(src.Type), "file": file,
+		row := map[string]any{"qname": store.PrintedQName(src), "type": string(src.Type), "file": file,
 			"access": kind, "uses": e.Count, "lines": []int{line}, "value": values[e.Dst].QualifiedName}
 		if src.CanonicalID != "" {
 			row["canonical_id"] = src.CanonicalID

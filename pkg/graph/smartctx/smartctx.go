@@ -385,7 +385,7 @@ func packWithinBudget(store persist.StoreReader, rows []scoredNode, query string
 func bodyEntry(n types.Node, source, cite string, hasCite bool) map[string]any {
 	body := map[string]any{
 		"id":     n.ID,
-		"qname":  n.QualifiedName,
+		"qname":  persist.PrintedQName(n),
 		"source": source,
 	}
 	if hasCite {
@@ -400,7 +400,7 @@ func bodyEntry(n types.Node, source, cite string, hasCite bool) map[string]any {
 func summaryEntry(n types.Node, cite string, hasCite bool) map[string]any {
 	summary := map[string]any{
 		"id":        n.ID,
-		"qname":     n.QualifiedName,
+		"qname":     persist.PrintedQName(n),
 		"signature": n.Signature,
 		"doc":       n.DocComment,
 	}

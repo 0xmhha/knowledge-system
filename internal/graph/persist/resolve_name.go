@@ -402,6 +402,11 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 	if len(exact) > 0 {
 		return oneDeclaration(name, exact), nil
 	}
+	if declaring, ok := strings.CutSuffix(name, MutexSuffix); ok && declaring != "" {
+		if res, err := resolveMutex(r, declaring, language); err != nil || res.Found() || res.Ambiguous() {
+			return res, err
+		}
+	}
 	if qname, file, line, ok := ParseSiteName(name); ok {
 		return resolveSite(r, qname, file, line, opts)
 	}
@@ -473,16 +478,29 @@ func ParseSiteName(name string) (qname, file string, line int, ok bool) {
 
 // resolveSite resolves a site name: the nodes of qname that stand at line of
 // file.
-func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOptions) (NameResolution, error) {
+func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOptions, only ...types.NodeType) (NameResolution, error) {
 	nodes, err := r.FindSymbol(qname, true, opts)
 	if err != nil {
 		return NameResolution{}, fmt.Errorf("resolve %q at %s:%d: %w", qname, file, line, err)
 	}
 	var at []types.Node
 	for _, n := range nodes {
-		if n.FilePath == file && n.StartLine == line {
+		if n.FilePath == file && n.StartLine == line && (len(only) == 0 || n.Type == only[0]) {
 			at = append(at, n)
 		}
+	}
+	if len(only) > 0 {
+		if len(at) == 0 {
+			return NameResolution{}, nil
+		}
+		return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
+	}
+	at = withoutMutexOfValue(at)
+	if declaring, ok := strings.CutSuffix(qname, MutexSuffix); ok && len(at) == 0 && declaring != "" {
+		// "<variable>#mutex@<file>:<line>": the Mutex node of the
+		// variable at that place, the one name of the mutex of a local
+		// that its function declares twice.
+		return resolveSite(r, declaring, file, line, opts, types.NodeMutex)
 	}
 	if len(at) == 0 {
 		return NameResolution{}, nil
@@ -490,18 +508,108 @@ func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOpt
 	return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
 }
 
-// NameOf returns the name that names n alone: its qualified name, or its
-// site name ("<qname>@<file>:<line>") when several declarations carry that
-// qualified name, as ResolveName lists them.
+// MutexSuffix ends the name of a mutex as a seed: the qualified name of the
+// Mutex node of a struct field ("pkg.T.mu#mutex"), and the name by which the
+// Mutex node of a variable is asked for ("pkg.mu#mutex"; its node carries
+// the variable's own name).
+const MutexSuffix = "#mutex"
+
+// NamedNodes returns the nodes that the qualified name qname names among
+// nodes, all carrying it: without the Mutex node of a variable (see
+// withoutMutexOfValue). find_symbol lists these, as the seed tools resolve
+// to them.
+func NamedNodes(nodes []types.Node) []types.Node { return withoutMutexOfValue(nodes) }
+
+// withoutMutexOfValue leaves out of nodes, all carrying one qualified name,
+// the Mutex nodes that stand at the place of a Variable or LocalVariable
+// among them: a `var mu sync.Mutex` is a Variable and a Mutex node of one
+// name and place, and its name names the variable, a value whose readers and
+// writers every tool answers with, as it names a field that is a mutex (the
+// field's Mutex node is "<field>#mutex"). With both nodes, find_callers took
+// the name for no value and answered with the two nodes alone (9 of 13 mutex
+// variables of go-stablenet). The Mutex node is asked for with MutexSuffix.
+func withoutMutexOfValue(nodes []types.Node) []types.Node {
+	values := map[declPlace]bool{}
+	for _, n := range nodes {
+		if n.Type == types.NodeVariable || n.Type == types.NodeLocalVariable {
+			values[declPlace{language: n.Language, file: n.FilePath, line: n.StartLine}] = true
+		}
+	}
+	if len(values) == 0 {
+		return nodes
+	}
+	out := make([]types.Node, 0, len(nodes))
+	for _, n := range nodes {
+		if n.Type != types.NodeMutex || !values[declPlace{language: n.Language, file: n.FilePath, line: n.StartLine}] {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
+// resolveMutex resolves "<declaring>#mutex" when no node carries that name:
+// the Mutex nodes of the variable declaring names, alone. A declaring name
+// that names several declarations is answered with their candidates.
+func resolveMutex(r StoreReader, declaring, language string) (NameResolution, error) {
+	nodes, err := r.FindSymbol(declaring, true, FindSymbolOptions{Language: language, Limit: FindSymbolNoLimit})
+	if err != nil {
+		return NameResolution{}, fmt.Errorf("resolve %q%s: %w", declaring, MutexSuffix, err)
+	}
+	if res := oneDeclaration(declaring, nodes); res.Ambiguous() {
+		// Candidates that name the mutexes, not the variables.
+		for i, c := range res.Candidates {
+			res.Candidates[i] = declaring + MutexSuffix + strings.TrimPrefix(c, declaring)
+		}
+		return res, nil
+	}
+	var mutexes []types.Node
+	for _, n := range nodes {
+		if n.Type == types.NodeMutex {
+			mutexes = append(mutexes, n)
+		}
+	}
+	if len(mutexes) == 0 {
+		return NameResolution{}, nil
+	}
+	return NameResolution{QName: declaring, Nodes: mutexes, ByID: true}, nil
+}
+
+// NameOf returns the name that names n alone, the one a tool prints for n:
+// its PrintedQName, or that name's site form ("<name>@<file>:<line>") when
+// several declarations carry it, as ResolveName lists them. Every such name
+// resolves back to n (a promoted copy's to the method it copies).
 func NameOf(r StoreReader, n types.Node) (string, error) {
 	nodes, err := r.FindSymbol(n.QualifiedName, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
 	if err != nil {
 		return "", fmt.Errorf("name of %s: %w", n.QualifiedName, err)
 	}
-	if oneDeclaration(n.QualifiedName, nodes).Ambiguous() {
-		return siteName(n.QualifiedName, n), nil
+	name := PrintedQName(n)
+	if name != n.QualifiedName {
+		// The Mutex node of a variable: among the Mutex nodes of the name.
+		var mutexes []types.Node
+		for _, m := range nodes {
+			if m.Type == types.NodeMutex {
+				mutexes = append(mutexes, m)
+			}
+		}
+		nodes = mutexes
 	}
-	return n.QualifiedName, nil
+	if oneDeclaration(n.QualifiedName, nodes).Ambiguous() {
+		return siteName(name, n), nil
+	}
+	return name, nil
+}
+
+// PrintedQName is the qualified name a tool prints for n: the qualified name,
+// except for the Mutex node of a variable, which carries the variable's own
+// name and is printed "<name>#mutex" (MutexSuffix), the name that resolves to
+// it; printed plain, it named the variable. A field's Mutex node carries the
+// suffix in its qualified name already.
+func PrintedQName(n types.Node) string {
+	if n.Type == types.NodeMutex && !strings.HasSuffix(n.QualifiedName, MutexSuffix) {
+		return n.QualifiedName + MutexSuffix
+	}
+	return n.QualifiedName
 }
 
 // declPlace is where a declaration stands, for telling the declarations
@@ -515,6 +623,11 @@ type declPlace struct {
 // the nodes when they are one declaration, else the candidates that name
 // each declaration (see ResolveName).
 func oneDeclaration(qname string, nodes []types.Node) NameResolution {
+	all := len(nodes)
+	nodes = withoutMutexOfValue(nodes)
+	// Fewer nodes than carry the name: they are exact nodes, so a walk
+	// starts from them and not from every node of the name.
+	byID := len(nodes) < all
 	places := map[declPlace]types.Node{}
 	byLanguage := map[string]int{}
 	for _, n := range nodes {
@@ -532,7 +645,7 @@ func oneDeclaration(qname string, nodes []types.Node) NameResolution {
 		several = several || c > 1
 	}
 	if !several {
-		return NameResolution{QName: qname, Nodes: nodes}
+		return NameResolution{QName: qname, Nodes: nodes, ByID: byID}
 	}
 	ps := make([]declPlace, 0, len(places))
 	for p := range places {

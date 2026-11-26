@@ -74,6 +74,10 @@ func newNameStore(t *testing.T) persist.Store {
 		node("n000000000000028", types.NodeMutex, "catalyst.TestBlock.errMu", "", 92, 92),
 		node("n000000000000029", types.NodeLocalVariable, "catalyst.TestBlock.errMu", "", 101, 101),
 		node("n000000000000030", types.NodeMutex, "catalyst.TestBlock.errMu", "", 101, 101),
+		// A package-level mutex: its Variable and its Mutex node share the
+		// qualified name and the place.
+		node("n000000000000031", types.NodeVariable, "downloader.chainsLock", "ex/downloader.chainsLock", 120, 120),
+		node("n000000000000032", types.NodeMutex, "downloader.chainsLock", "", 120, 120),
 	}
 	if err := s.InsertNodes(nodes); err != nil {
 		t.Fatalf("InsertNodes: %v", err)
@@ -117,8 +121,20 @@ func TestResolveName(t *testing.T) {
 		// each place a candidate that resolves to its own declaration.
 		{name: "catalyst.TestBlock.errMu", candidates: []string{"catalyst.TestBlock.errMu@p/f.go:92", "catalyst.TestBlock.errMu@p/f.go:101"}},
 		{name: "errMu", candidates: []string{"catalyst.TestBlock.errMu@p/f.go:92", "catalyst.TestBlock.errMu@p/f.go:101"}},
-		{name: "catalyst.TestBlock.errMu@p/f.go:92", wantQName: "catalyst.TestBlock.errMu", wantIDs: []string{"n000000000000027", "n000000000000028"}, byID: true},
+		{name: "catalyst.TestBlock.errMu@p/f.go:92", wantQName: "catalyst.TestBlock.errMu", wantIDs: []string{"n000000000000027"}, byID: true},
 		{name: "catalyst.TestBlock.errMu@p/f.go:93"},
+		// The name of a mutex variable is the variable, a value; with
+		// #mutex it is the mutex, as "pkg.T.mu#mutex" is for a field.
+		{name: "downloader.chainsLock", wantQName: "downloader.chainsLock", wantIDs: []string{"n000000000000031"}, byID: true},
+		{name: "chainsLock", wantQName: "downloader.chainsLock", wantIDs: []string{"n000000000000031"}, byID: true},
+		{name: "downloader.chainsLock#mutex", wantQName: "downloader.chainsLock", wantIDs: []string{"n000000000000032"}, byID: true},
+		{name: "catalyst.TestBlock.errMu@p/f.go:101", wantQName: "catalyst.TestBlock.errMu", wantIDs: []string{"n000000000000029"}, byID: true},
+		// The mutex of a local declared twice: "#mutex" lists the two
+		// mutexes by site names that keep the suffix, and each resolves to
+		// its Mutex node alone.
+		{name: "catalyst.TestBlock.errMu#mutex", candidates: []string{"catalyst.TestBlock.errMu#mutex@p/f.go:92", "catalyst.TestBlock.errMu#mutex@p/f.go:101"}},
+		{name: "catalyst.TestBlock.errMu#mutex@p/f.go:101", wantQName: "catalyst.TestBlock.errMu", wantIDs: []string{"n000000000000030"}, byID: true},
+		{name: "catalyst.TestBlock.errMu#mutex@p/f.go:93"},
 		{name: "NoSuchName"},
 		{name: ""},
 	} {
@@ -231,6 +247,39 @@ func TestSeedNote(t *testing.T) {
 		}
 		if got := res.SeedNote() != ""; got != tc.note || res.QName != "state.StateDB.Prepare" {
 			t.Errorf("ResolveName(%s): note %q, qname %s", tc.name, res.SeedNote(), res.QName)
+		}
+	}
+}
+
+// TestNameOfRoundTrip: the name printed for a node (NameOf) resolves back to
+// that node, for every node of the fixture: the Mutex node of a variable is
+// printed "<name>#mutex", a declaration whose qualified name others carry
+// by its site name. The copy of a promoted method is the one exception by
+// design: its name answers with the method it copies.
+func TestNameOfRoundTrip(t *testing.T) {
+	s := newNameStore(t)
+	all, err := s.AllNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range all {
+		name, err := persist.NameOf(s, n)
+		if err != nil {
+			t.Fatalf("NameOf(%s): %v", n.QualifiedName, err)
+		}
+		res, err := persist.ResolveName(s, name, "")
+		if err != nil {
+			t.Fatalf("ResolveName(%s): %v", name, err)
+		}
+		if _, isCopy := persist.PromotedFrom(n); isCopy {
+			continue
+		}
+		found := false
+		for _, m := range res.Nodes {
+			found = found || m.ID == n.ID
+		}
+		if !found || len(res.Nodes) != 1 && n.Type != types.NodeExternal {
+			t.Errorf("%s %s printed as %q resolves to %v", n.Type, n.QualifiedName, name, res.Nodes)
 		}
 	}
 }
