@@ -180,6 +180,8 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
+		mcp.WithBoolean("direct", mcp.Description("only calls and interface calls recorded against the symbol itself (calls and invokes edges): no callers through the interface methods it implements, no dispatches_to, modifiers, events or errors (default false). For a field, variable or constant, whose answer is its readers and writers, it changes nothing: those are its direct uses")),
+		mcp.WithString("tests", mcp.Description("include (default) or exclude test code: the files the build recorded as test code; the symbol itself is kept. For a field, variable or constant it drops the readers and writers in test code")),
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		q := req.GetString("qname", "")
@@ -193,15 +195,35 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 		// A field, variable or constant has no callers; its uses are value
 		// edges. Answer with them instead of an empty call graph that looks
 		// like "nobody uses it".
+		direct, noTests := req.GetBool("direct", false), req.GetString("tests", testsInclude) == testsExclude
 		if own, err := resolved.nodes(reader); err == nil && allValueNodes(own) {
-			out, err := valueUsers(reader, resolved, "all", defaultReferenceLimit)
+			// direct changes nothing here: readers and writers are a
+			// value's direct uses. tests=exclude drops those in test code.
+			limit := defaultReferenceLimit
+			if noTests {
+				limit = 0
+			}
+			out, err := valueUsers(reader, resolved, "all", limit)
 			if err != nil {
 				return nil, err
+			}
+			if noTests {
+				if err := dropTestUsers(reader, out, defaultReferenceLimit); err != nil {
+					return nil, err
+				}
 			}
 			out["note"] = "this symbol is a " + joinKinds(nodeKinds(own))[2:] + ": calls are recorded for functions and methods only. " +
 				"users are the code that reads or writes it (the same as find_references)."
 			out["nodes"] = []map[string]any{}
 			out["edges"] = []types.Edge{}
+			return textResult(resolved.result(out)), nil
+		}
+		if direct || noTests {
+			out, err := callersFiltered(reader, resolved, d, direct, noTests)
+			if err != nil {
+				return nil, err
+			}
+			out["nodes"] = attachBlobs(reader, out["nodes"].([]types.Node), incl)
 			return textResult(resolved.result(out)), nil
 		}
 		// Union the concrete seed with the interface methods it satisfies, so
@@ -217,6 +239,93 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 			"edges": edges,
 		})), nil
 	})
+}
+
+// dropTestUsers removes from a valueUsers payload the users in test code
+// (testFileRule, the rule callersFiltered uses), then cuts the list at limit
+// with total and truncated for what is left.
+func dropTestUsers(reader store.Reader, out map[string]any, limit int) error {
+	isTest, err := testFileRule(reader)
+	if err != nil {
+		return err
+	}
+	users, _ := out["users"].([]map[string]any)
+	kept := make([]map[string]any, 0, len(users))
+	for _, u := range users {
+		if f, _ := u["file"].(string); !isTest(f) {
+			kept = append(kept, u)
+		}
+	}
+	out["total"] = len(kept)
+	delete(out, "truncated")
+	if limit > 0 && len(kept) > limit {
+		kept = kept[:limit]
+		out["truncated"] = true
+	}
+	out["users"] = kept
+	return nil
+}
+
+// The values of a tests argument.
+const (
+	testsInclude = "include"
+	testsExclude = "exclude"
+)
+
+// directCallEdgeTypes are the edges find_callers follows with direct=true:
+// a call or an interface call recorded against the symbol itself.
+var directCallEdgeTypes = []string{string(types.EdgeCalls), string(types.EdgeInvokes)}
+
+// callersFiltered is find_callers with direct or tests=exclude: the reverse
+// walk over directCallEdgeTypes alone when direct (else the walk find_callers
+// makes), and without the nodes of test code (testFileRule, the rule
+// investigate uses) when noTests, the seed kept. With direct, depth=1 and
+// noTests it returns exactly the callers an investigate card counts.
+func callersFiltered(reader store.Reader, seed seedRef, depth int, direct, noTests bool) (map[string]any, error) {
+	var nodes []types.Node
+	var edges []types.Edge
+	var err error
+	if direct {
+		nodes, edges, err = seed.neighborhood(reader, depth, true, directCallEdgeTypes...)
+	} else {
+		nodes, edges, err = reverseCallersUnion(reader, seed, depth)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if noTests {
+		own, err := seed.nodes(reader)
+		if err != nil {
+			return nil, err
+		}
+		isTest, err := testFileRule(reader)
+		if err != nil {
+			return nil, err
+		}
+		keep := map[string]bool{}
+		for _, n := range own {
+			keep[n.ID] = true
+		}
+		kept := nodes[:0:0]
+		for _, n := range nodes {
+			if keep[n.ID] || !isTest(n.FilePath) {
+				keep[n.ID] = true
+				kept = append(kept, n)
+			}
+		}
+		nodes = kept
+		var keptEdges []types.Edge
+		for _, e := range edges {
+			if keep[e.Src] && keep[e.Dst] {
+				keptEdges = append(keptEdges, e)
+			}
+		}
+		edges = keptEdges
+	}
+	if edges == nil {
+		edges = []types.Edge{}
+	}
+	return map[string]any{"nodes": nodes, "edges": edges}, nil
 }
 
 // RegisterFindCallees walks the forward call graph from the seed.

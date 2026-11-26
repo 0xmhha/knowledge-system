@@ -773,10 +773,15 @@ func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool
 		}
 		fmt.Fprintf(&b, "  callers: %s", capNames(callers, c))
 		if len(callers) > c {
-			// The card lists the direct callers; find_callers at depth 1
-			// returns every one, test code and callers through the
-			// interface methods it implements included.
-			fmt.Fprintf(&b, "; find_callers qname=%q depth=1 returns them all", seedName(n))
+			// The card lists the direct callers (calls and invokes edges
+			// to the function itself), without test code unless tests are
+			// included: find_callers with direct=true, and tests=exclude
+			// when they are left out, returns exactly those.
+			tests := " tests=" + testsExclude
+			if withTests {
+				tests = ""
+			}
+			fmt.Fprintf(&b, "; find_callers qname=%q depth=1 direct=true%s returns exactly them", seedName(n), tests)
 		}
 		b.WriteByte('\n')
 	}
@@ -1570,7 +1575,7 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 		sess.mu.Lock()
 		defer sess.mu.Unlock()
 		sess.seq++
-		inv := &investigation{id: "i" + strconv.Itoa(sess.seq), withTests: req.GetString("tests", "exclude") == "include"}
+		inv := &investigation{id: "i" + strconv.Itoa(sess.seq), withTests: req.GetString("tests", testsExclude) == testsInclude}
 		for _, t := range terms {
 			inv.words = append(inv.words, x.resolveWord(t, inv.withTests))
 		}
@@ -1668,31 +1673,12 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 	switch {
 	case strings.HasPrefix(what, "card:"):
 		q := strings.TrimPrefix(what, "card:")
-		var ids []string
-		qname, file, line, site := store.ParseSiteName(q)
-		if !site {
-			qname = q
-		}
-		if _, ok := x.nodes[q]; ok {
-			ids = []string{q}
-		} else {
-			// A site name ("<qname>@<file>:<line>") names the declaration
-			// at that place; a qualified name every node that carries it,
-			// one card each.
-			for _, id := range x.byLeaf[leafName(qname)] {
-				n := x.nodes[id]
-				if n.QualifiedName == qname && (!site || n.FilePath == file && n.StartLine == line) {
-					ids = append(ids, id)
-				}
-			}
-		}
+		ids, local, msg := x.cardIDs(q)
 		if len(ids) == 0 {
-			local, owner, msg := x.localOwner(q)
-			if owner == "" {
-				return msg
-			}
+			return msg
+		}
+		if local != "" {
 			entries = append(entries, local)
-			ids = []string{owner}
 		}
 		for _, id := range ids {
 			entries = append(entries, x.card(id, inv.words, inv.withTests, false))
@@ -1759,29 +1745,46 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 // localKey starts the line a card: answer has when the name is a local.
 const localKey = "local: "
 
-// localOwner answers card: for a name that has no card of its own, a local
-// (a variable, constant, type or mutex declared inside a function or in a
-// function literal of a package-level initialiser). The name resolves as in
-// every tool (store.ResolveName, site names included); the answer is the
-// card of the declaration that holds the local, after a line that says so:
-// "local: <name> is declared at <file>:<line> in <owner>". owner is "" when
-// the name names nothing or several declarations; msg then says which.
-func (x *invIndex) localOwner(q string) (line, owner, msg string) {
+// cardIDs resolves the name of a card: request. A node id of the index is
+// that node; any other name is resolved as in every tool (store.ResolveName:
+// a canonical id, a qualified name, a site name "<qname>@<file>:<line>" or a
+// bare name), with the same answers when it names several declarations or
+// none. The cards are those of the nodes it resolves to that have one. A
+// local has none: it is answered with the card of the function or variable
+// that holds it, and local is the line that says so ("local: <name> is
+// declared at <file>:<line> in <owner>"). msg is the answer when there is no
+// card.
+func (x *invIndex) cardIDs(q string) (ids []string, local, msg string) {
+	if _, ok := x.nodes[q]; ok {
+		return []string{q}, "", ""
+	}
 	res, err := store.ResolveName(x.reader, q, "")
 	switch {
 	case err != nil:
-		return "", "", fmt.Sprintf("unknown declaration %q: %v", q, err)
+		return nil, "", fmt.Sprintf("unknown declaration %q: %v", q, err)
 	case res.Ambiguous():
-		return "", "", fmt.Sprintf("%q names several declarations; open one: %s", q, strings.Join(res.Candidates, ", "))
+		return nil, "", fmt.Sprintf("%q names several declarations; open one: %s", q, strings.Join(res.Candidates, ", "))
 	case !res.Found():
-		return "", "", fmt.Sprintf("unknown declaration %q", q)
+		msg = fmt.Sprintf("unknown declaration %q", q)
+		if len(res.OtherCase) > 0 {
+			msg += "; other case: " + strings.Join(res.OtherCase, ", ")
+		}
+		return nil, "", msg
+	}
+	for _, n := range res.Nodes {
+		if _, ok := x.nodes[n.ID]; ok {
+			ids = append(ids, n.ID)
+		}
+	}
+	if len(ids) > 0 {
+		return ids, "", ""
 	}
 	n := res.Nodes[0]
-	owner = x.innermost(n)
+	owner := x.innermost(n)
 	if owner == "" {
-		return "", "", fmt.Sprintf("unknown declaration %q: no card holds it", q)
+		return nil, "", fmt.Sprintf("unknown declaration %q: no card holds it", q)
 	}
-	return fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), owner, ""
+	return []string{owner}, fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), ""
 }
 
 // innermost returns the function, method or variable (store.IsEncloser,
