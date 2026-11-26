@@ -10,6 +10,7 @@ import (
 	server "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // callText calls a tool on a fresh server over store and returns its text.
@@ -288,5 +289,35 @@ func TestInvestigate_SelfCallIsACaller(t *testing.T) {
 	}
 	if !self {
 		t.Errorf("find_callers lacks the self-call: %v", callers["edges"])
+	}
+}
+
+// TestInvestigate_StatementLineIsStable: the line a guard names is read from
+// the function that holds the statement, whatever order the index lists the
+// functions in. A promoted copy has the lines of the method it copies and no
+// source; taken from map order, it made a guard read "[then of L167 ; ...]"
+// on some server starts and "[then of L167 if !conf.SkipCode {; ...]" on
+// others (5 of 30 investigate queries differed across fresh servers).
+func TestInvestigate_StatementLineIsStable(t *testing.T) {
+	s := toolStore(t)
+	// A statement of Prepare that writes a field: the index reads guards
+	// only from a graph that has them.
+	stmt := types.Node{ID: "if00000000000001", Type: types.NodeIfStmt, Name: "if", QualifiedName: "state.StateDB.Prepare#IfStmt@40",
+		FilePath: fxStateFile, StartLine: 11, EndLine: 11, Language: "go", Confidence: types.ConfExtracted}
+	if err := s.InsertNodes([]types.Node{stmt}); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.InsertEdges([]types.Edge{{Src: stmt.ID, Dst: "st00000000000002", Type: types.EdgeBodyWrites, FilePath: fxStateFile,
+		Line: 11, Count: 1, Confidence: types.ConfExtracted}}); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 20; i++ {
+		x, err := buildInvIndex(safeReader(s))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := x.stmtLine(stmt); got != "s.logs = rules" {
+			t.Fatalf("build %d: statement line = %q, want the line of state.StateDB.Prepare", i, got)
+		}
 	}
 }

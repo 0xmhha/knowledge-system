@@ -17,6 +17,9 @@ import (
 //	function: every path from the function's start to the use locks L
 //	(Lock or RLock) and does not unlock it (Unlock or RUnlock) after.
 //
+// A field use is what reads_field and writes_field count (fieldUsesAt): a
+// selector that names the field and an element of a struct literal.
+//
 // It is read off the syntax tree, statement by statement, the paths of a
 // branch met at its end (a mutex is held after an if, a switch or a select
 // only when every branch that goes on holds it; a branch that returns, panics
@@ -98,8 +101,8 @@ type lockFlow struct {
 	info *gotypes.Info
 	// mutexOf returns the Mutex node a Lock or Unlock receiver denotes.
 	mutexOf func(recv ast.Expr) *types.Node
-	// fieldOf returns the Field node a selector names.
-	fieldOf func(sel *ast.SelectorExpr) *types.Node
+	// fieldOf returns the Field node of a struct field.
+	fieldOf func(f *gotypes.Var) *types.Node
 	// uses are the (field, mutex) pairs found; undecided says the function
 	// holds code the rule cannot decide, and its uses are dropped.
 	uses      [][2]*types.Node
@@ -413,15 +416,7 @@ func (w *funcWalk) lockCall(call *ast.CallExpr, held heldMutexes) (heldMutexes, 
 	if mu == nil {
 		return held, false
 	}
-	// Locking or unlocking a mutex field uses that field under the other
-	// mutexes held (the order in which locks are taken); it is no use of
-	// the field under the mutex itself.
-	if sel, ok := ast.Unparen(recv).(*ast.SelectorExpr); ok {
-		held = w.exprs(sel.X, held)
-		others := held.clone()
-		delete(others, mu.ID)
-		w.use(sel, others)
-	}
+	held = w.receiver(recv, mu, held)
 	next := held.clone()
 	if method == lockMethodLock || method == lockMethodRLock {
 		next[mu.ID] = mu
@@ -431,13 +426,36 @@ func (w *funcWalk) lockCall(call *ast.CallExpr, held heldMutexes) (heldMutexes, 
 	return next, true
 }
 
+// receiver records the uses of the receiver of a Lock or Unlock call of mu:
+// the path to the mutex (s.inner in s.inner.mu.Lock()) is used under held,
+// and the mutex field itself under the other mutexes held (the order in
+// which locks are taken), not under mu. It returns what is held after.
+func (w *funcWalk) receiver(recv ast.Expr, mu *types.Node, held heldMutexes) heldMutexes {
+	sel, ok := ast.Unparen(recv).(*ast.SelectorExpr)
+	if !ok {
+		return w.exprs(recv, held)
+	}
+	held = w.exprs(sel.X, held)
+	others := held.clone()
+	delete(others, mu.ID)
+	w.use(sel, others)
+	return held
+}
+
 // callApart handles the call of a go or defer statement: its function and
-// arguments are evaluated here, and a function literal runs elsewhere, with
-// nothing held.
+// arguments are evaluated here, with what is held here, and only the call
+// runs later; a function literal runs elsewhere, with nothing held. So the
+// receiver path of `defer s.Wallet.lock.Unlock()` is read where the defer
+// stands (accounts/scwallet/wallet.go:919 read s.Wallet under the lock and
+// had no edge).
 func (w *funcWalk) callApart(call *ast.CallExpr, held heldMutexes) {
 	if lit, ok := ast.Unparen(call.Fun).(*ast.FuncLit); ok {
 		w.flow.body(lit.Body, heldMutexes{}, w.record)
 	} else if _, isLock := lockMethodName(call); !isLock {
+		w.exprs(call.Fun, held)
+	} else if recv := call.Fun.(*ast.SelectorExpr).X; w.flow.mutexOf(recv) != nil {
+		w.receiver(recv, w.flow.mutexOf(recv), held)
+	} else {
 		w.exprs(call.Fun, held)
 	}
 	for _, a := range call.Args {
@@ -486,21 +504,24 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 				after = kept
 			}
 			return false
-		case *ast.SelectorExpr:
-			w.use(x, held)
 		}
+		w.use(c, held)
 		return true
 	})
 	return after
 }
 
-// use records the field sel names, if any, as used under every mutex of
-// held.
-func (w *funcWalk) use(sel *ast.SelectorExpr, held heldMutexes) {
+// use records the field uses that n makes itself (fieldUsesAt: a selector,
+// the elements of a struct literal) as uses under every mutex of held.
+func (w *funcWalk) use(n ast.Node, held heldMutexes) {
 	if !w.record || len(held) == 0 {
 		return
 	}
-	if field := w.flow.fieldOf(sel); field != nil {
+	for _, u := range fieldUsesAt(n, w.flow.info) {
+		field := w.flow.fieldOf(u.field)
+		if field == nil {
+			continue
+		}
 		// In id order: the edges come out in the same order on every build.
 		for _, id := range slices.Sorted(maps.Keys(held)) {
 			w.flow.uses = append(w.flow.uses, [2]*types.Node{field, held[id]})

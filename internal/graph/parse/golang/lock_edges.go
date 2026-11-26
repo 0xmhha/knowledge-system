@@ -261,7 +261,7 @@ func EmitLockEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Edge, 
 		info := c.info()
 		flow := &lockFlow{info: info,
 			mutexOf: func(recv ast.Expr) *types.Node { return mutexes.receiver(info, recv, 0) },
-			fieldOf: func(sel *ast.SelectorExpr) *types.Node { return fields.node(info.ObjectOf(sel.Sel)) },
+			fieldOf: func(f *gotypes.Var) *types.Node { return fields.node(f) },
 		}
 		flow.body(body, heldMutexes{}, true)
 		if flow.undecided {

@@ -288,6 +288,20 @@ func TestSeed_NameDeclaredTwice(t *testing.T) {
 	if card := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:abi.TestPack@" + fxNamesFile + ":20"}); !strings.Contains(card, "function abi.TestPack") {
 		t.Errorf("investigate_open with a site name: %s", card)
 	}
+	// A local has no card: the site name of one is answered with the card of
+	// the function that holds it, after a line that says so (30 of 30 were
+	// "unknown declaration"). The name of both is ambiguous, a wrong place
+	// unknown.
+	local := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:" + want[1]})
+	if !strings.Contains(local, "local: "+want[1]+" is declared at "+fxNamesFile+":25 in abi.TestPack\n") || !strings.Contains(local, "function abi.TestPack") {
+		t.Errorf("investigate_open with a local's site name:\n%s", local)
+	}
+	if both := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:abi.TestPack.flag"}); !strings.Contains(both, "names several declarations") {
+		t.Errorf("investigate_open with an ambiguous local: %s", both)
+	}
+	if wrong := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:abi.TestPack.flag@" + fxNamesFile + ":24"}); !strings.Contains(wrong, "unknown declaration") {
+		t.Errorf("investigate_open with a wrong site name: %s", wrong)
+	}
 }
 
 // TestSolidityRelations: the tools follow Solidity's relations as they follow

@@ -490,6 +490,20 @@ func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOpt
 	return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
 }
 
+// NameOf returns the name that names n alone: its qualified name, or its
+// site name ("<qname>@<file>:<line>") when several declarations carry that
+// qualified name, as ResolveName lists them.
+func NameOf(r StoreReader, n types.Node) (string, error) {
+	nodes, err := r.FindSymbol(n.QualifiedName, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
+	if err != nil {
+		return "", fmt.Errorf("name of %s: %w", n.QualifiedName, err)
+	}
+	if oneDeclaration(n.QualifiedName, nodes).Ambiguous() {
+		return siteName(n.QualifiedName, n), nil
+	}
+	return n.QualifiedName, nil
+}
+
 // declPlace is where a declaration stands, for telling the declarations
 // that share a qualified name apart (oneDeclaration).
 type declPlace struct {

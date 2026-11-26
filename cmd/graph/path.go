@@ -78,8 +78,7 @@ node below has it to the node above).`,
 				fmt.Printf("(no path of length ≤ %d between the two endpoints)\n", maxDepth)
 				return nil
 			}
-			printPath(os.Stdout, nodes, path, hops)
-			return nil
+			return printPath(os.Stdout, store, nodes, path, hops)
 		},
 	}
 	cmd.Flags().StringVar(&graph, "graph", "", "graph directory (required)")
@@ -198,7 +197,10 @@ func bfsShortestPath(nodes []types.Node, edges []types.Edge,
 // crosses edges both ways, so the order of the chain says nothing about who
 // calls or writes whom. Format mirrors graphify's path output but uses CKG's
 // richer schema (Type column + qualified_name).
-func printPath(w io.Writer, nodes []types.Node, path []string, hops []pathHop) {
+// printPath prints path. Each node is shown by the name that names it alone
+// (persist.NameOf): two locals of one name in one function are told apart
+// by their site names, which ckg path also takes as arguments.
+func printPath(w io.Writer, r persist.StoreReader, nodes []types.Node, path []string, hops []pathHop) error {
 	idx := make(map[string]types.Node, len(path))
 	for _, n := range nodes {
 		for _, id := range path {
@@ -213,7 +215,11 @@ func printPath(w io.Writer, nodes []types.Node, path []string, hops []pathHop) {
 		pathArrowDown, pathArrowUp)
 	for i, id := range path {
 		n := idx[id]
-		_, _ = fmt.Fprintf(w, "  %2d. [%s] %s — `%s`\n", i+1, n.Type, n.Name, n.QualifiedName)
+		name, err := persist.NameOf(r, n)
+		if err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintf(w, "  %2d. [%s] %s — `%s`\n", i+1, n.Type, n.Name, name)
 		if i < len(hops) {
 			arrow := pathArrowDown
 			if !hops[i].forward {
@@ -222,4 +228,5 @@ func printPath(w io.Writer, nodes []types.Node, path []string, hops []pathHop) {
 			_, _ = fmt.Fprintf(w, "       %s [%s]\n", arrow, hops[i].edgeType)
 		}
 	}
+	return nil
 }

@@ -311,7 +311,12 @@ import (
 // field of a function that locks it somewhere; a function with a goto gets
 // none. Node ids stay; Solidity end bytes and accessed_under_lock edges
 // change; force a cold rebuild.
-const SchemaVersion = "1.40"
+//
+// 1.41 (2026-11-26): accessed_under_lock counts the fields a struct literal
+// sets while the mutex is held, as writes_field does (one notion of a field
+// use, fieldUsesAt), and the receiver path of a deferred Unlock, read where
+// the defer stands. accessed_under_lock edges change; force a cold rebuild.
+const SchemaVersion = "1.41"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

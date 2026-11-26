@@ -2,9 +2,16 @@ package mcphandlers
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"reflect"
+	"regexp"
 	"testing"
+
+	mcp "github.com/mark3labs/mcp-go/mcp"
+	server "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
@@ -64,44 +71,129 @@ func fanInStore(t *testing.T) persist.Store {
 	return s
 }
 
-// TestToolsAreDeterministic: the same call gives the same bytes. A search
-// hit with more than 10 callers listed a different 10 on each call (the
-// neighbourhood came out of a map); every tool that returns or cuts a list
-// of neighbours is called twice, each time on a fresh server, and compared.
+// determinismCalls are the calls TestToolsAreDeterministic repeats: one
+// sequence (calls on one server) per case, and every tool in at least one.
+var determinismCalls = [][]struct {
+	tool string
+	args map[string]any
+}{
+	{{"search_code", map[string]any{"pattern": `leaf\(\)`, "expand": []any{"callers", "callees", "references"}}}},
+	{{"search_code", map[string]any{"pattern": `func hub`, "expand": []any{"callers"}}}},
+	{{"search_test_code", map[string]any{"pattern": `hub`}}},
+	{{"find_callers", map[string]any{"qname": "fanin.leaf", "depth": 2}}},
+	{{"find_callees", map[string]any{"qname": "fanin.caller03", "depth": 2}}},
+	{{"find_references", map[string]any{"qname": "fanin.hub"}}},
+	{{"get_subgraph", map[string]any{"seed_qname": "fanin.hub"}}},
+	{{"impact_of_change", map[string]any{"seed_qname": "fanin.leaf"}}},
+	{{"concurrency_impact", map[string]any{"seed_qname": "fanin.hub"}}},
+	{{"change_history", map[string]any{"qname": "fanin.hub"}}},
+	{{"evidence_for_intent", map[string]any{"intent": "hub leaf"}}},
+	{{"search_text", map[string]any{"query": "caller"}}},
+	{{"find_symbol", map[string]any{"name": "hub", "exact": false}}},
+	{{"get_context_for_task", map[string]any{"task_description": "what calls hub and leaf"}}},
+	{{"value_dependencies", map[string]any{"canonical_id": "ex/fanin.hub"}}},
+	{{"rule_candidates", map[string]any{"rule_pack": "go-local-review@1.0.0", "function": map[string]any{"canonical_id": "ex/fanin.hub"}}}},
+	{
+		{"investigate", map[string]any{"words": "hub|leaf", "budget": 2000}},
+		{"investigate_open", map[string]any{"open": "card:fanin.hub"}},
+		{"investigate_open", map[string]any{"open": "hop:leaf:1"}},
+		{"investigate_open", map[string]any{"open": "rest"}},
+	},
+}
+
+// runSequence runs one sequence of calls on a fresh server over store and
+// returns every response as bytes: its structured content and its text.
+// elapsed_micros, the time value_dependencies and rule_candidates measure
+// and publish in their output schema, is set to 0: it is the one field a
+// repeated call may change.
+func runSequence(t *testing.T, store persist.StoreReader, calls []struct {
+	tool string
+	args map[string]any
+}) []byte {
+	t.Helper()
+	srv := server.NewMCPServer("test", "0")
+	RegisterAll(srv, store)
+	var out bytes.Buffer
+	for _, c := range calls {
+		tool := srv.GetTool(c.tool)
+		if tool == nil {
+			t.Fatalf("%s not registered", c.tool)
+		}
+		req := mcp.CallToolRequest{}
+		req.Params.Name = c.tool
+		req.Params.Arguments = c.args
+		res, err := tool.Handler(context.Background(), req)
+		if err != nil {
+			t.Fatalf("%s: %v", c.tool, err)
+		}
+		raw, err := json.Marshal(res)
+		if err != nil {
+			t.Fatalf("%s: %v", c.tool, err)
+		}
+		out.Write(elapsedMicros.ReplaceAll(raw, []byte(`"elapsed_micros":0`)))
+		out.WriteByte('\n')
+	}
+	return out.Bytes()
+}
+
+// elapsedMicros matches the measured time in a response.
+var elapsedMicros = regexp.MustCompile(`"elapsed_micros":\d+`)
+
+// TestToolsAreDeterministic: the same calls give the same bytes, on a fresh
+// server each time and on two stores built from the same nodes. A search hit
+// with more than 10 callers listed a different 10 on each call (the
+// neighbourhood came out of a map), and investigate differed across fresh
+// servers on 5 of 30 queries (a guard's statement line was read from a
+// promoted copy in map order). Every registered tool is called.
 func TestToolsAreDeterministic(t *testing.T) {
-	s := fanInStore(t)
-	for _, tc := range []struct {
-		tool string
-		args map[string]any
-	}{
-		{"search_code", map[string]any{"pattern": `leaf\(\)`, "expand": []any{"callers", "callees"}}},
-		{"search_code", map[string]any{"pattern": `func hub`, "expand": []any{"callers"}}},
-		{"find_callers", map[string]any{"qname": "fanin.leaf", "depth": 2}},
-		{"find_callees", map[string]any{"qname": "fanin.caller03", "depth": 2}},
-		{"get_subgraph", map[string]any{"seed_qname": "fanin.hub"}},
-		{"impact_of_change", map[string]any{"seed_qname": "fanin.leaf"}},
-		{"search_text", map[string]any{"query": "caller"}},
-		{"find_symbol", map[string]any{"name": "hub", "exact": false}},
-	} {
-		first := callToolRaw(t, s, tc.tool, tc.args)
-		for i := 0; i < 5; i++ {
-			if again := callToolRaw(t, s, tc.tool, tc.args); !bytes.Equal(first, again) {
-				t.Errorf("%s %v: two calls differ:\n%s\n%s", tc.tool, tc.args, first, again)
+	stores := []persist.Store{fanInStore(t), fanInStore(t)}
+	srv := server.NewMCPServer("test", "0")
+	RegisterAll(srv, stores[0])
+	covered := map[string]bool{}
+	for _, seq := range determinismCalls {
+		for _, c := range seq {
+			covered[c.tool] = true
+		}
+	}
+	for name := range srv.ListTools() {
+		if !covered[name] {
+			t.Errorf("tool %s has no call in determinismCalls", name)
+		}
+	}
+	for _, seq := range determinismCalls {
+		first := runSequence(t, stores[0], seq)
+		for i, s := range []persist.StoreReader{stores[0], stores[0], stores[1], stores[1]} {
+			if again := runSequence(t, s, seq); !bytes.Equal(first, again) {
+				t.Errorf("%s: run %d differs:\n%s\n%s", seq[0].tool, i, first, again)
 				break
 			}
 		}
 	}
-	card := func() string {
-		srv := newInvServer(t, s)
-		head := callTextOn(t, srv, "investigate", map[string]any{"words": "hub|leaf", "budget": 2000})
-		return head + callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:fanin.hub"}) +
-			callTextOn(t, srv, "investigate_open", map[string]any{"open": "hop:leaf:1"})
+}
+
+// TestExpandTotalIsFindCallersAtDepthOne: the callers an expansion counts are
+// exactly what find_callers returns at depth 1 besides the hit, as the guide
+// says; find_callers' default depth 2 returns more. The guide said they
+// "return them all" without the depth.
+func TestExpandTotalIsFindCallersAtDepthOne(t *testing.T) {
+	s := fanInStore(t)
+	out := callTool(t, s, "search_code", map[string]any{"pattern": `^func leaf`, "expand": []any{"callers"}})
+	h := hitByName(out, "fanin.leaf")
+	if h == nil || h["callers_total"] != float64(fanInCallers+1) {
+		t.Fatalf("hit %v, want callers_total %d", h, fanInCallers+1)
 	}
-	first := card()
-	for i := 0; i < 5; i++ {
-		if again := card(); again != first {
-			t.Errorf("investigate and investigate_open differ:\n%s\n%s", first, again)
-			break
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": h["canonical_id"], "depth": 1})
+	var names []string
+	for _, n := range asSlice(callers["nodes"]) {
+		if q := n.(map[string]any)["qname"]; q != "fanin.leaf" {
+			names = append(names, q.(string))
 		}
+	}
+	if len(names) != fanInCallers+1 {
+		t.Errorf("find_callers depth=1 returns %d callers, the expansion counts %v", len(names), h["callers_total"])
+	}
+	shown := rowNames(h, "callers")
+	if want := sorted(names)[:searchCodeExpandCap]; !reflect.DeepEqual(shown, want) {
+		t.Errorf("shown %v, want the first %d of find_callers by name: %v", shown, searchCodeExpandCap, want)
 	}
 }

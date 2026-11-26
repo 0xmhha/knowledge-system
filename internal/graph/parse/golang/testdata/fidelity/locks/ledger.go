@@ -137,3 +137,26 @@ func (l *Ledger) Order() {
 	l.other.Unlock()
 	l.mu.Unlock()
 }
+
+// entry is set by a composite literal while a mutex is held.
+type entry struct {
+	key, value int
+}
+
+// Fill sets both fields of an entry, by key and by place, while it holds mu.
+func (l *Ledger) Fill() (entry, entry) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return entry{key: 1}, entry{2, 3}
+}
+
+// Outer reaches a Ledger's mutex through its field inner.
+type Outer struct {
+	inner *Ledger
+}
+
+// Hold reads inner again where the deferred Unlock stands, under mu.
+func (o *Outer) Hold() {
+	o.inner.mu.Lock()
+	defer o.inner.mu.Unlock()
+}

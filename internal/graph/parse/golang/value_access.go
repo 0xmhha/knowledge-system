@@ -120,35 +120,14 @@ func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Inf
 
 	line := func(p token.Pos) int { return fset.Position(p).Line }
 	ast.Inspect(root, func(n ast.Node) bool {
+		for _, u := range fieldUsesAt(n, info) {
+			typ := types.EdgeReadsField
+			if u.literal || writes[n.(ast.Expr)] {
+				typ = types.EdgeWritesField
+			}
+			a.emit(src, fields.node(u.field), typ, "", line(u.pos))
+		}
 		switch x := n.(type) {
-		case *ast.SelectorExpr:
-			if sel := info.Selections[x]; sel != nil && sel.Kind() == gotypes.FieldVal {
-				typ := types.EdgeReadsField
-				if writes[x] {
-					typ = types.EdgeWritesField
-				}
-				a.emit(src, fields.node(sel.Obj()), typ, "", line(x.Sel.Pos()))
-			}
-		case *ast.CompositeLit:
-			_, st := literalStruct(info.TypeOf(x))
-			if st == nil {
-				return true
-			}
-			for i, elt := range x.Elts {
-				var field *gotypes.Var
-				pos := elt.Pos()
-				if kv, ok := elt.(*ast.KeyValueExpr); ok {
-					if key, ok := kv.Key.(*ast.Ident); ok {
-						field, _ = info.Uses[key].(*gotypes.Var)
-						pos = key.Pos()
-					}
-				} else if i < st.NumFields() {
-					field = st.Field(i)
-				}
-				if field != nil && field.IsField() {
-					a.emit(src, fields.node(field), types.EdgeWritesField, "", line(pos))
-				}
-			}
 		case *ast.Ident:
 			obj := info.Uses[x]
 			if obj == nil || obj.Pkg() == nil {

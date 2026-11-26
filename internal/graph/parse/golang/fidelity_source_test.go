@@ -797,6 +797,14 @@ func checkUnderLock(t *testing.T, g *fidelityGraph) {
 			t.Errorf("Ledger.%s is under %v, want %v (mu %s, other %s, rw %s)", name, got, wantSet, mu.ID, other.ID, rw.ID)
 		}
 	}
+	// A struct literal sets its fields, by key and by place: a use like a
+	// selector (180 such pairs of go-stablenet had no edge). The receiver path
+	// of a deferred Unlock is read where the defer stands, under mu.
+	for _, q := range []string{"locks.entry.key", "locks.entry.value", "locks.Outer.inner"} {
+		if f := g.one(t, types.NodeField, q); !g.has(types.EdgeAccessedUnderLock, f.ID, mu.ID) {
+			t.Errorf("%s is not under mu", q)
+		}
+	}
 	// Locking other while mu is held uses the field other under mu, the order
 	// the two are taken in; no mutex field is used under itself.
 	otherField, muField := g.one(t, types.NodeField, "locks.Ledger.other"), g.one(t, types.NodeField, "locks.Ledger.mu")

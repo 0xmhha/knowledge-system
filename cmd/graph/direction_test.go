@@ -28,6 +28,7 @@ func directionGraph() ([]types.Node, []types.Edge) {
 // read backwards ("callstack —[writes_field]→ newCallTracer").
 func TestPathArrowFollowsRelation(t *testing.T) {
 	nodes, edges := directionGraph()
+	store := pathStore(t, nodes)
 	for _, tc := range []struct {
 		from, to string
 		want     []string
@@ -49,7 +50,9 @@ func TestPathArrowFollowsRelation(t *testing.T) {
 	} {
 		path, hops := bfsShortestPath(nodes, edges, tc.from, tc.to, 12)
 		var out bytes.Buffer
-		printPath(&out, nodes, path, hops)
+		if err := printPath(&out, store, nodes, path, hops); err != nil {
+			t.Fatal(err)
+		}
 		text := out.String()
 		if !strings.Contains(text, "Path (2 hops)") {
 			t.Fatalf("%s to %s: no 2-hop path:\n%s", tc.from, tc.to, text)

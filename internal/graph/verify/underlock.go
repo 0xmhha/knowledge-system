@@ -16,6 +16,9 @@ import (
 // by a must-hold data flow. It shares no code with the extractor, which
 // walks the syntax tree instead.
 //
+// A use of a field is a selector that names it, or an element of a struct
+// literal, which sets it (T{F: v}, T{v}).
+//
 // A mutex is held at a point when every path from the function's entry to
 // that point locks it (Lock or RLock) and does not unlock it (Unlock or
 // RUnlock) after. A deferred call does not run where it is written, so
@@ -176,8 +179,16 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 	case *ast.DeferStmt:
 		// The call runs at the end: only its function value and arguments
 		// are evaluated here, and a literal is a function of its own. The
-		// receiver of a deferred Unlock is the mutex, not a use.
-		if _, _, ok := lt.lockCall(x.Call); ok {
+		// receiver path of a deferred Unlock is evaluated here, with what
+		// is held here; the mutex itself is used under the others.
+		if m, _, ok := lt.lockCall(x.Call); ok {
+			recv := ast.Unparen(x.Call.Fun.(*ast.SelectorExpr).X)
+			if sel, isSel := recv.(*ast.SelectorExpr); isSel && record {
+				others := copyHeld(held)
+				delete(others, m)
+				lt.access(sel, others)
+				lt.exprs([]ast.Expr{sel.X}, held, record, true)
+			}
 			lt.exprs(x.Call.Args, held, record, true)
 			return held
 		}
@@ -237,6 +248,10 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 				if record && !receivers[x] {
 					lt.access(x, held)
 				}
+			case *ast.CompositeLit:
+				if record {
+					lt.literal(x, held)
+				}
 			}
 			return true
 		})
@@ -288,9 +303,36 @@ func (lt *lockTruth) exprs(es []ast.Expr, held heldSet, record, literalsApart bo
 				if record {
 					lt.access(x, held)
 				}
+			case *ast.CompositeLit:
+				if record {
+					lt.literal(x, held)
+				}
 			}
 			return true
 		})
+	}
+}
+
+// literal records the fields a struct literal sets as used under held: the
+// field each key names, or the field at each element's place when the
+// literal has no keys.
+func (lt *lockTruth) literal(lit *ast.CompositeLit, held heldSet) {
+	st, ok := derefStruct(lt.info.TypeOf(lit))
+	if !ok || len(held) == 0 {
+		return
+	}
+	for i, elt := range lit.Elts {
+		var f *gotypes.Var
+		if kv, isKV := elt.(*ast.KeyValueExpr); isKV {
+			if id, isID := kv.Key.(*ast.Ident); isID {
+				f, _ = lt.info.ObjectOf(id).(*gotypes.Var)
+			}
+		} else if i < st.NumFields() {
+			f = st.Field(i)
+		}
+		if f != nil && f.IsField() {
+			lt.record(f.Origin(), held)
+		}
 	}
 }
 
@@ -303,7 +345,12 @@ func (lt *lockTruth) access(sel *ast.SelectorExpr, held heldSet) {
 	if !ok || !v.IsField() {
 		return
 	}
-	field := lt.declKey(v.Origin())
+	lt.record(v.Origin(), held)
+}
+
+// record notes the field v as used under every mutex of held.
+func (lt *lockTruth) record(v *gotypes.Var, held heldSet) {
+	field := lt.declKey(v)
 	if field == "" {
 		return
 	}
@@ -375,6 +422,9 @@ func (lt *lockTruth) mutexOf(sel *ast.SelectorExpr) gotypes.Object {
 }
 
 func derefStruct(t gotypes.Type) (*gotypes.Struct, bool) {
+	if t == nil {
+		return nil, false
+	}
 	t = gotypes.Unalias(t)
 	if p, ok := t.Underlying().(*gotypes.Pointer); ok {
 		t = p.Elem()

@@ -122,6 +122,9 @@ func (e invEdge) verb() string {
 }
 
 type invIndex struct {
+	// reader is the graph the index was built from; card: resolves a name
+	// that has no card (a local) through it.
+	reader    store.Reader
 	code      *codeIndex
 	nodes     map[string]types.Node
 	test      map[string]bool
@@ -195,7 +198,7 @@ func buildInvIndex(reader store.Reader) (*invIndex, error) {
 	if err != nil {
 		return nil, err
 	}
-	x := &invIndex{code: code, nodes: map[string]types.Node{}, test: map[string]bool{}, declOf: map[string]int{},
+	x := &invIndex{reader: reader, code: code, nodes: map[string]types.Node{}, test: map[string]bool{}, declOf: map[string]int{},
 		byLeaf: map[string][]string{}, byFold: map[string][]string{}, adj: map[string][]invEdge{},
 		members: map[string][]string{}, owner: map[string]string{}, fieldDecl: map[string]string{},
 		guard: map[guardKey]invGuard{}, parent: map[string]invGuard{}, stmt: map[string]types.Node{}, funcFile: map[string][]string{}}
@@ -768,9 +771,25 @@ func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool
 		if compact {
 			c = invCompactCallers
 		}
-		fmt.Fprintf(&b, "  callers: %s\n", capNames(callers, c))
+		fmt.Fprintf(&b, "  callers: %s", capNames(callers, c))
+		if len(callers) > c {
+			// The card lists the direct callers; find_callers at depth 1
+			// returns every one, test code and callers through the
+			// interface methods it implements included.
+			fmt.Fprintf(&b, "; find_callers qname=%q depth=1 returns them all", seedName(n))
+		}
+		b.WriteByte('\n')
 	}
 	return b.String()
+}
+
+// seedName is the name that names n alone in a seed: its canonical id, or
+// its qualified name when it has none.
+func seedName(n types.Node) string {
+	if n.CanonicalID != "" {
+		return n.CanonicalID
+	}
+	return n.QualifiedName
 }
 
 // valueCard lists who writes the value and who reads it, one row per line
@@ -898,10 +917,17 @@ func (x *invIndex) loadGuards(reader store.Reader) error {
 	for _, n := range ns {
 		x.stmt[n.ID] = n
 	}
+	// Only functions with stored source, in id order: a promoted copy has
+	// the lines of the method it copies and no source of its own, and with
+	// the copies listed in map order stmtLine took one of them on some runs
+	// and wrote "[then of L167 ; ...]" without the statement's line.
 	for id, n := range x.nodes {
-		if n.Type == types.NodeFunction || n.Type == types.NodeMethod {
+		if _, src := x.declOf[id]; src && (n.Type == types.NodeFunction || n.Type == types.NodeMethod) {
 			x.funcFile[n.FilePath] = append(x.funcFile[n.FilePath], id)
 		}
+	}
+	for _, ids := range x.funcFile {
+		sort.Strings(ids)
 	}
 	return nil
 }
@@ -1576,7 +1602,7 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 
 	open := nsTool("investigate_open",
 		mcp.WithReadOnlyHintAnnotation(true),
-		mcp.WithDescription("Return a part of an earlier investigate result: open=\"card:<qname>\" (the full card of any declaration), \"joins\", "+
+		mcp.WithDescription("Return a part of an earlier investigate result: open=\"card:<name>\" (the full card of any declaration; the name is resolved as in every tool, site names \"<qname>@<file>:<line>\" included, and a local, which has no card, is answered with the card of the declaration that holds it after a line \"local: <name> is declared at <file>:<line> in <owner>\"), \"joins\", "+
 			"\"hop:<word>:<1|2|3>\" (what a word reaches at that hop and through what), \"partial:<word>\", or \"rest\" (what the last response left out, in order). "+
 			"Use from= to continue a long part."),
 		mcp.WithString("id", mcp.Description("investigation id (default: the latest)")),
@@ -1661,7 +1687,12 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 			}
 		}
 		if len(ids) == 0 {
-			return fmt.Sprintf("unknown declaration %q", q)
+			local, owner, msg := x.localOwner(q)
+			if owner == "" {
+				return msg
+			}
+			entries = append(entries, local)
+			ids = []string{owner}
 		}
 		for _, id := range ids {
 			entries = append(entries, x.card(id, inv.words, inv.withTests, false))
@@ -1723,6 +1754,54 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 		}
 	}
 	return b.String()
+}
+
+// localKey starts the line a card: answer has when the name is a local.
+const localKey = "local: "
+
+// localOwner answers card: for a name that has no card of its own, a local
+// (a variable, constant, type or mutex declared inside a function or in a
+// function literal of a package-level initialiser). The name resolves as in
+// every tool (store.ResolveName, site names included); the answer is the
+// card of the declaration that holds the local, after a line that says so:
+// "local: <name> is declared at <file>:<line> in <owner>". owner is "" when
+// the name names nothing or several declarations; msg then says which.
+func (x *invIndex) localOwner(q string) (line, owner, msg string) {
+	res, err := store.ResolveName(x.reader, q, "")
+	switch {
+	case err != nil:
+		return "", "", fmt.Sprintf("unknown declaration %q: %v", q, err)
+	case res.Ambiguous():
+		return "", "", fmt.Sprintf("%q names several declarations; open one: %s", q, strings.Join(res.Candidates, ", "))
+	case !res.Found():
+		return "", "", fmt.Sprintf("unknown declaration %q", q)
+	}
+	n := res.Nodes[0]
+	owner = x.innermost(n)
+	if owner == "" {
+		return "", "", fmt.Sprintf("unknown declaration %q: no card holds it", q)
+	}
+	return fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), owner, ""
+}
+
+// innermost returns the function, method or variable (store.IsEncloser,
+// what a local is part of) with a card and stored source whose lines hold n,
+// the narrowest one; a tie goes to the smaller id. "" when none does.
+func (x *invIndex) innermost(n types.Node) string {
+	best, span := "", 1<<30
+	for id, o := range x.nodes {
+		if id == n.ID || o.FilePath != n.FilePath || n.StartLine < o.StartLine || n.EndLine > o.EndLine {
+			continue
+		}
+		if _, src := x.declOf[id]; !src || !store.IsEncloser(o) {
+			continue
+		}
+		s := o.EndLine - o.StartLine
+		if s < span || s == span && id < best {
+			best, span = id, s
+		}
+	}
+	return best
 }
 
 func invTrace(x *invIndex, inv *investigation, in, cut []invBlock, chars int) map[string]any {
