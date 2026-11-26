@@ -173,7 +173,7 @@ func TestBuildCmd_LockPropagationFlagWired(t *testing.T) {
 			onCount, offCount)
 	}
 	// Bound the floor: OFF must emit at least one edge (intra-fn B1 pass —
-	// the W-A fixture has direct lock-then-touch in lock_propagation/single_hop.go).
+	// the W-A fixture has direct lock-then-touch in lock_propagation/direct.go).
 	// Catches the reverse failure where the build inadvertently disables both
 	// passes (e.g. emit table dropped).
 	if offCount == 0 {

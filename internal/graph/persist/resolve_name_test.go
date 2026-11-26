@@ -67,6 +67,13 @@ func newNameStore(t *testing.T) persist.Store {
 		node("n000000000000023", types.NodeVariable, "enode.parseNodeTests.r", "", 75, 75),
 		node("n000000000000024", types.NodeVariable, "enode.cfg", "ex/enode.cfg", 82, 84),
 		node("n000000000000025", types.NodeField, "enode.cfg.struct@900.Port", "", 83, 83),
+		// One function declares the mutex errMu twice, in two blocks: each
+		// declaration is a LocalVariable and a Mutex node at its line.
+		node("n000000000000026", types.NodeFunction, "catalyst.TestBlock", "ex/catalyst.TestBlock", 90, 110),
+		node("n000000000000027", types.NodeLocalVariable, "catalyst.TestBlock.errMu", "", 92, 92),
+		node("n000000000000028", types.NodeMutex, "catalyst.TestBlock.errMu", "", 92, 92),
+		node("n000000000000029", types.NodeLocalVariable, "catalyst.TestBlock.errMu", "", 101, 101),
+		node("n000000000000030", types.NodeMutex, "catalyst.TestBlock.errMu", "", 101, 101),
 	}
 	if err := s.InsertNodes(nodes); err != nil {
 		t.Fatalf("InsertNodes: %v", err)
@@ -106,6 +113,12 @@ func TestResolveName(t *testing.T) {
 		{name: "count", wantQName: "b.count", wantIDs: []string{"n000000000000014"}},
 		{name: "row", wantQName: "b.row", wantIDs: []string{"n000000000000016"}},
 		{name: "ex/coll1.(*Set).Size", wantQName: "coll1.Set.Size", wantIDs: []string{"n000000000000009"}, byID: true},
+		// A name declared at two places of one function is ambiguous, with
+		// each place a candidate that resolves to its own declaration.
+		{name: "catalyst.TestBlock.errMu", candidates: []string{"catalyst.TestBlock.errMu@p/f.go:92", "catalyst.TestBlock.errMu@p/f.go:101"}},
+		{name: "errMu", candidates: []string{"catalyst.TestBlock.errMu@p/f.go:92", "catalyst.TestBlock.errMu@p/f.go:101"}},
+		{name: "catalyst.TestBlock.errMu@p/f.go:92", wantQName: "catalyst.TestBlock.errMu", wantIDs: []string{"n000000000000027", "n000000000000028"}, byID: true},
+		{name: "catalyst.TestBlock.errMu@p/f.go:93"},
 		{name: "NoSuchName"},
 		{name: ""},
 	} {

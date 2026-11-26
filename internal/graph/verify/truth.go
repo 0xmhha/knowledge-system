@@ -69,6 +69,10 @@ type Truth struct {
 	CallsOutsideFuncs int
 	// Stmts are the statement links of every function body (statements.go).
 	Stmts map[StmtFact]bool
+	// UnderLock are the (field, mutex) pairs of accessed_under_lock: a field
+	// used in a function body at a point where the mutex is held
+	// (underlock.go). Both are keyed "file:line:name" of their declaration.
+	UnderLock map[[2]string]bool
 	// Load is what the go command reported while loading the truth's
 	// packages; Modules compares the outside modules with the scope's.
 	Load    detect.LoadProblems
@@ -108,7 +112,7 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	// The truth comes from the same go command as the graph. When it cannot
 	// load a package, both lose the same references and agree, so the
 	// problems are reported with the comparison.
-	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
+	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}
@@ -192,9 +196,11 @@ func (w *fileWalker) walk(f *ast.File) {
 	// The file's bytes, for the blanks between a function and the comment
 	// after it; without them a function ends at its last token.
 	src, _ := os.ReadFile(filepath.Join(w.root, filepath.FromSlash(w.rel)))
+	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock}
 	for _, d := range f.Decls {
 		switch d := d.(type) {
 		case *ast.FuncDecl:
+			locks.function(d.Body, nil)
 			cid := w.declare(d.Name, d.Pos(), w.funcEnd(d, f.Comments, src))
 			if cid == "" {
 				// No canonical id (a method of an alias type): its statement

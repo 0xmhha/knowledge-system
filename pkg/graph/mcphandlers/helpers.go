@@ -245,6 +245,8 @@ func reverseCallersUnionTraced(reader store.Reader, resolved seedRef, depth int,
 	for _, n := range nodeByID {
 		nodes = append(nodes, n)
 	}
+	// Map order differs on every call; the answer must not.
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
 	return nodes, edges, nil
 }
 

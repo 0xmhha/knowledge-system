@@ -485,6 +485,7 @@ func (s *sqliteStore) neighborhoodFrom(roots []types.Node, depth int, reverse bo
 	for _, n := range seen {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, allEdges, nil
 }
 
@@ -512,6 +513,7 @@ func (s *sqliteStore) SubgraphByQname(qname string, depth int) ([]types.Node, []
 	for _, n := range merged {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, append(fwdE, revE...), nil
 }
 

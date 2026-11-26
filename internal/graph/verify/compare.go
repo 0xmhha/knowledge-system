@@ -86,7 +86,56 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	if r.Statements, err = compareStatements(truth.Stmts, nodes, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
+	if r.UnderLock, err = compareUnderLock(truth.UnderLock, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
 	return r, nil
+}
+
+// compareUnderLock compares the accessed_under_lock edges of g with the
+// truth's pairs. A node is named like a truth declaration: its file, its
+// first line and its name (a Mutex node has its declaration's span and the
+// name of the variable or field, or of the embedded mutex type).
+func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, samples int) (UnderLockStats, error) {
+	edges, err := g.QueryEdgesByType(string(types.EdgeAccessedUnderLock))
+	if err != nil {
+		return UnderLockStats{}, fmt.Errorf("verify: read accessed_under_lock: %w", err)
+	}
+	key := func(id string) string {
+		n, ok := idx.byID[id]
+		if !ok {
+			return ""
+		}
+		return fmt.Sprintf("%s:%d:%s", n.FilePath, n.StartLine, n.Name)
+	}
+	st := UnderLockStats{Truth: len(truth)}
+	graph := map[[2]string]bool{}
+	var unsupported []string
+	for _, e := range edges {
+		k := [2]string{key(e.Src), key(e.Dst)}
+		if graph[k] {
+			continue
+		}
+		graph[k] = true
+		st.Edges++
+		if truth[k] {
+			st.Matched++
+			continue
+		}
+		st.Unsupported++
+		unsupported = append(unsupported, k[0]+" -> "+k[1])
+	}
+	missing := make([]string, 0)
+	for k := range truth {
+		if !graph[k] {
+			missing = append(missing, k[0]+" -> "+k[1])
+		}
+	}
+	sort.Strings(missing)
+	sort.Strings(unsupported)
+	st.MissingSamples = firstN(missing, samples)
+	st.UnsupportedSamples = firstN(unsupported, samples)
+	return st, nil
 }
 
 // nodeIndex looks graph nodes up by id and by (file, canonical id base).

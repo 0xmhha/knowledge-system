@@ -266,3 +266,27 @@ func TestInvestigate_TestsExcludedFromCallers(t *testing.T) {
 		t.Errorf("no file is test code in this build, yet the card drops %s:\n%s", caller, got)
 	}
 }
+
+// TestInvestigate_SelfCallIsACaller: a function that calls itself is one of
+// its own callers, in the card as in find_callers. The card of
+// core.ChainIndexer.newHead left out its call at core/chain_indexer.go:272.
+// Only the invokes edge a function has to itself, which stands for a call
+// through a function value, is not a call to itself.
+func TestInvestigate_SelfCallIsACaller(t *testing.T) {
+	s := toolStore(t)
+	srv := newInvServer(t, s)
+	callTextOn(t, srv, "investigate", map[string]any{"words": "wrap"})
+	card := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:state.wrap"})
+	if !strings.Contains(card, "state.wrap:20") {
+		t.Errorf("the card of a recursive function lacks its own call:\n%s", card)
+	}
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": "state.wrap", "depth": 1})
+	self := false
+	for _, e := range asSlice(callers["edges"]) {
+		m := e.(map[string]any)
+		self = self || m["src"] == "st00000000000005" && m["dst"] == "st00000000000005"
+	}
+	if !self {
+		t.Errorf("find_callers lacks the self-call: %v", callers["edges"])
+	}
+}

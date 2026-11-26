@@ -29,6 +29,7 @@ const (
 	fileOrder        = "linear/Order.sol"
 	fileGap          = "linear/Gap.sol"
 	fileSetOwner     = "linear/SetOwner.sol"
+	fileTrailing     = "comments/Trailing.sol"
 	importOZ         = "@openzeppelin/contracts/token/ERC20/IERC20.sol"
 	qnameMinter      = "Minter"
 	qnameMinterMint  = "Minter.mint"
@@ -222,6 +223,47 @@ func TestFidelityDeclarationSpans(t *testing.T) {
 				t.Errorf("text %q, want prefix %q and suffix %q", text, tc.prefix, tc.suffix)
 			}
 		})
+	}
+}
+
+// TestFidelityTrailingComments: a declaration runs through the plain comment
+// that follows it on its last line, as a Go declaration does: with only
+// blanks between, or the comma that separates an enum value from the next.
+// A NatSpec comment there (`///`, `/** */`) documents the next declaration
+// and stays out. The stored text is the file's bytes of the span. On
+// go-stablenet the comment after an enum value (GovBase.sol:112) was in no
+// stored text and was searched only under the enum's line.
+func TestFidelityTrailingComments(t *testing.T) {
+	g := loadFidelity(t, fidelityDir)
+	for _, tc := range []struct {
+		nt          types.NodeType
+		qname, text string
+	}{
+		{types.NodeConstant, "Trailing.Result.Ok", "Ok, // the call succeeded"},
+		{types.NodeConstant, "Trailing.Result.Failed", "Failed // the call failed"},
+		{types.NodeField, "Trailing.limit", "uint256 public limit; // the most a caller may take"},
+		{types.NodeEvent, "Trailing.Taken", "event Taken(uint256 amount); /* emitted on take */ // and logged"},
+		{types.NodeField, "Trailing.before", "uint256 public before;"},
+		{types.NodeFunction, "Trailing.take", "function take() external {} // takes nothing"},
+	} {
+		n := g.one(t, fileTrailing, tc.nt, tc.qname)
+		if got := string(g.src[fileTrailing][n.StartByte:n.EndByte]); got != tc.text {
+			t.Errorf("text of %s: got %q, want %q", tc.qname, got, tc.text)
+		}
+		if n.StartLine != n.EndLine {
+			t.Errorf("%s spans lines %d-%d, want one line", tc.qname, n.StartLine, n.EndLine)
+		}
+	}
+	contract := g.one(t, fileTrailing, types.NodeContract, "Trailing")
+	if got := string(g.src[fileTrailing][contract.StartByte:contract.EndByte]); !strings.HasSuffix(got, "} // Trailing ends here") {
+		t.Errorf("contract text ends %q", got[max(0, len(got)-30):])
+	}
+	enum := g.one(t, fileTrailing, types.NodeEnum, "Trailing.Result")
+	if got := string(g.src[fileTrailing][enum.StartByte:enum.EndByte]); !strings.HasSuffix(got, "the call failed\n    }") {
+		t.Errorf("enum text ends %q", got)
+	}
+	if doc := g.one(t, fileTrailing, types.NodeField, "Trailing.later").DocComment; doc != "documents later, not before" {
+		t.Errorf("NatSpec of later = %q", doc)
 	}
 }
 

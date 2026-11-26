@@ -984,6 +984,7 @@ func (s *pgStore) neighborhoodFrom(roots []types.Node, depth int, reverse bool, 
 	for _, n := range seen {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, allEdges, nil
 }
 
@@ -1008,6 +1009,7 @@ func (s *pgStore) SubgraphByQname(qname string, depth int) ([]types.Node, []type
 	for _, n := range merged {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, append(fwdE, revE...), nil
 }
 

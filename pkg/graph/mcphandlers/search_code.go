@@ -836,7 +836,7 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 		mcp.WithBoolean("word", mcp.Description("match whole words only")),
 		mcp.WithString("in", mcp.Description("body (default: declaration source, signature included), name (the qualified name, or the declaration's first line from its first token with its comments left out, e.g. \"func (t *Template) Render(\"; never comment text), or both")),
 		mcp.WithString("path", mcp.Description("only files under this path prefix, or matching this glob (* and **)")),
-		mcp.WithArray("expand", mcp.Description("attach for each hit: callers, callees, references (who reads or writes a value)"), mcp.WithStringItems()),
+		mcp.WithArray("expand", mcp.Description("attach for each hit: callers, callees, references (who reads or writes a value); at most 10 of each, callers and callees the first 10 by qualified name, then file and line, references in the order find_references gives; when there are more, the hit has callers_total, callees_total or references_total, and find_callers, find_callees or find_references return them all"), mcp.WithStringItems()),
 		mcp.WithBoolean("resolve", mcp.Description("list the calls and value uses on each matched line (default true)")),
 		mcp.WithNumber("context", mcp.Description("lines of context around each matched line (0 to 3, default 0)")),
 		mcp.WithArray("ids", mcp.Description("qname (or canonical_id) of declarations to return in full: their matched lines with code, uses and expansion. Use it after a result that came as an index"), mcp.WithStringItems()),
@@ -1201,6 +1201,7 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 		for i, h := range ranked {
 			for kind, total := range attachExpansion(reader, rows[i], idx.decls[h.decl].node, a.expand) {
 				if total > searchCodeExpandCap {
+					rows[i][kind+expandTotalSuffix] = total
 					cut = append(cut, map[string]any{"qname": rows[i]["qname"], "kind": kind, "total": total, "shown": searchCodeExpandCap})
 				}
 			}
@@ -1506,8 +1507,12 @@ const dispatchNameCap = 4
 func attachExpansion(reader store.Reader, row map[string]any, n types.Node, kinds []string) map[string]int {
 	seed := seedRef{QName: n.QualifiedName, IDs: []string{n.ID}}
 	totals := map[string]int{}
+	// The first searchCodeExpandCap neighbours by qualified name, then file
+	// and line, are listed; totals counts them all (expansionOrder).
 	brief := func(kind string, ns []types.Node, self string) []map[string]any {
 		var out []map[string]any
+		ns = append([]types.Node(nil), ns...)
+		sort.SliceStable(ns, func(i, j int) bool { return expansionOrder(ns[i], ns[j]) })
 		for _, x := range ns {
 			if x.ID == self {
 				continue
@@ -1543,6 +1548,24 @@ func attachExpansion(reader store.Reader, row map[string]any, n types.Node, kind
 		}
 	}
 	return totals
+}
+
+// expandTotalSuffix ends the key that gives, on a hit whose expansion was
+// cut, how many there are ("callers_total").
+const expandTotalSuffix = "_total"
+
+// expansionOrder is the order of an expansion list (callers, callees):
+// qualified name, then file, then line, then id.
+func expansionOrder(a, b types.Node) bool {
+	switch {
+	case a.QualifiedName != b.QualifiedName:
+		return a.QualifiedName < b.QualifiedName
+	case a.FilePath != b.FilePath:
+		return a.FilePath < b.FilePath
+	case a.StartLine != b.StartLine:
+		return a.StartLine < b.StartLine
+	}
+	return a.ID < b.ID
 }
 
 // keptBy is how many of n ranked hits a limit keeps (0 keeps all).

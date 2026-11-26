@@ -26,7 +26,10 @@ func RegisterConcurrencyImpact(s *server.MCPServer, reader store.Reader) {
 				"Seed a Channel/Mutex/Field node to recover producer<->consumer or lock-sharing peers; a function "+
 				"seed reaches its own goroutine and the channel it writes, but not the peer across the channel. "+
 				"A mutex is seeded by the qualified name of the field or variable that declares it, with or without \"#mutex\" after it, the same for a struct field, a package-level variable and a local variable "+
-				"(\"pkg.T.mu\" or \"pkg.T.mu#mutex\", \"pkg.mu\" or \"pkg.mu#mutex\", \"pkg.F.mu\" or \"pkg.F.mu#mutex\"); it leads to the functions that lock it and the fields it guards, and mutex names its Mutex node. "+
+				"(\"pkg.T.mu\" or \"pkg.T.mu#mutex\", \"pkg.mu\" or \"pkg.mu#mutex\", \"pkg.F.mu\" or \"pkg.F.mu#mutex\"), and both forms give one answer: "+
+				"mutex names the Mutex node and declared_by the field or variable that declares it; locked_by lists the functions that lock this mutex, one per lock line; "+
+				"guarded_by lists the other mutexes held where the declaring field or variable itself is accessed; modules and edges are the walk from the Mutex node (the functions that lock it, the fields it guards, and on). "+
+				"A name that one function declares twice (two blocks) is ambiguous; its candidates name each declaration as \"<qname>@<file>:<line>\", which is a seed too. "+
 				"seed_qname may be a canonical id, a qualified name or a bare name; an ambiguous bare name returns its candidates.",
 		),
 		mcp.WithString("seed_qname"),

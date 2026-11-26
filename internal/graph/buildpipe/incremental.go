@@ -748,7 +748,9 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, roles Fil
 
 		// Lock edges — same wiring as cold path; per-file FilePath, so dirty
 		// files' rows go with the CASCADE and cached rows win dedup.
-		rg.Edges = append(rg.Edges, gop.EmitLockEdges(p.Pkgs(), rg.Nodes)...)
+		lockEdges, lst := gop.EmitLockEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, lockEdges...)
+		log.Info("lock edges emitted (incremental)", "count", len(lockEdges), "undecided_functions", lst.UndecidedFunctions)
 
 		// Value uses (reads_field / writes_field / references) — same wiring as cold path.
 		vaEdges := gop.EmitValueAccessEdges(p.Pkgs(), rg.Nodes)

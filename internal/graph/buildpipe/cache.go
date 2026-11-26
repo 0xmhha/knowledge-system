@@ -303,7 +303,15 @@ import (
 // literal written in a statement header belongs to that header; a lock on a
 // mutex returned by a getter has its edge. Nodes, edges and scores change;
 // force a cold rebuild.
-const SchemaVersion = "1.39"
+//
+// 1.40 (2026-11-26): the span of a Solidity declaration runs through the
+// plain comment after it on its last line (after the comma of an enum
+// value), as a Go declaration's does; the comment was in no node's text.
+// accessed_under_lock names a field used where the mutex is held, not every
+// field of a function that locks it somewhere; a function with a goto gets
+// none. Node ids stay; Solidity end bytes and accessed_under_lock edges
+// change; force a cold rebuild.
+const SchemaVersion = "1.40"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

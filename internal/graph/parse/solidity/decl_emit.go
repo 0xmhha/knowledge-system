@@ -73,7 +73,8 @@ type declSpec struct {
 // definer, and returns the node id.
 //
 // The node spans the whole declaration, from its first token to its closing
-// brace or semicolon. It used to span only the name identifier: all 265
+// brace or semicolon, and through the comment that follows it on that line
+// (trailingCommentEnd). It used to span only the name identifier: all 265
 // functions of the system contracts had start_line = end_line and the stored
 // text of `isValidator` was the 11 bytes of its name. The name position is
 // still the id key (spec.idByte), so code that finds a callable from a node
@@ -85,7 +86,7 @@ func (v *declVisitor) emitDecl(spec declSpec) string {
 		FilePath:  v.rel,
 		StartLine: int(spec.decl.StartPosition().Row) + 1,
 		EndLine:   int(spec.decl.EndPosition().Row) + 1,
-		StartByte: int(spec.decl.StartByte()), EndByte: int(spec.decl.EndByte()),
+		StartByte: int(spec.decl.StartByte()), EndByte: trailingCommentEnd(v.src, int(spec.decl.EndByte())),
 		Language: langSol, Confidence: types.ConfExtracted,
 		SubKind:    spec.subKind,
 		Signature:  spec.signature,
@@ -128,6 +129,79 @@ func (v *declVisitor) emitCallable(decl *sitter.Node, subKind string) string {
 		v.lastNode().CanonicalID = v.rel + ":" + qname + funcParamSignature(decl, v.src)
 	}
 	return id
+}
+
+// The bytes that may stand between a declaration's last token and the
+// comment after it (trailingCommentEnd), and the delimiters of a comment.
+const (
+	lineBlanks        = " \t"
+	memberSeparator   = ','
+	lineCommentOpen   = "//"
+	blockCommentOpen  = "/*"
+	blockCommentClose = "*/"
+)
+
+// trailingCommentEnd returns where a declaration whose last token ends at
+// byte end of src ends: after the comments that follow it on that line, or
+// at end when none does. It is the span rule of Go declarations
+// (golang.spanOf) for Solidity: the comment after a declaration on its last
+// line describes it (`uint256 public limit; // the most a caller may take`,
+// `NotApproved, // Proposal not in Approved status`). Between the last token
+// and the comment there may be blanks and, after an enum value, the comma
+// that separates it from the next one, a token of the enum, not of the
+// value. A block comment counts when it closes on the line, and a line
+// comment may follow it. A NatSpec comment (`///`, `/** */`) documents the
+// next declaration (natSpecOf) and ends the run, so no comment is part of
+// two nodes. The tree-sitter node of a declaration ends at its last token,
+// so its comments were in no node's text: a top-level contract's and a
+// state variable's were not searched at all.
+func trailingCommentEnd(src []byte, end int) int {
+	if end > len(src) {
+		return end
+	}
+	i := skipLineBlanks(src, end)
+	if i < len(src) && src[i] == memberSeparator {
+		i = skipLineBlanks(src, i+1)
+	}
+	out := end
+	for i < len(src) {
+		rest := string(src[i:])
+		switch {
+		case strings.HasPrefix(rest, lineCommentOpen):
+			eol := strings.IndexByte(rest, '\n')
+			if eol < 0 {
+				eol = len(rest)
+			}
+			text := strings.TrimRight(rest[:eol], "\r")
+			if docCommentKind(text) != "" {
+				return out
+			}
+			return i + len(text)
+		case strings.HasPrefix(rest, blockCommentOpen):
+			closeAt := strings.Index(rest, blockCommentClose)
+			if closeAt < 0 {
+				return out
+			}
+			text := rest[:closeAt+len(blockCommentClose)]
+			if strings.Contains(text, "\n") || docCommentKind(text) != "" {
+				return out
+			}
+			out = i + len(text)
+			i = skipLineBlanks(src, out)
+		default:
+			return out
+		}
+	}
+	return out
+}
+
+// skipLineBlanks returns the first byte at or after i of src that is not a
+// space or a tab.
+func skipLineBlanks(src []byte, i int) int {
+	for i < len(src) && strings.IndexByte(lineBlanks, src[i]) >= 0 {
+		i++
+	}
+	return i
 }
 
 // lastNode returns the node emitDecl appended last, so a caller can set the

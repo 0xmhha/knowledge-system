@@ -26,7 +26,9 @@
 //     Mutex node with the variable's own name, so its name resolves to both.
 //     The node names differ and stay (ids and stored graphs depend on them);
 //     the seed forms do not: every mutex is seeded by its declaring name, or
-//     by that name with "#mutex".
+//     by that name with "#mutex", and both give one answer: the walk from
+//     the Mutex node, with Result.DeclaredBy, Result.LockedBy and
+//     Result.GuardedBy beside it.
 //
 //   - The store's neighbourhood walk is single-direction per call, so a
 //     FUNCTION seed reaches its own goroutine and the channel it writes,

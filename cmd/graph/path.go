@@ -3,15 +3,12 @@
 // way. Inspired by graphify's `graphify path "A" "B"` ergonomic
 // (__main__.py:1622-1683).
 //
-// Resolution order for each argument:
-//
-//  1. Exact qualified_name match (the deterministic case for fully
-//     qualified inputs like `pkg.SubPkg.Foo`).
-//  2. Exact name match — when ambiguous, picks the highest-PageRank
-//     candidate so a user typing a bare `Run` resolves to the project's
-//     primary Run() rather than a test-fixture Run().
-//  3. ID prefix match — useful when copy-pasting from /api/edges output
-//     that surfaces 16-char node IDs.
+// Each argument is resolved by persist.ResolveName, the resolver every tool
+// shares (a canonical id, a qualified name, a site name
+// "<qname>@<file>:<line>", or a bare name); a name that resolves to several
+// declarations is an error that lists the candidates, never a silent pick.
+// A 16-char node ID prefix (copied from /api/edges output) is accepted when
+// the name resolves to nothing.
 //
 // BFS is undirected because "how are X and Y related" doesn't depend on
 // edge direction (matches graphify's nx.shortest_path default behaviour).
@@ -37,9 +34,10 @@ func newPathCmd() *cobra.Command {
 		Use:   "path <from> <to>",
 		Short: "Find the shortest path between two nodes (qualified_name / name / ID prefix)",
 		Long: `Print the shortest undirected path between two nodes. Each argument
-can be a fully-qualified name (e.g. ` + "`pkg.Foo`" + `), a bare name
-(highest-PageRank match wins on ambiguity), or a 16-char node ID
-prefix.
+can be a canonical id, a fully-qualified name (e.g. ` + "`pkg.Foo`" + `), a site name
+(` + "`pkg.F.x@file.go:12`" + `, the form candidates take), a bare name, or a 16-char
+node ID prefix. A name that matches several declarations is an error that
+lists them.
 
 Output: the hop count, then a numbered chain of nodes with the relation
 that links each pair (` + pathArrowDown + ` the node above has it to the node below, ` + pathArrowUp + ` the
@@ -62,25 +60,17 @@ node below has it to the node above).`,
 				return fmt.Errorf("load edges: %w", err)
 			}
 
-			fromID, fromHits := resolveNodeQuery(nodes, args[0])
-			toID, toHits := resolveNodeQuery(nodes, args[1])
-			if fromID == "" {
-				return fmt.Errorf("could not resolve %q to any node", args[0])
+			fromID, err := resolveNodeQuery(store, nodes, args[0])
+			if err != nil {
+				return err
 			}
-			if toID == "" {
-				return fmt.Errorf("could not resolve %q to any node", args[1])
+			toID, err := resolveNodeQuery(store, nodes, args[1])
+			if err != nil {
+				return err
 			}
 			if fromID == toID {
 				fmt.Println("(both endpoints resolved to the same node — distance 0)")
 				return nil
-			}
-			if fromHits > 1 {
-				_, _ = fmt.Fprintf(os.Stderr, "ckg path: %q matched %d nodes; using highest-PageRank.\n",
-					args[0], fromHits)
-			}
-			if toHits > 1 {
-				_, _ = fmt.Fprintf(os.Stderr, "ckg path: %q matched %d nodes; using highest-PageRank.\n",
-					args[1], toHits)
 			}
 
 			path, hops := bfsShortestPath(nodes, edges, fromID, toID, maxDepth)
@@ -99,39 +89,25 @@ node below has it to the node above).`,
 	return cmd
 }
 
-// resolveNodeQuery resolves a free-form query to a node ID. Returns the
-// best match and the total count of candidates so the caller can warn
-// when a bare name was ambiguous.
-func resolveNodeQuery(nodes []types.Node, q string) (string, int) {
-	// 1. Exact qualified_name.
-	for _, n := range nodes {
-		if n.QualifiedName == q {
-			return n.ID, 1
-		}
+// resolveNodeQuery resolves one argument of ckg path to a node id (see the
+// package comment): by persist.ResolveName, else by node id prefix.
+func resolveNodeQuery(r persist.StoreReader, nodes []types.Node, q string) (string, error) {
+	res, err := persist.ResolveName(r, q, "")
+	if err != nil {
+		return "", fmt.Errorf("resolve %q: %w", q, err)
 	}
-	// 2. Exact name (highest-PageRank wins on tie).
-	var best types.Node
-	bestPR := -1.0
-	hits := 0
-	for _, n := range nodes {
-		if n.Name == q {
-			hits++
-			if n.PageRank > bestPR {
-				best = n
-				bestPR = n.PageRank
-			}
-		}
+	switch {
+	case res.Ambiguous():
+		return "", fmt.Errorf("%q names several declarations; use one of: %s", q, strings.Join(res.Candidates, ", "))
+	case res.Found():
+		return res.Nodes[0].ID, nil
 	}
-	if hits > 0 {
-		return best.ID, hits
-	}
-	// 3. ID prefix.
 	for _, n := range nodes {
 		if strings.HasPrefix(n.ID, q) {
-			return n.ID, 1
+			return n.ID, nil
 		}
 	}
-	return "", 0
+	return "", fmt.Errorf("could not resolve %q to any node", q)
 }
 
 // pathHop is the relation between two successive nodes of a path.

@@ -155,6 +155,7 @@ func TestFidelity(t *testing.T) {
 		{"the names of one specification say which one they are", checkSpecNamePositions},
 		{"a Mutex node spans the declaration of its variable or field", checkMutexSpans},
 		{"a declaration's span runs through the comment after it", checkTrailingComments},
+		{"a field is under a mutex only where the mutex is held", checkUnderLock},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) { tc.check(t, g) })

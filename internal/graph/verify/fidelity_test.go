@@ -2,6 +2,7 @@ package verify
 
 import (
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -61,6 +62,15 @@ func TestRunGo_FixtureGraphAgreesWithTruth(t *testing.T) {
 	}
 	if r.Decls.OtherSpan != 0 {
 		t.Errorf("declarations whose node does not span them, first token through trailing comment: %v", r.Decls.OtherSpanSamples)
+	}
+	// accessed_under_lock: no edge the source does not support, and of the
+	// true pairs only the one in a function with a goto, which the
+	// extractor leaves out by rule, is missing.
+	if r.UnderLock.Unsupported != 0 {
+		t.Errorf("accessed_under_lock edges the source does not support: %v", r.UnderLock.UnsupportedSamples)
+	}
+	if want := []string{"locks/ledger.go:21:jumped -> locks/ledger.go:7:mu"}; !reflect.DeepEqual(r.UnderLock.MissingSamples, want) {
+		t.Errorf("true accessed_under_lock pairs missing: %v, want %v", r.UnderLock.MissingSamples, want)
 	}
 	for _, rel := range []struct {
 		name string

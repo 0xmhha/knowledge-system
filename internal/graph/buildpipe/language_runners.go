@@ -265,9 +265,11 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		// Lock edges: acquires_lock / releases_lock from the function to the
 		// Mutex node, wherever the mutex is declared, and accessed_under_lock.
 		// Before the contract pass and lock propagation, which read them.
-		lockEdges := gop.EmitLockEdges(p.Pkgs(), rg.Nodes)
+		lockEdges, lst := gop.EmitLockEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, lockEdges...)
-		log.Debug("lock edges emitted", "count", len(lockEdges))
+		// undecided_functions lock a mutex in control flow the
+		// accessed_under_lock rule does not follow; their uses have no edge.
+		log.Info("lock edges emitted", "count", len(lockEdges), "undecided_functions", lst.UndecidedFunctions)
 
 		// Value uses: reads_field / writes_field (function -> struct field) and
 		// references (function or initializer -> package-level var/const).

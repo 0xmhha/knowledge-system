@@ -255,7 +255,8 @@ func LoadAndResolveWith(root string, opts LoadOptions) (*parse.ResolvedGraph, er
 	// One file shows each package, the same on every build (see packages.go).
 	CanonicalPackagePaths(rg.Nodes, isGoTestFile)
 	// Lock edges: acquires_lock / releases_lock / accessed_under_lock (see lock_edges.go).
-	rg.Edges = append(rg.Edges, EmitLockEdges(p.Pkgs(), rg.Nodes)...)
+	lockEdges, _ := EmitLockEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, lockEdges...)
 	// Value uses: reads_field / writes_field and references (see value_access.go).
 	rg.Edges = append(rg.Edges, EmitValueAccessEdges(p.Pkgs(), rg.Nodes)...)
 	// Runtime links: dispatches_to from SSA + VTA (see dispatch.go).

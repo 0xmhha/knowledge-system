@@ -110,6 +110,12 @@ func InFunctionBody(n types.Node, enclosers []types.Node) bool {
 // scope) and whether r holds that record. See persist.TestFiles.
 func TestFiles(r Reader) (files []string, recorded bool, err error) { return persist.TestFiles(r) }
 
+// ParseSiteName splits a site name, "<qname>@<file>:<line>", into its parts;
+// ok is false for any other name. See persist.ParseSiteName.
+func ParseSiteName(name string) (qname, file string, line int, ok bool) {
+	return persist.ParseSiteName(name)
+}
+
 // IsCallable reports whether n is a function, method, modifier or constructor
 // declaration.
 func IsCallable(n types.Node) bool { return persist.IsCallable(n) }

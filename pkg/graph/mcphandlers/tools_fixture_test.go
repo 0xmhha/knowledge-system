@@ -147,6 +147,9 @@ func toolStore(t *testing.T) persist.Store {
 		{id: "nm00000000000011", kind: types.NodeStruct, qname: "abi.TestPack.row", file: fxNamesFile, start: 23, end: 25, src: "row struct {\n\t\tSize int\n\t}"},
 		{id: "nm00000000000012", kind: types.NodeField, qname: "abi.TestPack.row.Size", file: fxNamesFile, start: 24, end: 24, src: "Size int"},
 		{id: "nm00000000000013", kind: types.NodeConstant, qname: "abi.TestPack.limit", file: fxNamesFile, start: 26, end: 26, src: "const limit = 2"},
+		// abi.TestPack declares flag twice, in two blocks.
+		{id: "nm00000000000015", kind: types.NodeLocalVariable, qname: "abi.TestPack.flag", file: fxNamesFile, start: 21, end: 21, src: "flag := 1"},
+		{id: "nm00000000000016", kind: types.NodeLocalVariable, qname: "abi.TestPack.flag", file: fxNamesFile, start: 25, end: 25, src: "flag := 2"},
 		{id: "nm00000000000014", kind: types.NodeGoroutine, qname: "abi.TestPack#Goroutine@77", file: fxNamesFile, start: 22, end: 22},
 		{id: "nm00000000000006", kind: types.NodeVariable, qname: "abi.count", canonical: "ex/abi.count", file: fxNamesFile, start: 8, end: 8, src: "var count = 3"},
 		{id: "nm00000000000007", kind: types.NodeMethod, qname: "coll1.Set.Size", canonical: "ex/coll1.(*Set).Size", file: fxNamesFile, start: 10, end: 10, src: "func (s *Set) Size() int { return 0 }"},
@@ -248,6 +251,8 @@ func toolStore(t *testing.T) persist.Store {
 		edge("st00000000000003", "st00000000000006", types.EdgeCalls, "", 12),
 		edge("st00000000000003", "st00000000000004", types.EdgeContains, fxStateFile, 0),
 		edge("st00000000000004", "st00000000000006", types.EdgeSiteCalls, fxStateFile, 12),
+		// state.wrap calls itself.
+		edge("st00000000000005", "st00000000000005", types.EdgeCalls, "", 20),
 		edge("lg00000000000002", "st00000000000003", types.EdgeCalls, "", 11),
 		edge("nm00000000000009", "nm00000000000007", types.EdgeCalls, "", 12),
 

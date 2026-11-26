@@ -15,8 +15,8 @@ import (
 //
 //	acquires_lock        Function/Method -> Mutex, for mu.Lock() / mu.RLock()
 //	releases_lock        Function/Method -> Mutex, for mu.Unlock() / mu.RUnlock()
-//	accessed_under_lock  Field -> Mutex, for a field used in a function that
-//	                     locks the mutex
+//	accessed_under_lock  Field -> Mutex, for a field used where the mutex
+//	                     is held (lock_held.go)
 //
 // The pass runs after Resolve, over all files. It used to run file by file
 // with the mutexes of that one file, so a lock on a mutex declared in another
@@ -31,11 +31,9 @@ import (
 // The read/write variant (RLock) is on the Mutex node's sub kind (rwmutex),
 // not on the edge.
 //
-// accessed_under_lock keeps its V0 rule: any field used in a function that
-// locks a mutex anywhere is recorded under every mutex the function locks. It
-// over-reports a field touched before the Lock or after the Unlock and never
-// misses one; cross-function propagation is buildpipe's lock propagation
-// pass.
+// accessed_under_lock is recorded for a field used at a point of a function
+// where the mutex is held (lock_held.go). Cross-function propagation is
+// buildpipe's lock propagation pass.
 
 // mutexIndex finds the Mutex node of a mutex by where it is declared.
 type mutexIndex struct {
@@ -199,11 +197,21 @@ func (ix mutexIndex) embedded(t gotypes.Type) *types.Node {
 	return nil
 }
 
+// LockStats counts what EmitLockEdges could not decide.
+type LockStats struct {
+	// UndecidedFunctions are the functions that lock a mutex and whose
+	// field uses got no accessed_under_lock edge because the rule cannot
+	// follow their control flow (a goto, a jump to an unknown target).
+	UndecidedFunctions int
+}
+
 // EmitLockEdges returns the acquires_lock, releases_lock and
-// accessed_under_lock edges of the loaded packages.
-func EmitLockEdges(pkgs []*packages.Package, nodes []types.Node) []types.Edge {
+// accessed_under_lock edges of the loaded packages, and what it could not
+// decide.
+func EmitLockEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Edge, LockStats) {
+	var st LockStats
 	if len(pkgs) == 0 {
-		return nil
+		return nil, st
 	}
 	mutexes := newMutexIndex(pkgs, nodes)
 	fields := newFieldIndex(fsetOf(pkgs), nodes)
@@ -246,29 +254,33 @@ func EmitLockEdges(pkgs []*packages.Package, nodes []types.Node) []types.Edge {
 		if len(held) == 0 || c.part != partBody {
 			return
 		}
-		ast.Inspect(c.root, func(n ast.Node) bool {
-			sel, ok := n.(*ast.SelectorExpr)
-			if !ok {
-				return true
+		body, ok := c.root.(*ast.BlockStmt)
+		if !ok {
+			return
+		}
+		info := c.info()
+		flow := &lockFlow{info: info,
+			mutexOf: func(recv ast.Expr) *types.Node { return mutexes.receiver(info, recv, 0) },
+			fieldOf: func(sel *ast.SelectorExpr) *types.Node { return fields.node(info.ObjectOf(sel.Sel)) },
+		}
+		flow.body(body, heldMutexes{}, true)
+		if flow.undecided {
+			st.UndecidedFunctions++
+			return
+		}
+		for _, use := range flow.uses {
+			field, mu := use[0], use[1]
+			k := edgeDedupKey{src: field.ID, dst: mu.ID}
+			if under[k] {
+				continue
 			}
-			field := fields.node(c.info().ObjectOf(sel.Sel))
-			if field == nil {
-				return true
-			}
-			for _, mu := range held {
-				k := edgeDedupKey{src: field.ID, dst: mu.ID}
-				if under[k] {
-					continue
-				}
-				under[k] = true
-				edges = append(edges, types.Edge{
-					Src: field.ID, Dst: mu.ID, Type: types.EdgeAccessedUnderLock,
-					Count: 1, Confidence: types.ConfInferred,
-					FilePath: c.owner.FilePath,
-				})
-			}
-			return true
-		})
+			under[k] = true
+			edges = append(edges, types.Edge{
+				Src: field.ID, Dst: mu.ID, Type: types.EdgeAccessedUnderLock,
+				Count: 1, Confidence: types.ConfInferred,
+				FilePath: c.owner.FilePath,
+			})
+		}
 	})
-	return edges
+	return edges, st
 }

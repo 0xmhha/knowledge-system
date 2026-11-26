@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/tools/go/packages"
+
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -763,5 +765,70 @@ func TestFidelityOutsideScope(t *testing.T) {
 				t.Errorf("External node %s names package %+v, want path %s", tc.cid, ext.External, pkg)
 			}
 		})
+	}
+}
+
+// checkUnderLock: accessed_under_lock names a field used where the mutex is
+// held, not every field of a function that locks it somewhere. On
+// go-stablenet 545 of 1,761 edges named a field used before the lock, after
+// the unlock or in another branch (TypeMuxSubscription.closeMu under postMu).
+func checkUnderLock(t *testing.T, g *fidelityGraph) {
+	mu := g.one(t, types.NodeMutex, "locks.Ledger.mu#mutex")
+	other := g.one(t, types.NodeMutex, "locks.Ledger.other#mutex")
+	rw := g.one(t, types.NodeMutex, "locks.Ledger.rw#mutex")
+	want := map[string]string{
+		"inside": mu.ID, "deferred": mu.ID, "inPlace": mu.ID, "looped": mu.ID,
+		"relocked": mu.ID, "early": mu.ID, "rlocked": rw.ID,
+	}
+	for _, name := range []string{"before", "inside", "after", "branch", "deferred", "literal", "inPlace", "looped",
+		"relocked", "early", "rlocked", "jumped", "switched", "litOuter", "afterCall"} {
+		field := g.one(t, types.NodeField, "locks.Ledger."+name)
+		got := map[string]bool{}
+		for _, m := range []types.Node{mu, other, rw} {
+			if g.has(types.EdgeAccessedUnderLock, field.ID, m.ID) {
+				got[m.ID] = true
+			}
+		}
+		wantSet := map[string]bool{}
+		if id, ok := want[name]; ok {
+			wantSet[id] = true
+		}
+		if len(got) != len(wantSet) || !got[want[name]] && len(wantSet) > 0 {
+			t.Errorf("Ledger.%s is under %v, want %v (mu %s, other %s, rw %s)", name, got, wantSet, mu.ID, other.ID, rw.ID)
+		}
+	}
+	// Locking other while mu is held uses the field other under mu, the order
+	// the two are taken in; no mutex field is used under itself.
+	otherField, muField := g.one(t, types.NodeField, "locks.Ledger.other"), g.one(t, types.NodeField, "locks.Ledger.mu")
+	if !g.has(types.EdgeAccessedUnderLock, otherField.ID, mu.ID) {
+		t.Errorf("Ledger.other is not under mu, though Order locks it while it holds mu")
+	}
+	for _, c := range [][2]string{{muField.ID, other.ID}, {muField.ID, mu.ID}, {otherField.ID, other.ID}} {
+		if g.has(types.EdgeAccessedUnderLock, c[0], c[1]) {
+			t.Errorf("unexpected accessed_under_lock %s -> %s", c[0], c[1])
+		}
+	}
+}
+
+// TestLockEdges_UndecidedCounted: a function the accessed_under_lock rule
+// cannot follow (Ledger.Jump has a goto) gets no edge and is counted, so a
+// build log says how many uses were left out rather than guessing.
+func TestLockEdges_UndecidedCounted(t *testing.T) {
+	root, err := filepath.Abs(fidelityRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rg, err := gop.LoadAndResolve(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pkgs, err := packages.Load(&packages.Config{Dir: root, Mode: packages.NeedName | packages.NeedFiles |
+		packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedCompiledGoFiles}, "./locks")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, st := gop.EmitLockEdges(pkgs, rg.Nodes)
+	if st.UndecidedFunctions != 1 {
+		t.Errorf("undecided functions = %d, want 1 (Ledger.Jump)", st.UndecidedFunctions)
 	}
 }

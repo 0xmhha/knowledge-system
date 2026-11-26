@@ -3,6 +3,7 @@ package persist
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
@@ -324,6 +325,17 @@ func (r NameResolution) Ambiguous() bool { return len(r.Candidates) > 0 }
 //     copies, function-local names and External stubs are considered only
 //     when no declaration has the name, class by class (see NameClass).
 //
+// One qualified name can name several declarations: a function that declares
+// a local name twice, in two blocks (`errMu` at lines 978 and 1016 of one
+// test), or two init functions that declare the same local. Such a name is
+// not resolved by merging them: like a bare name that matches several
+// qualified names, it is ambiguous, and its Candidates name each declaration
+// as "<qname>@<file>:<line>" (siteName), a form ResolveName accepts and
+// resolves to the nodes of that declaration alone. Nodes at one place (the
+// LocalVariable and the Mutex node of one `var mu sync.Mutex`) are one
+// declaration, and so are nodes with a canonical id or of different
+// languages, which name one symbol.
+//
 // A name that resolves to the copy of a promoted method ("logger.dummy.Prepare"
 // for state.StateDB.Prepare) is answered with the method it copies, and
 // PromotedAs keeps the name asked for: the copy has no edge but the one from
@@ -388,7 +400,10 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 		return NameResolution{}, fmt.Errorf("resolve %q by qualified name: %w", name, err)
 	}
 	if len(exact) > 0 {
-		return NameResolution{QName: name, Nodes: exact}, nil
+		return oneDeclaration(name, exact), nil
+	}
+	if qname, file, line, ok := ParseSiteName(name); ok {
+		return resolveSite(r, qname, file, line, opts)
 	}
 	matches, err := r.FindSymbol(name, false, opts)
 	if err != nil {
@@ -416,9 +431,112 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 		if names := distinctQNames(nodes); len(names) > 1 && !oneMethod {
 			return NameResolution{Candidates: names}, nil
 		}
-		return NameResolution{QName: nodes[0].QualifiedName, Nodes: nodes}, nil
+		return oneDeclaration(nodes[0].QualifiedName, nodes), nil
 	}
 	return NameResolution{}, nil
+}
+
+// siteMark separates a qualified name from the place of one of its
+// declarations in a site name ("<qname>@<file>:<line>"); lineMark separates
+// the file from the line.
+const (
+	siteMark = "@"
+	lineMark = ":"
+)
+
+// siteName names the declaration of qname that n stands at.
+func siteName(qname string, n types.Node) string {
+	return qname + siteMark + n.FilePath + lineMark + strconv.Itoa(n.StartLine)
+}
+
+// ParseSiteName splits a site name ("<qname>@<file>:<line>", the form
+// ResolveName gives the candidates of a qualified name that several
+// declarations carry) into its qualified name, file and line.
+// A qualified name may hold "@" itself (pkg.T.struct@120.f), so the place is
+// what follows the last one and must end in ":<line>".
+func ParseSiteName(name string) (qname, file string, line int, ok bool) {
+	at := strings.LastIndex(name, siteMark)
+	if at <= 0 {
+		return "", "", 0, false
+	}
+	place := name[at+len(siteMark):]
+	colon := strings.LastIndex(place, lineMark)
+	if colon <= 0 {
+		return "", "", 0, false
+	}
+	line, err := strconv.Atoi(place[colon+len(lineMark):])
+	if err != nil || line <= 0 {
+		return "", "", 0, false
+	}
+	return name[:at], place[:colon], line, true
+}
+
+// resolveSite resolves a site name: the nodes of qname that stand at line of
+// file.
+func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOptions) (NameResolution, error) {
+	nodes, err := r.FindSymbol(qname, true, opts)
+	if err != nil {
+		return NameResolution{}, fmt.Errorf("resolve %q at %s:%d: %w", qname, file, line, err)
+	}
+	var at []types.Node
+	for _, n := range nodes {
+		if n.FilePath == file && n.StartLine == line {
+			at = append(at, n)
+		}
+	}
+	if len(at) == 0 {
+		return NameResolution{}, nil
+	}
+	return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
+}
+
+// declPlace is where a declaration stands, for telling the declarations
+// that share a qualified name apart (oneDeclaration).
+type declPlace struct {
+	language, file string
+	line           int
+}
+
+// oneDeclaration returns the resolution of qname to nodes, all carrying it:
+// the nodes when they are one declaration, else the candidates that name
+// each declaration (see ResolveName).
+func oneDeclaration(qname string, nodes []types.Node) NameResolution {
+	places := map[declPlace]types.Node{}
+	byLanguage := map[string]int{}
+	for _, n := range nodes {
+		if n.CanonicalID != "" || n.Type == types.NodeExternal {
+			continue
+		}
+		p := declPlace{language: n.Language, file: n.FilePath, line: n.StartLine}
+		if _, seen := places[p]; !seen {
+			places[p] = n
+			byLanguage[n.Language]++
+		}
+	}
+	several := false
+	for _, c := range byLanguage {
+		several = several || c > 1
+	}
+	if !several {
+		return NameResolution{QName: qname, Nodes: nodes}
+	}
+	ps := make([]declPlace, 0, len(places))
+	for p := range places {
+		if byLanguage[p.language] > 1 {
+			ps = append(ps, p)
+		}
+	}
+	sort.Slice(ps, func(i, j int) bool {
+		if ps[i].file != ps[j].file {
+			return ps[i].file < ps[j].file
+		}
+		return ps[i].line < ps[j].line
+	})
+	candidates := make([]string, len(ps))
+	for i, p := range ps {
+		candidates[i] = siteName(qname, places[p])
+	}
+	return NameResolution{Candidates: candidates}
 }
 
 // oneSite reports whether nodes all have one declaration site.
@@ -470,4 +588,12 @@ func distinctQNames(nodes []types.Node) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// sortNodesByID puts nodes collected in a map in id order, so a traversal
+// returns the same list on every call: the neighbourhood walks returned their
+// nodes in map order, and a tool that cut such a list (search_code's
+// expand, at 10) showed a different part of it each time.
+func sortNodesByID(nodes []types.Node) {
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
 }

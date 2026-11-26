@@ -50,6 +50,16 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 		if err != nil {
 			return nil, err
 		}
+		// A site name, the form of the candidates of a qualified name that
+		// several declarations carry, names one declaration: the resolver
+		// every tool shares answers it.
+		if _, _, _, site := store.ParseSiteName(name); site && len(matches) == 0 {
+			res, err := store.ResolveName(reader, name, lang)
+			if err != nil {
+				return nil, err
+			}
+			matches, exact = res.Nodes, true
+		}
 		kept, leftOut, err := rankNamed(reader, matches, exact || req.GetBool("all", false))
 		if err != nil {
 			return nil, err

@@ -254,6 +254,42 @@ func TestLocalOfInitialiser(t *testing.T) {
 	}
 }
 
+// TestSeed_NameDeclaredTwice: a qualified name that one function declares
+// twice is ambiguous in every seed tool, with one candidate per declaration,
+// and a candidate is a seed of its own. Seeds used to merge both silently.
+func TestSeed_NameDeclaredTwice(t *testing.T) {
+	s := toolStore(t)
+	want := []string{"abi.TestPack.flag@" + fxNamesFile + ":21", "abi.TestPack.flag@" + fxNamesFile + ":25"}
+	for _, tc := range []struct{ tool, arg string }{
+		{"find_references", "qname"}, {"find_callers", "qname"}, {"get_subgraph", "seed_qname"},
+		{"impact_of_change", "seed_qname"}, {"concurrency_impact", "seed_qname"}, {"change_history", "qname"},
+		{"find_callees", "qname"},
+	} {
+		out := callTool(t, s, tc.tool, map[string]any{tc.arg: "abi.TestPack.flag"})
+		if out["ambiguous"] != true || !reflect.DeepEqual(stringsOf(out["candidates"]), want) {
+			t.Errorf("%s: ambiguous %v candidates %v, want %v", tc.tool, out["ambiguous"], out["candidates"], want)
+		}
+		if one := callTool(t, s, tc.tool, map[string]any{tc.arg: want[1]}); one["ambiguous"] == true || one["not_found"] == true {
+			t.Errorf("%s(%s) did not resolve: %v", tc.tool, want[1], one)
+		}
+	}
+	// find_symbol answers a site name with the one declaration it names, with
+	// either exact setting; it found none of 145 on go-stablenet.
+	for _, exact := range []bool{true, false} {
+		out := callTool(t, s, "find_symbol", map[string]any{"name": want[1], "exact": exact})
+		nodes := asSlice(out["nodes"])
+		if len(nodes) != 1 || nodes[0].(map[string]any)["id"] != "nm00000000000016" {
+			t.Errorf("find_symbol(%s, exact=%v) = %v, want the declaration at line 25", want[1], exact, out["nodes"])
+		}
+	}
+	// investigate_open opens the card of the declaration a site name names.
+	srv := newInvServer(t, s)
+	callTextOn(t, srv, "investigate", map[string]any{"words": "TestPack"})
+	if card := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:abi.TestPack@" + fxNamesFile + ":20"}); !strings.Contains(card, "function abi.TestPack") {
+		t.Errorf("investigate_open with a site name: %s", card)
+	}
+}
+
 // TestSolidityRelations: the tools follow Solidity's relations as they follow
 // Go's. On go-stablenet find_callers and find_callees returned none of 70
 // modifier applications, 58 emits and 128 reverts, find_references nothing

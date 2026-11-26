@@ -32,6 +32,9 @@ type Report struct {
 	// without --observed.
 	Observed       *observe.Report `json:"observed,omitempty"`
 	LocalDeclNodes LocalDeclStats  `json:"unmatched_decl_nodes"`
+	// UnderLock compares the accessed_under_lock edges with the fields a
+	// function uses while it holds the mutex (underlock.go).
+	UnderLock UnderLockStats `json:"accessed_under_lock"`
 	// Load is what the go command reported while loading the truth. Graph
 	// and truth come from the same go command, so a package it cannot load
 	// is missing from both and the counts above cannot show it.
@@ -99,6 +102,21 @@ type UnexpectedStats struct {
 	TypeRefSamples []string `json:"type_ref_samples,omitempty"`
 }
 
+// UnderLockStats compares the accessed_under_lock edges (Field -> Mutex)
+// with the truth's (field, mutex) pairs, both named by the file, line and
+// name of their declarations.
+type UnderLockStats struct {
+	// Truth is the pairs the source supports; Matched those the graph has.
+	Truth   int `json:"truth"`
+	Matched int `json:"matched"`
+	// Edges is the graph's edges; Unsupported those the source does not
+	// support (a field used where the mutex is not held).
+	Edges              int      `json:"edges"`
+	Unsupported        int      `json:"unsupported"`
+	MissingSamples     []string `json:"missing_samples,omitempty"`
+	UnsupportedSamples []string `json:"unsupported_samples,omitempty"`
+}
+
 // LocalDeclStats counts declaration-kind graph nodes that no package-level
 // declaration maps to.
 type LocalDeclStats struct {
@@ -133,6 +151,8 @@ func (r Report) WriteText(w io.Writer) error {
 	p("dynamic call sites (not checked): %d\n", r.DynamicCallSites)
 	p("calls in package-level initialisers (not checked): %d\n", r.CallsOutsideFuncs)
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
+	p("accessed_under_lock: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.UnderLock.Matched, r.UnderLock.Truth, r.UnderLock.Unsupported, r.UnderLock.Edges)
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
 	if r.Statements == nil {
 		p("statement links: none in this graph\n")

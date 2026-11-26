@@ -1,6 +1,9 @@
 package concurrency_test
 
 import (
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/concurrency"
@@ -324,13 +327,19 @@ func TestAnalyze_MaxTotalAndDeterministicSort(t *testing.T) {
 // a LocalVariable with a Mutex node beside it. The Go extractor names the
 // Mutex node of a field "<field>#mutex" and that of a variable after the
 // variable itself (node names are kept: ids and stored graphs depend on
-// them). Every mutex is accepted as a seed in both forms, its declaring
-// name and that name with "#mutex", and every answer names its Mutex node.
-// "pkg.registry#mutex" and "pkg.Guard.made#mutex" were not found.
+// them). Both seed forms, the declaring name and that name with "#mutex",
+// give one answer: mutex and declared_by name the two nodes, locked_by the
+// functions that lock the mutex with their lines, guarded_by the other
+// mutexes held where the declaration is accessed, and modules the walk from
+// the Mutex node. On go-stablenet the two forms of 150 of 150 field mutexes
+// differed (the field among the modules in one, the other mutexes guarding
+// the field in the other), and "pkg.registry#mutex" was not found.
 func TestAnalyze_MutexSeedForms(t *testing.T) {
 	nodes := []types.Node{
 		node("n_field", "mu", "pkg.State.mu", "c.go", 30, types.NodeField),
 		node("n_fmutex", "mu", "pkg.State.mu#mutex", "c.go", 30, types.NodeMutex),
+		node("n_outer", "outerMu", "pkg.State.outerMu#mutex", "c.go", 29, types.NodeMutex),
+		node("n_bal", "balance", "pkg.State.balance", "c.go", 31, types.NodeField),
 		node("n_var", "registry", "pkg.registry", "c.go", 5, types.NodeVariable),
 		node("n_vmutex", "registry", "pkg.registry", "c.go", 5, types.NodeMutex),
 		node("n_guard", "Guard", "pkg.Guard", "c.go", 40, types.NodeFunction),
@@ -345,32 +354,95 @@ func TestAnalyze_MutexSeedForms(t *testing.T) {
 	}
 	r := &fakeReader{nodes: m, edges: []types.Edge{
 		edge("n_add", "n_fmutex", types.EdgeAcquiresLock, 36),
+		edge("n_field", "n_fmutex", types.EdgeAccessedUnderLock, 0),
+		edge("n_field", "n_outer", types.EdgeAccessedUnderLock, 0),
+		edge("n_bal", "n_fmutex", types.EdgeAccessedUnderLock, 0),
 		edge("n_scan", "n_vmutex", types.EdgeAcquiresLock, 11),
 		edge("n_guard", "n_lmutex", types.EdgeAcquiresLock, 42),
 	}}
 	for _, tc := range []struct {
-		seed, mutex, locker string
+		forms             []string
+		mutex, declaredBy string
+		lockedBy          []string
+		guardedBy         []string
+		modules           []string
 	}{
-		{"pkg.State.mu", "pkg.State.mu#mutex", "pkg.State.Add"},
-		{"pkg.State.mu#mutex", "pkg.State.mu#mutex", "pkg.State.Add"},
-		{"pkg.registry", "pkg.registry", "pkg.Scan"},
-		{"pkg.registry#mutex", "pkg.registry", "pkg.Scan"},
-		{"pkg.Guard.made", "pkg.Guard.made", "pkg.Guard"},
-		{"pkg.Guard.made#mutex", "pkg.Guard.made", "pkg.Guard"},
+		{[]string{"pkg.State.mu", "pkg.State.mu#mutex"}, "pkg.State.mu#mutex", "pkg.State.mu",
+			[]string{"pkg.State.Add:36"}, []string{"pkg.State.outerMu#mutex"}, []string{"pkg.State.Add", "pkg.State.balance"}},
+		{[]string{"pkg.registry", "pkg.registry#mutex"}, "pkg.registry", "pkg.registry",
+			[]string{"pkg.Scan:11"}, nil, []string{"pkg.Scan"}},
+		{[]string{"pkg.Guard.made", "pkg.Guard.made#mutex"}, "pkg.Guard.made", "pkg.Guard.made",
+			[]string{"pkg.Guard:42"}, nil, []string{"pkg.Guard"}},
 	} {
-		res, err := concurrency.Analyze(r, tc.seed, concurrency.Options{Depth: 1})
-		if err != nil {
-			t.Fatalf("Analyze(%s): %v", tc.seed, err)
-		}
-		if res.NotFound || res.Mutex != tc.mutex {
-			t.Errorf("Analyze(%s): not_found %v, mutex %q, want %q", tc.seed, res.NotFound, res.Mutex, tc.mutex)
-		}
-		if m, ok := qnames(res.Modules)[tc.locker]; !ok || m.Direction != "affects" {
-			t.Errorf("Analyze(%s): locker %s missing: %+v", tc.seed, tc.locker, res.Modules)
+		var first []byte
+		for _, seed := range tc.forms {
+			res, err := concurrency.Analyze(r, seed, concurrency.Options{Depth: 1})
+			if err != nil {
+				t.Fatalf("Analyze(%s): %v", seed, err)
+			}
+			if res.NotFound || res.Mutex != tc.mutex || res.DeclaredBy != tc.declaredBy {
+				t.Errorf("Analyze(%s): not_found %v, mutex %q, declared_by %q", seed, res.NotFound, res.Mutex, res.DeclaredBy)
+			}
+			var locked, guarded, mods []string
+			for _, l := range res.LockedBy {
+				locked = append(locked, fmt.Sprintf("%s:%d", l.Qname, l.Line))
+			}
+			for _, g := range res.GuardedBy {
+				guarded = append(guarded, g.Qname)
+			}
+			for _, md := range res.Modules {
+				mods = append(mods, md.Qname)
+			}
+			if !reflect.DeepEqual(locked, tc.lockedBy) || !reflect.DeepEqual(guarded, tc.guardedBy) || !reflect.DeepEqual(mods, tc.modules) {
+				t.Errorf("Analyze(%s): locked_by %v guarded_by %v modules %v, want %v %v %v", seed, locked, guarded, mods, tc.lockedBy, tc.guardedBy, tc.modules)
+			}
+			res.Seed = ""
+			b, _ := json.Marshal(res)
+			if first == nil {
+				first = b
+			} else if string(b) != string(first) {
+				t.Errorf("the forms %v answer differently:\n%s\n%s", tc.forms, first, b)
+			}
 		}
 	}
 	// A name with the suffix that names no mutex stays not found.
 	if res, err := concurrency.Analyze(r, "pkg.Scan#mutex", concurrency.Options{Depth: 1}); err != nil || !res.NotFound {
 		t.Errorf("Analyze(pkg.Scan#mutex) = %+v, %v; want not found", res, err)
+	}
+}
+
+// TestAnalyze_LocalDeclaredTwice: a name that one function declares twice
+// names two mutexes; the seed is ambiguous with one candidate per
+// declaration, in both forms, and each candidate resolves to its own mutex.
+// catalyst.TestSimultaneousNewBlock.errMu merged the two silently.
+func TestAnalyze_LocalDeclaredTwice(t *testing.T) {
+	nodes := []types.Node{
+		node("n_fn", "F", "pkg.F", "c.go", 1, types.NodeFunction),
+		node("n_a", "mu", "pkg.F.mu", "c.go", 3, types.NodeLocalVariable),
+		node("n_am", "mu", "pkg.F.mu", "c.go", 3, types.NodeMutex),
+		node("n_b", "mu", "pkg.F.mu", "c.go", 9, types.NodeLocalVariable),
+		node("n_bm", "mu", "pkg.F.mu", "c.go", 9, types.NodeMutex),
+	}
+	m := map[string]types.Node{}
+	for _, n := range nodes {
+		m[n.ID] = n
+	}
+	r := &fakeReader{nodes: m, edges: []types.Edge{
+		edge("n_fn", "n_am", types.EdgeAcquiresLock, 4),
+		edge("n_fn", "n_bm", types.EdgeAcquiresLock, 10),
+	}}
+	want := []string{"pkg.F.mu@c.go:3", "pkg.F.mu@c.go:9"}
+	for _, seed := range []string{"pkg.F.mu", "pkg.F.mu#mutex"} {
+		res, err := concurrency.Analyze(r, seed, concurrency.Options{Depth: 1})
+		if err != nil {
+			t.Fatalf("Analyze(%s): %v", seed, err)
+		}
+		if !res.Ambiguous || !reflect.DeepEqual(res.Candidates, want) {
+			t.Errorf("Analyze(%s): ambiguous %v candidates %v, want %v", seed, res.Ambiguous, res.Candidates, want)
+		}
+	}
+	res, err := concurrency.Analyze(r, want[1], concurrency.Options{Depth: 1})
+	if err != nil || len(res.LockedBy) != 1 || res.LockedBy[0].Line != 10 {
+		t.Errorf("Analyze(%s) = %+v, %v; want the mutex locked at line 10 only", want[1], res.LockedBy, err)
 	}
 }

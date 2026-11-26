@@ -218,8 +218,12 @@ func buildInvIndex(reader store.Reader) (*invIndex, error) {
 			return nil, err
 		}
 		for _, e := range es {
-			if e.Src == e.Dst {
-				continue // a call through a function value: target unknown
+			// An invokes edge back to its own function stands for a call
+			// through a function value, whose target is unknown; a calls
+			// edge to itself is a recursive call, and the function is one
+			// of its own callers, as find_callers lists it.
+			if e.Src == e.Dst && e.Type == types.EdgeInvokes {
+				continue
 			}
 			if _, ok := x.nodes[e.Src]; !ok {
 				continue
@@ -1639,11 +1643,19 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 	case strings.HasPrefix(what, "card:"):
 		q := strings.TrimPrefix(what, "card:")
 		var ids []string
+		qname, file, line, site := store.ParseSiteName(q)
+		if !site {
+			qname = q
+		}
 		if _, ok := x.nodes[q]; ok {
 			ids = []string{q}
 		} else {
-			for _, id := range x.byLeaf[leafName(q)] {
-				if x.nodes[id].QualifiedName == q {
+			// A site name ("<qname>@<file>:<line>") names the declaration
+			// at that place; a qualified name every node that carries it,
+			// one card each.
+			for _, id := range x.byLeaf[leafName(qname)] {
+				n := x.nodes[id]
+				if n.QualifiedName == qname && (!site || n.FilePath == file && n.StartLine == line) {
 					ids = append(ids, id)
 				}
 			}
