@@ -344,7 +344,12 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 	}
 
 	if primary != nil {
-		resp["seed"] = seedSummary(*primary)
+		resp["seed"] = seedSummary(store, *primary)
+	}
+	// A canonical id that other declarations carry as their qualified name
+	// answers for its node and lists them.
+	if len(name.AlsoNamed) > 0 {
+		resp["also_named"] = name.AlsoNamed
 	}
 	// A seed that named the copy of a promoted method was answered for the
 	// method it copies; say so with the keys every seed tool uses.
@@ -362,7 +367,7 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 		})
 		seedList := make([]map[string]any, 0, len(sortedSeeds))
 		for _, s := range sortedSeeds {
-			seedList = append(seedList, seedSummary(s))
+			seedList = append(seedList, seedSummary(store, s))
 		}
 		resp["seeds"] = seedList
 		resp["seed_file"] = seedFile
@@ -421,7 +426,7 @@ func nodeToImpactEntry(store persist.StoreReader, n types.Node, includeBlobs boo
 		"id":          n.ID,
 		"type":        n.Type,
 		"name":        n.Name,
-		"qname":       persist.PrintedQName(n),
+		"qname":       persist.PrintedName(store, n),
 		"file":        n.FilePath,
 		"line":        n.StartLine,
 		"confidence":  n.Confidence,
@@ -434,7 +439,7 @@ func nodeToImpactEntry(store persist.StoreReader, n types.Node, includeBlobs boo
 		*warnings = append(*warnings, map[string]any{
 			"code":    "missing-citation",
 			"node_id": n.ID,
-			"qname":   persist.PrintedQName(n),
+			"qname":   persist.PrintedName(store, n),
 		})
 	}
 	if includeBlobs {
@@ -446,12 +451,12 @@ func nodeToImpactEntry(store persist.StoreReader, n types.Node, includeBlobs boo
 }
 
 // seedSummary produces the small envelope used for `seed` / `seeds` keys.
-func seedSummary(n types.Node) map[string]any {
+func seedSummary(store persist.StoreReader, n types.Node) map[string]any {
 	out := map[string]any{
 		"id":         n.ID,
 		"type":       n.Type,
 		"name":       n.Name,
-		"qname":      persist.PrintedQName(n),
+		"qname":      persist.PrintedName(store, n),
 		"file_path":  n.FilePath,
 		"start_line": n.StartLine,
 	}

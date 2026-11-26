@@ -42,6 +42,10 @@ type Module struct {
 	StartLine int            `json:"start_line"`
 	Citation  string         `json:"citation,omitempty"` // "file:line" when both present
 	Direction string         `json:"direction"`          // affects | affected_by | both
+	// qualified is the node's qualified name, the first key of the order of
+	// Modules (Qname is the printed name, which for two declarations of one
+	// name carries the line as text: ":1016" sorted before ":978").
+	qualified string
 }
 
 // mutexSuffix ends the qualified name of the Mutex node the Go extractor
@@ -63,6 +67,9 @@ type Result struct {
 	Candidates []string `json:"candidates,omitempty"`
 	// OtherCase lists names that differ from an unresolved seed only in case.
 	OtherCase []string `json:"other_case,omitempty"`
+	// AlsoNamed lists the other declarations whose qualified name is the
+	// seed, when the seed was the canonical id of one node.
+	AlsoNamed []string `json:"also_named,omitempty"`
 	// PromotedFrom and SeedNote are set when the seed named the copy of a
 	// promoted method: the method the answer is for, and a sentence saying
 	// so (the keys every seed tool uses, store.SeedKeyPromotedFrom and
@@ -112,8 +119,8 @@ type Site struct {
 // Result (mutexAnswer): the two forms of 150 of 150 field mutexes gave two
 // different answers while the walk also started at the field.
 //
-// Deterministic: modules are sorted by qname (tiebreak id), edges by
-// (type, src, dst, line), so cks's prompt cache stays stable.
+// Deterministic: modules are sorted by qualified name, then file, line and
+// id, edges by (type, src, dst, line), so cks's prompt cache stays stable.
 func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 	d := opt.Depth
 	if d == 0 {
@@ -141,6 +148,7 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 	if note := name.SeedNote(); note != "" {
 		res.Seed, res.PromotedFrom, res.SeedNote = name.QName, name.QName, note
 	}
+	res.AlsoNamed = name.AlsoNamed
 	roots, hidden, err := mutexAnswer(r, name.Nodes, &res)
 	if err != nil {
 		return Result{}, err
@@ -193,7 +201,8 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 			ID:        id,
 			Type:      n.Type,
 			Name:      n.Name,
-			Qname:     store.PrintedQName(n),
+			Qname:     store.PrintedName(r, n),
+			qualified: n.QualifiedName,
 			FilePath:  n.FilePath,
 			StartLine: n.StartLine,
 			Direction: dir[id],
@@ -203,11 +212,18 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 		}
 		modules = append(modules, m)
 	}
+	// Ordered by qualified name, then file, line and id.
 	sort.Slice(modules, func(i, j int) bool {
-		if modules[i].Qname != modules[j].Qname {
-			return modules[i].Qname < modules[j].Qname
+		a, b := modules[i], modules[j]
+		switch {
+		case a.qualified != b.qualified:
+			return a.qualified < b.qualified
+		case a.FilePath != b.FilePath:
+			return a.FilePath < b.FilePath
+		case a.StartLine != b.StartLine:
+			return a.StartLine < b.StartLine
 		}
-		return modules[i].ID < modules[j].ID
+		return a.ID < b.ID
 	})
 	if opt.MaxTotal > 0 && len(modules) > opt.MaxTotal {
 		modules = modules[:opt.MaxTotal]
@@ -284,9 +300,9 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 			roots = append(roots, n)
 		}
 	}
-	res.Mutex = store.PrintedQName(mutexes[0])
+	res.Mutex = store.PrintedName(r, mutexes[0])
 	if len(decls) > 0 {
-		res.DeclaredBy = decls[0].QualifiedName
+		res.DeclaredBy = store.PrintedName(r, decls[0])
 	}
 	mutexIDs := make([]string, len(mutexes))
 	own := map[string]bool{}
@@ -297,7 +313,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 	if err != nil {
 		return nil, nil, fmt.Errorf("lockers of %s: %w", res.Mutex, err)
 	}
-	res.LockedBy = sites(lockers, lockEdges, func(e types.Edge) (string, bool) { return e.Src, own[e.Dst] })
+	res.LockedBy = sites(r, lockers, lockEdges, func(e types.Edge) (string, bool) { return e.Src, own[e.Dst] })
 	if len(decls) > 0 {
 		ids := make([]string, len(decls))
 		for i, n := range decls {
@@ -307,7 +323,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 		if err != nil {
 			return nil, nil, fmt.Errorf("mutexes guarding %s: %w", res.DeclaredBy, err)
 		}
-		res.GuardedBy = sites(guards, guardEdges, func(e types.Edge) (string, bool) {
+		res.GuardedBy = sites(r, guards, guardEdges, func(e types.Edge) (string, bool) {
 			return e.Dst, hidden[e.Src] && !own[e.Dst]
 		})
 	}
@@ -317,7 +333,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 // sites returns one Site per edge of edges that pick keeps, for the node
 // pick names, among nodes: at the edge's line, or at the node's line when the
 // edge has none. Sorted by qualified name, then line.
-func sites(nodes []types.Node, edges []types.Edge, pick func(types.Edge) (string, bool)) []Site {
+func sites(r store.Reader, nodes []types.Node, edges []types.Edge, pick func(types.Edge) (string, bool)) []Site {
 	byID := make(map[string]types.Node, len(nodes))
 	for _, n := range nodes {
 		byID[n.ID] = n
@@ -334,7 +350,7 @@ func sites(nodes []types.Node, edges []types.Edge, pick func(types.Edge) (string
 		if line == 0 {
 			line = n.StartLine
 		}
-		s := Site{ID: id, Qname: store.PrintedQName(n), File: n.FilePath, Line: line}
+		s := Site{ID: id, Qname: store.PrintedName(r, n), File: n.FilePath, Line: line}
 		if !seen[s] {
 			seen[s] = true
 			out = append(out, s)

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 
 	mcp "github.com/mark3labs/mcp-go/mcp"
@@ -195,5 +196,31 @@ func TestExpandTotalIsFindCallersAtDepthOne(t *testing.T) {
 	shown := rowNames(h, "callers")
 	if want := sorted(names)[:searchCodeExpandCap]; !reflect.DeepEqual(shown, want) {
 		t.Errorf("shown %v, want the first %d of find_callers by name: %v", shown, searchCodeExpandCap, want)
+	}
+}
+
+// TestIndexKeepsCanonicalIDOfSharedName: a hit printed in the site form has
+// a qualified name that other declarations carry; its index row keeps the
+// canonical_id it had while such rows shared the plain qname (535 search
+// hits on go-stablenet lost it).
+func TestIndexKeepsCanonicalIDOfSharedName(t *testing.T) {
+	old := searchCodePageBytes
+	t.Cleanup(func() { searchCodePageBytes = old })
+	searchCodePageBytes = 2500
+	long := []map[string]any{{"line": 1, "text": strings.Repeat("x", 2000)}}
+	out := map[string]any{"pattern": "x", "hits": []map[string]any{
+		{"qname": "eth.testKey@eth/handler_test.go:43", "canonical_id": "ex/eth.testKey", "file": "eth/handler_test.go", "start_line": 43, "end_line": 43, "lines": long},
+		{"qname": "p.unique", "canonical_id": "ex/p.unique", "file": "p/p.go", "start_line": 1, "end_line": 1, "lines": long},
+	}}
+	res, ok := indexSearchCode(out, nil, "search_code")
+	if !ok {
+		t.Fatal("no index for a result larger than a part")
+	}
+	raw, err := json.Marshal(res)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(raw, []byte(`"canonical_id":"ex/eth.testKey"`)) {
+		t.Errorf("index lost the canonical_id of a site-form row: %s", raw)
 	}
 }

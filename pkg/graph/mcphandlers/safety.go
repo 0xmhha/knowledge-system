@@ -44,6 +44,10 @@ func safeReader(r store.Reader) store.Reader {
 // (store.TestFiles); it holds no Hunk or Commit node.
 func (s *llmSafeReader) TestFiles() ([]string, bool, error) { return store.TestFiles(s.Reader) }
 
+// UnwrapReader returns the wrapped reader, so caches keyed by store
+// (persist.PrintedName) are shared by its wrappers.
+func (s *llmSafeReader) UnwrapReader() store.Reader { return s.Reader }
+
 func (s *llmSafeReader) FindSymbol(name string, exact bool, opts store.FindSymbolOptions) ([]types.Node, error) {
 	out, err := s.Reader.FindSymbol(name, exact, opts)
 	return filterLLMSafe(out), err

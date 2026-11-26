@@ -50,6 +50,26 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 		if err != nil {
 			return nil, err
 		}
+		// A canonical id names one node, as in every tool: the printed
+		// name of an External stub whose qualified name others carry
+		// ("github.com/pkg/errors.New"), and of the standard library's
+		// errors.New, whose canonical id is its qualified name.
+		var candidates, alsoNamed []string
+		if exact {
+			if _, found, err := reader.FindByCanonicalID(name); err != nil {
+				return nil, err
+			} else if found {
+				// Through the resolver: init functions share a canonical id.
+				res, err := store.ResolveName(reader, name, lang)
+				if err != nil {
+					return nil, err
+				}
+				matches, candidates = res.Nodes, res.Candidates
+				if len(res.AlsoNamed) > 0 {
+					alsoNamed = res.AlsoNamed
+				}
+			}
+		}
 		// A name names what the seed tools resolve it to: a mutex
 		// variable's name the variable, not its Mutex node. A site name and
 		// "<variable>#mutex" (each also with the other) carry no node of
@@ -61,7 +81,7 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 			if err != nil {
 				return nil, err
 			}
-			matches, exact = res.Nodes, true
+			matches, exact, candidates = res.Nodes, true, res.Candidates
 		}
 		kept, leftOut, err := rankNamed(reader, matches, exact || req.GetBool("all", false))
 		if err != nil {
@@ -86,6 +106,14 @@ func RegisterFindSymbol(s *server.MCPServer, reader store.Reader) {
 			}
 		}
 		out["nodes"] = rows
+		// A name that names several declarations and no node of its own
+		// lists them, as every seed tool does.
+		if len(candidates) > 0 {
+			out["ambiguous"], out["candidates"] = true, candidates
+		}
+		if len(alsoNamed) > 0 {
+			out[alsoNamedKey] = alsoNamed
+		}
 		if len(leftOut) > 0 {
 			out["left_out"] = leftOut
 		}

@@ -288,6 +288,10 @@ type seedRef struct {
 	// seed is then the method it copies and Note says so
 	// (store.NameResolution.SeedNote).
 	Note string
+	// AlsoNamed lists the other declarations whose qualified name is the
+	// input, when the input was the canonical id of the seed
+	// (store.NameResolution.AlsoNamed).
+	AlsoNamed []string
 	// OtherCase lists names that differ from the input only in case; set
 	// only when the seed did not resolve.
 	OtherCase []string
@@ -344,6 +348,9 @@ func (s seedRef) result(payload map[string]any) map[string]any {
 	if len(s.IDs) == 1 {
 		payload["seed_id"] = s.IDs[0]
 	}
+	if len(s.AlsoNamed) > 0 {
+		payload[alsoNamedKey] = s.AlsoNamed
+	}
 	if s.Note != "" {
 		payload[store.SeedKeyPromotedFrom] = s.QName
 		payload[store.SeedKeyNote] = s.Note
@@ -382,7 +389,7 @@ func resolveSeed(reader store.Reader, seed, lang string) (resolved seedRef, cand
 	case !res.Found():
 		return seedRef{OtherCase: res.OtherCase}, nil, false, false
 	}
-	ref := seedRef{QName: res.QName, Note: res.SeedNote()}
+	ref := seedRef{QName: res.QName, Note: res.SeedNote(), AlsoNamed: res.AlsoNamed}
 	if res.ByID {
 		for _, n := range res.Nodes {
 			ref.IDs = append(ref.IDs, n.ID)
@@ -421,6 +428,10 @@ func seedNotFoundResult(seed string) map[string]any {
 	}
 }
 
+// alsoNamedKey lists, in an answer for a canonical id that other
+// declarations carry as their qualified name, those declarations.
+const alsoNamedKey = "also_named"
+
 // seedAmbiguousResult is returned when a bare seed name matches more than
 // one distinct qualified_name. The agent is expected to retry with one of
 // the candidates rather than receive a silently-picked (and possibly
@@ -447,7 +458,7 @@ func attachBlobs(reader store.Reader, nodes []types.Node, include bool) []map[st
 			"id":          n.ID,
 			"type":        n.Type,
 			"name":        n.Name,
-			"qname":       store.PrintedQName(n),
+			"qname":       store.PrintedName(reader, n),
 			"file":        n.FilePath,
 			"line":        n.StartLine,
 			"end_line":    n.EndLine,

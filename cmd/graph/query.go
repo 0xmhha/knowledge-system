@@ -80,7 +80,8 @@ names, package fragments) for best results.`,
 			}
 			adj := buildAdjacency(edges)
 			edgeIdx := buildEdgeIndex(edges)
-			renderQueryAnswer(os.Stdout, question, seedNodes, nodes, adj, edgeIdx, depth, budget)
+			renderQueryAnswer(os.Stdout, question, seedNodes, nodes, adj, edgeIdx, depth, budget,
+				func(n types.Node) string { return persist.PrintedName(store, n) })
 			return nil
 		},
 	}
@@ -241,10 +242,12 @@ const (
 	queryLegend      = "_`a` —[r]→ `b`: a has relation r to b. `a` ←[r]— `b`: b has it to a._\n\n"
 )
 
+// renderQueryAnswer writes the seeds and the neighbourhood of an answer;
+// name is the name printed for a seed (persist.PrintedName in a build).
 func renderQueryAnswer(w io.Writer, question string,
 	seeds []types.Node, allNodes []types.Node,
 	adj map[string][]string, eidx edgeIndex,
-	depth, tokenBudget int) {
+	depth, tokenBudget int, name func(types.Node) string) {
 	idx := make(map[string]types.Node, len(allNodes))
 	for _, n := range allNodes {
 		idx[n.ID] = n
@@ -253,7 +256,7 @@ func renderQueryAnswer(w io.Writer, question string,
 	_, _ = fmt.Fprintf(w, "Seeds (top-%d by keyword score):\n\n", len(seeds))
 	for i, s := range seeds {
 		_, _ = fmt.Fprintf(w, "%d. **`%s`** [%s] · `%s` · %s:%d\n",
-			i+1, s.Name, s.Type, persist.PrintedQName(s), s.FilePath, s.StartLine)
+			i+1, s.Name, s.Type, name(s), s.FilePath, s.StartLine)
 	}
 	_, _ = fmt.Fprintln(w)
 

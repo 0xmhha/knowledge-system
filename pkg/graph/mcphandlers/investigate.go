@@ -681,7 +681,7 @@ func capJoin(v []string, n int, sep string) string {
 
 func (x *invIndex) header(id string) string {
 	n := x.nodes[id]
-	return fmt.Sprintf("%s %s  %s:%d-%d", strings.ToLower(string(n.Type)), n.QualifiedName, n.FilePath, n.StartLine, n.EndLine)
+	return fmt.Sprintf("%s %s  %s:%d-%d", strings.ToLower(string(n.Type)), x.name(n), n.FilePath, n.StartLine, n.EndLine)
 }
 
 // funcCard lists the function's lines, each with what it calls, reads or
@@ -700,7 +700,7 @@ func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool
 		if !e.out || e.line < n.StartLine || e.line > n.EndLine {
 			continue
 		}
-		q := x.nodes[e.other].QualifiedName
+		q := x.name(x.nodes[e.other])
 		u := e.verb() + " " + q
 		if e.write() {
 			u += x.guardNote(e.other, n.FilePath, e.line)
@@ -764,7 +764,7 @@ func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool
 			continue
 		}
 		seen[e.other] = true
-		callers = append(callers, x.nodes[e.other].QualifiedName+":"+strconv.Itoa(e.line))
+		callers = append(callers, x.name(x.nodes[e.other])+":"+strconv.Itoa(e.line))
 	}
 	if len(callers) > 0 {
 		c := invCallerCap
@@ -781,20 +781,24 @@ func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool
 			if withTests {
 				tests = ""
 			}
-			fmt.Fprintf(&b, "; find_callers qname=%q depth=1 direct=true%s returns exactly them", seedName(n), tests)
+			fmt.Fprintf(&b, "; find_callers qname=%q depth=1 direct=true%s returns exactly them", x.seedName(n), tests)
 		}
 		b.WriteByte('\n')
 	}
 	return b.String()
 }
 
+// name is the name printed for n, the one that opens n alone
+// (store.PrintedName).
+func (x *invIndex) name(n types.Node) string { return store.PrintedName(x.reader, n) }
+
 // seedName is the name that names n alone in a seed: its canonical id, or
-// its qualified name when it has none.
-func seedName(n types.Node) string {
+// its printed name when it has none.
+func (x *invIndex) seedName(n types.Node) string {
 	if n.CanonicalID != "" {
 		return n.CanonicalID
 	}
-	return n.QualifiedName
+	return x.name(n)
 }
 
 // valueCard lists who writes the value and who reads it, one row per line
@@ -803,7 +807,7 @@ func seedName(n types.Node) string {
 func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 	n := x.nodes[id]
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s %s  %s:%d", strings.ToLower(string(n.Type)), n.QualifiedName, n.FilePath, n.StartLine)
+	fmt.Fprintf(&b, "%s %s  %s:%d", strings.ToLower(string(n.Type)), x.name(n), n.FilePath, n.StartLine)
 	if d := x.fieldDecl[id]; d != "" {
 		fmt.Fprintf(&b, "  decl: %s", d)
 	} else if d := x.lineIn(id, n.StartLine); d != "" {
@@ -811,7 +815,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 	}
 	b.WriteByte('\n')
 	if o := x.owner[id]; o != "" {
-		fmt.Fprintf(&b, "  in %s\n", x.nodes[o].QualifiedName)
+		fmt.Fprintf(&b, "  in %s\n", x.name(x.nodes[o]))
 	}
 	for _, write := range []bool{true, false} {
 		var rows, names []string
@@ -820,7 +824,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 			if e.out || !e.valueUse() || e.write() != write || !withTests && x.test[e.other] {
 				continue
 			}
-			q := x.nodes[e.other].QualifiedName
+			q := x.name(x.nodes[e.other])
 			if !users[e.other] {
 				names = append(names, q)
 			}
@@ -840,7 +844,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 			for _, r := range rows[:c] {
 				b.WriteString(r + "\n")
 			}
-			fmt.Fprintf(&b, "    … %d more lines, in: %s; open=\"card:%s\"\n", len(rows)-c, capNames(names, invCompactNames), n.QualifiedName)
+			fmt.Fprintf(&b, "    … %d more lines, in: %s; open=\"card:%s\"\n", len(rows)-c, capNames(names, invCompactNames), x.name(n))
 			continue
 		}
 		for _, r := range rows {
@@ -853,7 +857,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 	for _, e := range x.adj[id] {
 		if e.typ == types.EdgeFlowsTo && !sameSeen[e.other] {
 			sameSeen[e.other] = true
-			same = append(same, x.nodes[e.other].QualifiedName)
+			same = append(same, x.name(x.nodes[e.other]))
 		}
 	}
 	if len(same) > 0 {
@@ -867,7 +871,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 			if e.out || e.typ != op || e.line == 0 || !withTests && x.test[e.other] {
 				continue
 			}
-			rows = append(rows, fmt.Sprintf("    %s:%d  %s", x.nodes[e.other].QualifiedName, e.line, x.lineIn(e.other, e.line)))
+			rows = append(rows, fmt.Sprintf("    %s:%d  %s", x.name(x.nodes[e.other]), e.line, x.lineIn(e.other, e.line)))
 		}
 		if len(rows) == 0 {
 			continue
@@ -878,7 +882,7 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 		}
 		fmt.Fprintf(&b, "  %s (%d lines)\n", label, len(rows))
 		if compact && len(rows) > invCompactReaders {
-			fmt.Fprintf(&b, "%s\n    … %d more lines; open=\"card:%s\"\n", strings.Join(rows[:invCompactReaders], "\n"), len(rows)-invCompactReaders, n.QualifiedName)
+			fmt.Fprintf(&b, "%s\n    … %d more lines; open=\"card:%s\"\n", strings.Join(rows[:invCompactReaders], "\n"), len(rows)-invCompactReaders, x.name(n))
 			continue
 		}
 		b.WriteString(strings.Join(rows, "\n") + "\n")
@@ -1021,7 +1025,7 @@ func (x *invIndex) typeCard(id string, withTests, compact bool) string {
 		// "name Type", "name *pkg.Type", "name []Type": the type follows the name.
 		if sp := strings.IndexAny(d, " \t"); sp > 0 {
 			if _, wh := wholeIn(d[sp:], leaf); wh {
-				held = append(held, x.nodes[fid].QualifiedName)
+				held = append(held, x.name(x.nodes[fid]))
 			}
 		}
 	}
@@ -1037,7 +1041,7 @@ func (x *invIndex) typeCard(id string, withTests, compact bool) string {
 				continue
 			}
 			seen[e.other] = true
-			us = append(us, x.nodes[e.other].QualifiedName)
+			us = append(us, x.name(x.nodes[e.other]))
 		}
 		if len(us) > 0 {
 			label := "used by"
@@ -1195,7 +1199,7 @@ func (x *invIndex) summary(inv *investigation) string {
 		var names []string
 		for _, id := range w.entities {
 			n := x.nodes[id]
-			names = append(names, strings.ToLower(string(n.Type))+" "+n.QualifiedName)
+			names = append(names, strings.ToLower(string(n.Type))+" "+x.name(n))
 		}
 		named := "names no declaration (a local or part of a name)"
 		if len(names) > 0 {
@@ -1269,7 +1273,7 @@ func (x *invIndex) joinEntries(js []invJoin) []string {
 	out := make([]string, len(js))
 	for i, j := range js {
 		n := x.nodes[j.id]
-		out[i] = fmt.Sprintf("  %s  %s:%d  [%s]\n", n.QualifiedName, n.FilePath, n.StartLine, strings.Join(j.hops, " "))
+		out[i] = fmt.Sprintf("  %s  %s:%d  [%s]\n", x.name(n), n.FilePath, n.StartLine, strings.Join(j.hops, " "))
 	}
 	return out
 }
@@ -1292,9 +1296,9 @@ func (x *invIndex) hopEntries(w *invWord, h int, reached map[string]int) []strin
 	out := make([]string, 0, len(ids))
 	for _, id := range ids {
 		n := x.nodes[id]
-		line := fmt.Sprintf("  %s  %s:%d", n.QualifiedName, n.FilePath, n.StartLine)
+		line := fmt.Sprintf("  %s  %s:%d", x.name(n), n.FilePath, n.StartLine)
 		if v, ok := w.via[id]; ok {
-			from := x.nodes[v.from].QualifiedName
+			from := x.name(x.nodes[v.from])
 			at := ""
 			if v.edge.line > 0 {
 				at = fmt.Sprintf(" (line %d)", v.edge.line)
@@ -1347,15 +1351,15 @@ func (x *invIndex) blocks(inv *investigation, earlier []*invWord, marks map[stri
 		carded[id] = true
 		n := x.nodes[id]
 		if prev, ok := marks[id]; ok {
-			out = append(out, invBlock{layer: layer, handle: "card:" + n.QualifiedName, what: why,
-				text: fmt.Sprintf("%s %s: card shown in %s\n", strings.ToLower(string(n.Type)), n.QualifiedName, prev)})
+			out = append(out, invBlock{layer: layer, handle: "card:" + x.name(n), what: why,
+				text: fmt.Sprintf("%s %s: card shown in %s\n", strings.ToLower(string(n.Type)), x.name(n), prev)})
 			return
 		}
 		text := x.card(id, inv.words, inv.withTests, compact)
 		if compact {
-			text = cutCard(text, maxCard, "card:"+n.QualifiedName)
+			text = cutCard(text, maxCard, "card:"+x.name(n))
 		}
-		out = append(out, invBlock{layer: layer, handle: "card:" + n.QualifiedName, what: why,
+		out = append(out, invBlock{layer: layer, handle: "card:" + x.name(n), what: why,
 			text: text, cards: []string{id}})
 	}
 	ordered := specific(inv.words)
@@ -1479,7 +1483,7 @@ func (x *invIndex) blocks(inv *investigation, earlier []*invWord, marks map[stri
 		var es []string
 		for _, o := range w.partial {
 			n := x.nodes[o.id]
-			es = append(es, fmt.Sprintf("  %s  %s lines %s\n", n.QualifiedName, n.FilePath, joinInts(o.lines)))
+			es = append(es, fmt.Sprintf("  %s  %s lines %s\n", x.name(n), n.FilePath, joinInts(o.lines)))
 		}
 		out = append(out, invBlock{layer: 5, handle: "partial:" + w.label, what: w.label + " inside longer names",
 			head: fmt.Sprintf("%s inside longer names: %d declarations\n", w.label, len(w.partial)), entries: es})
@@ -1707,7 +1711,7 @@ func (x *invIndex) open(inv *investigation, sess *invSession, what string, from,
 		}
 		for _, o := range w.partial {
 			n := x.nodes[o.id]
-			entries = append(entries, fmt.Sprintf("  %s  %s lines %s\n", n.QualifiedName, n.FilePath, joinInts(o.lines)))
+			entries = append(entries, fmt.Sprintf("  %s  %s lines %s\n", x.name(n), n.FilePath, joinInts(o.lines)))
 		}
 	case what == "rest":
 		for _, bl := range inv.cut {
@@ -1782,7 +1786,7 @@ func (x *invIndex) cardIDs(q string) (ids []string, local, msg string) {
 	n := res.Nodes[0]
 	if inFn, err := store.NodesInFunctions(x.reader, []types.Node{n}); err == nil && inFn[n.ID] {
 		if owner := x.innermost(n); owner != "" {
-			return []string{owner}, fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.nodes[owner].QualifiedName), ""
+			return []string{owner}, fmt.Sprintf("%s%s is declared at %s:%d in %s\n", localKey, q, n.FilePath, n.StartLine, x.name(x.nodes[owner])), ""
 		}
 	}
 	return nil, "", x.noCard(q, n)
@@ -1795,7 +1799,7 @@ func (x *invIndex) cardIDs(q string) (ids []string, local, msg string) {
 // can open one. card:filters answered "no card holds it" and listed none.
 func (x *invIndex) noCard(q string, n types.Node) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "%q names %s %s, which has no card", q, strings.ToLower(string(n.Type)), n.QualifiedName)
+	fmt.Fprintf(&b, "%q names %s %s, which has no card", q, strings.ToLower(string(n.Type)), x.name(n))
 	matches, err := x.reader.FindSymbol(leafName(n.QualifiedName), false, store.FindSymbolOptions{Limit: store.FindSymbolNoLimit})
 	if err != nil {
 		return b.String()
@@ -1819,7 +1823,7 @@ func (x *invIndex) noCard(q string, n types.Node) string {
 		case card:
 			rows = append(rows, fmt.Sprintf("%s (%s, card)", name, strings.ToLower(string(m.Type))))
 		case inFn[m.ID] && x.innermost(m) != "":
-			rows = append(rows, fmt.Sprintf("%s (%s, local of %s)", name, strings.ToLower(string(m.Type)), x.nodes[x.innermost(m)].QualifiedName))
+			rows = append(rows, fmt.Sprintf("%s (%s, local of %s)", name, strings.ToLower(string(m.Type)), x.name(x.nodes[x.innermost(m)])))
 		}
 	}
 	sort.Strings(rows)

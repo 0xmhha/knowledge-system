@@ -573,8 +573,9 @@ func TestSearchCode_BlankDeclaration(t *testing.T) {
 		args map[string]any
 		want []string
 	}{
-		{map[string]any{"pattern": "var _ Hasher = (*Hash)(nil)", "fixed": true}, []string{"types._"}},
-		{map[string]any{"pattern": "Hasher", "in": "both"}, []string{"types._"}},
+		// Printed by its site name: other blank declarations carry types._.
+		{map[string]any{"pattern": "var _ Hasher = (*Hash)(nil)", "fixed": true}, []string{"types._@" + fxTypesFile + ":11"}},
+		{map[string]any{"pattern": "Hasher", "in": "both"}, []string{"types._@" + fxTypesFile + ":11"}},
 		{map[string]any{"pattern": `types\._`, "in": "name"}, []string{}},
 		{map[string]any{"pattern": "Hasher", "in": "name"}, []string{}},
 	} {

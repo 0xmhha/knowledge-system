@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -82,7 +83,7 @@ func TestQueryArrowFollowsRelation(t *testing.T) {
 		{2, []string{"- `run` —[calls]→ `newCallTracer`", "- `newCallTracer` —[writes_field]→ `callstack`"}},
 	} {
 		var out bytes.Buffer
-		renderQueryAnswer(&out, "q", nodes[tc.seed:tc.seed+1], nodes, buildAdjacency(edges), buildEdgeIndex(edges), 2, 2000)
+		renderQueryAnswer(&out, "q", nodes[tc.seed:tc.seed+1], nodes, buildAdjacency(edges), buildEdgeIndex(edges), 2, 2000, persist.PrintedQName)
 		for _, want := range tc.want {
 			if !strings.Contains(out.String(), want) {
 				t.Errorf("seed %s: %q missing in:\n%s", nodes[tc.seed].Name, want, out.String())

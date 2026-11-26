@@ -122,6 +122,10 @@ func NamedNodes(nodes []types.Node) []types.Node { return persist.NamedNodes(nod
 // site name when several declarations carry it. See persist.NameOf.
 func NameOf(r Reader, n types.Node) (string, error) { return persist.NameOf(r, n) }
 
+// PrintedName is the name a tool prints for n, the one that resolves back to
+// it alone. See persist.PrintedName.
+func PrintedName(r Reader, n types.Node) string { return persist.PrintedName(r, n) }
+
 // PrintedQName is the qualified name a tool prints for n ("<name>#mutex" for
 // the Mutex node of a variable). See persist.PrintedQName.
 func PrintedQName(n types.Node) string { return persist.PrintedQName(n) }

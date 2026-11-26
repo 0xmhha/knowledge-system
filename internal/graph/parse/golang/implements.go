@@ -131,6 +131,25 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.
 			}
 		}
 	}
+	// The order of the packages (and so of the pairs) differs between loads;
+	// the edges are stored in this order, so it is fixed here, or their
+	// row ids changed from one build of one source to the next (304
+	// implements and 4 extends edges of go-stablenet).
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Type != out[j].Type {
+			return out[i].Type < out[j].Type
+		}
+		if out[i].Src != out[j].Src {
+			return out[i].Src < out[j].Src
+		}
+		return out[i].Dst < out[j].Dst
+	})
+	sort.SliceStable(pending, func(i, j int) bool {
+		if pending[i].SrcID != pending[j].SrcID {
+			return pending[i].SrcID < pending[j].SrcID
+		}
+		return pending[i].TargetCanonicalID < pending[j].TargetCanonicalID
+	})
 	return out, pending
 }
 

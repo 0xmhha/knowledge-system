@@ -3,6 +3,7 @@ package persist_test
 import (
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -251,35 +252,117 @@ func TestSeedNote(t *testing.T) {
 	}
 }
 
-// TestNameOfRoundTrip: the name printed for a node (NameOf) resolves back to
-// that node, for every node of the fixture: the Mutex node of a variable is
-// printed "<name>#mutex", a declaration whose qualified name others carry
-// by its site name. The copy of a promoted method is the one exception by
-// design: its name answers with the method it copies.
-func TestNameOfRoundTrip(t *testing.T) {
-	s := newNameStore(t)
-	all, err := s.AllNodes()
+// dupStore holds every way one qualified name is carried by several nodes:
+// a local declared twice, the v1 and v2 copies of a Solidity contract,
+// Solidity overloads, init functions that share a canonical id, blank names
+// of one declaration, External stubs of one name, two packages of one
+// name, and a mutex variable.
+func dupStore(t *testing.T) persist.Store {
+	t.Helper()
+	s, err := persist.Open(filepath.Join(t.TempDir(), "dup.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, n := range all {
-		name, err := persist.NameOf(s, n)
+	t.Cleanup(func() { _ = s.Close() })
+	if err := s.Migrate(); err != nil {
+		t.Fatal(err)
+	}
+	n := func(id string, kind types.NodeType, qname, cid, file string, line int, lang, sig string) types.Node {
+		name := qname[strings.LastIndex(qname, ".")+1:]
+		return types.Node{ID: id, Type: kind, Name: name, QualifiedName: qname, CanonicalID: cid, FilePath: file,
+			StartLine: line, EndLine: line, Language: lang, Signature: sig, Confidence: types.ConfExtracted}
+	}
+	ext := types.ExternalFilePath
+	nodes := []types.Node{
+		n("d000000000000001", types.NodeFunction, "abi.ABI.Pack", "ex/abi.(ABI).Pack", "abi/abi.go", 10, "go", ""),
+		n("d000000000000002", types.NodeLocalVariable, "abi.ABI.Pack.err", "", "abi/abi.go", 12, "go", ""),
+		n("d000000000000003", types.NodeLocalVariable, "abi.ABI.Pack.err", "", "abi/abi.go", 15, "go", ""),
+		n("d000000000000004", types.NodeContract, "GovMinter", "v1/GovMinter.sol:GovMinter", "v1/GovMinter.sol", 5, "sol", ""),
+		n("d000000000000005", types.NodeContract, "GovMinter", "v2/GovMinter.sol:GovMinter", "v2/GovMinter.sol", 5, "sol", ""),
+		n("d000000000000006", types.NodeFunction, "GovMinter._mark", "v1/GovMinter.sol:GovMinter._mark(uint256)", "v1/GovMinter.sol", 40, "sol", ""),
+		n("d000000000000007", types.NodeFunction, "GovMinter._mark", "v2/GovMinter.sol:GovMinter._mark(uint256)", "v2/GovMinter.sol", 44, "sol", ""),
+		n("d000000000000008", types.NodeFunction, "ECRecover.recover", "e.sol:ECRecover.recover(bytes32,bytes)", "e.sol", 74, "sol", ""),
+		n("d000000000000009", types.NodeFunction, "ECRecover.recover", "e.sol:ECRecover.recover(bytes32,uint8)", "e.sol", 42, "sol", ""),
+		n("d000000000000010", types.NodeFunction, "vm.init", "ex/vm.init", "vm/a.go", 3, "go", ""),
+		n("d000000000000011", types.NodeFunction, "vm.init", "ex/vm.init", "vm/b.go", 7, "go", ""),
+		n("d000000000000012", types.NodeVariable, "flags._", "", "flags/f.go", 20, "go", "name 1 of 2"),
+		n("d000000000000013", types.NodeVariable, "flags._", "", "flags/f.go", 20, "go", "name 2 of 2"),
+		n("d000000000000014", types.NodeVariable, "flags._", "", "flags/g.go", 4, "go", ""),
+		n("d000000000000015", types.NodeExternal, "errors.New", "errors.New", ext, 1, "go", ""),
+		n("d000000000000016", types.NodeExternal, "errors.New", "github.com/pkg/errors.New", ext, 1, "go", ""),
+		n("d000000000000017", types.NodeStruct, "bn256.G1", "ex/bn256/cloudflare.G1", "bn256/cloudflare/b.go", 39, "go", ""),
+		n("d000000000000018", types.NodeTypeAlias, "bn256.G1", "ex/bn256.G1", "bn256/fast.go", 17, "go", ""),
+		n("d000000000000019", types.NodeVariable, "dl.chainsLock", "ex/dl.chainsLock", "dl/dl.go", 5, "go", ""),
+		n("d000000000000020", types.NodeMutex, "dl.chainsLock", "", "dl/dl.go", 5, "go", ""),
+		n("d000000000000021", types.NodeLocalVariable, "abi.ABI.Pack.mu", "", "abi/abi.go", 13, "go", ""),
+		n("d000000000000022", types.NodeMutex, "abi.ABI.Pack.mu", "", "abi/abi.go", 13, "go", ""),
+		n("d000000000000023", types.NodeLocalVariable, "abi.ABI.Pack.mu", "", "abi/abi.go", 16, "go", ""),
+		n("d000000000000024", types.NodeMutex, "abi.ABI.Pack.mu", "", "abi/abi.go", 16, "go", ""),
+		n("d000000000000025", types.NodeField, "abi.ABI.Methods", "ex/abi.ABI.Methods", "abi/abi.go", 3, "go", ""),
+		n("d000000000000026", types.NodeMutex, "abi.ABI.lock#mutex", "", "abi/abi.go", 4, "go", ""),
+		n("d000000000000027", types.NodePackage, "abi", "", "abi/abi.go", 1, "go", ""),
+		n("d000000000000028", types.NodeConstant, "abi.limit", "ex/abi.limit", "abi/abi.go", 30, "go", ""),
+		n("d000000000000029", types.NodeStruct, "bls.G1", "ex/bls.G1", "bls/g1.go", 9, "go", ""),
+	}
+	if err := s.InsertNodes(nodes); err != nil {
+		t.Fatal(err)
+	}
+	return s
+}
+
+// TestNameOfRoundTrip: the name printed for a node (NameOf, PrintedName)
+// resolves back to exactly that node, for every node kind and every way one
+// qualified name is carried by several nodes. The copy of a promoted method
+// is the exception by design: its name answers with the method it copies.
+// A plain name that several declarations carry lists their printed names.
+func TestNameOfRoundTrip(t *testing.T) {
+	for _, s := range []persist.Store{newNameStore(t), dupStore(t)} {
+		all, err := s.AllNodes()
 		if err != nil {
-			t.Fatalf("NameOf(%s): %v", n.QualifiedName, err)
+			t.Fatal(err)
 		}
+		for _, n := range all {
+			name, err := persist.NameOf(s, n)
+			if err != nil {
+				t.Fatalf("NameOf(%s): %v", n.QualifiedName, err)
+			}
+			if cached := persist.PrintedName(s, n); cached != name {
+				t.Errorf("%s: PrintedName %q, NameOf %q", n.ID, cached, name)
+			}
+			if _, isCopy := persist.PromotedFrom(n); isCopy {
+				continue
+			}
+			res, err := persist.ResolveName(s, name, "")
+			if err != nil {
+				t.Fatalf("ResolveName(%s): %v", name, err)
+			}
+			if len(res.Nodes) != 1 || res.Nodes[0].ID != n.ID {
+				t.Errorf("%s %s printed as %q resolves to %d nodes, candidates %v", n.Type, n.QualifiedName, name, len(res.Nodes), res.Candidates)
+			}
+		}
+	}
+	s := dupStore(t)
+	// A canonical id that is also the qualified name of other declarations
+	// names its node and lists the others.
+	if res, err := persist.ResolveName(s, "errors.New", ""); err != nil || len(res.Nodes) != 1 || res.Nodes[0].ID != "d000000000000015" ||
+		!reflect.DeepEqual(res.AlsoNamed, []string{"github.com/pkg/errors.New"}) {
+		t.Errorf("ResolveName(errors.New) = %+v, %v", res, err)
+	}
+	for name, want := range map[string][]string{
+		"abi.ABI.Pack.err":      {"abi.ABI.Pack.err@abi/abi.go:12", "abi.ABI.Pack.err@abi/abi.go:15"},
+		"GovMinter._mark":       {"GovMinter._mark@v1/GovMinter.sol:40", "GovMinter._mark@v2/GovMinter.sol:44"},
+		"ex/vm.init":            {"vm.init@vm/a.go:3", "vm.init@vm/b.go:7"},
+		"flags._@flags/f.go:20": {"flags._@flags/f.go:20#1", "flags._@flags/f.go:20#2"},
+		"abi.ABI.Pack.mu#mutex": {"abi.ABI.Pack.mu#mutex@abi/abi.go:13", "abi.ABI.Pack.mu#mutex@abi/abi.go:16"},
+		"bn256.G1":              {"bn256.G1@bn256/cloudflare/b.go:39", "bn256.G1@bn256/fast.go:17"},
+		// A bare name lists each declaration by its printed name, decided
+		// over the whole graph: bn256.G1 is carried by two.
+		"G1": {"bls.G1", "bn256.G1@bn256/cloudflare/b.go:39", "bn256.G1@bn256/fast.go:17"},
+		"_":  {"flags._@flags/f.go:20#1", "flags._@flags/f.go:20#2", "flags._@flags/g.go:4"},
+	} {
 		res, err := persist.ResolveName(s, name, "")
-		if err != nil {
-			t.Fatalf("ResolveName(%s): %v", name, err)
-		}
-		if _, isCopy := persist.PromotedFrom(n); isCopy {
-			continue
-		}
-		found := false
-		for _, m := range res.Nodes {
-			found = found || m.ID == n.ID
-		}
-		if !found || len(res.Nodes) != 1 && n.Type != types.NodeExternal {
-			t.Errorf("%s %s printed as %q resolves to %v", n.Type, n.QualifiedName, name, res.Nodes)
+		if err != nil || !reflect.DeepEqual(res.Candidates, want) {
+			t.Errorf("ResolveName(%s) = candidates %v nodes %d, want candidates %v (%v)", name, res.Candidates, len(res.Nodes), want, err)
 		}
 	}
 }

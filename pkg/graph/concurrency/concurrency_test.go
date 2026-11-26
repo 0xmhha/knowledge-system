@@ -31,6 +31,15 @@ func (f *fakeReader) FindSymbol(name string, _ bool, _ store.FindSymbolOptions) 
 	return out, nil
 }
 
+// AllNodes returns every fixture node (the printed-name index reads them).
+func (f *fakeReader) AllNodes() ([]types.Node, error) {
+	out := make([]types.Node, 0, len(f.nodes))
+	for _, n := range f.nodes {
+		out = append(out, n)
+	}
+	return out, nil
+}
+
 // FindByCanonicalID finds nothing: the fixture nodes carry no canonical id.
 func (f *fakeReader) FindByCanonicalID(string) (types.Node, bool, error) {
 	return types.Node{}, false, nil
@@ -442,7 +451,7 @@ func TestAnalyze_LocalDeclaredTwice(t *testing.T) {
 			t.Errorf("Analyze(%s): ambiguous %v candidates %v, want %v", seed, res.Ambiguous, res.Candidates, cands)
 		}
 	}
-	if res, err := concurrency.Analyze(r, "pkg.F.mu#mutex@c.go:9", concurrency.Options{Depth: 1}); err != nil || res.Mutex != "pkg.F.mu#mutex" || len(res.LockedBy) != 1 || res.LockedBy[0].Line != 10 {
+	if res, err := concurrency.Analyze(r, "pkg.F.mu#mutex@c.go:9", concurrency.Options{Depth: 1}); err != nil || res.Mutex != "pkg.F.mu#mutex@c.go:9" || res.DeclaredBy != "pkg.F.mu@c.go:9" || len(res.LockedBy) != 1 || res.LockedBy[0].Line != 10 {
 		t.Errorf("Analyze(pkg.F.mu#mutex@c.go:9) = %+v, %v", res, err)
 	}
 	res, err := concurrency.Analyze(r, want[1], concurrency.Options{Depth: 1})

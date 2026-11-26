@@ -1096,7 +1096,7 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 			n := idx.decls[h.decl].node
 			// A promoted method may be asked for under an embedding type's
 			// name; it is this declaration.
-			keys := []string{n.CanonicalID, n.QualifiedName}
+			keys := []string{n.CanonicalID, n.QualifiedName, store.PrintedName(reader, n)}
 			for _, to := range idx.decls[h.decl].promotedTo {
 				keys = append(keys, to+"."+n.Name)
 			}
@@ -1140,7 +1140,7 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 			terms = append(terms, t)
 		}
 		sort.Strings(terms)
-		row := map[string]any{"qname": n.QualifiedName, "type": string(n.Type), "file": n.FilePath,
+		row := map[string]any{"qname": store.PrintedName(reader, n), "type": string(n.Type), "file": n.FilePath,
 			"start_line": n.StartLine, "end_line": n.EndLine, "matches": h.matches, "matched": terms}
 		if n.CanonicalID != "" {
 			row["canonical_id"] = n.CanonicalID
@@ -1521,7 +1521,7 @@ func attachExpansion(reader store.Reader, row map[string]any, n types.Node, kind
 			if len(out) == searchCodeExpandCap {
 				continue
 			}
-			out = append(out, map[string]any{"qname": store.PrintedQName(x), "file": x.FilePath, "line": x.StartLine})
+			out = append(out, map[string]any{"qname": store.PrintedName(reader, x), "file": x.FilePath, "line": x.StartLine})
 		}
 		return out
 	}
@@ -1665,7 +1665,12 @@ func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) 
 	withLines := make([]map[string]any, len(rows))
 	nameOnly := make([]map[string]any, len(rows))
 	for i, r := range rows {
-		dup := seenQ[r["qname"]] > 1
+		// A row printed in the site form has a qualified name other
+		// declarations carry: it keeps its canonical_id, as it did when
+		// such rows shared the plain qname.
+		q, _ := r["qname"].(string)
+		_, _, _, site := store.ParseSiteName(q)
+		dup := seenQ[r["qname"]] > 1 || site
 		withLines[i], nameOnly[i] = indexRow(r, true, dup), indexRow(r, false, dup)
 	}
 	sizes := func(rs []map[string]any) []int {
@@ -2030,7 +2035,7 @@ func reasonNeighbours(reader store.Reader, idx *codeIndex, hitIDs []string, reas
 	})
 	for _, r := range rows {
 		n := idx.decls[cands[r.id].decl].node
-		m := map[string]any{"qname": store.PrintedQName(n), "type": string(n.Type), "file": n.FilePath,
+		m := map[string]any{"qname": store.PrintedName(reader, n), "type": string(n.Type), "file": n.FilePath,
 			"start_line": n.StartLine, "end_line": n.EndLine, "reason_matched": r.own, "via": cands[r.id].via}
 		if n.Signature != "" {
 			m["signature"] = n.Signature

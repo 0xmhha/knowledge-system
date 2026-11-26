@@ -469,7 +469,7 @@ func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offs
 			StartLine: h.StartLine,
 			EndLine:   h.EndLine,
 			PatchText: patch,
-			Modifies:  decorateModifies(mods),
+			Modifies:  decorateModifies(store, mods),
 		}
 		payloads = append(payloads, hunkPayload{
 			row:   row,
@@ -569,14 +569,14 @@ func sortedIssueIDs(set map[string]bool) []string {
 // JSON-friendly ModifiesInfo shape. Returns nil rather than [] for
 // hunks with no modifies edges so JSON serialization elides the field
 // entirely (matches the `omitempty` tag on the struct).
-func decorateModifies(targets []types.Node) []ModifiesInfo {
+func decorateModifies(store persist.StoreReader, targets []types.Node) []ModifiesInfo {
 	if len(targets) == 0 {
 		return nil
 	}
 	out := make([]ModifiesInfo, 0, len(targets))
 	for _, t := range targets {
 		out = append(out, ModifiesInfo{
-			Qname:     persist.PrintedQName(t),
+			Qname:     persist.PrintedName(store, t),
 			Type:      string(t.Type),
 			FilePath:  t.FilePath,
 			StartLine: t.StartLine,

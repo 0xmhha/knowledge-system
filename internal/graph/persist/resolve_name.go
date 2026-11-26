@@ -292,6 +292,13 @@ type NameResolution struct {
 	// OtherCase lists qualified names that differ from the input only in
 	// case, when the input matched nothing.
 	OtherCase []string
+	// AlsoNamed lists, by printed name, the other declarations whose
+	// qualified name is the input when the input resolved as the canonical
+	// id of one node (the standard library's errors.New has the canonical
+	// id "errors.New", which External stubs of other packages carry as
+	// their qualified name). The canonical id wins; these are named so the
+	// caller can choose another.
+	AlsoNamed []string
 }
 
 // Found reports whether the input resolved to one qualified name.
@@ -392,7 +399,7 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 	if n, found, err := r.FindByCanonicalID(name); err != nil {
 		return NameResolution{}, fmt.Errorf("resolve %q by canonical id: %w", name, err)
 	} else if found {
-		return NameResolution{QName: n.QualifiedName, Nodes: []types.Node{n}, ByID: true}, nil
+		return byCanonicalID(r, name, n)
 	}
 	opts := FindSymbolOptions{Language: language, Limit: FindSymbolNoLimit}
 	exact, err := r.FindSymbol(name, true, opts)
@@ -407,8 +414,8 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 			return res, err
 		}
 	}
-	if qname, file, line, ok := ParseSiteName(name); ok {
-		return resolveSite(r, qname, file, line, opts)
+	if qname, file, line, ordinal, ok := parseSite(name); ok {
+		return resolveSite(r, qname, file, line, ordinal, opts)
 	}
 	matches, err := r.FindSymbol(name, false, opts)
 	if err != nil {
@@ -434,9 +441,19 @@ func resolveName(r StoreReader, name, language string) (NameResolution, error) {
 		// method ResolveName answers them with.
 		oneMethod := c == NamePromoted && oneSite(nodes)
 		if names := distinctQNames(nodes); len(names) > 1 && !oneMethod {
-			return NameResolution{Candidates: names}, nil
+			return NameResolution{Candidates: candidatesOf(r, nodes)}, nil
 		}
-		return oneDeclaration(nodes[0].QualifiedName, nodes), nil
+		// Whether the one qualified name names one declaration is decided
+		// over every node that carries it, not over the matches of a class.
+		q := nodes[0].QualifiedName
+		all, err := r.FindSymbol(q, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
+		if err != nil {
+			return NameResolution{}, fmt.Errorf("resolve %q: %w", q, err)
+		}
+		if oneMethod || len(all) == 0 {
+			return oneDeclaration(q, nodes), nil
+		}
+		return oneDeclaration(q, all), nil
 	}
 	return NameResolution{}, nil
 }
@@ -460,52 +477,91 @@ func siteName(qname string, n types.Node) string {
 // A qualified name may hold "@" itself (pkg.T.struct@120.f), so the place is
 // what follows the last one and must end in ":<line>".
 func ParseSiteName(name string) (qname, file string, line int, ok bool) {
+	qname, file, line, _, ok = parseSite(name)
+	return qname, file, line, ok
+}
+
+// parseSite is ParseSiteName with the place among the names of one
+// declaration ("#<n>" at the end, 0 when absent).
+func parseSite(name string) (qname, file string, line, ordinal int, ok bool) {
 	at := strings.LastIndex(name, siteMark)
 	if at <= 0 {
-		return "", "", 0, false
+		return "", "", 0, 0, false
 	}
-	place := name[at+len(siteMark):]
+	place, ordinal := splitOrdinal(name[at+len(siteMark):])
 	colon := strings.LastIndex(place, lineMark)
 	if colon <= 0 {
-		return "", "", 0, false
+		return "", "", 0, 0, false
 	}
 	line, err := strconv.Atoi(place[colon+len(lineMark):])
 	if err != nil || line <= 0 {
-		return "", "", 0, false
+		return "", "", 0, 0, false
 	}
-	return name[:at], place[:colon], line, true
+	return name[:at], place[:colon], line, ordinal, true
 }
 
 // resolveSite resolves a site name: the nodes of qname that stand at line of
 // file.
-func resolveSite(r StoreReader, qname, file string, line int, opts FindSymbolOptions, only ...types.NodeType) (NameResolution, error) {
+func resolveSite(r StoreReader, qname, file string, line, ordinal int, opts FindSymbolOptions, only ...types.NodeType) (NameResolution, error) {
 	nodes, err := r.FindSymbol(qname, true, opts)
 	if err != nil {
 		return NameResolution{}, fmt.Errorf("resolve %q at %s:%d: %w", qname, file, line, err)
 	}
 	var at []types.Node
 	for _, n := range nodes {
-		if n.FilePath == file && n.StartLine == line && (len(only) == 0 || n.Type == only[0]) {
+		if n.FilePath == file && n.StartLine == line && (ordinal == 0 || ordinalOf(n) == ordinal) && (len(only) == 0 || n.Type == only[0]) {
 			at = append(at, n)
 		}
 	}
-	if len(only) > 0 {
-		if len(at) == 0 {
-			return NameResolution{}, nil
-		}
-		return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
+	if len(only) == 0 {
+		at = withoutMutexOfValue(at)
 	}
-	at = withoutMutexOfValue(at)
-	if declaring, ok := strings.CutSuffix(qname, MutexSuffix); ok && len(at) == 0 && declaring != "" {
+	if declaring, ok := strings.CutSuffix(qname, MutexSuffix); ok && len(at) == 0 && len(only) == 0 && declaring != "" {
 		// "<variable>#mutex@<file>:<line>": the Mutex node of the
 		// variable at that place, the one name of the mutex of a local
 		// that its function declares twice.
-		return resolveSite(r, declaring, file, line, opts, types.NodeMutex)
+		return resolveSite(r, declaring, file, line, ordinal, opts, types.NodeMutex)
 	}
 	if len(at) == 0 {
 		return NameResolution{}, nil
 	}
+	// Several names of one declaration share the place: each is named
+	// with its place among them.
+	if res := oneDeclaration(qname, at); res.Ambiguous() {
+		return res, nil
+	}
 	return NameResolution{QName: qname, Nodes: at, ByID: true}, nil
+}
+
+// byCanonicalID answers a canonical id that names n: n alone, unless other
+// declarations carry the same id (the init functions of one package share
+// "<path>.init"), when it is ambiguous with their printed names.
+func byCanonicalID(r StoreReader, cid string, n types.Node) (NameResolution, error) {
+	nodes, err := r.FindSymbol(n.QualifiedName, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
+	if err != nil {
+		return NameResolution{}, fmt.Errorf("resolve %q: %w", cid, err)
+	}
+	var same []types.Node
+	for _, m := range nodes {
+		if m.CanonicalID == cid {
+			same = append(same, m)
+		}
+	}
+	if res := oneDeclaration(n.QualifiedName, same); res.Ambiguous() {
+		return res, nil
+	}
+	res := NameResolution{QName: n.QualifiedName, Nodes: []types.Node{n}, ByID: true}
+	named, err := r.FindSymbol(cid, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
+	if err != nil {
+		return NameResolution{}, fmt.Errorf("resolve %q: %w", cid, err)
+	}
+	for _, m := range named {
+		if m.ID != n.ID && declKey(m) != declKey(n) {
+			res.AlsoNamed = append(res.AlsoNamed, PrintedName(r, m))
+		}
+	}
+	sort.Strings(res.AlsoNamed)
+	return res, nil
 }
 
 // MutexSuffix ends the name of a mutex as a seed: the qualified name of the
@@ -574,32 +630,6 @@ func resolveMutex(r StoreReader, declaring, language string) (NameResolution, er
 	return NameResolution{QName: declaring, Nodes: mutexes, ByID: true}, nil
 }
 
-// NameOf returns the name that names n alone, the one a tool prints for n:
-// its PrintedQName, or that name's site form ("<name>@<file>:<line>") when
-// several declarations carry it, as ResolveName lists them. Every such name
-// resolves back to n (a promoted copy's to the method it copies).
-func NameOf(r StoreReader, n types.Node) (string, error) {
-	nodes, err := r.FindSymbol(n.QualifiedName, true, FindSymbolOptions{Limit: FindSymbolNoLimit})
-	if err != nil {
-		return "", fmt.Errorf("name of %s: %w", n.QualifiedName, err)
-	}
-	name := PrintedQName(n)
-	if name != n.QualifiedName {
-		// The Mutex node of a variable: among the Mutex nodes of the name.
-		var mutexes []types.Node
-		for _, m := range nodes {
-			if m.Type == types.NodeMutex {
-				mutexes = append(mutexes, m)
-			}
-		}
-		nodes = mutexes
-	}
-	if oneDeclaration(n.QualifiedName, nodes).Ambiguous() {
-		return siteName(name, n), nil
-	}
-	return name, nil
-}
-
 // PrintedQName is the qualified name a tool prints for n: the qualified name,
 // except for the Mutex node of a variable, which carries the variable's own
 // name and is printed "<name>#mutex" (MutexSuffix), the name that resolves to
@@ -623,20 +653,21 @@ type declPlace struct {
 // the nodes when they are one declaration, else the candidates that name
 // each declaration (see ResolveName).
 func oneDeclaration(qname string, nodes []types.Node) NameResolution {
+	printed := printedNames(nodes)
 	all := len(nodes)
-	nodes = withoutMutexOfValue(nodes)
+	named := withoutMutexOfValue(nodes)
 	// Fewer nodes than carry the name: they are exact nodes, so a walk
 	// starts from them and not from every node of the name.
-	byID := len(nodes) < all
-	places := map[declPlace]types.Node{}
+	byID := len(named) < all
+	reps := map[string]types.Node{}
 	byLanguage := map[string]int{}
-	for _, n := range nodes {
-		if n.CanonicalID != "" || n.Type == types.NodeExternal {
+	for _, n := range named {
+		if _, isCopy := PromotedFrom(n); isCopy {
 			continue
 		}
-		p := declPlace{language: n.Language, file: n.FilePath, line: n.StartLine}
-		if _, seen := places[p]; !seen {
-			places[p] = n
+		k := declKey(n)
+		if _, seen := reps[k]; !seen {
+			reps[k] = n
 			byLanguage[n.Language]++
 		}
 	}
@@ -645,23 +676,22 @@ func oneDeclaration(qname string, nodes []types.Node) NameResolution {
 		several = several || c > 1
 	}
 	if !several {
-		return NameResolution{QName: qname, Nodes: nodes, ByID: byID}
+		return NameResolution{QName: qname, Nodes: named, ByID: byID}
 	}
-	ps := make([]declPlace, 0, len(places))
-	for p := range places {
-		if byLanguage[p.language] > 1 {
-			ps = append(ps, p)
+	var ps []types.Node
+	for _, n := range reps {
+		if byLanguage[n.Language] > 1 {
+			ps = append(ps, n)
 		}
 	}
-	sort.Slice(ps, func(i, j int) bool {
-		if ps[i].file != ps[j].file {
-			return ps[i].file < ps[j].file
+	sort.Slice(ps, func(i, j int) bool { return placeLess(ps[i], ps[j]) })
+	candidates := make([]string, 0, len(ps))
+	seen := map[string]bool{}
+	for _, n := range ps {
+		if c := printed[n.ID]; !seen[c] {
+			seen[c] = true
+			candidates = append(candidates, c)
 		}
-		return ps[i].line < ps[j].line
-	})
-	candidates := make([]string, len(ps))
-	for i, p := range ps {
-		candidates[i] = siteName(qname, places[p])
 	}
 	return NameResolution{Candidates: candidates}
 }
@@ -700,6 +730,30 @@ func otherCaseNames(r StoreReader, name string, opts FindSymbolOptions) (NameRes
 		names = names[:otherCaseLimit]
 	}
 	return NameResolution{OtherCase: names}, nil
+}
+
+// candidatesOf names each declaration among nodes (the matches of a bare
+// name) by its printed name, decided over the whole graph (PrintedName): a
+// qualified name that other declarations carry is listed in its site form,
+// once per declaration. Sorted, each once.
+func candidatesOf(r StoreReader, nodes []types.Node) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, n := range nodes {
+		if _, isCopy := PromotedFrom(n); isCopy {
+			if !seen[n.QualifiedName] {
+				seen[n.QualifiedName] = true
+				out = append(out, n.QualifiedName)
+			}
+			continue
+		}
+		if name := PrintedName(r, n); !seen[name] {
+			seen[name] = true
+			out = append(out, name)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // distinctQNames returns the distinct qualified names of nodes, sorted, or

@@ -840,3 +840,43 @@ func TestLockEdges_UndecidedCounted(t *testing.T) {
 		t.Errorf("undecided functions = %d, want 1 (Ledger.Jump)", st.UndecidedFunctions)
 	}
 }
+
+// TestImplementsEdgesInFixedOrder: implements and extends edges come out
+// sorted by type, source and target, whatever order packages.Load lists the packages in,
+// so a build of one source stores them with the same row ids each time
+// (304 edges of go-stablenet changed ids between two builds).
+func TestImplementsEdgesInFixedOrder(t *testing.T) {
+	root, err := filepath.Abs(fidelityRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rg, err := gop.LoadAndResolve(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pkgs, err := packages.Load(&packages.Config{Dir: root, Mode: packages.NeedName | packages.NeedFiles |
+		packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedCompiledGoFiles}, "./...")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, order := range [][]*packages.Package{pkgs, reversed(pkgs)} {
+		edges, _ := gop.EmitImplementsEdges(order, rg.Nodes)
+		if len(edges) == 0 {
+			t.Fatal("no implements edges in the fixture")
+		}
+		for i := 1; i < len(edges); i++ {
+			a, b := edges[i-1], edges[i]
+			if a.Type > b.Type || a.Type == b.Type && (a.Src > b.Src || a.Src == b.Src && a.Dst > b.Dst) {
+				t.Fatalf("edges out of order at %d: %s %s->%s before %s %s->%s", i, a.Type, a.Src, a.Dst, b.Type, b.Src, b.Dst)
+			}
+		}
+	}
+}
+
+func reversed(pkgs []*packages.Package) []*packages.Package {
+	out := make([]*packages.Package, len(pkgs))
+	for i, p := range pkgs {
+		out[len(pkgs)-1-i] = p
+	}
+	return out
+}
