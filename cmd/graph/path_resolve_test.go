@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -75,5 +76,79 @@ func TestPrintPath_SiteNames(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "`p.F.x@p/f.go:9`") || !strings.Contains(out.String(), "`p.F`") {
 		t.Errorf("path output:\n%s", out.String())
+	}
+}
+
+// codeSpans returns the text in backticks in out.
+func codeSpans(out string) []string {
+	var spans []string
+	for i, part := range strings.Split(out, "`") {
+		if i%2 == 1 {
+			spans = append(spans, part)
+		}
+	}
+	return spans
+}
+
+// cliStore holds a function that declares x twice and calls a helper of a
+// name another package declares too, so short names and plain qualified
+// names would not open one node.
+func cliStore(t *testing.T) (persist.Store, []types.Node, []types.Edge) {
+	t.Helper()
+	node := func(id string, nt types.NodeType, name, qname, file string, line int) types.Node {
+		return types.Node{ID: id, Type: nt, Name: name, QualifiedName: qname, CanonicalID: map[bool]string{true: "ex/" + qname + "@" + file}[nt != types.NodeLocalVariable],
+			FilePath: file, StartLine: line, EndLine: line, PageRank: 0.1}
+	}
+	nodes := []types.Node{
+		node("cc00000000000001", types.NodeFunction, "Run", "p.Run", "p/run.go", 1),
+		node("cc00000000000002", types.NodeLocalVariable, "x", "p.Run.x", "p/run.go", 3),
+		node("cc00000000000003", types.NodeLocalVariable, "x", "p.Run.x", "p/run.go", 6),
+		node("cc00000000000004", types.NodeFunction, "help", "util.help", "a/util/h.go", 2),
+		node("cc00000000000005", types.NodeFunction, "help", "util.help", "b/util/h.go", 2),
+	}
+	edges := []types.Edge{
+		{Src: "cc00000000000001", Dst: "cc00000000000002", Type: types.EdgeDefines},
+		{Src: "cc00000000000001", Dst: "cc00000000000003", Type: types.EdgeDefines},
+		{Src: "cc00000000000001", Dst: "cc00000000000004", Type: types.EdgeCalls},
+		{Src: "cc00000000000001", Dst: "cc00000000000005", Type: types.EdgeCalls},
+	}
+	return pathStore(t, nodes), nodes, edges
+}
+
+// TestCLINamesRoundTrip: every node name ckg query, ckg path and ckg report
+// print in code spans opens exactly one node. The query's neighbourhood
+// printed short names (299 of 300 sampled did not resolve back), and the
+// report printed short and plain qualified names.
+func TestCLINamesRoundTrip(t *testing.T) {
+	s, nodes, edges := cliStore(t)
+	name := func(n types.Node) string { return persist.PrintedName(s, n) }
+	var q bytes.Buffer
+	renderQueryAnswer(&q, "run", nodes[:1], nodes, buildAdjacency(edges), buildEdgeIndex(edges), 2, 2000, name)
+	var p strings.Builder
+	path, hops := bfsShortestPath(nodes, edges, "cc00000000000003", "cc00000000000005", 4)
+	if err := printPath(&p, s, nodes, path, hops); err != nil {
+		t.Fatal(err)
+	}
+	for _, out := range []string{q.String(), p.String()} {
+		spans := codeSpans(out)
+		if len(spans) == 0 {
+			t.Fatalf("no names in:\n%s", out)
+		}
+		for _, sp := range spans {
+			res, err := persist.ResolveName(s, sp, "")
+			if err != nil || len(res.Nodes) != 1 {
+				t.Errorf("%q printed in\n%s\nresolves to %d nodes (candidates %v)", sp, out, len(res.Nodes), res.Candidates)
+			}
+		}
+	}
+	// The report prints in code spans the names it is given, never a short
+	// name: mark each printed name to find any that bypasses it.
+	report := buildReport(persist.Manifest{}, nodes, edges, nil, 5, func(n types.Node) string { return "@" + n.ID })
+	for _, sp := range codeSpans(report) {
+		for _, n := range nodes {
+			if sp == n.Name || sp == n.QualifiedName {
+				t.Errorf("report prints %q, the short or plain name of %s", sp, n.ID)
+			}
+		}
 	}
 }

@@ -79,8 +79,8 @@ func TestQueryArrowFollowsRelation(t *testing.T) {
 		seed int
 		want []string
 	}{
-		{0, []string{"- `callstack` ←[writes_field]— `newCallTracer`", "- `newCallTracer` ←[calls]— `run`"}},
-		{2, []string{"- `run` —[calls]→ `newCallTracer`", "- `newCallTracer` —[writes_field]→ `callstack`"}},
+		{0, []string{"- `native.callTracer.callstack` ←[writes_field]— `native.newCallTracer`", "- `native.newCallTracer` ←[calls]— `native.run`"}},
+		{2, []string{"- `native.run` —[calls]→ `native.newCallTracer`", "- `native.newCallTracer` —[writes_field]→ `native.callTracer.callstack`"}},
 	} {
 		var out bytes.Buffer
 		renderQueryAnswer(&out, "q", nodes[tc.seed:tc.seed+1], nodes, buildAdjacency(edges), buildEdgeIndex(edges), 2, 2000, persist.PrintedQName)

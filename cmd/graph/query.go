@@ -239,11 +239,13 @@ func buildEdgeIndex(edges []types.Edge) edgeIndex {
 const (
 	queryLineForward = "- `%s` —[%s]→ `%s` · %s:%d\n"
 	queryLineReverse = "- `%s` ←[%s]— `%s` · %s:%d\n"
-	queryLegend      = "_`a` —[r]→ `b`: a has relation r to b. `a` ←[r]— `b`: b has it to a._\n\n"
+	queryLegend      = "_A —[r]→ B: A has relation r to B. A ←[r]— B: B has it to A. Every name in a code span opens that node._\n\n"
 )
 
 // renderQueryAnswer writes the seeds and the neighbourhood of an answer;
-// name is the name printed for a seed (persist.PrintedName in a build).
+// name is the name printed for a node in code spans, the one that opens
+// exactly that node (persist.PrintedName in a build). The neighbourhood
+// printed short names, and 299 of 300 sampled did not resolve back.
 func renderQueryAnswer(w io.Writer, question string,
 	seeds []types.Node, allNodes []types.Node,
 	adj map[string][]string, eidx edgeIndex,
@@ -255,7 +257,7 @@ func renderQueryAnswer(w io.Writer, question string,
 	_, _ = fmt.Fprintf(w, "## Query: %s\n\n", question)
 	_, _ = fmt.Fprintf(w, "Seeds (top-%d by keyword score):\n\n", len(seeds))
 	for i, s := range seeds {
-		_, _ = fmt.Fprintf(w, "%d. **`%s`** [%s] · `%s` · %s:%d\n",
+		_, _ = fmt.Fprintf(w, "%d. **%s** [%s] · `%s` · %s:%d\n",
 			i+1, s.Name, s.Type, name(s), s.FilePath, s.StartLine)
 	}
 	_, _ = fmt.Fprintln(w)
@@ -296,7 +298,7 @@ bfs:
 				if e.Src != src {
 					format = queryLineReverse
 				}
-				line := fmt.Sprintf(format, cur.Name, e.Type, other.Name, other.FilePath, other.StartLine)
+				line := fmt.Sprintf(format, name(cur), e.Type, name(other), other.FilePath, other.StartLine)
 				if (rendered.Len()+len(line))/charsPerToken > tokenBudget {
 					rendered.WriteString("- _… token budget reached; rerun with --budget=N for more._\n")
 					tokens = rendered.Len() / charsPerToken

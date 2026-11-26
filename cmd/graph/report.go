@@ -70,7 +70,8 @@ calls, runs in seconds even on 220K-node graphs.`,
 				topics = nil
 			}
 
-			report := buildReport(manifest, nodes, edges, topics, topGod)
+			report := buildReport(manifest, nodes, edges, topics, topGod,
+				func(n types.Node) string { return persist.PrintedName(store, n) })
 			if err := os.WriteFile(out, []byte(report), 0o644); err != nil {
 				return fmt.Errorf("write report: %w", err)
 			}
@@ -92,8 +93,12 @@ calls, runs in seconds even on 220K-node graphs.`,
 // topics is the persisted topic_tree (LoadHierarchy("topic")) — empty
 // is OK; the Communities + Knowledge Gaps sections degrade gracefully
 // without it.
+//
+// name is the name the report prints for a node in code spans, the one that
+// opens exactly that node (persist.PrintedName in a build); short names were
+// printed, and most did not resolve back to their node.
 func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
-	topics []persist.HierarchyRow, topGod int) string {
+	topics []persist.HierarchyRow, topGod int, name func(types.Node) string) string {
 	var b strings.Builder
 
 	// ── Header
@@ -140,8 +145,8 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 		b.WriteString("| # | Type | Name | Qualified Name | PageRank | In/Out |\n")
 		b.WriteString("|---|------|------|----------------|---------:|-------:|\n")
 		for i, n := range gods {
-			_, _ = fmt.Fprintf(&b, "| %d | %s | `%s` | `%s` | %.5f | %d/%d |\n",
-				i+1, n.Type, n.Name, n.QualifiedName,
+			_, _ = fmt.Fprintf(&b, "| %d | %s | %s | `%s` | %.5f | %d/%d |\n",
+				i+1, n.Type, n.Name, name(n),
 				n.PageRank, n.InDegree, n.OutDegree)
 		}
 		b.WriteString("\n")
@@ -171,7 +176,7 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 		b.WriteString("| Community | Size | Cohesion | Sample symbols |\n")
 		b.WriteString("|-----------|-----:|---------:|----------------|\n")
 		for _, c := range commSummary {
-			samples := sampleCommunityNames(c.members, nodes, 5)
+			samples := sampleCommunityNames(c.members, nodes, 5, name)
 			_, _ = fmt.Fprintf(&b, "| `%s` | %d | %.3f | %s |\n",
 				truncateRunes(c.parentID, 24), c.size, c.cohesion, samples)
 		}
@@ -190,7 +195,7 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 				if i >= 5 {
 					break
 				}
-				labels = append(labels, fmt.Sprintf("`%s`", n.Name))
+				labels = append(labels, fmt.Sprintf("`%s`", name(n)))
 			}
 			b.WriteString(" " + strings.Join(labels, ", "))
 			if len(gaps.isolated) > 5 {
@@ -213,7 +218,7 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 	b.WriteString("## Suggested questions\n\n")
 	b.WriteString("Questions the graph is uniquely positioned to answer.\n\n")
 	bc := score.ApproxBetweenness(nodes, edges, 100, 42)
-	for _, q := range suggestedQuestionsV2(nodes, edges, gods, hotFiles, communities, cohesions, gaps, bc, axisCounts) {
+	for _, q := range suggestedQuestionsV2(nodes, edges, gods, hotFiles, communities, cohesions, gaps, bc, axisCounts, name) {
 		_, _ = fmt.Fprintf(&b, "- %s\n", q)
 	}
 	b.WriteString("\n")
@@ -530,7 +535,7 @@ func topCommunities(communities map[string][]string, cohesions map[string]float6
 // sampleCommunityNames returns up to n node names from the community,
 // preferring high-PageRank symbols so the sample reads as "what this
 // community is about" rather than a random slice.
-func sampleCommunityNames(memberIDs []string, allNodes []types.Node, n int) string {
+func sampleCommunityNames(memberIDs []string, allNodes []types.Node, n int, name func(types.Node) string) string {
 	idx := make(map[string]types.Node, len(allNodes))
 	for _, nd := range allNodes {
 		idx[nd.ID] = nd
@@ -552,7 +557,7 @@ func sampleCommunityNames(memberIDs []string, allNodes []types.Node, n int) stri
 	}
 	parts := make([]string, n)
 	for i := 0; i < n; i++ {
-		parts[i] = "`" + picked[i].Name + "`"
+		parts[i] = "`" + name(picked[i]) + "`"
 	}
 	return strings.Join(parts, ", ")
 }
@@ -628,14 +633,15 @@ func suggestedQuestionsV2(
 	gaps knowledgeGaps,
 	bc map[string]float64,
 	axes map[string]int,
+	name func(types.Node) string,
 ) []string {
 	var out []string
 
 	// 1. AMBIGUOUS edges
 	for _, e := range edges {
 		if e.Confidence == types.ConfAmbiguous && len(out) < 3 {
-			srcName := nodeNameByID(nodes, e.Src)
-			dstName := nodeNameByID(nodes, e.Dst)
+			srcName := nodeNameByID(nodes, e.Src, name)
+			dstName := nodeNameByID(nodes, e.Dst, name)
 			out = append(out, fmt.Sprintf(
 				"What is the exact relationship between `%s` and `%s`? _(edge tagged AMBIGUOUS, relation: %s)_",
 				srcName, dstName, e.Type))
@@ -672,7 +678,7 @@ func suggestedQuestionsV2(
 		nd := idx[br.id]
 		out = append(out, fmt.Sprintf(
 			"Why does `%s` bridge so much of the graph? _(betweenness centrality %.4f — a cross-cutting concern)_",
-			nd.Name, br.score))
+			name(nd), br.score))
 	}
 
 	// 3. God nodes — substitute "What touches X?" since CKG rarely has
@@ -683,12 +689,12 @@ func suggestedQuestionsV2(
 		}
 		out = append(out, fmt.Sprintf(
 			"What calls `%s`? _(top-PageRank — its callers define the refactoring blast radius)_",
-			gn.QualifiedName))
+			name(gn)))
 	}
 	if len(gods) >= 3 {
 		out = append(out, fmt.Sprintf(
 			"How are `%s`, `%s`, and `%s` connected? _(the three biggest hubs — paths between them are the load-bearing call chains)_",
-			gods[0].Name, gods[1].Name, gods[2].Name))
+			name(gods[0]), name(gods[1]), name(gods[2])))
 	}
 
 	// 4. Isolated nodes
@@ -698,7 +704,7 @@ func suggestedQuestionsV2(
 			if i >= 3 {
 				break
 			}
-			labels = append(labels, "`"+n.Name+"`")
+			labels = append(labels, "`"+name(n)+"`")
 		}
 		out = append(out, fmt.Sprintf(
 			"What connects %s to the rest of the system? _(degree ≤ 1 — possible documentation gaps)_",
@@ -759,10 +765,10 @@ func firstHub(hubs []fileHub) string {
 	return hubs[0].path
 }
 
-func nodeNameByID(nodes []types.Node, id string) string {
+func nodeNameByID(nodes []types.Node, id string, name func(types.Node) string) string {
 	for _, n := range nodes {
 		if n.ID == id {
-			return n.Name
+			return name(n)
 		}
 	}
 	return id[:min(8, len(id))]
