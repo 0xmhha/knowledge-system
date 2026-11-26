@@ -37,16 +37,22 @@ func newDeclIndex(nodes []types.Node) declIndex {
 
 // at returns the node of the declaration with canonical id cid (or, when no
 // node has that id, qualified name qname) declared at pos.
+//
+// A canonical id names one declaration, so a single candidate found by it is
+// the answer. The qualified name does not: it uses the package name, which
+// two programs share (`package main`), so a candidate found by it counts only
+// when it is declared in pos's file.
 func (ix declIndex) at(cid, qname string, pos token.Position) *types.Node {
 	cands := ix.byCanonical[cid]
-	if cid == "" || len(cands) == 0 {
+	byName := cid == "" || len(cands) == 0
+	if byName {
 		cands = ix.byQname[qname]
 	}
-	return pickDecl(cands, pos)
+	return pickDecl(cands, pos, byName)
 }
 
-func pickDecl(cands []*types.Node, pos token.Position) *types.Node {
-	if len(cands) == 1 {
+func pickDecl(cands []*types.Node, pos token.Position, needFile bool) *types.Node {
+	if len(cands) == 1 && (!needFile || sameFile(cands[0].FilePath, pos.Filename)) {
 		return cands[0]
 	}
 	var inFile *types.Node

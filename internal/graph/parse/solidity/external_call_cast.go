@@ -2,8 +2,6 @@ package solidity
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
 // Sol cast / wrapper shape detection for HasExternalCall.
@@ -125,7 +123,7 @@ func (v *declVisitor) runExternalCallCastMarker() {
 			if !ok {
 				continue
 			}
-			id := parse.MakeID(fnQ, "sol", fnStart)
+			id := v.declID(fnQ, fnStart)
 			if isSelfCast(inner, v.src) {
 				selfAffected[id] = true
 				if methodName == "delegatecall" {

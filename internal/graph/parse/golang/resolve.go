@@ -45,13 +45,20 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 		// CallSite -> enclosing Function/Method of the same file, by byte
-		// span. The CallSite qname prefix ("<parentQname>#CallSite@<offset>")
+		// span. The CallSite qname prefix ("<parentQname>#CallSite@<start>-<end>")
 		// is not unique across packages that share a name (two `package
 		// main`, several `init`), so looking the parent up by it attached
 		// calls to the wrong function. Spans work for freshly parsed files and
 		// for cached files reloaded without their edges.
 		for id, parent := range enclosingFuncs(r.Nodes) {
 			callSiteParent[id] = parent
+		}
+		// A call site in a package-level initialiser is inside no function:
+		// the variable it initialises makes the call. The contains edge of
+		// the site names that variable exactly; enclosingFuncs falls back to
+		// spans for files reloaded without their edges.
+		for id, owner := range initialiserOwners(r.Nodes, r.Edges) {
+			callSiteParent[id] = owner
 		}
 	}
 	// The suffix fallback below is for AST-only builds, where targets are
@@ -238,13 +245,18 @@ func readFile(path string) ([]byte, error) {
 	return readFileOS(path)
 }
 
-// enclosingFuncs maps each CallSite node of one file to the innermost
-// Function or Method node whose byte span contains it.
+// enclosingFuncs maps each CallSite node of one file to the node that makes
+// the call: the innermost Function or Method whose byte span contains it, or,
+// for a site inside no function, the innermost Variable whose span contains
+// it (the call is in that variable's package-level initialiser).
 func enclosingFuncs(nodes []types.Node) map[string]string {
-	var funcs []types.Node
+	var funcs, vars []types.Node
 	for _, n := range nodes {
-		if n.Type == types.NodeFunction || n.Type == types.NodeMethod {
+		switch n.Type {
+		case types.NodeFunction, types.NodeMethod:
 			funcs = append(funcs, n)
+		case types.NodeVariable:
+			vars = append(vars, n)
 		}
 	}
 	out := map[string]string{}
@@ -252,17 +264,46 @@ func enclosingFuncs(nodes []types.Node) map[string]string {
 		if n.Type != types.NodeCallSite {
 			continue
 		}
-		best := -1
-		for i, f := range funcs {
-			if f.FilePath != n.FilePath || n.StartByte < f.StartByte || n.StartByte >= f.EndByte {
-				continue
-			}
-			if best < 0 || f.EndByte-f.StartByte < funcs[best].EndByte-funcs[best].StartByte {
-				best = i
-			}
+		if id := innermost(funcs, n); id != "" {
+			out[n.ID] = id
+		} else if id := innermost(vars, n); id != "" {
+			out[n.ID] = id
 		}
-		if best >= 0 {
-			out[n.ID] = funcs[best].ID
+	}
+	return out
+}
+
+// innermost returns the ID of the smallest of owners, in site's file, whose
+// byte span contains the start of site; "" when none does.
+func innermost(owners []types.Node, site types.Node) string {
+	best := -1
+	for i, o := range owners {
+		if o.FilePath != site.FilePath || site.StartByte < o.StartByte || site.StartByte >= o.EndByte {
+			continue
+		}
+		if best < 0 || o.EndByte-o.StartByte < owners[best].EndByte-owners[best].StartByte {
+			best = i
+		}
+	}
+	if best < 0 {
+		return ""
+	}
+	return owners[best].ID
+}
+
+// initialiserOwners maps each CallSite node that a Variable contains to that
+// Variable. The declaration pass adds the contains edge when it walks a
+// package-level initialiser, and it knows which name a value belongs to,
+// which spans do not say for `var a, b = f(), g()`.
+func initialiserOwners(nodes []types.Node, edges []types.Edge) map[string]string {
+	kind := make(map[string]types.NodeType, len(nodes))
+	for _, n := range nodes {
+		kind[n.ID] = n.Type
+	}
+	out := map[string]string{}
+	for _, e := range edges {
+		if e.Type == types.EdgeContains && kind[e.Src] == types.NodeVariable && kind[e.Dst] == types.NodeCallSite {
+			out[e.Dst] = e.Src
 		}
 	}
 	return out

@@ -2,6 +2,7 @@ package golang
 
 import (
 	"go/ast"
+	"go/token"
 	gotypes "go/types"
 
 	"golang.org/x/tools/go/packages"
@@ -61,7 +62,24 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 	// Index the symbols that can be a uses_type SRC: Function, Method
 	// (callers using it as param/return), Struct (caller using it as field
 	// type's container).
-	srcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct)
+	srcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct,
+		types.NodeInterface, types.NodeTypeAlias)
+	// The struct pass walks the fields of a type's underlying struct. A
+	// defined type over a struct (`type snapHandler handler`) has that
+	// underlying struct too but names only handler, so the pass looks its
+	// sources up among Struct nodes alone.
+	structIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct)
+	// Functions are found the way the other post-Resolve passes find them:
+	// several init functions of a package share one canonical id.
+	decls := newDeclIndex(nodes)
+
+	// An edge's file is the file of the node it leaves, relative to the source
+	// root as every node path is. The compiled file name the walkers pass as
+	// hintFile is absolute and stays on pending refs only.
+	fileOf := make(map[string]string, len(nodes))
+	for i := range nodes {
+		fileOf[nodes[i].ID] = nodes[i].FilePath
+	}
 
 	emitted := make(map[edgeDedupKey]struct{}, len(srcIndex.byQname)*2)
 	var edges []types.Edge
@@ -80,7 +98,7 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 			edges = append(edges, types.Edge{
 				Src: srcID, Dst: dstID, Type: types.EdgeUsesType,
 				Count: 1, Confidence: types.ConfExtracted,
-				Line: line, FilePath: hintFile,
+				Line: line, FilePath: fileOf[srcID],
 			})
 			return
 		}
@@ -108,9 +126,12 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		}
 		// Functions and methods (Function/Method nodes): walk param + result
 		// signatures.
-		emitUsesTypeForFunctions(pkg, pkgName, srcIndex, addEdge)
+		emitUsesTypeForFunctions(pkg, pkgName, decls, addEdge)
 		// Struct field types.
-		emitUsesTypeForStructs(scope, pkgName, srcIndex, addEdge)
+		emitUsesTypeForStructs(scope, pkgName, structIndex, addEdge)
+		// The types a type declaration names: an interface's method
+		// signatures, the target of a defined type or alias.
+		emitUsesTypeForTypeSpecs(pkg, pkgName, srcIndex, addEdge)
 	}
 
 	return edges, pending
@@ -125,7 +146,7 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 // edge.line and the same qname construction declarations.go uses.
 func emitUsesTypeForFunctions(
 	pkg *packages.Package, pkgName string,
-	srcIndex symbolIndex,
+	decls declIndex,
 	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
 ) {
 	if pkg.TypesInfo == nil || pkg.Fset == nil {
@@ -149,14 +170,15 @@ func emitUsesTypeForFunctions(
 			// exprName which strips pointer/selector.
 			var srcQname string
 			if fd.Recv != nil && len(fd.Recv.List) > 0 {
-				srcQname = pkgName + "." + exprName(fd.Recv.List[0].Type) + "." + fd.Name.Name
+				srcQname = pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
 			} else {
 				srcQname = pkgName + "." + fd.Name.Name
 			}
-			srcID, ok := srcIndex.lookup(pkg.TypesInfo.Defs[fd.Name], srcQname)
-			if !ok {
+			src := decls.at(goCanonicalID(pkg.TypesInfo.Defs[fd.Name]), srcQname, pkg.Fset.Position(fd.Pos()))
+			if src == nil {
 				continue
 			}
+			srcID := src.ID
 			line := pkg.Fset.Position(fd.Pos()).Line
 			// Parameters
 			if fd.Type.Params != nil {
@@ -178,8 +200,92 @@ func emitUsesTypeForFunctions(
 					})
 				}
 			}
+			// The receiver type and every type the body names (a
+			// conversion, a type assertion, a variable's declared type, a
+			// type argument): on go-stablenet 10,754 of the 24,653 type
+			// references go/types sees were outside the signatures and
+			// struct fields walked above.
+			named := func(tn *gotypes.TypeName, qname string, pos token.Pos) {
+				addEdge(srcID, tn, qname, pkg.Fset.Position(pos).Line, hintFile)
+			}
+			if fd.Recv != nil {
+				forEachTypeNameUnder(pkg.TypesInfo, fd.Recv, named)
+			}
+			forEachTypeNameUnder(pkg.TypesInfo, fd.Type, named)
+			if fd.Body != nil {
+				forEachTypeNameUnder(pkg.TypesInfo, fd.Body, named)
+			}
 		}
 	}
+}
+
+// emitUsesTypeForTypeSpecs emits a uses_type edge from each package-level
+// type declaration to the types its type expression names: the parameter and
+// result types of an interface's methods and the interfaces it embeds, the
+// target of a defined type (`type List []Item`) or of an alias, the
+// parameters of a function type. Struct fields are also covered by
+// emitUsesTypeForStructs; the edge is deduplicated.
+func emitUsesTypeForTypeSpecs(
+	pkg *packages.Package, pkgName string,
+	srcIndex symbolIndex,
+	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
+) {
+	if pkg.TypesInfo == nil || pkg.Fset == nil {
+		return
+	}
+	for fileIdx, f := range pkg.Syntax {
+		if f == nil {
+			continue
+		}
+		var hintFile string
+		if fileIdx < len(pkg.CompiledGoFiles) {
+			hintFile = pkg.CompiledGoFiles[fileIdx]
+		}
+		for _, decl := range f.Decls {
+			gd, ok := decl.(*ast.GenDecl)
+			if !ok || gd.Tok != token.TYPE {
+				continue
+			}
+			for _, spec := range gd.Specs {
+				ts, ok := spec.(*ast.TypeSpec)
+				if !ok || ts.Type == nil {
+					continue
+				}
+				self := pkg.TypesInfo.Defs[ts.Name]
+				srcID, ok := srcIndex.lookup(self, pkgName+"."+ts.Name.Name)
+				if !ok {
+					continue
+				}
+				forEachTypeNameUnder(pkg.TypesInfo, ts.Type, func(tn *gotypes.TypeName, qname string, pos token.Pos) {
+					if gotypes.Object(tn) != self {
+						addEdge(srcID, tn, qname, pkg.Fset.Position(pos).Line, hintFile)
+					}
+				})
+			}
+		}
+	}
+}
+
+// forEachTypeNameUnder yields every package-level named type that an
+// identifier under root names, with the identifier's position. Type
+// parameters and types declared inside a function are not package-level and
+// are skipped.
+func forEachTypeNameUnder(info *gotypes.Info, root ast.Node, yield func(tn *gotypes.TypeName, qname string, pos token.Pos)) {
+	if info == nil || root == nil {
+		return
+	}
+	ast.Inspect(root, func(n ast.Node) bool {
+		id, ok := n.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		tn, ok := info.Uses[id].(*gotypes.TypeName)
+		if !ok || tn.Pkg() == nil || tn.Parent() != tn.Pkg().Scope() {
+			return true
+		}
+		yield(tn, tn.Pkg().Name()+"."+tn.Name(), id.Pos())
+		return true
+	})
 }
 
 // emitUsesTypeForStructs walks every Struct type at package scope and

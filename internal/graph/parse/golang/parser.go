@@ -41,6 +41,9 @@ type Parser struct {
 	// EmitImplementsEdges) can iterate package scopes. Same lifetime as
 	// fileIndex — both populated by SetPackages, both nil in AST-only mode.
 	pkgs []*packages.Package
+	// netRPC reports whether any loaded package imports net/rpc. Set by
+	// SetPackages; in AST-only mode each file is asked for its own imports.
+	netRPC bool
 	// ext indexes the functions, methods and types the build uses but does
 	// not contain (External nodes, schema 1.36). Built on first use.
 	ext     *externalIndex
@@ -85,10 +88,12 @@ func (p *Parser) SetPackages(pkgs []*packages.Package) {
 	if len(pkgs) == 0 {
 		p.fileIndex = nil
 		p.pkgs = nil
+		p.netRPC = false
 		return
 	}
 	p.fileIndex = buildFileIndex(pkgs)
 	p.pkgs = pkgs
+	p.netRPC = importsPackage(pkgs, netRPCPath)
 	p.ext, p.extOnce = nil, sync.Once{}
 }
 
@@ -164,6 +169,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 	if tf, ok := p.lookupTyped(path); ok {
 		v := newDeclVisitor(tf.fset, rel, tf.file.Name.Name)
 		v.typesInfo = tf.info
+		v.netRPC = p.netRPC
 		// Mutex nodes must be emitted BEFORE the body walk so the Lock/Unlock
 		// detector (in statements.go's CallExpr case) can resolve receivers
 		// to the matching Mutex node ID. Channel emission stays inline with
@@ -189,6 +195,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
 	v := newDeclVisitor(p.fset, rel, f.Name.Name)
+	v.netRPC = fileImports(f, netRPCPath)
 	v.emitConcurrencyDecls(f)
 	ast.Walk(v, f)
 	v.emitDistributedDecls(f)

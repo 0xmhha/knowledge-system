@@ -6,32 +6,23 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// Cross-file enum size propagation audit. A
-// per-file enumSizes index drives 1-byte
-// packing for enum-typed state-vars. Cross-file enum references
-// (`Ext.Status` after `import "./status_lib.sol" as Ext`) stay
-// outside the per-file map and fall through to solTypeSize's
-// conservative 32-byte fallback.
+// A state variable typed as an enum of another file (`Ext.Status` after
+// `import "./status_lib.sol" as Ext`) packs like the enum it is: one byte for
+// up to 256 values.
 //
-// This audit locks the current conservative behaviour with this
-// test. Promoting to actual cross-file size propagation needs a
-// globalEnumSizes index aggregated across ParseResults and a
-// Pass-2 post-pass that updates SlotIndex retroactively — out of
-// scope here.
-//
-// A future regression that mis-extends per-file enumSizes to
-// match qualified names (e.g. by stripping the namespace prefix
-// blindly) would silently change slot indices on cross-file
-// holders and fail this lock.
-func TestStorageSlot_CrossFileEnumConservative(t *testing.T) {
+// This test used to lock a known defect: enum sizes were kept per file, so a
+// cross-file enum fell back to a full slot (status1 = 1, tail = 2). Sizes are
+// now read from the nodes of every file (typeSizesFromNodes), so `head` and
+// `status1` share slot 0 and `tail` is in slot 1.
+func TestStorageSlot_CrossFileEnum(t *testing.T) {
 	nodes, _ := parseResolveMultiSol(t,
 		"testdata/storage_slot_cross_file_enum",
 		[]string{"status_lib.sol", "holder.sol"})
 
 	want := map[string]int{
 		"Holder.head":    0,
-		"Holder.status1": 1, // locked: cross-file enum → full slot
-		"Holder.tail":    2, // uint256 advances to next slot
+		"Holder.status1": 0, // one byte, shares the slot of head
+		"Holder.tail":    1, // uint256 starts the next slot
 	}
 	got := map[string]int{}
 	for _, n := range nodes {
@@ -49,8 +40,7 @@ func TestStorageSlot_CrossFileEnumConservative(t *testing.T) {
 			continue
 		}
 		if g != w {
-			t.Errorf("NodeField %q SlotIndex: got %d, want %d (V15 conservative lock)",
-				qn, g, w)
+			t.Errorf("NodeField %q SlotIndex: got %d, want %d", qn, g, w)
 		}
 	}
 }

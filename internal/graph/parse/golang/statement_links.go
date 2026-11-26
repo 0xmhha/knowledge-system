@@ -45,9 +45,13 @@ type StatementStats struct {
 	Unresolved int // calls whose callee has no node (builtins, conversions, outside code, function values)
 }
 
+// stmtKey finds the node of a statement. A call site is also keyed by its
+// end byte, because the calls of a chain start at the same byte; for the
+// other kinds end is 0.
 type stmtKey struct {
 	file string
 	off  int
+	end  int
 	typ  types.NodeType
 }
 
@@ -69,33 +73,63 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 				}
 			}
 		case types.NodeIfStmt, types.NodeLoopStmt, types.NodeSwitchStmt, types.NodeReturnStmt, types.NodeGoroutine:
-			stmts[stmtKey{n.FilePath, n.StartByte, n.Type}] = n
+			stmts[stmtKey{n.FilePath, n.StartByte, 0, n.Type}] = n
 		case types.NodeCallSite:
 			if n.SubKind == "" { // send and recv sites are channel operations, not calls
-				stmts[stmtKey{n.FilePath, n.StartByte, n.Type}] = n
+				stmts[stmtKey{n.FilePath, n.StartByte, n.EndByte, n.Type}] = n
 			}
 		}
 	}
 	decls := newDeclIndex(nodes)
+	fields := newFieldIndex(fsetOf(pkgs), nodes)
 	c := &stmtCollector{seen: map[stmtEdgeKey]int{}}
+	// Each file is walked once (see fileVisits): walking the test variant's
+	// copy as well gave count 2 to 21,681 site_calls edges of go-stablenet.
+	walked := fileVisits{}
 	for _, pkg := range pkgs {
 		if pkg == nil || pkg.Types == nil || pkg.TypesInfo == nil {
 			continue
 		}
 		for _, f := range pkg.Syntax {
-			for _, decl := range f.Decls {
-				d, ok := decl.(*ast.FuncDecl)
-				if !ok || d.Body == nil {
-					continue
-				}
-				src := decls.at(goCanonicalID(pkg.TypesInfo.Defs[d.Name]), funcDeclQname(pkg.Types.Name(), d), pkg.Fset.Position(d.Pos()))
-				if src == nil {
-					continue
-				}
-				st.Functions++
+			if f == nil || !walked.first(pkg, f) {
+				continue
+			}
+			walk := func(src *types.Node, body ast.Node) {
 				w := &stmtWalker{c: c, st: &st, info: pkg.TypesInfo, fset: pkg.Fset, file: src.FilePath,
-					stmts: stmts, byCanonical: byCanonical, lhs: writtenIn(d.Body)}
-				w.region(d.Body, ctl{})
+					stmts: stmts, byCanonical: byCanonical, fields: fields, lhs: writtenIn(body)}
+				w.region(body, ctl{})
+			}
+			for _, decl := range f.Decls {
+				switch d := decl.(type) {
+				case *ast.FuncDecl:
+					if d.Body == nil {
+						continue
+					}
+					src := decls.at(goCanonicalID(pkg.TypesInfo.Defs[d.Name]), funcDeclQname(pkg.Types.Name(), d), pkg.Fset.Position(d.Pos()))
+					if src == nil {
+						continue
+					}
+					st.Functions++
+					walk(src, d.Body)
+				case *ast.GenDecl:
+					// The initialiser of a package-level variable holds
+					// statements and call sites of its own (schema 1.38).
+					if d.Tok != token.VAR {
+						continue
+					}
+					for _, spec := range d.Specs {
+						vs, ok := spec.(*ast.ValueSpec)
+						if !ok {
+							continue
+						}
+						for i, value := range vs.Values {
+							name := vs.Names[initialiserOwner(i, len(vs.Names))]
+							if src := byCanonical[goCanonicalID(pkg.TypesInfo.Defs[name])]; src != nil {
+								walk(src, value)
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -142,6 +176,7 @@ type stmtWalker struct {
 	file        string
 	stmts       map[stmtKey]*types.Node
 	byCanonical map[string]*types.Node
+	fields      fieldIndex
 	lhs         map[ast.Expr]bool // the left sides of assignments and increments in the body
 }
 
@@ -185,7 +220,16 @@ func writtenIn(body ast.Node) map[ast.Expr]bool {
 func (w *stmtWalker) line(p token.Pos) int { return w.fset.Position(p).Line }
 
 func (w *stmtWalker) node(t types.NodeType, p token.Pos) *types.Node {
-	n := w.stmts[stmtKey{w.file, w.fset.Position(p).Offset, t}]
+	n := w.stmts[stmtKey{w.file, w.fset.Position(p).Offset, 0, t}]
+	if n == nil {
+		w.st.NoNode++
+	}
+	return n
+}
+
+// site returns the CallSite node of the call x.
+func (w *stmtWalker) site(x *ast.CallExpr) *types.Node {
+	n := w.stmts[stmtKey{w.file, w.fset.Position(x.Pos()).Offset, w.fset.Position(x.End()).Offset, types.NodeCallSite}]
 	if n == nil {
 		w.st.NoNode++
 	}
@@ -261,7 +305,7 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 			w.enclose(c, w.node(types.NodeReturnStmt, x.Pos()), x.Pos())
 		case *ast.CallExpr:
 			callee, kind := w.callee(x)
-			if s := w.node(types.NodeCallSite, x.Pos()); s != nil {
+			if s := w.site(x); s != nil {
 				w.enclose(c, s, x.Pos())
 				w.c.emit(s, callee, types.EdgeSiteCalls, kind, w.line(x.Pos()))
 			}
@@ -283,7 +327,7 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 		case *ast.SelectorExpr:
 			if c.kind == "cond" && !w.lhs[x] {
 				if sel := w.info.Selections[x]; sel != nil && sel.Kind() == gotypes.FieldVal {
-					w.c.emit(c.node, w.byCanonical[selectedFieldCanonical(sel)], types.EdgeCondReads, "", w.line(x.Sel.Pos()))
+					w.c.emit(c.node, w.fields.node(sel.Obj()), types.EdgeCondReads, "", w.line(x.Sel.Pos()))
 				}
 			}
 		case *ast.Ident:
@@ -357,7 +401,7 @@ func (w *stmtWalker) written(e ast.Expr, c ctl) {
 		w.written(x.X, c)
 	case *ast.SelectorExpr:
 		if sel := w.info.Selections[x]; sel != nil && sel.Kind() == gotypes.FieldVal {
-			w.c.emit(c.node, w.byCanonical[selectedFieldCanonical(sel)], types.EdgeBodyWrites, c.kind, w.line(x.Sel.Pos()))
+			w.c.emit(c.node, w.fields.node(sel.Obj()), types.EdgeBodyWrites, c.kind, w.line(x.Sel.Pos()))
 			return
 		}
 		if v := w.pkgValue(x.Sel); v != nil { // pkg.Var

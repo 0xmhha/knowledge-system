@@ -31,6 +31,20 @@ type declVisitor struct {
 	edges     []types.Edge
 	pending   []parse.PendingRef
 	typesInfo *gotypes.Info
+	// scope is the function whose body is being walked; zero at package
+	// level. A type, var or const declared inside a body is named under the
+	// function and defined by it (see declOwner).
+	scope declScope
+	// structsDone holds the struct type expressions whose fields already
+	// have nodes, so the walk does not emit them a second time when it
+	// reaches the expression itself (see emitStructFields).
+	structsDone map[*ast.StructType]bool
+	// inInitialiser is set while a package-level initialiser is walked: the
+	// code then belongs to a Variable, not to a function.
+	inInitialiser bool
+	// netRPC says the build uses net/rpc, so a method with the net/rpc
+	// handler shape may be a handler (see maybeEmitJSONRPCHandler).
+	netRPC bool
 	// mutexNodeIDs maps a *types.Object (the var/field declaration of a
 	// sync.Mutex/RWMutex) to the Mutex node ID emitted by emitConcurrencyDecls.
 	// Populated during decl walk; consumed by Lock/Unlock detection so
@@ -130,14 +144,124 @@ func newDeclVisitor(fset *token.FileSet, relPath, pkgName string) *declVisitor {
 	return v
 }
 
+// declScope is what a local declaration belongs to: the function whose body
+// holds it, or the package-level variable whose initialiser holds it.
+type declScope struct {
+	id    string // node ID of the function, method or variable
+	qname string // its qualified name
+}
+
 func (v *declVisitor) Visit(n ast.Node) ast.Visitor {
 	switch d := n.(type) {
 	case *ast.GenDecl:
 		v.visitGenDecl(d)
+		if v.scope.id == "" {
+			// Package level: emitValueSpec walks each initialiser itself,
+			// with the variable as scope, and a type holds no declarations.
+			return nil
+		}
 	case *ast.FuncDecl:
 		v.visitFuncDecl(d)
+		// The body is walked here, with the function as scope, so the
+		// declarations inside it are not taken for package-level ones.
+		// The signature is walked with it: a parameter or result may be
+		// of a struct type written on the spot.
+		id, qname := v.funcDeclIDQname(d)
+		outer := v.scope
+		v.scope = declScope{id: id, qname: qname}
+		if d.Recv != nil {
+			ast.Walk(v, d.Recv)
+		}
+		ast.Walk(v, d.Type)
+		if d.Body != nil {
+			ast.Walk(v, d.Body)
+		}
+		v.scope = outer
+		return nil
+	case *ast.StructType:
+		v.emitAnonymousStruct(d)
+	case *ast.AssignStmt:
+		if d.Tok == token.DEFINE {
+			for _, lhs := range d.Lhs {
+				v.emitLocalName(lhs, d.End())
+			}
+		}
+	case *ast.RangeStmt:
+		if d.Tok == token.DEFINE {
+			v.emitLocalName(d.Key, d.X.End())
+			v.emitLocalName(d.Value, d.X.End())
+		}
 	}
 	return v
+}
+
+// emitStructFields emits the Field nodes of the struct type st under the
+// node parentID and records st as done.
+func (v *declVisitor) emitStructFields(parentID, parentQname, parentCanonical string, st *ast.StructType) {
+	if st == nil || st.Fields == nil {
+		return
+	}
+	if v.structsDone == nil {
+		v.structsDone = map[*ast.StructType]bool{}
+	}
+	v.structsDone[st] = true
+	for _, f := range st.Fields.List {
+		v.emitFields(parentID, parentQname, parentCanonical, f)
+	}
+}
+
+// emitAnonymousStruct emits the fields of a struct type that is written
+// where it is used and so belongs to no type or variable declaration: the
+// element type of a composite literal (`[]struct{ in, want int }{...}`), a
+// parameter type, a conversion. The fields are named
+// "<owner>.struct@<start byte>.<Field>" and defined by the owner, the
+// function or variable whose code holds the type (the file at package level).
+// They have no canonical id; a use finds them by position (fieldIndex).
+func (v *declVisitor) emitAnonymousStruct(st *ast.StructType) {
+	if v.structsDone[st] {
+		return
+	}
+	prefix, definer := v.declOwner()
+	_, startByte := v.pos(st.Pos())
+	v.emitStructFields(definer, fmt.Sprintf("%s.struct@%d", prefix, startByte), "", st)
+}
+
+// emitLocalName emits a LocalVariable node for a name that a short variable
+// declaration (x := ...) or a range clause (for k, v := range ...) declares.
+// The node is named "<function>.<name>", spans the name up to end, and is
+// defined by the function, or by the variable whose initialiser holds it.
+//
+// Only a name that go/types records as a definition gets a node: in
+// `a, err := f()` an err that already exists in the scope is assigned, not
+// declared. Without type information the two cannot be told apart, so an
+// AST-only build emits no local names. The blank identifier names nothing.
+func (v *declVisitor) emitLocalName(e ast.Expr, end token.Pos) {
+	id, ok := e.(*ast.Ident)
+	if !ok || id.Name == "_" || v.typesInfo == nil || v.typesInfo.Defs[id] == nil || v.scope.id == "" {
+		return
+	}
+	qname := v.scope.qname + "." + id.Name
+	startLine, startByte := v.pos(id.Pos())
+	endLine, endByte := v.pos(end)
+	nodeID := v.declID(qname, startByte)
+	v.appendNode(nodeID, types.NodeLocalVariable, id.Name, qname,
+		startLine, endLine, startByte, endByte, "", "", "")
+	v.edges = append(v.edges, types.Edge{
+		Src: v.scope.id, Dst: nodeID, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
+	})
+}
+
+// declOwner returns the qualified-name prefix of a type, var or const
+// declared at the current position and the node that defines it: the package
+// name and the file at package level, the function's name and the function
+// inside a body. Named after the package alone, a local `var buf` was
+// "pkg.buf", the name a package-level buf would have, and 3,194 local
+// variables of go-stablenet shared a qualified name with another node.
+func (v *declVisitor) declOwner() (prefix, definer string) {
+	if v.scope.id != "" {
+		return v.scope.qname, v.scope.id
+	}
+	return v.pkgName, v.fileID
 }
 
 func (v *declVisitor) pos(p token.Pos) (line, byteOff int) {
@@ -159,7 +283,8 @@ func (v *declVisitor) visitGenDecl(d *ast.GenDecl) {
 }
 
 func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
-	qname := v.pkgName + "." + s.Name.Name
+	prefix, definer := v.declOwner()
+	qname := prefix + "." + s.Name.Name
 	startLine, startByte := v.pos(s.Pos())
 	endLine, endByte := v.pos(s.End())
 	id := v.declID(qname, startByte)
@@ -176,9 +301,7 @@ func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
 		nodeType = types.NodeStruct
 		v.appendNode(id, nodeType, s.Name.Name, qname, startLine, endLine, startByte, endByte, exported(s.Name.Name), commentText(doc), "")
 		v.setLastCanonicalID(cid)
-		for _, f := range t.Fields.List {
-			v.emitFields(id, qname, cid, f)
-		}
+		v.emitStructFields(id, qname, cid, t)
 	case *ast.InterfaceType:
 		nodeType = types.NodeInterface
 		v.appendNode(id, nodeType, s.Name.Name, qname, startLine, endLine, startByte, endByte, exported(s.Name.Name), commentText(doc), "")
@@ -190,9 +313,12 @@ func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
 		nodeType = types.NodeTypeAlias
 		v.appendNode(id, nodeType, s.Name.Name, qname, startLine, endLine, startByte, endByte, exported(s.Name.Name), commentText(doc), "")
 		v.setLastCanonicalID(cid)
+		// A defined type over an anonymous struct (`type Rows []struct{..}`):
+		// the struct's fields belong to the type.
+		v.emitStructFields(id, qname, cid, anonymousStruct(s.Type))
 	}
 	v.edges = append(v.edges, types.Edge{
-		Src: v.fileID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
+		Src: definer, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 	})
 }
 
@@ -205,8 +331,28 @@ func (v *declVisitor) setLastCanonicalID(cid string) {
 	}
 }
 
+// subKindEmbedded marks the Field node of an embedded field.
+const subKindEmbedded = "embedded"
+
+// emitFields emits one Field node per name of the field declaration f, under
+// the struct or the field parentID.
+//
+// An embedded field has no name in the syntax; Go names it after its type
+// (x.Key for an embedded *Key), and that name gets the node. When the field's
+// type is an anonymous struct, the struct's own fields are emitted under the
+// field, so `Sig struct{ R, S int }` in Wire gives Wire.Sig, Wire.Sig.R and
+// Wire.Sig.S.
 func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, f *ast.Field) {
-	for _, name := range f.Names {
+	names := f.Names
+	embedded := len(names) == 0
+	if embedded {
+		id := asTypeIdent(f.Type)
+		if id == nil {
+			return
+		}
+		names = []*ast.Ident{id}
+	}
+	for _, name := range names {
 		qname := parentQname + "." + name.Name
 		startLine, startByte := v.pos(f.Pos())
 		endLine, endByte := v.pos(f.End())
@@ -214,12 +360,18 @@ func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, 
 		v.appendNode(id, types.NodeField, name.Name, qname,
 			startLine, endLine, startByte, endByte,
 			exported(name.Name), commentText(f.Doc), "")
+		if embedded {
+			v.nodes[len(v.nodes)-1].SubKind = subKindEmbedded
+		}
 		// field canonical id: <importpath>.<Type>.<Field>, derived from the
 		// owning type's canonical id (a field *types.Var carries no receiver).
 		// Skip the blank identifier `_` (struct padding fields) — see goCanonicalID.
+		canonical := ""
 		if parentCanonical != "" && name.Name != "_" {
-			v.setLastCanonicalID(parentCanonical + "." + name.Name)
+			canonical = parentCanonical + "." + name.Name
+			v.setLastCanonicalID(canonical)
 		}
+		v.emitStructFields(id, qname, canonical, anonymousStruct(f.Type))
 		v.edges = append(v.edges, types.Edge{
 			Src: parentID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 		})
@@ -236,6 +388,27 @@ func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, 
 			}
 		}
 	}
+}
+
+// anonymousStruct returns the struct type literal that e is, points to or
+// holds as an element (struct{..}, *struct{..}, []struct{..}, [N]struct{..},
+// map[K]struct{..}, chan struct{..}); nil for any other type expression.
+func anonymousStruct(e ast.Expr) *ast.StructType {
+	switch t := e.(type) {
+	case *ast.StructType:
+		return t
+	case *ast.ParenExpr:
+		return anonymousStruct(t.X)
+	case *ast.StarExpr:
+		return anonymousStruct(t.X)
+	case *ast.ArrayType:
+		return anonymousStruct(t.Elt)
+	case *ast.MapType:
+		return anonymousStruct(t.Value)
+	case *ast.ChanType:
+		return anonymousStruct(t.Value)
+	}
+	return nil
 }
 
 func (v *declVisitor) emitInterfaceMethod(parentID, parentQname, parentCanonical string, f *ast.Field) {
@@ -259,8 +432,10 @@ func (v *declVisitor) emitInterfaceMethod(parentID, parentQname, parentCanonical
 }
 
 func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
+	prefix, definer := v.declOwner()
+	owners := make([]declScope, 0, len(s.Names))
 	for _, name := range s.Names {
-		qname := v.pkgName + "." + name.Name
+		qname := prefix + "." + name.Name
 		startLine, startByte := v.pos(name.Pos())
 		endLine, endByte := v.pos(s.End())
 		id := v.declID(qname, startByte)
@@ -282,9 +457,38 @@ func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
 			}
 		}
 		v.edges = append(v.edges, types.Edge{
-			Src: v.fileID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
+			Src: definer, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 		})
+		owners = append(owners, declScope{id: id, qname: qname})
+		// A variable declared with an anonymous struct type
+		// (`var Config struct{..}`): the struct's fields belong to it.
+		if s.Type != nil {
+			v.emitStructFields(id, qname, "", anonymousStruct(s.Type))
+		}
 	}
+	// A package-level initialiser runs outside any function: its statements,
+	// call sites and local declarations belong to the variable it
+	// initialises. Inside a function the body walk already covers it.
+	if v.scope.id != "" {
+		return
+	}
+	for i, value := range s.Values {
+		owner := owners[initialiserOwner(i, len(owners))]
+		v.scope, v.inInitialiser = owner, true
+		v.emitBodyPos(owner.qname, owner.id, value)
+		ast.Walk(v, value)
+		v.scope, v.inInitialiser = declScope{}, false
+	}
+}
+
+// initialiserOwner is the index of the name that value i of a value
+// specification initialises: its own name, or the first name when there are
+// fewer names than values or one value for several names (`var a, b = f()`).
+func initialiserOwner(i, names int) int {
+	if i < names {
+		return i
+	}
+	return 0
 }
 
 func (v *declVisitor) emitImportSpec(s *ast.ImportSpec) {
@@ -301,19 +505,13 @@ func (v *declVisitor) emitImportSpec(s *ast.ImportSpec) {
 }
 
 func (v *declVisitor) visitFuncDecl(d *ast.FuncDecl) {
-	var qname string
-	var nt types.NodeType
+	nt := types.NodeFunction
 	if d.Recv != nil && len(d.Recv.List) > 0 {
-		recvType := exprName(d.Recv.List[0].Type)
-		qname = v.pkgName + "." + recvType + "." + d.Name.Name
 		nt = types.NodeMethod
-	} else {
-		qname = v.pkgName + "." + d.Name.Name
-		nt = types.NodeFunction
 	}
+	id, qname := v.funcDeclIDQname(d)
 	startLine, startByte := v.pos(d.Pos())
 	endLine, endByte := v.pos(d.End())
-	id := v.declID(qname, startByte)
 	sig := v.formatSignature(d)
 	v.appendNode(id, nt, d.Name.Name, qname, startLine, endLine, startByte, endByte,
 		exported(d.Name.Name), commentText(d.Doc), sig)
@@ -430,6 +628,23 @@ func goCanonicalID(obj gotypes.Object) string {
 	return pkgPath + ".(" + star + named.Obj().Name() + ")." + fn.Name()
 }
 
+// recvTypeName is the type name of a method receiver: T for (t T), (t *T),
+// and for the generic receivers (t *T[K]) and (t *T[K, V]), whose type
+// expression is an index over the type name.
+func recvTypeName(e ast.Expr) string {
+	switch t := e.(type) {
+	case *ast.StarExpr:
+		return recvTypeName(t.X)
+	case *ast.ParenExpr:
+		return recvTypeName(t.X)
+	case *ast.IndexExpr:
+		return recvTypeName(t.X)
+	case *ast.IndexListExpr:
+		return recvTypeName(t.X)
+	}
+	return exprName(e)
+}
+
 func exprName(e ast.Expr) string {
 	switch t := e.(type) {
 	case *ast.Ident:
@@ -456,7 +671,7 @@ func (v *declVisitor) formatSignature(d *ast.FuncDecl) string {
 	var b strings.Builder
 	b.WriteString("func ")
 	if d.Recv != nil && len(d.Recv.List) > 0 {
-		_, _ = fmt.Fprintf(&b, "(%s) ", exprName(d.Recv.List[0].Type))
+		_, _ = fmt.Fprintf(&b, "(%s) ", recvTypeName(d.Recv.List[0].Type))
 	}
 	b.WriteString(d.Name.Name)
 

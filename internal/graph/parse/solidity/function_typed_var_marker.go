@@ -5,7 +5,6 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -79,7 +78,7 @@ func (v *declVisitor) runFunctionTypedVarMarker() {
 			if !ok {
 				continue
 			}
-			fnID := parse.MakeID(fnQ, "sol", fnStart)
+			fnID := v.declID(fnQ, fnStart)
 			affected[fnID] = true
 			nameNode := node.ChildByFieldName("name")
 			if nameNode != nil {
@@ -150,7 +149,7 @@ func (v *declVisitor) findFunctionPointerPropagators(
 		if !ok {
 			return
 		}
-		fnID := parse.MakeID(fnQ, "sol", fnStart)
+		fnID := v.declID(fnQ, fnStart)
 		name := idNode.Utf8Text(v.src)
 		if pool, has := fnByID[fnID]; has && pool[name] {
 			out[fnID] = true
@@ -362,7 +361,7 @@ func (v *declVisitor) findFunctionPointerCallers(
 			if !ok {
 				continue
 			}
-			fnID := parse.MakeID(fnQ, "sol", fnStart)
+			fnID := v.declID(fnQ, fnStart)
 			name := ident.Utf8Text(v.src)
 			if pool, has := fnByID[fnID]; has && pool[name] {
 				out[fnID] = true

@@ -8,13 +8,13 @@ import (
 )
 
 func TestAllNodeTypes_Count(t *testing.T) {
-	if got, want := len(types.AllNodeTypes()), 38; got != want {
+	if got, want := len(types.AllNodeTypes()), 39; got != want {
 		t.Fatalf("AllNodeTypes count = %d, want %d", got, want)
 	}
 }
 
 func TestAllEdgeTypes_Count(t *testing.T) {
-	if got, want := len(types.AllEdgeTypes()), 50; got != want {
+	if got, want := len(types.AllEdgeTypes()), 51; got != want {
 		t.Fatalf("AllEdgeTypes count = %d, want %d", got, want)
 	}
 }
@@ -98,6 +98,7 @@ func TestAllNodeTypes_Stable(t *testing.T) {
 		types.NodePolicy,
 		types.NodeSecurityPattern,
 		types.NodeExternal,
+		types.NodeError,
 	}
 	if !reflect.DeepEqual(types.AllNodeTypes(), want) {
 		t.Fatalf("AllNodeTypes order changed:\n got=%v\nwant=%v", types.AllNodeTypes(), want)
@@ -131,6 +132,7 @@ func TestAllEdgeTypes_Stable(t *testing.T) {
 		types.EdgeDispatchesTo,
 		types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
 		types.EdgeFlowsTo,
+		types.EdgeRevertsWith,
 	}
 	if !reflect.DeepEqual(types.AllEdgeTypes(), want) {
 		t.Fatalf("AllEdgeTypes order changed:\n got=%v\nwant=%v", types.AllEdgeTypes(), want)

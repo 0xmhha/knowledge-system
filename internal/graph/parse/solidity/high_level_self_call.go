@@ -31,8 +31,6 @@ package solidity
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
 func (v *declVisitor) runHighLevelSelfCallMarker() {
@@ -101,7 +99,7 @@ func (v *declVisitor) runHighLevelSelfCallMarker() {
 			if !ok {
 				continue
 			}
-			id := parse.MakeID(fnQ, "sol", fnStart)
+			id := v.declID(fnQ, fnStart)
 			highLevelSelfAffected[id] = true
 		}
 	}

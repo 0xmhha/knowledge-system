@@ -123,13 +123,20 @@ const (
 	// or interface_method; Signature is the go/types signature. FilePath is
 	// ExternalFilePath, not a file of the repository.
 	NodeExternal NodeType = "External"
+
+	// NodeError (schema 1.38): a Solidity custom error declaration
+	// (`error NotOwner(address who);`), at file level or inside a contract,
+	// interface or library. It is none of the other kinds: it is not emitted
+	// like an event and holds no value like a constant. reverts_with edges
+	// end at it. Signature is the declaration header.
+	NodeError NodeType = "Error"
 )
 
 // ExternalFilePath is the file_path of every External node. It names no file
 // of the repository, so per-file deletes and reloads never touch these nodes.
 const ExternalFilePath = "(external)"
 
-// AllNodeTypes returns all 38 node types in a stable order.
+// AllNodeTypes returns all 39 node types in a stable order.
 // NOTE: identifier names are stable; positional indices are load-bearing
 // only for tests that snapshot the full slice (TestAllNodeTypes_Stable).
 // NodeMutex was inserted at index 24 to keep the concurrency family
@@ -152,6 +159,7 @@ const ExternalFilePath = "(external)"
 // security risk pattern annotations loaded from an external YAML.
 // NodeExternal (schema 1.36) is appended at index 37 — symbols the build
 // calls but does not contain.
+// NodeError (schema 1.38) is appended at index 38 — Solidity custom errors.
 func AllNodeTypes() []NodeType {
 	return []NodeType{
 		NodePackage, NodeFile, NodeStruct, NodeInterface, NodeClass,
@@ -168,6 +176,7 @@ func AllNodeTypes() []NodeType {
 		NodePolicy,
 		NodeSecurityPattern,
 		NodeExternal,
+		NodeError,
 	}
 }
 
@@ -188,6 +197,11 @@ func AllNodeTypes() []NodeType {
 //     contracts/Vault even when the consumer wanted the class itself.
 //   - External nodes — code outside the build; a search for repository
 //     symbols should not return time.Now.
+//   - Local names (LocalVariable, schema 1.38) — a name made by := or a
+//     range clause inside a function body. There are tens of thousands
+//     (err, ok, i), each known only inside its function; a keyword search
+//     for a symbol should not return them. A caller that wants them
+//     passes NodeKinds.
 //
 // search_text (pkg/mcphandlers + internal/persist.SearchFTS) uses
 // IsSymbol as the default whitelist when SearchFTSOptions.NodeKinds
@@ -200,7 +214,8 @@ func (t NodeType) IsSymbol() bool {
 		NodeAwaitPoint,
 		NodeCommit, NodeHunk,
 		NodeImport, NodeExport,
-		NodeExternal:
+		NodeExternal,
+		NodeLocalVariable:
 		return false
 	default:
 		return true
@@ -478,9 +493,14 @@ const (
 	// names; sends_to and recvs_from point at the name each operation uses,
 	// and flows_to joins the names.
 	EdgeFlowsTo EdgeType = "flows_to"
+	// Schema 1.38 (Solidity custom errors): reverts_with from a function,
+	// modifier or constructor to the Error it can revert with, one edge per
+	// line of `revert X(...)` or `require(cond, X(...))`. No existing kind
+	// fits: emits_event ends at an Event and calls at a callable.
+	EdgeRevertsWith EdgeType = "reverts_with"
 )
 
-// AllEdgeTypes returns all 50 edge types in stable order.
+// AllEdgeTypes returns all 51 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -493,6 +513,7 @@ const (
 // EdgeDispatchesTo is appended at index 43 (schema 1.31 — runtime links).
 // The five statement-link types are appended at indices 44-48 (schema 1.32).
 // EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
+// EdgeRevertsWith is appended at index 50 (schema 1.38 — Solidity errors).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -514,6 +535,7 @@ func AllEdgeTypes() []EdgeType {
 		EdgeDispatchesTo,
 		EdgeSiteCalls, EdgeCondReads, EdgeCondCalls, EdgeBodyWrites, EdgeEncloses,
 		EdgeFlowsTo,
+		EdgeRevertsWith,
 	}
 }
 

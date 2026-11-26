@@ -210,18 +210,52 @@ func (w *fileWalker) genSpec(spec ast.Spec) {
 			}
 		}
 	case *ast.ValueSpec:
+		keys := make([]string, 0, len(s.Names))
 		for _, n := range s.Names {
-			w.declare(n)
+			keys = append(keys, w.declare(n))
 		}
-		for _, v := range s.Values {
-			ast.Inspect(v, func(n ast.Node) bool {
-				if c, ok := n.(*ast.CallExpr); ok && typeutil.StaticCallee(w.info, c) != nil {
-					w.t.CallsOutsideFuncs++
-				}
-				return true
-			})
+		for i, v := range s.Values {
+			// Value i initialises name i; with one value for several names
+			// (var a, b = f()) the first name owns it.
+			owner := keys[0]
+			if i < len(keys) {
+				owner = keys[i]
+			}
+			if owner == "" {
+				// The blank identifier has no key: its initialiser's calls
+				// stay uncompared and are counted.
+				ast.Inspect(v, func(n ast.Node) bool {
+					if c, ok := n.(*ast.CallExpr); ok && typeutil.StaticCallee(w.info, c) != nil {
+						w.t.CallsOutsideFuncs++
+					}
+					return true
+				})
+				continue
+			}
+			w.callsIn(owner, v)
+			w.statementsIn(v)
 		}
 	}
+}
+
+// callsIn records the calls under root as calls by caller, closures included.
+func (w *fileWalker) callsIn(caller string, root ast.Node) {
+	var lits []*ast.FuncLit // function literals enclosing the current node
+	ast.Inspect(root, func(n ast.Node) bool {
+		if n == nil {
+			return true
+		}
+		for len(lits) > 0 && n.Pos() >= lits[len(lits)-1].End() {
+			lits = lits[:len(lits)-1]
+		}
+		switch n := n.(type) {
+		case *ast.FuncLit:
+			lits = append(lits, n)
+		case *ast.CallExpr:
+			w.call(caller, n, len(lits) > 0)
+		}
+		return true
+	})
 }
 
 // declare records a package-level declaration and returns its key

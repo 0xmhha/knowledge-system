@@ -48,22 +48,6 @@ type declVisitor struct {
 	// form. resolveUsingForRef consults both maps when resolving a
 	// using-for binding's leading identifier.
 	importPaths map[string]string
-	// Per-file enum name → byte footprint.
-	// Sol enums with ≤256 variants compile to uint8 (1 byte), ≤65k
-	// to uint16 (2 bytes), and so on. runStateVarDecl consults
-	// this map before falling back to the conservative full-slot
-	// path so enum-typed state vars pack with adjacent small
-	// primitives.
-	enumSizes map[string]int
-	// Per-file struct → byte footprint when
-	// declared as a storage state variable. Populated by
-	// computeStructSizes (called once before runStateVarDecl) by
-	// summing each member's solTypeSize / solFixedArrayBytes /
-	// recursive struct lookup with the standard slotState packing
-	// rules. Used by runStateVarDecl to route NodeField state-vars
-	// whose user_defined_type matches a known struct through the
-	// array-shaped advanceForStructField path.
-	structSizes map[string]int
 }
 
 // newDeclVisitor allocates a per-file visitor with a local abi map. The
@@ -81,15 +65,13 @@ func newDeclVisitor(rel string, src []byte, lang *sitter.Language, root *sitter.
 		namespaceAliases: map[string]bool{},
 		namespacePaths:   map[string]string{},
 		importPaths:      map[string]string{},
-		enumSizes:        map[string]int{},
-		structSizes:      map[string]int{},
 	}
-	fileQ := "file:" + rel
-	v.fileID = parse.MakeID(fileQ, "sol", 0)
+	fileQ := fileQNamePrefix + rel
+	v.fileID = v.declID(fileQ, 0)
 	v.nodes = append(v.nodes, types.Node{
 		ID: v.fileID, Type: types.NodeFile, Name: rel, QualifiedName: fileQ,
 		FilePath: rel, StartLine: 1, EndLine: 1,
-		Language: "sol", Confidence: types.ConfExtracted,
+		Language: langSol, Confidence: types.ConfExtracted,
 	})
 	return v
 }
@@ -110,18 +92,11 @@ func (v *declVisitor) visit() {
 	v.runLibraryDecl()
 	v.runInterfaceDecl()
 	// Function emit is SubKind-aware (virtual / override / virtual_override
-	// / function). The generic runDecl path is bypassed for functions so the
-	// modifier scan and EdgeOverrides PendingRef emission share a single AST
-	// walk. Node IDs and the `defines` edge stay identical to runDecl, so
-	// downstream consumers (ABI, mapping writes, emits, modifier_invocation)
-	// continue to resolve against the same Function node.
+	// / function) and queues the override references in the same walk.
 	v.runFunctionDecl()
 	v.runDecl(queryModifier, types.NodeModifier)
-	// Emit parameter / local-var meta for
-	// every modifier_definition so receivers used inside the modifier
-	// body (params, locals) flow through the same lookupReceiverType
-	// path as function bodies. runDecl(queryModifier, ...) creates the
-	// NodeModifier; this pass adds the side-channel meta PendingRefs.
+	// Parameter and local variable types of every modifier, so a receiver
+	// used inside a modifier body resolves like one in a function body.
 	v.runModifierMeta()
 	// Emit NodeFunction (synthetic name
 	// "constructor") + parameter / local-var meta for every
@@ -136,20 +111,17 @@ func (v *declVisitor) visit() {
 	// source token.
 	v.runFallbackReceiveDecl()
 	v.runDecl(queryEvent, types.NodeEvent)
+	// Custom errors: the system contracts declare 91 and the graph had no
+	// node for any of them, so a revert had nothing to point at.
+	v.runDecl(queryError, types.NodeError)
 	v.runDecl(queryStruct, types.NodeStruct)
 	v.runDecl(queryEnum, types.NodeEnum)
-	// Count enum variants per name so
-	// runStateVarDecl can size enum-typed state-vars at 1 / 2 / 4
-	// bytes (uint8/16/32) instead of the conservative full-slot
-	// fallback. Sol enums with ≤256 variants compile to uint8.
-	v.computeEnumSizes()
-	// Compute per-struct byte footprint so
-	// runStateVarDecl can size NodeField rows whose user_defined_type
-	// is a known struct. Must run before runStateVarDecl.
-	v.computeStructSizes()
+	v.runImports()
 	v.runStateVarDecl()
 	v.runEmits()
 	v.runHasModifier()
+	v.runBodyRefs()
+	v.runTypeUses()
 	// Detect `modifier m() override {}` and
 	// emit EdgeOverrides PendingRefs. Re-uses resolveOverridesRef
 	// in Pass 2 (NodeType-agnostic — modifier qnames live in funcByQName
@@ -279,6 +251,10 @@ func (v *declVisitor) visit() {
 	}
 }
 
+// runDecl emits one node per match of a declaration query that captures the
+// declaration as @decl and its name identifier as @name. It serves modifiers,
+// events, errors, structs and enums; a struct also gets its members and an
+// enum its values.
 func (v *declVisitor) runDecl(q string, nt types.NodeType) {
 	query, qErr := sitter.NewQuery(v.lang, q)
 	if qErr != nil {
@@ -294,38 +270,31 @@ func (v *declVisitor) runDecl(q string, nt types.NodeType) {
 		if m == nil {
 			break
 		}
+		var nameNode, declNode *sitter.Node
 		for _, c := range m.Captures {
-			if names[c.Index] != "name" {
-				continue
+			n := c.Node
+			switch names[c.Index] {
+			case "name":
+				nameNode = &n
+			case "decl":
+				declNode = &n
 			}
-			node := c.Node
-			ident := node.Utf8Text(v.src)
-			startByte := int(node.StartByte())
-			endByte := int(node.EndByte())
-			qname := ident
-			// Modifiers also get a
-			// Container.<name> qname so containerIDByFuncID (Pass 1.5)
-			// can resolve their enclosing contract from the qname
-			// prefix — same idiom as NodeFunction. byName indexing
-			// (resolve.go) keys NodeModifier on bare Name field, so
-			// the qname change doesn't break EdgeHasModifier resolution.
-			if nt == types.NodeFunction || nt == types.NodeModifier {
-				if cn := nearestContractName(&node, v.src); cn != "" {
-					qname = cn + "." + ident
-				}
-			}
-			id := parse.MakeID(qname, "sol", startByte)
-			v.nodes = append(v.nodes, types.Node{
-				ID: id, Type: nt, Name: ident, QualifiedName: qname,
-				FilePath: v.rel, StartLine: int(node.StartPosition().Row) + 1,
-				EndLine:   int(node.EndPosition().Row) + 1,
-				StartByte: startByte, EndByte: endByte,
-				Language: "sol", Confidence: types.ConfExtracted,
-			})
-			v.edges = append(v.edges, types.Edge{
-				Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-				Count: 1, Confidence: types.ConfExtracted,
-			})
+		}
+		if nameNode == nil || declNode == nil {
+			continue
+		}
+		ident := nameNode.Utf8Text(v.src)
+		qname := v.memberQName(nameNode, ident)
+		id := v.emitDecl(declSpec{
+			nt: nt, name: ident, qname: qname, decl: declNode,
+			idByte: int(nameNode.StartByte()), definer: v.definerOf(declNode),
+			signature: declHeader(declNode, v.src),
+		})
+		switch nt {
+		case types.NodeStruct:
+			v.emitStructMembers(id, qname, declNode)
+		case types.NodeEnum:
+			v.emitEnumValues(id, qname, declNode)
 		}
 	}
 }
@@ -346,15 +315,6 @@ func (v *declVisitor) runStateVarDecl() {
 	defer func() { cur.Close() }()
 	matches := cur.Matches(query, v.root, v.src)
 	names := query.CaptureNames()
-	// Per-contract packing slot state.
-	// Each entry tracks the current slot index and bytes already used
-	// in it. The walk uses solTypeSize plus
-	// advanceForField to pack consecutive sub-32-byte primitives into
-	// shared slots (Sol §11.1 layout rules). Mapping state-vars run
-	// through advanceForMapping, which reserves a full slot without
-	// producing a SlotIndex (NodeMapping path stays at zero default
-	// here; mappings are indexed separately).
-	slotPerContract := map[string]slotState{}
 	for {
 		m := matches.Next()
 		if m == nil {
@@ -365,226 +325,87 @@ func (v *declVisitor) runStateVarDecl() {
 				continue
 			}
 			declNode := c.Node
-			// Operator-form using directives
-			// (`using {f as +} for T;`) misparse as ERROR-wrapped
-			// state_variable_declaration nodes in vendored tree-
-			// sitter-solidity v1.2.11. The operator-form recovery walker emits
-			// the binding edge for those — runStateVarDecl must NOT
-			// also emit a NodeField for them, because doing so
-			// inflates the per-contract slot count by one for every
-			// operator-form directive (Sol §11.1 says using
-			// directives don't consume storage). Skip when the
-			// misparse signature matches.
+			// A misparsed operator-form using directive (`using {f as +}
+			// for T;`) looks like a state variable. The operator-form
+			// recovery walker emits its binding; it is no variable and
+			// takes no storage.
 			if _, _, ok := matchOperatorFormStateVar(&declNode, v.src); ok {
 				continue
 			}
-			nameNode := declNode.ChildByFieldName("name")
-			typeNode := declNode.ChildByFieldName("type")
-			if nameNode == nil {
-				continue
-			}
-			name := nameNode.Utf8Text(v.src)
-			startByte := int(nameNode.StartByte())
-			endByte := int(nameNode.EndByte())
-			line := int(nameNode.StartPosition().Row) + 1
-			isMapping := typeNode != nil && typeNameIsMapping(typeNode, v.src)
-			var nt types.NodeType
-			var qname string
-			if isMapping {
-				nt = types.NodeMapping
-				qname = name + ":mapping"
-			} else {
-				nt = types.NodeField
-				// Qualify NodeField qnames with
-				// the enclosing container's name so Pass 2 can recover
-				// the state-var → container relationship cheaply (same
-				// idiom as runFunctionDecl's `Container.func` qname).
-				// File-level state-var declarations are out of scope in
-				// Solidity; nearestContractName returns "" for them and
-				// the qname falls back to the bare name (original
-				// shape preserved for that edge case).
-				qname = name
-				if cn := nearestContractName(nameNode, v.src); cn != "" {
-					qname = cn + "." + name
-				}
-			}
-			id := parse.MakeID(qname, "sol", startByte)
-			// Stash the declared type name on the
-			// Field/Mapping node's Signature so Pass 2 can resolve
-			// `<stateVar>.<method>(...)` callsites by looking up the
-			// state-variable's type and matching it against the using-for
-			// binding map. We use Signature (not SubKind) because the value
-			// here is the raw user-written type expression — graph
-			// consumers already treat Signature as opaque metadata. Empty
-			// typeNode (rare — degenerate parses) → Signature stays empty.
-			signature := ""
-			if typeNode != nil {
-				signature = extractTypeNameText(typeNode, v.src)
-			}
-			// State-var visibility / immutable
-			// encoded into SubKind. Grammar v1.2.11 only exposes these
-			// two keyword categories as named children; `constant` and
-			// parameter locations are AST-invisible (deferred).
-			// SubKind precedence: immutable > visibility > "" (default
-			// stays empty rather than synthesising "internal" so consumers
-			// can distinguish "explicitly internal" from "default/unknown").
-			subKind := ""
-			if !isMapping {
-				for i := uint(0); i < declNode.NamedChildCount(); i++ {
-					child := declNode.NamedChild(i)
-					if child == nil {
-						continue
-					}
-					switch child.Kind() {
-					case "immutable":
-						subKind = "immutable"
-					case "visibility":
-						if subKind == "" {
-							subKind = "storage_" + child.Utf8Text(v.src)
-						}
-					}
-				}
-			}
-			// Assign packed slot
-			// index for every state-var: type-size aware packing,
-			// mappings addressable by declaration slot, and
-			// fixed-size value-type arrays (uint8[4],
-			// uint256[2], uint8[4][2]) which Sol §11.1 lays out as
-			// new-slot-aligned blocks of ceil(elementBytes * count / 32)
-			// consecutive slots with post-slot alignment.
-			slotIndex := 0
-			containerKey := nearestContractName(nameNode, v.src)
-			state := slotPerContract[containerKey]
-			switch {
-			case isMapping:
-				slot, newState := advanceForMapping(state)
-				slotIndex = slot
-				slotPerContract[containerKey] = newState
-			default:
-				if arrayBytes, ok := solFixedArrayBytes(signature); ok {
-					slot, newState := advanceForArrayField(state, arrayBytes)
-					slotIndex = slot
-					slotPerContract[containerKey] = newState
-				} else if structBytes, ok := v.structSizes[signature]; ok {
-					// Struct state-vars consume
-					// ceil(sum_of_field_bytes / 32) slots, with
-					// pre/post slot alignment same as arrays.
-					slot, newState := advanceForArrayField(state, structBytes)
-					slotIndex = slot
-					slotPerContract[containerKey] = newState
-				} else if enumBytes, ok := v.enumSizes[signature]; ok {
-					// Enum-typed state-var packs
-					// like the underlying uintN (1 byte for the
-					// typical ≤256-variant case). Goes through
-					// advanceForField so adjacent small
-					// primitives share the slot.
-					slot, newState := advanceForField(state, enumBytes)
-					slotIndex = slot
-					slotPerContract[containerKey] = newState
-				} else {
-					size := solTypeSize(signature)
-					slot, newState := advanceForField(state, size)
-					slotIndex = slot
-					slotPerContract[containerKey] = newState
-				}
-			}
-			// Function-typed state-var marker.
-			// Detection: type_name contains `parameter` or `return_parameter`
-			// as a named child (Sol grammar emits these for function-type
-			// signatures instead of the usual primitive_type / user_defined_type
-			// / mapping shape). NodeMapping path keeps IsFunctionTyped false
-			// since mappings are a distinct grammar shape.
-			// Delegate
-			// to the shared typeNameIsFunctionTyped helper. It
-			// recurses into array_type, and there is no
-			// !isMapping guard so `mapping(K => function(...))`
-			// also lights up the marker. typeNameIsFunctionTyped
-			// recurses into nested type_name children and
-			// returns false for ordinary mappings whose value
-			// is a primitive — no false positives from removing
-			// the guard.
-			isFunctionTyped := typeNameIsFunctionTyped(typeNode)
-			v.nodes = append(v.nodes, types.Node{
-				ID: id, Type: nt, Name: name, QualifiedName: qname,
-				FilePath: v.rel, StartLine: line, EndLine: line,
-				StartByte: startByte, EndByte: endByte,
-				Language: "sol", Confidence: types.ConfExtracted,
-				Signature:       signature,
-				SubKind:         subKind,
-				SlotIndex:       slotIndex,
-				IsFunctionTyped: isFunctionTyped,
-			})
-			v.edges = append(v.edges, types.Edge{
-				Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-				Count: 1, Confidence: types.ConfExtracted,
-			})
-			if isMapping {
-				// TODO(T19+): pass `id` here once writes_mapping can be emitted as
-				// a same-file resolved edge directly (skip pending pipeline).
-				v.queueMappingWrites(name)
-			}
+			v.emitVariable(&declNode)
+		}
+	}
+	// A constant declared at file level (`uint256 constant TOP_C = 7;`) is
+	// its own node kind in the grammar. It had no node at all.
+	for i := uint(0); i < v.root.NamedChildCount(); i++ {
+		if c := v.root.NamedChild(i); c != nil && c.Kind() == kindConstantVariableDecl {
+			v.emitVariable(c)
 		}
 	}
 }
 
-// queueMappingWrites scans every function in the current root for an
-// augmented_assignment_expression whose LHS array_access targets the given
-// mapping name, and queues a pending writes_mapping edge. Simplification:
-// we treat any `name[...] = ...` or `name[...] += ...` as a write.
-func (v *declVisitor) queueMappingWrites(mappingName string) {
-	q := `(augmented_assignment_expression
-	         (expression (array_access (expression (identifier) @arr))))
-	      @stmt`
-	query, qErr := sitter.NewQuery(v.lang, q)
-	if qErr != nil {
-		// Fallback: try plain assignment_expression too.
+// emitVariable emits the node of one state variable, mapping or constant
+// declaration.
+func (v *declVisitor) emitVariable(decl *sitter.Node) {
+	nameNode := decl.ChildByFieldName(fieldName)
+	typeNode := decl.ChildByFieldName(fieldType)
+	if nameNode == nil {
 		return
 	}
-	defer func() { query.Close() }()
-	cur := sitter.NewQueryCursor()
-	defer func() { cur.Close() }()
-	matches := cur.Matches(query, v.root, v.src)
-	names := query.CaptureNames()
-	for {
-		m := matches.Next()
-		if m == nil {
-			break
+	name := nameNode.Utf8Text(v.src)
+	isMapping := typeNode != nil && typeNameIsMapping(typeNode, v.src)
+	isConstant := hasKeywordChild(decl, kindConstantKeyword)
+	isImmutable := hasKeywordChild(decl, kindImmutableKeyword)
+	visibility := visibilityOf(decl, v.src)
+	// A state variable is a Mapping when its type is a mapping, a
+	// Constant when it is declared `constant`, and a Field
+	// otherwise. A constant used to be a Field with a storage sub
+	// kind and a slot; it is compiled into the code and has neither.
+	nt := types.NodeField
+	subKind := ""
+	// The type is stored in Signature: Pass 2 reads a Field's
+	// Signature to find the type of a receiver (`set.add(x)`), and a
+	// reader sees the declared type. A mapping keeps its whole type
+	// expression; it never is a using-for receiver.
+	signature := ""
+	switch {
+	case isMapping:
+		nt = types.NodeMapping
+		signature = typeText(typeNode, v.src)
+	case isConstant:
+		nt = types.NodeConstant
+		subKind = subKindConstant
+		signature = extractTypeNameText(typeNode, v.src)
+	default:
+		signature = extractTypeNameText(typeNode, v.src)
+		// Sub kind precedence: immutable, then the written
+		// visibility; no visibility stays empty so a reader can
+		// tell "written internal" from "not written".
+		switch {
+		case isImmutable:
+			subKind = subKindImmutable
+		case visibility != "":
+			subKind = subKindStoragePrefix + visibility
 		}
-		var arrName string
-		var stmtNode *sitter.Node
-		for _, c := range m.Captures {
-			capName := names[c.Index]
-			node := c.Node
-			switch capName {
-			case "arr":
-				arrName = node.Utf8Text(v.src)
-			case "stmt":
-				// The capture's Node is a value type; we need a stable pointer
-				// for the parent walk below. Take address of the local copy.
-				stmtCopy := node
-				stmtNode = &stmtCopy
-			}
-		}
-		if arrName != mappingName || stmtNode == nil {
-			continue
-		}
-		fnQ, fnStart, ok := nearestFunctionQnameAndStart(stmtNode, v.src)
-		if !ok {
-			continue
-		}
-		// SrcID must match the function node ID emitted in runDecl, which
-		// hashes (qname, "sol", name-node startByte). Using offset 0 here would
-		// produce an ID that never resolves to a real node and graph.Validate
-		// would reject the resulting edge as dangling.
-		v.pending = append(v.pending, parse.PendingRef{
-			SrcID:       parse.MakeID(fnQ, "sol", fnStart),
-			EdgeType:    types.EdgeWritesMapping,
-			TargetQName: mappingName + ":mapping",
-			Line:        int(stmtNode.StartPosition().Row) + 1,
-		})
 	}
+	v.emitDecl(declSpec{
+		nt: nt, name: name, qname: v.memberQName(nameNode, name), decl: decl,
+		idByte: int(nameNode.StartByte()), definer: v.definerOf(decl),
+		subKind: subKind, signature: signature, visibility: visibility,
+	})
+	// The storage slot is assigned in Pass 2 (layoutStateVariables),
+	// which knows the types of every file.
+	//
+	// A function-typed state variable (`function(uint256) external
+	// handler;`) is marked so callers through it can be found. The
+	// helper recurses into arrays and mapping values.
+	v.lastNode().IsFunctionTyped = typeNameIsFunctionTyped(typeNode)
 }
 
+// runEmits queues one reference per `emit Name(...)` statement, from the
+// enclosing callable to the event name (`Name`, or `Owner.Name` when the
+// statement qualifies it). Pass 2 resolves the name in the scope of the
+// contract that emits.
 func (v *declVisitor) runEmits() {
 	query, qErr := sitter.NewQuery(v.lang, queryEmit)
 	if qErr != nil {
@@ -600,28 +421,22 @@ func (v *declVisitor) runEmits() {
 		if m == nil {
 			break
 		}
-		var event string
-		var fnQ string
-		var fnStart int
-		var fnOK bool
-		var line int
 		for _, c := range m.Captures {
-			if names[c.Index] == "event" {
-				node := c.Node
-				event = node.Utf8Text(v.src)
-				fnQ, fnStart, fnOK = nearestFunctionQnameAndStart(&node, v.src)
-				line = int(node.StartPosition().Row) + 1
+			if names[c.Index] != "stmt" {
+				continue
 			}
+			stmt := c.Node
+			event := unwrapExpression(stmt.ChildByFieldName(fieldName))
+			if event == nil {
+				continue
+			}
+			name := dottedName(event, v.src)
+			srcID, ok := v.callableIDAt(&stmt)
+			if name == "" || !ok {
+				continue
+			}
+			v.queue(srcID, types.EdgeEmitsEvent, refEmit, name, event)
 		}
-		if event == "" || !fnOK {
-			continue
-		}
-		v.pending = append(v.pending, parse.PendingRef{
-			SrcID:       parse.MakeID(fnQ, "sol", fnStart),
-			EdgeType:    types.EdgeEmitsEvent,
-			TargetQName: event,
-			Line:        line,
-		})
 	}
 }
 
@@ -682,20 +497,20 @@ func (v *declVisitor) runHasModifier() {
 			}
 		}
 		v.pending = append(v.pending, parse.PendingRef{
-			SrcID:       parse.MakeID(fnQ, "sol", fnStart),
-			EdgeType:    types.EdgeHasModifier,
-			TargetQName: mod,
-			Line:        line,
-			Order:       order,
+			SrcID:        v.declID(fnQ, fnStart),
+			EdgeType:     types.EdgeHasModifier,
+			TargetQName:  mod,
+			Line:         line,
+			Order:        order,
+			DispatchKind: refModifier,
 		})
 	}
 }
 
 // collectABI populates p.abi from the discovered Contract / Function nodes.
-// Iteration order matches v.nodes (which is append order from visit()), so
-// Contract nodes are seen before their methods because runDecl(Contract)
-// runs before runDecl(Function). For nested contracts we'd need a smarter
-// scope-tracking pass; this is single-level.
+// Iteration order matches v.nodes (append order from visit()): the function
+// is attributed to the contract node seen last before it. Name match is all
+// the cross-language linker needs.
 func (v *declVisitor) collectABI() {
 	currentContract := ""
 	for _, n := range v.nodes {
@@ -725,10 +540,8 @@ func (v *declVisitor) collectABI() {
 // return_type, so emitFunctionReturnMetaPending / emit-named-return are
 // not applicable here.)
 //
-// The modifier ID is recomputed from the same (qname, startByte) pair
-// that runDecl(NodeModifier) used (qname is now `Container.modifier`
-// in runDecl). Two-pass split keeps runDecl generic
-// and isolates the meta walk to its own function.
+// The modifier id comes from callableIDAt, the same rule that keyed the
+// Modifier node.
 func (v *declVisitor) runModifierMeta() {
 	query, qErr := sitter.NewQuery(v.lang, queryModifier)
 	if qErr != nil {
@@ -758,12 +571,10 @@ func (v *declVisitor) runModifierMeta() {
 		if nameNode == nil || declNode == nil {
 			continue
 		}
-		ident := nameNode.Utf8Text(v.src)
-		qname := ident
-		if cn := nearestContractName(nameNode, v.src); cn != "" {
-			qname = cn + "." + ident
+		id, ok := v.callableIDAt(declNode)
+		if !ok {
+			continue
 		}
-		id := parse.MakeID(qname, "sol", int(nameNode.StartByte()))
 		emitParameterMetaPending(v, id, declNode)
 		emitLocalVarMetaPending(v, id, declNode)
 	}
@@ -879,29 +690,10 @@ func trimStringQuotes(s string) string {
 	return s
 }
 
-// runConstructorDecl emits one
-// NodeFunction per constructor_definition with synthetic name
-// "constructor" and qname "<Container>.constructor", then drives the
-// meta-emission pipeline against the constructor body.
-//
-// Why a synthetic name? Solidity's grammar (verified via
-// node-types.json v1.2.13) defines constructor_definition without a
-// `name` field — only `body` (function_body) + direct `parameter`
-// children + optional modifier_invocation. The Sol language reserves
-// the keyword `constructor` for this role; we use that literal as the
-// canonical identifier. ID hashing follows the existing
-// MakeID(qname, "sol", startByte) idiom; startByte is the declaration
-// node's StartByte (start of the `constructor` keyword), which is
-// stable across builds.
-//
-// Why NodeFunction (not a new NodeConstructor)? Constructors share
-// runtime semantics with regular functions (callable, parameters,
-// body locals, modifier invocations) and existing consumers
-// (containerIDByFuncID, lookupReceiverType, EdgeHasModifier
-// resolution) already key off NodeFunction. Adding a sibling type
-// would force every downstream consumer to special-case it. The
-// SubKind field gets "constructor" to keep the role visible in
-// the graph without breaking the type-level contract.
+// runConstructorDecl emits one Function node per constructor_definition,
+// named "constructor" (the grammar gives the declaration no name field) with
+// qualified name `Container.constructor` and sub kind "constructor", then
+// queues the parameter and local variable types of its body.
 func (v *declVisitor) runConstructorDecl() {
 	query, qErr := sitter.NewQuery(v.lang, queryConstructor)
 	if qErr != nil {
@@ -927,26 +719,11 @@ func (v *declVisitor) runConstructorDecl() {
 		if declNode == nil {
 			continue
 		}
-		const ident = "constructor"
-		qname := ident
-		if cn := nearestContractName(declNode, v.src); cn != "" {
-			qname = cn + "." + ident
-		}
-		startByte := int(declNode.StartByte())
-		endByte := int(declNode.EndByte())
-		id := parse.MakeID(qname, "sol", startByte)
-		v.nodes = append(v.nodes, types.Node{
-			ID: id, Type: types.NodeFunction, Name: ident, QualifiedName: qname,
-			FilePath: v.rel, StartLine: int(declNode.StartPosition().Row) + 1,
-			EndLine:   int(declNode.EndPosition().Row) + 1,
-			StartByte: startByte, EndByte: endByte,
-			Language: "sol", Confidence: types.ConfExtracted,
-			SubKind: "constructor",
-		})
-		v.edges = append(v.edges, types.Edge{
-			Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-			Count: 1, Confidence: types.ConfExtracted,
-		})
+		// A constructor is a Function node named "constructor" with that
+		// sub kind: it has parameters, a body and modifiers like any
+		// function, and every consumer of callables already reads
+		// Function nodes.
+		id := v.emitCallable(declNode, nameConstructor)
 		// Meta pipeline — constructor has no return_type, so
 		// the return-type emits don't apply.
 		emitParameterMetaPending(v, id, declNode)
@@ -998,25 +775,7 @@ func (v *declVisitor) runFallbackReceiveDecl() {
 		if ident == "" {
 			continue // defensive — neither keyword found at node start
 		}
-		qname := ident
-		if cn := nearestContractName(declNode, v.src); cn != "" {
-			qname = cn + "." + ident
-		}
-		startByte := int(declNode.StartByte())
-		endByte := int(declNode.EndByte())
-		id := parse.MakeID(qname, "sol", startByte)
-		v.nodes = append(v.nodes, types.Node{
-			ID: id, Type: types.NodeFunction, Name: ident, QualifiedName: qname,
-			FilePath: v.rel, StartLine: int(declNode.StartPosition().Row) + 1,
-			EndLine:   int(declNode.EndPosition().Row) + 1,
-			StartByte: startByte, EndByte: endByte,
-			Language: "sol", Confidence: types.ConfExtracted,
-			SubKind: ident,
-		})
-		v.edges = append(v.edges, types.Edge{
-			Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-			Count: 1, Confidence: types.ConfExtracted,
-		})
+		id := v.emitCallable(declNode, ident)
 		// Meta pipeline — fallback can carry parameters (Sol
 		// 0.6+, e.g. `fallback(bytes calldata input) external returns
 		// (bytes memory)`); receive cannot by language rule, but the
@@ -1053,76 +812,64 @@ func fallbackOrReceiveKeyword(n *sitter.Node, src []byte) string {
 // as "Library.func" the same way contract methods are). Reserved for
 // future extension: `interface_declaration` (interface methods).
 func nearestContractName(n *sitter.Node, src []byte) string {
-	for cur := n; cur != nil; cur = cur.Parent() {
-		switch cur.Kind() {
-		case "contract_declaration", "library_declaration", "interface_declaration":
-			id := cur.ChildByFieldName("name")
-			if id != nil {
-				return id.Utf8Text(src)
-			}
+	if decl := nearestContractNode(n); decl != nil {
+		if id := decl.ChildByFieldName(fieldName); id != nil {
+			return id.Utf8Text(src)
 		}
 	}
 	return ""
 }
 
+// callableKey returns the name of a function, modifier, constructor,
+// fallback or receive declaration and the byte that keys its node id: the
+// start of the name identifier, or the start of the declaration for the
+// three kinds the language gives no name. ok is false when decl is not such
+// a declaration or its name could not be read. The emitters and every walker
+// that finds the callable around a node take the pair from here, so both
+// compute the same id.
+func callableKey(decl *sitter.Node, src []byte) (name string, idByte int, ok bool) {
+	switch decl.Kind() {
+	case kindFunctionDef, kindModifierDef:
+		ident := decl.ChildByFieldName(fieldName)
+		if ident == nil {
+			return "", 0, false
+		}
+		return ident.Utf8Text(src), int(ident.StartByte()), true
+	case kindConstructorDef:
+		return nameConstructor, int(decl.StartByte()), true
+	case kindFallbackReceiveDef:
+		// One node kind serves both; the leading keyword tells them apart.
+		keyword := fallbackOrReceiveKeyword(decl, src)
+		return keyword, int(decl.StartByte()), keyword != ""
+	}
+	return "", 0, false
+}
+
+// isCallableDecl reports whether n is a function, modifier, constructor,
+// fallback or receive declaration.
+func isCallableDecl(n *sitter.Node) bool {
+	switch n.Kind() {
+	case kindFunctionDef, kindModifierDef, kindConstructorDef, kindFallbackReceiveDef:
+		return true
+	}
+	return false
+}
+
 // nearestFunctionQnameAndStart walks the parent chain to the enclosing
-// function_definition and returns its qualified name (Contract.Func or just
-// Func) plus the StartByte of the function's name identifier — the same
-// (qname, startByte) pair that runDecl(NodeFunction) uses to mint the
-// function node ID. Pending refs that build SrcID via parse.MakeID(fnQ,
-// "sol", fnStart) will therefore resolve to a real node, avoiding dangling
-// edges in graph.Validate.
-//
-// Returns ok=false when no enclosing function_definition exists or its
-// name field is missing (defensive — every emit / modifier_invocation /
-// mapping write in valid Solidity sits inside a function with a name).
+// function, modifier, constructor, fallback or receive and returns its
+// qualified name (`Contract.name`, or the bare name at file level) and the
+// byte that keys its node id (see callableKey). ok is false outside any
+// callable.
 func nearestFunctionQnameAndStart(n *sitter.Node, src []byte) (string, int, bool) {
-	cn := nearestContractName(n, src)
 	for cur := n; cur != nil; cur = cur.Parent() {
-		// function_definition,
-		// modifier_definition, and constructor_definition all qualify
-		// as enclosing-callable scopes. All three share Contract.<name>
-		// qname and live in containerIDByFuncID (Pass 1.5), so using-
-		// for PendingRefs emitted from inside any of these bodies
-		// resolve through the same path as function-body emits.
-		if cur.Kind() == "function_definition" || cur.Kind() == "modifier_definition" {
-			id := cur.ChildByFieldName("name")
-			if id == nil {
-				return "", 0, false
-			}
-			ident := id.Utf8Text(src)
-			qname := ident
-			if cn != "" {
-				qname = cn + "." + ident
-			}
-			return qname, int(id.StartByte()), true
+		if !isCallableDecl(cur) {
+			continue
 		}
-		if cur.Kind() == "constructor_definition" {
-			// Synthetic identifier — mirrors runConstructorDecl's
-			// canonical (qname, startByte) pair so SrcID hashing
-			// aligns with the emitted NodeFunction.
-			const ident = "constructor"
-			qname := ident
-			if cn != "" {
-				qname = cn + "." + ident
-			}
-			return qname, int(cur.StartByte()), true
+		name, idByte, ok := callableKey(cur, src)
+		if !ok {
+			return "", 0, false
 		}
-		if cur.Kind() == "fallback_receive_definition" {
-			// Synthetic identifier is read from the
-			// source token at the node's start ("fallback" or
-			// "receive"). Mirrors runFallbackReceiveDecl's
-			// (qname, startByte) pair.
-			ident := fallbackOrReceiveKeyword(cur, src)
-			if ident == "" {
-				return "", 0, false
-			}
-			qname := ident
-			if cn != "" {
-				qname = cn + "." + ident
-			}
-			return qname, int(cur.StartByte()), true
-		}
+		return qualify(nearestContractName(cur, src), name), idByte, true
 	}
 	return "", 0, false
 }

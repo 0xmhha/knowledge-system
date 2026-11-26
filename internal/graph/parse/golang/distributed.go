@@ -6,6 +6,8 @@ import (
 	gotypes "go/types"
 	"strings"
 
+	"golang.org/x/tools/go/packages"
+
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -60,7 +62,9 @@ func (v *declVisitor) emitDistributedDecls(f *ast.File) {
 		if !ok {
 			continue
 		}
-		v.maybeEmitJSONRPCHandler(fd)
+		if v.netRPC {
+			v.maybeEmitJSONRPCHandler(fd)
+		}
 		if fd.Body == nil {
 			continue
 		}
@@ -100,7 +104,7 @@ func (v *declVisitor) scanFuncBodyForDistributed(parentFuncID, parentFuncQname s
 // Stays in sync with declarations.go.visitFuncDecl naming convention.
 func (v *declVisitor) funcDeclIDQname(fd *ast.FuncDecl) (id, qname string) {
 	if fd.Recv != nil && len(fd.Recv.List) > 0 {
-		recvType := exprName(fd.Recv.List[0].Type)
+		recvType := recvTypeName(fd.Recv.List[0].Type)
 		qname = v.pkgName + "." + recvType + "." + fd.Name.Name
 	} else {
 		qname = v.pkgName + "." + fd.Name.Name
@@ -519,10 +523,14 @@ func (v *declVisitor) upsertMessageType(qname, name, subKind string, startPos, e
 // NodeMessageType for A and a handles_message edge from the method to A.
 //
 // Net/rpc dispatches on this exact shape (https://pkg.go.dev/net/rpc).
-// The detection is purely structural — it doesn't require the method to be
-// registered via `rpc.Register` (which would require cross-function tracking).
-// False positives are possible (any 2-arg pointer-second-arg error-returning
-// method matches); kept INFERRED to surface the uncertainty.
+// The detection is structural — it doesn't require the method to be
+// registered via `rpc.Register` (which would require cross-function tracking)
+// — so the caller applies it only when the build imports net/rpc: on
+// go-stablenet, which does not, the shape alone gave 42 handles_message
+// edges and 39 of them were plain methods. Inside a build that does use
+// net/rpc, false positives are still possible (any 2-arg
+// pointer-second-arg error-returning method matches); kept INFERRED to
+// surface the uncertainty.
 func (v *declVisitor) maybeEmitJSONRPCHandler(fd *ast.FuncDecl) {
 	if fd.Recv == nil || len(fd.Recv.List) == 0 {
 		return // free functions can't be JSON-RPC handlers
@@ -912,4 +920,31 @@ func (v *declVisitor) upsertHTTPClientPlaceholder(method, path string, startPos,
 		Confidence: types.ConfAmbiguous,
 	})
 	return id
+}
+
+// netRPCPath is the import path of the standard RPC package whose handler
+// shape maybeEmitJSONRPCHandler recognises.
+const netRPCPath = "net/rpc"
+
+// importsPackage reports whether any of pkgs imports the package at path.
+func importsPackage(pkgs []*packages.Package, path string) bool {
+	for _, pkg := range pkgs {
+		if pkg == nil {
+			continue
+		}
+		if _, ok := pkg.Imports[path]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// fileImports reports whether f imports the package at path.
+func fileImports(f *ast.File, path string) bool {
+	for _, im := range f.Imports {
+		if strings.Trim(im.Path.Value, `"`) == path {
+			return true
+		}
+	}
+	return false
 }

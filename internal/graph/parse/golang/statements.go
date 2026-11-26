@@ -21,6 +21,14 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 	if body == nil {
 		return
 	}
+	v.emitBodyPos(parentQname, parentID, body)
+}
+
+// emitBodyPos is emitFunctionBodyPos for any piece of code that runs on
+// behalf of the node parentID: a function body, or the initialiser of a
+// package-level variable (`var Default = New().Inc()`), whose statements and
+// calls belong to the variable.
+func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 	// Reset channel variable scope for this function — chanVarIDs is function-scoped.
 	v.chanVarIDs = make(map[string]string)
 	// assignedMakeChan tracks token.Pos of make(chan ...) calls that were already
@@ -110,42 +118,47 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 			v.emitGoCall(parentID, parentQname, s)
 			return false // goroutine body handled by emitGoroutineChannelEdges; prevent double-walk
 		case *ast.SendStmt:
-			chanName := channelVarName(s.Chan)
-			if chanName != "" {
-				if chanID, ok := v.chanVarIDs[chanName]; ok {
-					v.edges = append(v.edges, types.Edge{
-						Src: parentID, Dst: chanID, Type: types.EdgeSendsTo,
-						Count: 1, Confidence: types.ConfExtracted,
-					})
-					break
-				}
-			}
-			// Fallback: channel not in chanVarIDs (parameter, return value, field, etc.)
-			id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "send", s.Pos(), s.End())
-			v.edges = append(v.edges, types.Edge{
-				Src: parentID, Dst: id, Type: types.EdgeSendsTo,
-				Count: 1, Confidence: types.ConfExtracted,
-			})
+			v.emitChannelOp(parentID, parentQname, types.EdgeSendsTo, subKindSend, s.Chan, s, true)
 		case *ast.UnaryExpr:
 			if s.Op == token.ARROW {
-				chanName := channelVarName(s.X)
-				if chanName != "" {
-					if chanID, ok := v.chanVarIDs[chanName]; ok {
-						v.edges = append(v.edges, types.Edge{
-							Src: parentID, Dst: chanID, Type: types.EdgeRecvsFrom,
-							Count: 1, Confidence: types.ConfExtracted,
-						})
-						break
-					}
-				}
-				id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "recv", s.Pos(), s.End())
-				v.edges = append(v.edges, types.Edge{
-					Src: parentID, Dst: id, Type: types.EdgeRecvsFrom,
-					Count: 1, Confidence: types.ConfExtracted,
-				})
+				v.emitChannelOp(parentID, parentQname, types.EdgeRecvsFrom, subKindRecv, s.X, s, true)
 			}
 		}
 		return true
+	})
+}
+
+// Sub kinds of the CallSite node of a channel operation.
+const (
+	subKindSend = "send"
+	subKindRecv = "recv"
+)
+
+// emitChannelOp records one send (et sends_to) or receive (et recvs_from) by
+// the function parentID; ch is the channel operand and op the operation.
+//
+// A channel that is a local variable bound to a make site is linked to its
+// Channel node. Any other channel (a parameter, a field, a call result) gets a
+// site node of sub kind subKind and an edge to it. Inside a go statement the
+// local channels are linked from the Goroutine node by
+// emitGoroutineChannelEdges, so that caller passes linkLocal false and only
+// the site of the other channels is recorded here.
+func (v *declVisitor) emitChannelOp(parentID, parentQname string, et types.EdgeType, subKind string, ch ast.Expr, op ast.Node, linkLocal bool) {
+	if name := channelVarName(ch); name != "" {
+		if chanID, ok := v.chanVarIDs[name]; ok {
+			if linkLocal {
+				v.edges = append(v.edges, types.Edge{
+					Src: parentID, Dst: chanID, Type: et,
+					Count: 1, Confidence: types.ConfExtracted,
+				})
+			}
+			return
+		}
+	}
+	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, subKind, op.Pos(), op.End())
+	v.edges = append(v.edges, types.Edge{
+		Src: parentID, Dst: id, Type: et,
+		Count: 1, Confidence: types.ConfExtracted,
 	})
 }
 
@@ -178,10 +191,20 @@ func channelVarName(e ast.Expr) string {
 
 // appendLogicBlockPos creates a logic-block (or CallSite/Goroutine) node and
 // a contains-edge from the enclosing parent. Returns the new node's ID.
+//
+// The node is named "<parent>#<Type>@<start byte>". A CallSite adds its end
+// byte, "<parent>#CallSite@<start>-<end>": the calls of a chain start at the
+// same byte (New().Inc().Val() is three calls from the N of New), and so does
+// a send whose channel is a call result (f() <- v). Named by the start alone
+// they shared one node ID, the graph kept one node per ID, and 3,245 calls of
+// go-stablenet had no site of their own.
 func (v *declVisitor) appendLogicBlockPos(parentID, parentQname string, t types.NodeType, subKind string, startPos, endPos token.Pos) string {
 	startLn, startBy := v.pos(startPos)
 	endLn, endBy := v.pos(endPos)
 	qname := fmt.Sprintf("%s#%s@%d", parentQname, t, startBy)
+	if t == types.NodeCallSite {
+		qname = fmt.Sprintf("%s-%d", qname, endBy)
+	}
 	id := v.declID(qname, startBy)
 	v.nodes = append(v.nodes, types.Node{
 		ID: id, Type: t, Name: string(t), QualifiedName: qname,
@@ -343,6 +366,12 @@ func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.
 				Confidence: types.ConfExtracted})
 			v.emitGoCall(parentID, parentQname, s)
 			return false
+		case *ast.SendStmt:
+			v.emitChannelOp(parentID, parentQname, types.EdgeSendsTo, subKindSend, s.Chan, s, false)
+		case *ast.UnaryExpr:
+			if s.Op == token.ARROW {
+				v.emitChannelOp(parentID, parentQname, types.EdgeRecvsFrom, subKindRecv, s.X, s, false)
+			}
 		case *ast.CallExpr:
 			v.emitCallSite(parentID, parentQname, s)
 		}
@@ -467,7 +496,10 @@ func (v *declVisitor) qualifiedStaticTarget(fun ast.Expr) string {
 // parentID directly. Reading emitFunctionBodyPos confirms parentID is the
 // function ID (visitFuncDecl passes `id` from MakeID(funcQname, ...)).
 func (v *declVisitor) maybeEmitInvokesSelfLoop(parentFuncID string, c *ast.CallExpr) {
-	if c == nil || parentFuncID == "" {
+	// The marker is a self-loop on a function. In a package-level
+	// initialiser the parent is a Variable, which is never a callee, so a
+	// loop on it would be a call edge ending at a variable.
+	if c == nil || parentFuncID == "" || v.inInitialiser {
 		return
 	}
 	dispatchKind := v.classifyCallDispatch(c)

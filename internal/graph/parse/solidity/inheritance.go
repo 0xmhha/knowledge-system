@@ -18,42 +18,30 @@ import (
 //	contract Multi is Base, IFoo, IBar { ... }    → 3 edges, one per parent
 //	interface IB   is IA { ... }                  → EdgeExtends    (IB → IA)
 //
-// Per §5.0 decisions:
-//   - Same-file resolution → ConfExtracted.
-//   - Cross-file resolution → ConfInferred (Pass 2 PendingRef).
-//   - Unresolved (parent qname matches no node) → drop (strict purge,
-//     graph.Validate rejects dangling edges).
-//   - Multiple inheritance is order-preserving (one edge per parent in
-//     source order); C3 linearisation is not applied to
-//     these edges (storage layout uses it; see c3_linearization.go).
+// Rules:
+//   - Same-file resolution → ConfExtracted; cross-file → ConfInferred.
+//   - A base that no file of the graph declares gets no node and no edge;
+//     it is counted as unresolved.
+//   - One edge per base, in source order. The linearisation (c3_linearization.go)
+//     is a separate index used for name lookup and storage layout.
 //   - Edge direction: child → parent ("child inherits from parent"),
 //     consistent with Go implements.go and TS heritage semantics.
+//   - extends or implements is decided by the resolved base: implements when
+//     a contract lists an interface, extends otherwise.
 //
-// Parent type classification (EdgeExtends vs EdgeImplements) requires
-// knowing whether `Parent` is a contract or an interface. We always emit
-// a PendingRef in Pass 1 with a *provisional* EdgeType (EdgeExtends by
-// default) and let Pass 2 (resolveInheritance) reclassify based on the
-// resolved target's NodeType. This keeps the Pass 1 / Pass 2 split clean
-// — Pass 1 only knows local file structure; cross-file type discovery
-// belongs to Pass 2.
+// The edges are emitted in Pass 2 by linkInheritance from the bases each
+// container's declaration header lists, for every container of the graph.
+// Pass 1 queues one pending reference per (child, base) pair as well; it
+// makes no edge, it records that the child's file depends on the base's
+// name, which is what makes an incremental build re-resolve the child's
+// file when the base's file changes.
 //
 // Out of scope here (separate detectors): virtual/override,
 // interface dispatch `IFoo(addr).bar()`, `using For`.
 
-// runInheritance walks every `is`-clause match and queues a PendingRef
-// per (child, parent) pair. The query (queryInheritance) matches both
-// contract_declaration and interface_declaration parents so the same
-// emit path covers both forms.
-//
-// Pass 1 cannot finalise the edge type — `Parent` may be a contract
-// (EdgeExtends) or interface (EdgeImplements), and that distinction can
-// only be made once the cross-file node table is built in Pass 2. We
-// stash a provisional EdgeType (EdgeExtends) on the PendingRef and
-// reclassify in resolveInheritance.
-//
-// We use `DispatchKind` as a side-channel marker — set to "inherit" so
-// the resolver knows which PendingRefs originated here. This avoids
-// adding a new field to PendingRef just for one detector.
+// runInheritance walks every `is`-clause match and queues the dependency
+// reference of each (child, base) pair. The query (queryInheritance) matches
+// both contract_declaration and interface_declaration.
 func (v *declVisitor) runInheritance() {
 	query, qErr := sitter.NewQuery(v.lang, queryInheritance)
 	if qErr != nil {
@@ -84,20 +72,15 @@ func (v *declVisitor) runInheritance() {
 		if childNode == nil || parentNode == nil {
 			continue
 		}
-		// SrcID must match the contract / interface node ID emitted by
-		// runContractDecl / runLibraryDecl / runInterfaceDecl, which all
-		// hash (name, "sol", name-node startByte). emitContractLikeNode
-		// (abstract_library.go) uses the *name identifier* StartByte, so
-		// we reuse childNode.StartByte() here — childNode is the same
-		// identifier node captured as `@name` in those decls.
-		childName := childNode.Utf8Text(v.src)
-		childStart := int(childNode.StartByte())
-		srcID := parse.MakeID(childName, "sol", childStart)
+		// The source is the contract or interface that declares the
+		// `is` clause; containerOf gives the id its node was emitted with.
+		srcID, _, ok := v.containerOf(childNode)
+		if !ok {
+			continue
+		}
 		parentName := parentNode.Utf8Text(v.src)
 		v.pending = append(v.pending, parse.PendingRef{
-			SrcID: srcID,
-			// Provisional — resolveInheritance reclassifies to
-			// EdgeImplements when the resolved parent is an Interface.
+			SrcID:        srcID,
 			EdgeType:     types.EdgeExtends,
 			TargetQName:  parentName,
 			Line:         int(parentNode.StartPosition().Row) + 1,
@@ -106,9 +89,5 @@ func (v *declVisitor) runInheritance() {
 	}
 }
 
-// dispatchKindInherit tags PendingRefs that originate from inheritance
-// detection so resolveInheritance can identify and process them in Pass 2.
-// String constant (rather than a typed enum) for consistency with existing
-// DispatchKind usage in golang/grpc.go ("rpc", "grpc"), which uses bare
-// string literals.
+// dispatchKindInherit tags the dependency references of `is` clauses.
 const dispatchKindInherit = "inherit"

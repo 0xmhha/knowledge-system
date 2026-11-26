@@ -7,8 +7,11 @@ import (
 )
 
 // MakeID returns a stable 16-char hash for (qname, language, startByte).
-// All language parsers must use this so node IDs collide deterministically
-// across pass boundaries and re-runs.
+// It has no file in its key, so it is only safe for a node whose qualified
+// name already tells files apart (a File node, `file:<path>`). The Go and
+// Solidity parsers key declarations with NodeID; the TypeScript and
+// proto parsers still key declarations with MakeID, and two of their files
+// that declare the same name at the same byte offset share one id.
 func MakeID(qname, lang string, startByte int) string {
 	return hashID(fmt.Sprintf("%s|%s|%d", qname, lang, startByte))
 }

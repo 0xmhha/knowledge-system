@@ -61,7 +61,7 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 				}
 				var srcQname string
 				if fd.Recv != nil && len(fd.Recv.List) > 0 {
-					srcQname = pkgName + "." + exprName(fd.Recv.List[0].Type) + "." + fd.Name.Name
+					srcQname = pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
 				} else {
 					srcQname = pkgName + "." + fd.Name.Name
 				}

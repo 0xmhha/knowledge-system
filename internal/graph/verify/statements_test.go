@@ -15,8 +15,11 @@ func TestCompareStatements_Classes(t *testing.T) {
 	nodes := []types.Node{
 		n("ifL2", types.NodeIfStmt, 2, ""), n("csL3", types.NodeCallSite, 3, ""),
 		n("goL8", types.NodeGoroutine, 8, ""), n("csL10", types.NodeCallSite, 10, ""),
-		n("fx", types.NodeFunction, 20, "p.X"), n("vv", types.NodeField, 30, "p.T.V"),
+		n("fx", types.NodeFunction, 20, "p.X"),
+		{ID: "vv", Type: types.NodeField, Name: "V", FilePath: "a.go", StartLine: 30, CanonicalID: "p.T.V", Language: "go"},
 	}
+	// A field is named by its declaration (file, line, name), on both sides.
+	fieldV := fieldRefAt("a.go", 30, "V")
 	e := func(typ types.EdgeType, src, dst, kind string, line int) types.Edge {
 		return types.Edge{Type: typ, Src: src, Dst: dst, DispatchKind: kind, Line: line, Count: 1}
 	}
@@ -30,7 +33,7 @@ func TestCompareStatements_Classes(t *testing.T) {
 	}
 	truth := map[StmtFact]bool{
 		f(types.EdgeSiteCalls, "CallSite@L3", "p.X", "static", 3):       true,
-		f(types.EdgeBodyWrites, "IfStmt@L2", "p.T.V", "then", 4):        true,
+		f(types.EdgeBodyWrites, "IfStmt@L2", fieldV, "then", 4):         true,
 		f(types.EdgeEncloses, "IfStmt@L9", "CallSite@L10", "then", 10):  true,
 		f(types.EdgeSiteCalls, "CallSite@L3", "q.Outside", "static", 3): true, // no node for the callee
 	}

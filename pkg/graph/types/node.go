@@ -45,6 +45,14 @@ type Node struct {
 	// non-state-var nodes and for NodeField rows where the value is
 	// the zero default.
 	SlotIndex int `json:"slot_index,omitempty"`
+	// HasStorageSlot: true when the node is a Solidity state variable or
+	// mapping that occupies storage, so SlotIndex is its slot. SlotIndex
+	// alone cannot say so: slot 0 is its zero value and is omitted, which
+	// made a variable in slot 0 (GovBase.proposalExpiry,
+	// Mintable.masterMinter) look like a node without a slot. False for
+	// every other node, constants and immutables included. The stored
+	// attrs carry `"slot_index":0` when this is set.
+	HasStorageSlot bool `json:"has_storage_slot,omitempty"`
 	// HasAssembly: true when a Solidity
 	// callable (function / modifier / constructor / fallback) contains
 	// at least one `assembly { ... }` block in its body. Lets

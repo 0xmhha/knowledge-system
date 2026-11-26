@@ -2,8 +2,6 @@ package solidity
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
 // Sol HasLowLevelCall and HasValueTransfer
@@ -87,21 +85,24 @@ func (v *declVisitor) runLowLevelCallMarker() {
 			if !isLow && !isVal {
 				continue
 			}
-			// Must be the function position of a call_expression. The
-			// member node is wrapped in an expression node, which is
-			// itself a child of the call_expression's `function` field.
-			parent := memberNode.Parent()
-			if parent != nil && parent.Kind() == "expression" {
-				parent = parent.Parent()
-			}
-			if parent == nil || parent.Kind() != "call_expression" {
+			// Must be the callee of a call, directly or under call
+			// options (`x.call{value: v}("")`). The call-options form was
+			// not recognised, so claimBurnRefund of GovMinter v2 had
+			// neither marker.
+			call := callOfCallee(&memberNode)
+			if call == nil {
 				continue
+			}
+			// A low-level call that passes value moves coins like send
+			// and transfer do.
+			if isLow && callSendsValue(&memberNode, v.src) {
+				isVal = true
 			}
 			fnQ, fnStart, ok := nearestFunctionQnameAndStart(&memberNode, v.src)
 			if !ok {
 				continue
 			}
-			id := parse.MakeID(fnQ, "sol", fnStart)
+			id := v.declID(fnQ, fnStart)
 			if isLow {
 				hasLowLevel[id] = true
 			}
@@ -122,4 +123,30 @@ func (v *declVisitor) runLowLevelCallMarker() {
 			v.nodes[i].HasValueTransfer = true
 		}
 	}
+}
+
+// optionValue is the call option that sends coins with a call.
+const optionValue = "value"
+
+// kindStructFieldAssignment is one `name: value` entry of call options.
+const kindStructFieldAssignment = "struct_field_assignment"
+
+// callSendsValue reports whether the call whose callee is member has a
+// `value` call option (`x.call{value: v}(data)`).
+func callSendsValue(member *sitter.Node, src []byte) bool {
+	for cur := member.Parent(); cur != nil && cur.Kind() != kindCallExpression; cur = cur.Parent() {
+		if cur.Kind() != kindStructExpression {
+			continue
+		}
+		for i := uint(0); i < cur.NamedChildCount(); i++ {
+			option := cur.NamedChild(i)
+			if option == nil || option.Kind() != kindStructFieldAssignment {
+				continue
+			}
+			if name := option.ChildByFieldName(fieldName); name != nil && name.Utf8Text(src) == optionValue {
+				return true
+			}
+		}
+	}
+	return false
 }

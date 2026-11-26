@@ -133,7 +133,7 @@ func (v *declVisitor) scanValueSpecForMutex(s *ast.ValueSpec) {
 func (v *declVisitor) scanFuncBodyForMutexLocals(fd *ast.FuncDecl) {
 	funcQname := v.pkgName + "." + fd.Name.Name
 	if fd.Recv != nil && len(fd.Recv.List) > 0 {
-		funcQname = v.pkgName + "." + exprName(fd.Recv.List[0].Type) + "." + fd.Name.Name
+		funcQname = v.pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
 	}
 	ast.Inspect(fd.Body, func(n ast.Node) bool {
 		decl, ok := n.(*ast.DeclStmt)
@@ -291,6 +291,13 @@ func embeddedMutexName(e ast.Expr) string {
 func asTypeIdent(e ast.Expr) *ast.Ident {
 	if star, ok := e.(*ast.StarExpr); ok {
 		return asTypeIdent(star.X)
+	}
+	// An instantiated generic type: Box[T] and Pair[K, V] are named Box, Pair.
+	if ix, ok := e.(*ast.IndexExpr); ok {
+		return asTypeIdent(ix.X)
+	}
+	if ix, ok := e.(*ast.IndexListExpr); ok {
+		return asTypeIdent(ix.X)
 	}
 	if sel, ok := e.(*ast.SelectorExpr); ok {
 		return sel.Sel

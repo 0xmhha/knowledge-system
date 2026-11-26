@@ -22,7 +22,12 @@ import (
 // flat walk keeps the stack of syntax nodes above each node, and the
 // innermost control statement and its part (cond, then, else, body, case,
 // go) are read off that stack. Canonical ids are formatted by this package
-// (canonicalID, fieldID), not the parser's.
+// (canonicalID), not the parser's. A struct field is named by where it is
+// declared (fieldRef), not by "<importpath>.<Type>.<Field>": that string
+// names the package-level field when a function declares a struct of the
+// same name, and no field at all through a defined type over a struct. While
+// the truth used the string, as the build then did, the two agreed on the
+// wrong field and the comparison showed nothing.
 //
 // A truth fact whose statement has no node in the graph (the build makes
 // only call-site nodes inside a goroutine's function literal, and none for
@@ -108,10 +113,16 @@ func stmtKind(n ast.Node) types.NodeType {
 
 // statements adds the statement facts of one function body.
 func (w *fileWalker) statements(d *ast.FuncDecl) {
-	if w.stmt == nil {
+	w.statementsIn(d.Body)
+}
+
+// statementsIn adds the statement facts of one piece of code: a function
+// body, or the initialiser of a package-level variable.
+func (w *fileWalker) statementsIn(body ast.Node) {
+	if w.stmt == nil || body == nil {
 		return
 	}
-	writes := writtenExprs(d.Body)
+	writes := writtenExprs(body)
 	key := func(n ast.Node) string {
 		return fmt.Sprintf("%s@L%d", stmtKind(n), w.fset.Position(n.Pos()).Line)
 	}
@@ -119,7 +130,7 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 		w.stmt[StmtFact{Rel: string(rel), File: w.rel, Src: key(src), Dst: dst, Kind: kind, Line: w.fset.Position(p).Line}] = true
 	}
 	var stack []ast.Node
-	ast.Inspect(d.Body, func(n ast.Node) bool {
+	ast.Inspect(body, func(n ast.Node) bool {
 		if n == nil {
 			stack = stack[:len(stack)-1]
 			return false
@@ -150,7 +161,7 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 			}
 		case *ast.SelectorExpr:
 			if s := w.info.Selections[x]; s != nil && s.Kind() == gotypes.FieldVal {
-				if id := fieldID(s); id != "" && w.inScopeID(s.Obj()) {
+				if id := w.fieldRef(s.Obj()); id != "" && w.inScopeID(s.Obj()) {
 					w.valueFact(add, ctl, part, writes[x], id, x.Sel.Pos())
 				}
 			}
@@ -337,32 +348,30 @@ func writtenExprs(body ast.Node) map[ast.Node]bool {
 	return out
 }
 
-// fieldID formats the field a selection reaches as <importpath>.<Type>.<Field>,
-// following embedded fields to the struct that declares it.
-func fieldID(s *gotypes.Selection) string {
-	t := s.Recv()
-	idx := s.Index()
-	for k, i := range idx {
-		u := gotypes.Unalias(t)
-		if p, ok := u.(*gotypes.Pointer); ok {
-			u = gotypes.Unalias(p.Elem())
-		}
-		st, ok := u.Underlying().(*gotypes.Struct)
-		if !ok || i >= st.NumFields() {
-			return ""
-		}
-		f := st.Field(i)
-		if k == len(idx)-1 {
-			named, ok := u.(*gotypes.Named)
-			if !ok || named.Origin().Obj().Pkg() == nil {
-				return "" // a field of an anonymous struct
-			}
-			o := named.Origin().Obj()
-			return o.Pkg().Path() + "." + o.Name() + "." + f.Name()
-		}
-		t = f.Type()
+// fieldRefAt names a struct field by its declaration: the file, the line and
+// the field name. The truth takes them from go/types, the graph side from the
+// Field node.
+func fieldRefAt(file string, line int, name string) string {
+	return fmt.Sprintf("field:%s:%d:%s", file, line, name)
+}
+
+// fieldRef is the fieldRefAt name of the field obj, or "" when obj is not a
+// field declared under the source root.
+func (w *fileWalker) fieldRef(obj gotypes.Object) string {
+	v, ok := obj.(*gotypes.Var)
+	if !ok || !v.IsField() {
+		return ""
 	}
-	return ""
+	v = v.Origin()
+	if !v.Pos().IsValid() {
+		return ""
+	}
+	pos := w.fset.Position(v.Pos())
+	rel, ok := relPath(w.root, pos.Filename)
+	if !ok {
+		return ""
+	}
+	return fieldRefAt(rel, pos.Line, v.Name())
 }
 
 // compareStatements classifies truth facts and graph edges per type.
@@ -375,13 +384,18 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		if stmtNodeTypes[n.Type] {
 			stmtNodes[n.FilePath+"|"+fmt.Sprintf("%s@L%d", n.Type, n.StartLine)] = true
 		}
-		if n.CanonicalID != "" {
+		if n.Type == types.NodeField {
+			canon[fieldRefAt(n.FilePath, n.StartLine, n.Name)] = true
+		} else if n.CanonicalID != "" {
 			canon[baseID(n.CanonicalID)] = true
 		}
 	}
 	ref := func(n types.Node) string {
-		if stmtNodeTypes[n.Type] {
+		switch {
+		case stmtNodeTypes[n.Type]:
 			return fmt.Sprintf("%s@L%d", n.Type, n.StartLine)
+		case n.Type == types.NodeField:
+			return fieldRefAt(n.FilePath, n.StartLine, n.Name)
 		}
 		return baseID(n.CanonicalID)
 	}

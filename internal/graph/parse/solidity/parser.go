@@ -28,23 +28,13 @@ type Parser struct {
 	srcRoot string
 	abiMu   sync.Mutex
 	abi     map[string][]ABISig
-	// Cross-file struct byte footprints.
-	// ParseFile runs per-file Pass 1 which computes structSizes from
-	// the file's own struct declarations. Cross-file refs (state-var
-	// typed as a struct declared in another file) need the union of
-	// every file's sizes; ParseFile merges its local map here under
-	// structMu so Resolve can read a complete table when correcting
-	// NodeField SlotIndex for cross-file references.
-	structMu    sync.Mutex
-	structSizes map[string]int
 }
 
 // New returns a Parser rooted at srcRoot (used for relative file paths).
 func New(srcRoot string) *Parser {
 	return &Parser{
-		srcRoot:     srcRoot,
-		abi:         map[string][]ABISig{},
-		structSizes: map[string]int{},
+		srcRoot: srcRoot,
+		abi:     map[string][]ABISig{},
 	}
 }
 
@@ -78,19 +68,6 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 			p.abi[contract] = append(p.abi[contract], sigs...)
 		}
 		p.abiMu.Unlock()
-	}
-	// Merge per-file struct sizes so cross-
-	// file refs can be resolved during Pass 2. Conflicts (same struct
-	// name with different sizes across files) prefer the larger
-	// value — defensive against incomplete declarations.
-	if len(v.structSizes) > 0 {
-		p.structMu.Lock()
-		for name, size := range v.structSizes {
-			if existing, has := p.structSizes[name]; !has || size > existing {
-				p.structSizes[name] = size
-			}
-		}
-		p.structMu.Unlock()
 	}
 	return &parse.ParseResult{
 		Path:    rel,

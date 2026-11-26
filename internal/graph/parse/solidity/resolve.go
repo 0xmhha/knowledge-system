@@ -1,7 +1,6 @@
 package solidity
 
 import (
-	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -62,47 +61,43 @@ type localDecl struct {
 // at the use site uses line containment + max declLine selection.
 type localVarTypeMap map[string]map[string][]localDecl
 
-// Resolve unions per-file results. Cross-file resolution is name-based:
-// pending edges (emits_event, has_modifier, writes_mapping) are matched
-// against any node whose Name (or QualifiedName for mappings) equals the
-// pending TargetQName. Cross-file matches are tagged INFERRED; same-file
-// matches stay EXTRACTED. Mirrors the TypeScript resolver.
+// Resolve unions the per-file results and turns their pending references
+// into edges.
 //
-// Inheritance: resolves `is`-clause
-// PendingRefs (DispatchKind="inherit"). The detector (inheritance.go)
-// emits these with a provisional EdgeType=EdgeExtends; this resolver
-// reclassifies to EdgeImplements when the resolved parent is an
-// Interface node. Contract / Interface lookups share the byName index
-// keyed by NodeType.
+// A name is resolved in the scope of the contract that uses it (scopeIndex):
+// the contract itself, its bases in linearisation order, then the file and
+// the files it imports. That covers emitted events, applied modifiers, calls
+// by name, reverts with a custom error, state variable and mapping reads and
+// writes, and overrides. An edge inside one file is EXTRACTED and one that
+// crosses files INFERRED.
 //
-// Virtual/override: resolves
-// override-specifier PendingRefs (DispatchKind="override" /
-// "override_explicit"). Bare overrides walk the resolved inheritance graph
-// to find every parent that declares a same-name function; explicit
-// `override(A, B)` looks up "Parent.method" directly. Both paths emit
-// EdgeOverrides (child → parent) at ConfExtracted (same-file) or
-// ConfInferred (cross-file).
+// What Resolve needs to know about a file other than its pending references
+// it reads from that file's nodes: which container declares a member (the
+// qualified name), what a file imports (its Import nodes), the bases of a
+// container and the parameter count of a function (the declaration header),
+// the size of a type (struct member and enum value nodes). An incremental
+// build parses only the changed files and hands the others over as stored
+// nodes; read this way, it resolves like a full build.
 //
-// Interface dispatch: resolves
-// `IFoo(addr).bar()` PendingRefs (DispatchKind="interface_dispatch").
-// Two-step lookup: (1) TypeName must resolve to a NodeInterface; (2)
-// `TypeName.MethodName` must resolve to a Function declared on that
-// interface. Both hits → emit EdgeInvokes at ConfAmbiguous (§5.0 Q5 —
-// confidence is constant regardless of file boundary; runtime dispatch
-// makes the resolved target an over-approximation). Any miss → drop
-// (strict-purge — keeps the AMBIGUOUS bucket scoped to real
-// interface dispatch only).
+// Kept from the earlier resolver, with their own lookups: the using-for
+// bindings and the receiver shapes of `x.method()` (resolveUsingFor*), casts
+// (`IFoo(addr).bar()`, `Token(addr).mint()`: invokes, AMBIGUOUS) and
+// low-level calls.
 func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, error) {
 	out := &parse.ResolvedGraph{}
 
-	// nodeFile maps node ID -> source file, so we can mark cross-file
-	// resolutions as INFERRED.
-	nodeFile := map[string]string{}
+	// nodeFile maps a node to its file and knows which files a file imports,
+	// so a name shared by several files resolves to the one the using file
+	// can see, and cross-file resolutions are marked INFERRED.
+	nodeFile := newFileIndex()
 	// nodeType maps node ID -> declared type — used by inheritance
 	// resolution to reclassify EdgeExtends → EdgeImplements when the
 	// target is an Interface.
 	nodeType := map[string]types.NodeType{}
-	// byName indexes resolvable nodes by their unqualified Name.
+	// byName indexes contracts, interfaces and free functions by their
+	// unqualified Name. Members (events, modifiers, mappings, state
+	// variables, errors) are not in it: they resolve through the scope
+	// index, in the contract that uses them.
 	byName := map[types.NodeType]map[string][]string{}
 	add := func(nt types.NodeType, key, id string) {
 		if byName[nt] == nil {
@@ -111,140 +106,72 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		byName[nt][key] = append(byName[nt][key], id)
 	}
 
-	// Indexes — populated in the same single pass over all per-file
-	// results below. The three maps work together so bare-override
-	// resolution can walk Function → enclosing Container → parent
-	// Containers → parent Function in O(1) per hop:
-	//
-	//   - funcByQName: "Container.func" → []nodeID — explicit override
-	//     lookup ("Parent.foo" TargetQName resolves here). The list is
-	//     plural because real-world Sol builds can contain duplicate
-	//     contract names across files (e.g. test fixtures with a shared
-	//     `Base` name in two unrelated subtrees); resolveOverridesRef
-	//     disambiguates by file path against the source function.
-	//   - containerNameByID: containerID → unqualified name. ID-keyed
-	//     reverse-direction map used to label parent contract IDs from
-	//     the inheritance index when constructing the "Parent.method"
-	//     qname for funcByQName lookup. Sol allows three container kinds
-	//     (Contract / Interface / Library) — override resolution indexes the first two
-	//     (Library has no override semantics in Sol).
-	//   - containerIDByFuncID: funcID → enclosing containerID. Pre-built
-	//     reverse index that replaces the O(N) scan over funcByQName +
-	//     reverse scan over containerNameByID that bare-override
-	//     resolution used to do per PendingRef. Population is two-step
-	//     because Function ↔ Container association requires both nodes
-	//     loaded first (same-file + name-prefix match); see the second
-	//     loop below.
+	// funcByQName: "Container.func" → []nodeID, for functions and
+	// modifiers. Plural because two files can declare the same contract
+	// name; callers pick through nodeFile.pick.
+	// containerNameByID: containerID → unqualified name.
+	// containerIDByFuncID: function or modifier → enclosing container.
 	funcByQName := map[string][]string{}
 	containerNameByID := map[string]string{}
 	containerIDByFuncID := map[string]string{}
 
-	// containerByNameFile is a transient lookup map for the second pass —
-	// keyed by (name + file) so a Function's enclosing container can be
-	// resolved without scanning every container in the build. Sol
-	// functions cannot span files, so file-scoping is a complete
-	// disambiguator (two `Base` contracts in different files won't
-	// shadow each other).
-	containerByNameFile := map[string]string{}
-
 	for _, r := range results {
 		out.Nodes = append(out.Nodes, r.Nodes...)
 		out.Edges = append(out.Edges, r.Edges...)
-		for _, n := range r.Nodes {
-			nodeFile[n.ID] = n.FilePath
-			nodeType[n.ID] = n.Type
-			switch n.Type {
-			case types.NodeEvent:
-				add(types.NodeEvent, n.Name, n.ID)
-			case types.NodeModifier:
-				add(types.NodeModifier, n.Name, n.ID)
-				// Also index modifiers by qname
-				// (`Container.modifier`) so resolveOverridesRef can find
-				// parent-modifier candidates the same way it finds parent-
-				// function candidates. Modifier qname is set by runDecl's
-				// NodeModifier path (declarations.go:192) and matches the
-				// NodeFunction shape.
-				if n.QualifiedName != "" && n.QualifiedName != n.Name {
-					funcByQName[n.QualifiedName] = append(funcByQName[n.QualifiedName], n.ID)
-				}
-			case types.NodeMapping:
-				add(types.NodeMapping, n.QualifiedName, n.ID)
-			// Index Contracts and Interfaces by Name so inheritance
-			// PendingRefs (which only know the parent's unqualified name)
-			// can resolve cross-file.
-			case types.NodeContract:
-				add(types.NodeContract, n.Name, n.ID)
-				containerNameByID[n.ID] = n.Name
-				containerByNameFile[n.Name+"|"+n.FilePath] = n.ID
-			case types.NodeInterface:
-				add(types.NodeInterface, n.Name, n.ID)
-				containerNameByID[n.ID] = n.Name
-				containerByNameFile[n.Name+"|"+n.FilePath] = n.ID
-			case types.NodeFunction:
-				// Explicit override `override(A,B)` queues a
-				// TargetQName of "Parent.method", so we index every Sol
-				// function by its qualified name. Bare-override resolution
-				// uses the same index, scoped by parent contract name.
+	}
+	for _, n := range out.Nodes {
+		nodeFile.byNode[n.ID] = n.FilePath
+		nodeType[n.ID] = n.Type
+		switch n.Type {
+		case types.NodeModifier:
+			if n.QualifiedName != "" && n.QualifiedName != n.Name {
 				funcByQName[n.QualifiedName] = append(funcByQName[n.QualifiedName], n.ID)
-				// Index free functions (qname ==
-				// name, no enclosing container) under byName[NodeFunction]
-				// so resolveUsingForRef's NodeFunction fallback can join
-				// the operator-form / free-function recovery walkers'
-				// PendingRefs. Restricted to file-scope functions to
-				// avoid binding to a same-named contract method when the
-				// developer wrote `using {mul as *} for T` expecting the
-				// free function.
-				if n.QualifiedName == n.Name {
-					add(types.NodeFunction, n.Name, n.ID)
-				}
+			}
+		case types.NodeContract, types.NodeInterface:
+			add(n.Type, n.Name, n.ID)
+			containerNameByID[n.ID] = n.Name
+		case types.NodeFunction:
+			funcByQName[n.QualifiedName] = append(funcByQName[n.QualifiedName], n.ID)
+			// Free functions (no enclosing container) are also indexed by
+			// name, for `using {f as +} for T` bindings.
+			if n.QualifiedName == n.Name {
+				add(types.NodeFunction, n.Name, n.ID)
 			}
 		}
 	}
 
-	// Pass 1.5 — build containerIDByFuncID and the state-variable
-	// type index. Both require Function / Container / Field nodes already
-	// indexed (above), so they run as a separate loop.
-	//
-	//   containerIDByFuncID: funcID → enclosing containerID (override
-	//                        reverse index, reused by using-for for call→contract
-	//                        recovery).
-	//   stateVarTypes:       contractID → varName → declared typeName
-	//                        (NodeField.Signature, set by runStateVarDecl
-	//                        via extractTypeNameText). Drives method-call
-	//                        receiver type lookup in Pass 2c.
-	//
-	// Both indexes derive the enclosing container from the node's
-	// QualifiedName prefix (`<Container>.<member>`) — emitted by
-	// runFunctionDecl and runStateVarDecl. File-level
-	// helpers without a container prefix are skipped (Sol allows free
-	// functions but not free state vars; either way override / using-for
-	// semantics don't apply).
-	stateVarTypes := stateVarTypeMap{}
+	// Imports first: every later name lookup asks which files a file sees.
+	linkImports(out, nodeFile)
+
+	// The scope index holds membership (which container declares which
+	// member). Membership used to be guessed from the qualified-name prefix
+	// plus the file, once per consumer; it is read from one place now.
+	scope := newScopeIndex(out.Nodes, nodeFile)
+	scoped := newScopedResolver(scope, out)
+
+	// fresh holds the files parsed in this run. On an incremental build an
+	// unchanged file arrives as stored nodes without edges; its nodes are
+	// already final (slot indexes include the bases' offset) and must not
+	// be laid out again.
+	fresh := map[string]bool{}
 	for _, r := range results {
-		for _, n := range r.Nodes {
-			// NodeModifier joins NodeFunction
-			// in containerIDByFuncID — modifier bodies can host using-for
-			// receivers (params, locals) just like function bodies. Same
-			// qname-prefix idiom (Container.<name>).
-			if n.Type != types.NodeFunction && n.Type != types.NodeField && n.Type != types.NodeModifier {
-				continue
-			}
-			dot := strings.IndexByte(n.QualifiedName, '.')
-			if dot < 0 {
-				continue
-			}
-			containerName := n.QualifiedName[:dot]
-			cid, ok := containerByNameFile[containerName+"|"+n.FilePath]
-			if !ok {
-				continue
-			}
-			if n.Type == types.NodeFunction || n.Type == types.NodeModifier {
-				containerIDByFuncID[n.ID] = cid
-				continue
-			}
-			// NodeField: stash typeName under the same container ID.
+		if len(r.Edges) > 0 {
+			fresh[r.Path] = true
+		}
+	}
+
+	// stateVarTypes: container → variable name → declared type, for the
+	// receiver of `variable.method(...)`. Own variables here; inherited ones
+	// are added once the linearisation is known.
+	stateVarTypes := stateVarTypeMap{}
+	for id, cid := range scope.owner {
+		n := scope.node[id]
+		switch n.Type {
+		case types.NodeFunction, types.NodeModifier:
+			containerIDByFuncID[id] = cid
+		case types.NodeField, types.NodeConstant:
 			if n.Signature == "" {
-				continue // extraction-failed shapes
+				continue
 			}
 			if stateVarTypes[cid] == nil {
 				stateVarTypes[cid] = map[string]string{}
@@ -253,50 +180,28 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// Pass 2a — resolve inheritance edges first, before override resolution needs them.
-	// Bare-override resolution walks the EdgeExtends/EdgeImplements
-	// adjacency built in buildInheritanceIndex; that index must include
-	// both same-file (already in out.Edges from Pass 1) and cross-file
-	// (resolved here) inheritance. Splitting the pending iteration into
-	// two sub-passes keeps the dependency explicit instead of relying on
-	// per-result ordering.
-	for _, r := range results {
-		for _, pr := range r.Pending {
-			if pr.DispatchKind != dispatchKindInherit {
-				continue
-			}
-			if edge, ok := resolveInheritanceRef(pr, byName, nodeFile, nodeType); ok {
-				out.Edges = append(out.Edges, edge)
-			}
-		}
-	}
+	// Pass 2a — inheritance. The bases of every container are read from
+	// its declaration header, so they are known for unchanged files too.
+	linkInheritance(out, scope)
 
-	// Inheritance edge index — contractID → []parentContractID. Built
-	// from the (now fully-resolved) EdgeExtends + EdgeImplements edges
-	// after Pass 2a above. Order is preserved (one entry per `is`-clause
-	// parent in source order), so `override` against a multi-parent class
-	// hits parents in the declared order.
-	parents := buildInheritanceIndex(out.Edges)
+	// parents: container → direct bases, in source order.
+	parents := scope.inheritanceParents()
 
-	// Re-pack state-var SlotIndex with the
-	// cross-file struct size table merged from every parsed file's
-	// Pass 1 (Parser.structSizes guarded by structMu). A state var
-	// typed as a foreign struct now sizes correctly; runs before
-	// inheritance offset accumulation so the contract-local fix
-	// applies first.
-	p.structMu.Lock()
-	globalStructSizes := make(map[string]int, len(p.structSizes))
-	maps.Copy(globalStructSizes, p.structSizes)
-	p.structMu.Unlock()
-	applyCrossFileStructSizes(out.Nodes, globalStructSizes)
+	// The linearisation of every container: the order names are looked up
+	// in (itself, then its bases). Computed once and shared by the scope
+	// index, receiver types, storage layout and inherited function-typed
+	// fields. mroFallbackIDs are the containers whose bases have no
+	// consistent linearisation.
+	mroByContractID, mroFallbackIDs := computeC3LinearizationWithFallbacks(parents)
+	scope.mro = mroByContractID
+	scoped.parents = parents
+	inheritStateVarTypes(stateVarTypes, mroByContractID)
 
-	// Inheritance offset on NodeField SlotIndex. Pass 1 emits
-	// per-contract local indices (each contract restarts at 0); this
-	// step adds the cumulative ancestor slot count so the value
-	// reflects absolute EVM storage position. The ancestor walk uses
-	// C3 linearization (see applyInheritanceSlotOffset and
-	// docs/graph/design/solidity-storage-slot-index.md).
-	applyInheritanceSlotOffset(out.Nodes, parents)
+	// Storage layout of the parsed files: slots within each container,
+	// then the slots the bases occupy.
+	sizes := typeSizesFromNodes(out.Nodes)
+	layoutStateVariables(out.Nodes, scope.owner, fresh, sizes)
+	applyInheritanceSlotOffset(out.Nodes, scope.owner, mroByContractID, fresh, sizes)
 
 	// Pre-build the (contractID, typeName) →
 	// libraryName binding map by sweeping all dispatchKindUsingForTypeBind
@@ -407,6 +312,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 	}
+
+	scoped.paramTypes, scoped.localVarTypes = paramTypes, localVarTypes
 
 	// Propagate inherited
 	// bindings down the inheritance graph so a child contract picks
@@ -527,33 +434,23 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 		fnTypedFields[contract][field] = true
 	}
-	// The C3 MRO is reused here to walk
-	// inherited function-typed fields. Computed once for the entire
-	// resolve pass.
-	//
-	// The variant call also surfaces the
-	// set of contracts whose hierarchy required the C3 fallback so
-	// we can stamp HasInheritanceMROFallback after Pass 2b.
-	mroByContractID, mroFallbackIDs := computeC3LinearizationWithFallbacks(parents)
-
 	// Pass 2b — everything except inheritance (already done) and any
 	// future detector-specific branches go through this loop. Overrides
 	// rely on the `parents` index built between the two sub-passes.
 	for _, r := range results {
 		for _, pr := range r.Pending {
-			if pr.DispatchKind == dispatchKindInherit {
-				continue // already handled in Pass 2a
+			// Names resolved in the scope of the contract that uses them:
+			// emits, modifiers, calls by name, reverts, reads and writes.
+			if scoped.handles(pr.DispatchKind) {
+				scoped.resolve(pr)
+				continue
 			}
 			// Override branch — fans out one EdgeOverrides per resolved
 			// parent. Bare `override` consults the inheritance index; the
 			// explicit form does a direct qname lookup.
 			if pr.DispatchKind == dispatchKindOverride ||
 				pr.DispatchKind == dispatchKindOverrideExplicit {
-				edges := resolveOverridesRef(
-					pr, funcByQName, containerNameByID,
-					containerIDByFuncID, parents, nodeFile,
-				)
-				out.Edges = append(out.Edges, edges...)
+				scoped.resolveOverride(pr)
 				continue
 			}
 			// Interface-dispatch branch — resolves IFoo(addr).bar()
@@ -626,13 +523,11 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			// receiver of that name, no binding for that type, no
 			// library function with that method) — strict-purge same
 			// as the other Sol resolvers.
-			if pr.DispatchKind == dispatchKindUsingForCall {
-				if edge, ok := resolveUsingForCallRef(
-					pr, bindings, stateVarTypes, paramTypes, localVarTypes,
-					containerIDByFuncID, funcByQName, nodeFile,
-				); ok {
-					out.Edges = append(out.Edges, edge)
-				}
+			if argc, ok := arityOfKind(pr.DispatchKind, dispatchKindUsingForCall); ok {
+				resolveUsingForCallRef(
+					pr, argc, scoped, bindings, stateVarTypes, paramTypes, localVarTypes,
+					containerIDByFuncID, funcByQName,
+				)
 				continue
 			}
 			// Depth-2 chained shape
@@ -653,12 +548,12 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				var fn1ID string
 				if containerName != "" {
 					if ids := funcByQName[containerName+"."+fn1Name]; len(ids) > 0 {
-						fn1ID = pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+						fn1ID = pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 					}
 				}
 				if fn1ID == "" {
 					if ids := funcByQName[fn1Name]; len(ids) > 0 {
-						fn1ID = pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+						fn1ID = pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 					}
 				}
 				if fn1ID == "" {
@@ -674,7 +569,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				if len(ids) == 0 {
 					continue
 				}
-				fn2ID := pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+				fn2ID := pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 				if fn2ID == "" {
 					continue
 				}
@@ -699,12 +594,12 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				var innerFuncID string
 				if containerName != "" {
 					if ids := funcByQName[containerName+"."+innerFnName]; len(ids) > 0 {
-						innerFuncID = pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+						innerFuncID = pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 					}
 				}
 				if innerFuncID == "" {
 					if ids := funcByQName[innerFnName]; len(ids) > 0 {
-						innerFuncID = pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+						innerFuncID = pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 					}
 				}
 				if innerFuncID == "" {
@@ -931,32 +826,9 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				continue
 			}
-			var targetType types.NodeType
-			switch pr.EdgeType {
-			case types.EdgeEmitsEvent:
-				targetType = types.NodeEvent
-			case types.EdgeHasModifier:
-				targetType = types.NodeModifier
-			case types.EdgeWritesMapping:
-				targetType = types.NodeMapping
-			default:
-				continue
-			}
-			ids := byName[targetType][pr.TargetQName]
-			if len(ids) == 0 {
-				continue
-			}
-			conf := types.ConfExtracted
-			if nodeFile[pr.SrcID] != "" && nodeFile[ids[0]] != "" && nodeFile[pr.SrcID] != nodeFile[ids[0]] {
-				conf = types.ConfInferred
-			}
-			out.Edges = append(out.Edges, types.Edge{
-				Src: pr.SrcID, Dst: ids[0], Type: pr.EdgeType,
-				Line: pr.Line, Count: 1, Confidence: conf,
-				Order: pr.Order,
-			})
 		}
 	}
+	out.Edges = append(out.Edges, mergeRepeatedEdges(scoped.edges)...)
 	// Apply HasExternalCall to every callable
 	// node that the Pass 2b loop flagged with an address-typed low-
 	// level call receiver. The marker complements HasLowLevelCall (set
@@ -994,236 +866,74 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	return out, nil
 }
 
-// applyInheritanceSlotOffset adjusts every NodeField's SlotIndex to include the
-// cumulative ancestor slot count using the C3 linearization MRO
-// (Method Resolution Order) Sol's reference compiler applies to
-// storage layout. Each contract's offset is the sum of slotCount
-// over every ancestor in its C3 linearization — diamond inheritance
-// no longer double-counts a shared grandparent.
+// applyInheritanceSlotOffset adds to the slot index of every state variable
+// of a freshly parsed file the number of slots its container's bases occupy,
+// so the index is the position in the storage of a contract that inherits
+// them.
 //
-// Algorithm:
+// The offset of a container is the sum of the slots its bases declare, over
+// its linearisation; a base shared by two branches (a diamond) is counted
+// once. The slots a container declares are where its own layout ends: the
+// last slot any of its state variables occupies, plus one. GovBase ends with
+// `uint256[37] __gap` in slots 13 to 49, so GovMasterMinter.fiatToken is in
+// slot 50 (0x32, as the source documents), not in slot 14. Fields and
+// mappings both count and both move: a mapping takes a slot like any other
+// variable. owner tells which container declares a variable, so two
+// contracts of the same name in two files keep separate counts.
 //
-//  1. Index contracts by Name (first occurrence wins for cross-file
-//     homonyms — same disambiguation idiom as interface dispatch /
-//     contract cast).
-//
-//  2. Count slots per contract: the maximum SlotIndex + 1 across
-//     non-mapping NodeField rows whose qname prefix matches a
-//     contract.
-//
-//  3. Compute the C3 linearization for every contract via
-//     computeC3Linearization. The MRO list is (self, base1, base2,
-//     …) — derived first, base last.
-//
-//  4. offset(c) = Σ slotCount(a) for each ancestor a in MRO[c]
-//     except c itself. C3 dedupes shared ancestors so the sum
-//     stays correct for diamond hierarchies.
-//
-//  5. Mutate every NodeField's SlotIndex by adding the offset.
-//
-// Limitations remaining:
-//
-//   - Library subkind contracts (SubKind="library") are included
-//     in the index. Libraries hold no state in practice, so the
-//     adjustment is a no-op for them; no explicit filter.
-//   - Cross-file homonymous contracts pick the first-occurrence ID
-//     (same idiom every other byName resolver uses).
-//   - Inconsistent hierarchies (no C3 solution exists, which solc
-//     would reject) fall back to a depth-first walk so the
-//     result stays deterministic.
-func applyInheritanceSlotOffset(nodes []types.Node, parents map[string][]string) {
-	contractIDByName := map[string]string{}
-	for _, n := range nodes {
-		if n.Type != types.NodeContract && n.Type != types.NodeInterface {
-			continue
-		}
-		if _, exists := contractIDByName[n.Name]; !exists {
-			contractIDByName[n.Name] = n.ID
-		}
-	}
-	if len(contractIDByName) == 0 {
-		return
-	}
-
-	slotCount := map[string]int{}
-	for _, n := range nodes {
-		if n.Type != types.NodeField {
-			continue
-		}
-		dot := strings.IndexByte(n.QualifiedName, '.')
-		if dot <= 0 {
-			continue
-		}
-		cid, ok := contractIDByName[n.QualifiedName[:dot]]
-		if !ok {
-			continue
-		}
-		if next := n.SlotIndex + 1; next > slotCount[cid] {
-			slotCount[cid] = next
-		}
-	}
-
-	mro := computeC3Linearization(parents)
-	offset := map[string]int{}
-	for _, cid := range contractIDByName {
-		lin := mro[cid]
-		if len(lin) == 0 {
-			// Contract has no recorded parents — leaf or no
-			// inheritance edges resolved. Offset is zero.
-			continue
-		}
-		total := 0
-		for _, anc := range lin[1:] { // skip self
-			total += slotCount[anc]
-		}
-		offset[cid] = total
-	}
-
+// The nodes of an unchanged file (not in fresh) already include their
+// offset. They are not moved, and the slots such a container declares are
+// its layout end minus the offset it already carries.
+func applyInheritanceSlotOffset(nodes []types.Node, owner map[string]string, mro map[string][]string,
+	fresh map[string]bool, sizes typeSizes,
+) {
+	layoutEnd := map[string]int{}
+	freshContainer := map[string]bool{}
 	for i := range nodes {
-		if nodes[i].Type != types.NodeField {
+		n := &nodes[i]
+		cid, owned := owner[n.ID]
+		if !owned || !isStateVariable(n) {
 			continue
 		}
-		dot := strings.IndexByte(nodes[i].QualifiedName, '.')
-		if dot <= 0 {
-			continue
+		if fresh[n.FilePath] {
+			freshContainer[cid] = true
 		}
-		cid, ok := contractIDByName[nodes[i].QualifiedName[:dot]]
-		if !ok {
-			continue
-		}
-		if off := offset[cid]; off > 0 {
-			nodes[i].SlotIndex += off
+		if end := n.SlotIndex + sizes.slotsOccupied(n); end > layoutEnd[cid] {
+			layoutEnd[cid] = end
 		}
 	}
-}
-
-// buildInheritanceIndex collects every EdgeExtends / EdgeImplements edge
-// into a child → []parent adjacency map. Order is preserved in append
-// order, matching the source-order inheritance emit (parents listed
-// left-to-right in the `is`-clause). Bare-override resolution iterates
-// this list to find every parent that declares a same-name virtual
-// function, so order stability matters for deterministic edge ordering.
-func buildInheritanceIndex(edges []types.Edge) map[string][]string {
-	out := map[string][]string{}
-	for _, e := range edges {
-		if e.Type != types.EdgeExtends && e.Type != types.EdgeImplements {
+	declared := map[string]int{}
+	var inherited func(cid string) int
+	// declaredSlots returns the slots cid itself declares.
+	declaredSlots := func(cid string) int {
+		if n, done := declared[cid]; done {
+			return n
+		}
+		declared[cid] = 0 // guards against a cycle in a broken hierarchy
+		n := layoutEnd[cid]
+		if !freshContainer[cid] && n > 0 {
+			n = max(n-inherited(cid), 0)
+		}
+		declared[cid] = n
+		return n
+	}
+	inherited = func(cid string) int {
+		total := 0
+		if lin := mro[cid]; len(lin) > 1 {
+			for _, ancestor := range lin[1:] { // skip the container itself
+				total += declaredSlots(ancestor)
+			}
+		}
+		return total
+	}
+	for i := range nodes {
+		n := &nodes[i]
+		cid, owned := owner[n.ID]
+		if !owned || !isStateVariable(n) || !fresh[n.FilePath] {
 			continue
 		}
-		out[e.Src] = append(out[e.Src], e.Dst)
+		n.SlotIndex += inherited(cid)
 	}
-	return out
-}
-
-// resolveOverridesRef fans one override PendingRef out into zero or more
-// EdgeOverrides edges. Two dispatch kinds:
-//
-//   - dispatchKindOverrideExplicit: TargetQName is "Parent.method".
-//     Direct lookup in funcByQName; no inheritance walk.
-//   - dispatchKindOverride: TargetQName is the bare method name.
-//     We use the source function's already-resolved EdgeExtends /
-//     EdgeImplements parents (via the `parents` adjacency keyed by the
-//     enclosing contract ID), and emit one EdgeOverrides per parent that
-//     declares a same-name function. Unresolved (no parent declares it)
-//     → zero edges.
-//
-// The child's enclosing contract is recovered via the pre-built
-// containerIDByFuncID reverse index (single hop, O(1)). The earlier
-// implementation scanned funcByQName to extract the qname prefix and
-// then scanned containerNameByID by (name + file) to recover the ID —
-// both passes are subsumed by the index.
-//
-// Confidence policy mirrors inheritance: same-file → ConfExtracted, cross-file →
-// ConfInferred. Multiple parents in a single bare override fan out into
-// multiple edges, each independently scored.
-func resolveOverridesRef(
-	pr parse.PendingRef,
-	funcByQName map[string][]string,
-	containerNameByID map[string]string,
-	containerIDByFuncID map[string]string,
-	parents map[string][]string,
-	nodeFile map[string]string,
-) []types.Edge {
-	switch pr.DispatchKind {
-	case dispatchKindOverrideExplicit:
-		ids := funcByQName[pr.TargetQName]
-		if len(ids) == 0 {
-			return nil
-		}
-		// Disambiguate when multiple candidates share the same "P.method"
-		// qname (rare but legal — homonymous contracts across files).
-		// Prefer a same-file match; fall back to the first candidate so
-		// genuine cross-file explicit overrides still resolve.
-		srcFile := nodeFile[pr.SrcID]
-		dstID := ids[0]
-		for _, candidate := range ids {
-			if nodeFile[candidate] == srcFile {
-				dstID = candidate
-				break
-			}
-		}
-		conf := types.ConfExtracted
-		if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
-			conf = types.ConfInferred
-		}
-		return []types.Edge{{
-			Src: pr.SrcID, Dst: dstID, Type: types.EdgeOverrides,
-			Line: pr.Line, Count: 1, Confidence: conf,
-		}}
-
-	case dispatchKindOverride:
-		// Recover the enclosing contract of pr.SrcID via the pre-built
-		// reverse index. Sol functions can't span files, so the index
-		// pairs each funcID with exactly one containerID; missing entries
-		// represent file-level functions (no override semantics — drop).
-		contractID, ok := containerIDByFuncID[pr.SrcID]
-		if !ok {
-			return nil
-		}
-		parentIDs := parents[contractID]
-		if len(parentIDs) == 0 {
-			return nil
-		}
-		srcFile := nodeFile[pr.SrcID]
-		method := pr.TargetQName
-		var out []types.Edge
-		for _, pid := range parentIDs {
-			parentName := containerNameByID[pid]
-			if parentName == "" {
-				continue
-			}
-			ids := funcByQName[parentName+"."+method]
-			if len(ids) == 0 {
-				continue
-			}
-			// When multiple containers share a name (rare but legal across
-			// files), funcByQName[parent+"."+method] may carry several IDs.
-			// Pick the one whose container ID matches the actual parent
-			// id we're processing — every other candidate is a homonym
-			// declared elsewhere. We compare by file (the parent
-			// container's file must match the function's file).
-			parentFile := nodeFile[pid]
-			var dstID string
-			for _, fid := range ids {
-				if nodeFile[fid] == parentFile {
-					dstID = fid
-					break
-				}
-			}
-			if dstID == "" {
-				continue
-			}
-			conf := types.ConfExtracted
-			if srcFile != "" && parentFile != "" && srcFile != parentFile {
-				conf = types.ConfInferred
-			}
-			out = append(out, types.Edge{
-				Src: pr.SrcID, Dst: dstID, Type: types.EdgeOverrides,
-				Line: pr.Line, Count: 1, Confidence: conf,
-			})
-		}
-		return out
-	}
-	return nil
 }
 
 // resolveUsingForRef resolves one using-for PendingRef (`using LibName for ...`)
@@ -1248,7 +958,7 @@ func resolveOverridesRef(
 func resolveUsingForRef(
 	pr parse.PendingRef,
 	byName map[types.NodeType]map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// The using-for walkers may attach
 	// two TargetQName hints to a binding PendingRef:
@@ -1283,7 +993,7 @@ func resolveUsingForRef(
 	if len(ids) == 0 {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := ""
 	if pathHint != "" {
 		dstID = pickByPathHint(ids, pathHint, nodeFile)
@@ -1292,7 +1002,7 @@ func resolveUsingForRef(
 		dstID = pickSameFileCandidate(ids, srcFile, nodeFile)
 	}
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	// When the walker carried a method name,
@@ -1317,58 +1027,50 @@ func resolveUsingForRef(
 // directive came from a namespace alias whose source path is known.
 // Returns "" when no candidate matches the hint, signalling the
 // caller to fall back to pickSameFileCandidate.
-func pickByPathHint(ids []string, pathHint string, nodeFile map[string]string) string {
+func pickByPathHint(ids []string, pathHint string, nodeFile *fileIndex) string {
 	// Strip a leading `./` from the hint so a recorded path of
 	// `./math.sol` matches a nodeFile of `math.sol`.
 	hint := strings.TrimPrefix(pathHint, "./")
 	for _, id := range ids {
-		if nodeFile[id] == hint {
+		if nodeFile.of(id) == hint {
 			return id
 		}
 	}
 	for _, id := range ids {
-		if strings.HasSuffix(nodeFile[id], "/"+hint) || strings.HasSuffix(nodeFile[id], hint) {
+		if strings.HasSuffix(nodeFile.of(id), "/"+hint) || strings.HasSuffix(nodeFile.of(id), hint) {
 			return id
 		}
 	}
 	return ""
 }
 
-// lookupReceiverType resolves a receiver identifier to its declared type.
-// Per Solidity scoping rules,
-// function-scope shadows contract-scope on identifier conflict — so the
-// lookup order is:
-//
-//  1. localVarTypes  (function-local declaration — innermost)
-//  2. paramTypes     (function parameter)
-//  3. stateVarTypes  (state variable — outermost)
-//
-// An earlier version walked state-var → param → local-var (reverse of Solidity
-// semantics). The bug manifested as a false negative when a local
-// shadowed a state-var with the same name: the resolver picked the
-// state-var type and dropped if its type had no binding.
-//
-// Shared across every using-for resolver that needs to look up an
-// identifier-named receiver (state-var / param / local-var receivers and
-// the struct-walker obj). The `this.<state-var>...` shape intentionally
-// bypasses this helper — `this` is an explicit contract reference that
-// bypasses the function scope, so the named member must be a state
-// variable, never a param or local.
-//
-// useSiteLine drives scope-aware local-var
-// lookup. localVarTypes carries multiple decls per (funcID, varName)
-// when shadowing happens; this helper selects the narrowest scope that
-// still contains useSiteLine (max declLine where declLine <= useSiteLine
-// AND useSiteLine <= scopeEndLine). useSiteLine = 0 falls back to the
-// first-decl-wins behavior (used by callers that don't
-// have a use-site line — e.g. binding declaration walks).
-//
-// useSiteByte adds byte-precision scope
-// containment so same-line shadows disambiguate. When all of decl
-// and use-site bytes are non-zero, selection switches to byte-based
-// containment + max declStartByte tiebreak. Falls back to line-only
-// when bytes are absent — defensive against parsers that don't
-// populate ByteOffset.
+// lookupReceiver returns the declared type of the receiver of
+// `name.method(...)` and whether name is a local variable or a parameter of
+// the callable, as opposed to a state variable of its contract. The order is
+// the language's: a local, then a parameter, then a state variable (the
+// contract's own or an inherited one). The type is "" when name is none of
+// them. useSiteLine and useSiteByte pick the declaration in scope when a
+// local name is declared in more than one block.
+func lookupReceiver(
+	name, contractID, funcID string,
+	useSiteLine, useSiteByte int,
+	stateVarTypes stateVarTypeMap,
+	paramTypes paramTypeMap,
+	localVarTypes localVarTypeMap,
+) (typeName string, isLocal bool) {
+	if decls := localVarTypes[funcID][name]; len(decls) > 0 {
+		if t := selectLocalDecl(decls, useSiteLine, useSiteByte); t != "" {
+			return t, true
+		}
+	}
+	if t := paramTypes[funcID][name]; t != "" {
+		return t, true
+	}
+	return stateVarTypes[contractID][name], false
+}
+
+// lookupReceiverType returns the declared type of a receiver (see
+// lookupReceiver).
 func lookupReceiverType(
 	name, contractID, funcID string,
 	useSiteLine, useSiteByte int,
@@ -1376,24 +1078,9 @@ func lookupReceiverType(
 	paramTypes paramTypeMap,
 	localVarTypes localVarTypeMap,
 ) string {
-	if localMap := localVarTypes[funcID]; localMap != nil {
-		if decls := localMap[name]; len(decls) > 0 {
-			if t := selectLocalDecl(decls, useSiteLine, useSiteByte); t != "" {
-				return t
-			}
-		}
-	}
-	if paramMap := paramTypes[funcID]; paramMap != nil {
-		if t := paramMap[name]; t != "" {
-			return t
-		}
-	}
-	if varMap := stateVarTypes[contractID]; varMap != nil {
-		if t := varMap[name]; t != "" {
-			return t
-		}
-	}
-	return ""
+	typeName, _ := lookupReceiver(name, contractID, funcID, useSiteLine, useSiteByte,
+		stateVarTypes, paramTypes, localVarTypes)
+	return typeName
 }
 
 // resolveBindingLib iterates the
@@ -1526,54 +1213,46 @@ func allHaveBytes(decls []localDecl) bool {
 // interface dispatch does — the call resolution is concrete.
 func resolveUsingForCallRef(
 	pr parse.PendingRef,
+	argc int,
+	scoped *scopedResolver,
 	bindings bindingMap,
 	stateVarTypes stateVarTypeMap,
 	paramTypes paramTypeMap,
 	localVarTypes localVarTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
-) (types.Edge, bool) {
+) {
 	// TargetQName encoding from runUsingForCalls: `receiverName|methodName`.
 	sep := strings.IndexByte(pr.TargetQName, '|')
 	if sep < 0 {
-		return types.Edge{}, false
+		return
 	}
 	receiverName := pr.TargetQName[:sep]
 	methodName := pr.TargetQName[sep+1:]
 
-	contractID, ok := containerIDByFuncID[pr.SrcID]
-	if !ok {
-		return types.Edge{}, false
-	}
-	// Receiver type lookup chain: state-var → parameter →
-	// local-var. Solidity scoping rules mean these three name-
-	// spaces don't legally overlap within a single function, so the
-	// order shapes precedence but cannot mis-resolve in valid code.
-	// useSiteLine = pr.Line drives narrowest-scope-wins for
-	// shadowed locals.
-	// useSiteByte = pr.ByteOffset for byte-precision same-line
-	// shadow disambiguation in addition to the line-precision filter.
-	typeName := lookupReceiverType(receiverName, contractID, pr.SrcID,
+	// A free function has no container; its receivers are parameters and
+	// locals only.
+	contractID := containerIDByFuncID[pr.SrcID]
+	// Receiver type lookup chain: local variable, parameter, state
+	// variable (inherited ones included). pr.Line and pr.ByteOffset pick the
+	// declaration in scope when a local name is declared twice.
+	typeName, isLocal := lookupReceiver(receiverName, contractID, pr.SrcID,
 		pr.Line, pr.ByteOffset, stateVarTypes, paramTypes, localVarTypes)
-	if typeName == "" {
-		return types.Edge{}, false
-	}
 	// Multi-binding aware resolution via resolveBindingLib.
 	ids, ok := resolveBindingLib(bindings[contractID], typeName, methodName, funcByQName)
-	if !ok {
-		return types.Edge{}, false
+	if typeName != "" && ok {
+		scoped.usingForCall(pr, ids, receiverName, isLocal, argc)
+		return
 	}
-	srcFile := nodeFile[pr.SrcID]
-	dstID := pickSameFileCandidate(ids, srcFile, nodeFile)
-	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
-		conf = types.ConfInferred
+	// No using-for binding: the receiver is a variable of interface or
+	// contract type, `super`, `this`, or the name of a library or a base
+	// contract. A call that binds to nothing in the graph (a method of an
+	// elementary type, a library outside the build) is counted as
+	// unresolved.
+	if !scoped.resolveMemberCall(pr, receiverName, typeName, methodName, argc) &&
+		typeName != "" && !builtinMembers[methodName] {
+		scoped.unresolved(pr)
 	}
-	return types.Edge{
-		Src: pr.SrcID, Dst: dstID, Type: types.EdgeCalls,
-		Line: pr.Line, Count: 1, Confidence: conf,
-	}, true
 }
 
 // resolveLowLevelCallRef resolves one
@@ -1613,7 +1292,7 @@ func resolveLowLevelCallRefExt(
 	paramTypes paramTypeMap,
 	localVarTypes localVarTypeMap,
 	containerIDByFuncID map[string]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool, bool) {
 	sep := strings.IndexByte(pr.TargetQName, '|')
 	if sep < 0 {
@@ -1642,7 +1321,7 @@ func resolveLowLevelCallRefExt(
 	if len(candidates) == 0 {
 		return types.Edge{}, isAddress, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(candidates, srcFile, nodeFile)
 	return types.Edge{
 		Src: pr.SrcID, Dst: dstID, Type: types.EdgeInvokes,
@@ -1678,7 +1357,7 @@ func resolveUsingForChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from runUsingForCalls chained branch:
 	// `innerFnName|methodName`.
@@ -1716,7 +1395,7 @@ func resolveUsingForChainCallRef(
 	var innerFuncID string
 	if containerName != "" {
 		if ids := funcByQName[containerName+"."+innerFnName]; len(ids) > 0 {
-			innerFuncID = pickSameFileCandidate(ids, nodeFile[pr.SrcID], nodeFile)
+			innerFuncID = pickSameFileCandidate(ids, nodeFile.of(pr.SrcID), nodeFile)
 		}
 	}
 	if innerFuncID == "" {
@@ -1731,10 +1410,10 @@ func resolveUsingForChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(ids, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -1772,7 +1451,7 @@ func resolveUsingForCrossChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from runUsingForCalls cross-chain branch:
 	// `receiverObjName|innerFnName|methodName`.
@@ -1811,7 +1490,7 @@ func resolveUsingForCrossChainCallRef(
 	if len(ids) == 0 {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	innerFuncID := pickSameFileCandidate(ids, srcFile, nodeFile)
 	returnType, ok := funcReturnTypes[innerFuncID]
 	if !ok || returnType == "" {
@@ -1824,7 +1503,7 @@ func resolveUsingForCrossChainCallRef(
 	}
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -1858,7 +1537,7 @@ func resolveUsingForDeepChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from runUsingForCalls deep-chain branch:
 	// `innerFn1|innerFn2|method`.
@@ -1874,7 +1553,7 @@ func resolveUsingForDeepChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	// Step 2: locate innerFn1 in the caller's contract namespace.
 	callerContainerName := ""
 	for qname, ids := range funcByQName {
@@ -1921,7 +1600,7 @@ func resolveUsingForDeepChainCallRef(
 	}
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -1955,7 +1634,7 @@ func resolveUsingForDeepCrossChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from runUsingForCalls deep cross-chain branch:
 	// `receiverObj|innerFn1|innerFn2|method`.
@@ -1972,7 +1651,7 @@ func resolveUsingForDeepCrossChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	// Receiver type lookup (state-var, then parameter).
 	var receiverType string
 	if varMap := stateVarTypes[callerContractID]; varMap != nil {
@@ -2015,7 +1694,7 @@ func resolveUsingForDeepCrossChainCallRef(
 	}
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2052,7 +1731,7 @@ func resolveUsingForTripleChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from runUsingForCalls triple-chain branch:
 	// `fn1|fn2|fn3|method`.
@@ -2066,7 +1745,7 @@ func resolveUsingForTripleChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	// Step 2: locate fn1 in the caller's contract namespace.
 	callerContainerName := ""
 	for qname, ids := range funcByQName {
@@ -2124,7 +1803,7 @@ func resolveUsingForTripleChainCallRef(
 	}
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2172,7 +1851,7 @@ func resolveUsingForGenericChainCallRef(
 	funcReturnTypes funcReturnTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	parts := strings.Split(pr.TargetQName, "|")
 	// Minimum parts: mode + recv + at least 1 segment + method = 4
@@ -2194,7 +1873,7 @@ func resolveUsingForGenericChainCallRef(
 	if !ok {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 
 	// Determine starting namespace.
 	var currentNamespace string
@@ -2258,7 +1937,7 @@ func resolveUsingForGenericChainCallRef(
 	}
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2291,7 +1970,7 @@ func resolveUsingForStructFieldCallRef(
 	structFieldTypes structFieldTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from matchStructFieldReceiverMethodCall:
 	// `objName|fieldName|methodName`.
@@ -2330,10 +2009,10 @@ func resolveUsingForStructFieldCallRef(
 	if !libOK {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2366,7 +2045,7 @@ func resolveUsingForNestedStructFieldCallRef(
 	structFieldTypes structFieldTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from matchNestedStructFieldReceiverMethodCall:
 	// `objName|field1|field2|methodName`.
@@ -2413,10 +2092,10 @@ func resolveUsingForNestedStructFieldCallRef(
 	if !libOK {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2458,7 +2137,7 @@ func resolveUsingForGenericMemberChainCallRef(
 	structFieldTypes structFieldTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// TargetQName encoding from matchGenericMemberChain:
 	// `obj|f1|f2|...|fN|method`. Need at least obj + 3 fields + method
@@ -2506,10 +2185,10 @@ func resolveUsingForGenericMemberChainCallRef(
 	if !libOK {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2553,7 +2232,7 @@ func resolveUsingForThisNestedChainCallRef(
 	structFieldTypes structFieldTypeMap,
 	containerIDByFuncID map[string]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// `<stateVar>|<f1>|...|<fN>|<method>` — N ≥ 1 → at least 3 parts.
 	parts := strings.Split(pr.TargetQName, "|")
@@ -2600,10 +2279,10 @@ func resolveUsingForThisNestedChainCallRef(
 	if !libOK {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
+	srcFile := nodeFile.of(pr.SrcID)
 	dstID := pickSameFileCandidate(libIDs, srcFile, nodeFile)
 	conf := types.ConfExtracted
-	if srcFile != "" && nodeFile[dstID] != "" && srcFile != nodeFile[dstID] {
+	if srcFile != "" && nodeFile.of(dstID) != "" && srcFile != nodeFile.of(dstID) {
 		conf = types.ConfInferred
 	}
 	return types.Edge{
@@ -2628,86 +2307,8 @@ func edgeIdentityKey(e types.Edge) string {
 // child won't usually inherit from a parent in an unrelated file with the
 // same name), and falling back to the first ID keeps cross-file resolution
 // working for genuine multi-file hierarchies. ids must be non-empty.
-func pickSameFileCandidate(ids []string, srcFile string, nodeFile map[string]string) string {
-	if srcFile != "" {
-		for _, id := range ids {
-			if nodeFile[id] == srcFile {
-				return id
-			}
-		}
-	}
-	return ids[0]
-}
-
-// resolveInheritanceRef resolves one inheritance PendingRef (a single `is X` parent
-// reference) against the indexed Contract / Interface tables.
-//
-// Edge-type classification (§2.1 / §3.1) depends on *both* child and
-// parent NodeType — Solidity allows three meaningful combinations:
-//
-//	child=Contract,  parent=Contract  → EdgeExtends    (`contract C is Base`)
-//	child=Contract,  parent=Interface → EdgeImplements (`contract C is IFoo`)
-//	child=Interface, parent=Interface → EdgeExtends    (`interface IB is IA`)
-//
-// (child=Interface, parent=Contract is syntactically invalid in Solidity
-// — interfaces can only `is` other interfaces — so it's not handled
-// here; solc rejects such code before our parser sees it.)
-//
-// Resolution order: prefer Interface first when both tables have a hit
-// for the same name. Real codebases keep contract / interface namespaces
-// disjoint, but solc itself uses the same lookup space — so this matches
-// Solidity's own resolution semantics.
-//
-// Confidence policy (§2.2):
-//   - same-file resolution  → ConfExtracted
-//   - cross-file resolution → ConfInferred
-//   - unresolved            → returns ok=false (caller drops the edge)
-//
-// Returns (edge, true) on success or (zero, false) when the parent name
-// matches no known Contract / Interface in the build set.
-func resolveInheritanceRef(
-	pr parse.PendingRef,
-	byName map[types.NodeType]map[string][]string,
-	nodeFile map[string]string,
-	nodeType map[string]types.NodeType,
-) (types.Edge, bool) {
-	// Locate the parent node — prefer Interface first to match solc's
-	// name-resolution behaviour (interfaces and contracts share one
-	// global namespace in Solidity). Within the matching type bucket,
-	// prefer a same-file candidate so homonymous parents declared across
-	// files don't shadow the locally-resolvable one. The explicit
-	// override path does the same.
-	srcFile := nodeFile[pr.SrcID]
-	var dstID string
-	var parentType types.NodeType
-	if ids := byName[types.NodeInterface][pr.TargetQName]; len(ids) > 0 {
-		dstID = pickSameFileCandidate(ids, srcFile, nodeFile)
-		parentType = types.NodeInterface
-	} else if ids := byName[types.NodeContract][pr.TargetQName]; len(ids) > 0 {
-		dstID = pickSameFileCandidate(ids, srcFile, nodeFile)
-		parentType = types.NodeContract
-	} else {
-		return types.Edge{}, false
-	}
-
-	// Classify based on (child, parent). The only combination that maps
-	// to EdgeImplements is (Contract, Interface) — a contract realising
-	// an interface. Interface-to-interface inheritance is EdgeExtends
-	// (interface IB is IA → IB extends IA, not implements).
-	childType := nodeType[pr.SrcID]
-	edgeType := types.EdgeExtends
-	if childType == types.NodeContract && parentType == types.NodeInterface {
-		edgeType = types.EdgeImplements
-	}
-
-	conf := types.ConfExtracted
-	if nodeFile[pr.SrcID] != "" && nodeFile[dstID] != "" && nodeFile[pr.SrcID] != nodeFile[dstID] {
-		conf = types.ConfInferred
-	}
-	return types.Edge{
-		Src: pr.SrcID, Dst: dstID, Type: edgeType,
-		Line: pr.Line, Count: 1, Confidence: conf,
-	}, true
+func pickSameFileCandidate(ids []string, srcFile string, nodeFile *fileIndex) string {
+	return nodeFile.pick(ids, srcFile)
 }
 
 // resolveInterfaceDispatchRef resolves one interface-dispatch PendingRef (an
@@ -2742,7 +2343,7 @@ func resolveInterfaceDispatchRef(
 	pr parse.PendingRef,
 	byName map[types.NodeType]map[string][]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	// Split TargetQName on the first "." into (typeName, methodName).
 	// dispatch.go always emits exactly one "." — no qualified parent
@@ -2769,14 +2370,7 @@ func resolveInterfaceDispatchRef(
 	// across files (homonym across fixtures), prefer the candidate in
 	// the source function's file, then any same-file as one of the
 	// interface IDs. Fall back to candidates[0] when neither rule fires.
-	srcFile := nodeFile[pr.SrcID]
-	dstID := candidates[0]
-	for _, fid := range candidates {
-		if nodeFile[fid] == srcFile {
-			dstID = fid
-			break
-		}
-	}
+	dstID := nodeFile.pick(candidates, nodeFile.of(pr.SrcID))
 	// AMBIGUOUS is the *fixed* confidence — see preamble + §5.0 Q5.
 	return types.Edge{
 		Src: pr.SrcID, Dst: dstID, Type: types.EdgeInvokes,
@@ -2802,7 +2396,7 @@ func resolveContractCastRef(
 	pr parse.PendingRef,
 	byName map[types.NodeType]map[string][]string,
 	funcByQName map[string][]string,
-	nodeFile map[string]string,
+	nodeFile *fileIndex,
 ) (types.Edge, bool) {
 	dot := strings.IndexByte(pr.TargetQName, '.')
 	if dot <= 0 || dot == len(pr.TargetQName)-1 {
@@ -2816,14 +2410,7 @@ func resolveContractCastRef(
 	if len(candidates) == 0 {
 		return types.Edge{}, false
 	}
-	srcFile := nodeFile[pr.SrcID]
-	dstID := candidates[0]
-	for _, fid := range candidates {
-		if nodeFile[fid] == srcFile {
-			dstID = fid
-			break
-		}
-	}
+	dstID := nodeFile.pick(candidates, nodeFile.of(pr.SrcID))
 	return types.Edge{
 		Src: pr.SrcID, Dst: dstID, Type: types.EdgeInvokes,
 		Line: pr.Line, Count: 1, Confidence: types.ConfAmbiguous,

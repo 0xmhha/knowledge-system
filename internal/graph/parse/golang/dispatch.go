@@ -283,7 +283,7 @@ func EmitDispatchEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		}
 		add(src, dst, "type_hierarchy", 0)
 	}
-	ch := &chanLinker{prog: prog, cg: cg, nodeOf: nodeOf, values: values, chans: chans,
+	ch := &chanLinker{prog: prog, cg: cg, nodeOf: nodeOf, values: values, fields: newFieldIndex(prog.Fset, nodes), chans: chans,
 		memo: map[ssa.Value][]chanOrigin{}}
 	for fn := range funcs {
 		ch.function(fn, &st)
@@ -364,6 +364,7 @@ type chanLinker struct {
 	cg      *callgraph.Graph
 	nodeOf  func(*ssa.Function) *types.Node
 	values  map[string]*types.Node
+	fields  fieldIndex
 	chans   map[string][]*types.Node
 	memo    map[ssa.Value][]chanOrigin
 	ops     []chanOp
@@ -551,11 +552,11 @@ func (c *chanLinker) makeSite(m *ssa.MakeChan) *types.Node {
 
 // field is the Field node of field index i of the struct t (or *t) denotes.
 func (c *chanLinker) field(t gotypes.Type, i int) *types.Node {
-	named, st := literalStruct(t)
+	_, st := literalStruct(t)
 	if st == nil || i >= st.NumFields() {
 		return nil
 	}
-	return c.values[fieldCanonical(named, st.Field(i))]
+	return c.fields.node(st.Field(i))
 }
 
 // stored follows a local cell (an escaping local) to the values stored in it.

@@ -21,6 +21,7 @@ import (
 //   - implements src must be a Struct or TypeAlias, dst must be Interface
 //   - listens_on src must be Function/Method, dst must be Endpoint
 //   - calls/invokes src and dst must be Function/Method
+//   - reverts_with src must be Function/Modifier, dst must be Error
 //
 // The validator is deterministic, fast, and dependency-free — safe to run
 // on every build. Findings inform Citation Enforcement and the LLM
@@ -52,6 +53,7 @@ var fileScopedTypes = map[types.NodeType]struct{}{
 	types.NodeLoopStmt:   {},
 	types.NodeSwitchStmt: {},
 	types.NodeReturnStmt: {},
+	types.NodeError:      {},
 }
 
 // Validate executes all schema checks and returns one report aggregating
@@ -232,10 +234,10 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeCalls, types.EdgeInvokes:
-			if !isCallable(src.Type) {
+			if !isCaller(src.Type) {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-src",
-					Message:  "calls/invokes src is not a callable kind (got " + string(src.Type) + ")",
+					Message:  "calls/invokes src is not a caller kind (got " + string(src.Type) + ")",
 					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
 					FilePath: e.FilePath,
 				})
@@ -246,6 +248,26 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-dst",
 					Message:  "calls/invokes dst is not a callable kind (got " + string(dst.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeRevertsWith:
+			// Schema 1.38: a Solidity function, modifier or constructor
+			// (a Function with sub kind constructor) reverts with a
+			// custom error.
+			if src.Type != types.NodeFunction && src.Type != types.NodeModifier {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "reverts-with-bad-src",
+					Message:  "reverts_with src is not a Function/Modifier (got " + string(src.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+			if dst.Type != types.NodeError {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "reverts-with-bad-dst",
+					Message:  "reverts_with dst is not an Error (got " + string(dst.Type) + ")",
 					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
 					FilePath: e.FilePath,
 				})
@@ -278,8 +300,24 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 	return report, nil
 }
 
+// isCaller reports whether t is a node type that can start a calls/invokes
+// edge: a callable kind, or a declaration whose own code makes calls without
+// being called itself. Those are a Variable, whose package-level initialiser
+// makes calls outside any function (`var Default = New().Inc()`; schema
+// 1.38), a Solidity Modifier, whose body makes calls (`modifier onlyOwner()
+// { _checkOwner(); _; }`), and a Solidity state variable or constant (Field,
+// Constant), whose initialiser can (`uint256 public cap = _defaultCap();`).
+// None of them ever ends a calls edge.
+func isCaller(t types.NodeType) bool {
+	switch t {
+	case types.NodeVariable, types.NodeModifier, types.NodeField, types.NodeConstant:
+		return true
+	}
+	return isCallable(t)
+}
+
 // isCallable reports whether t is a node type that legitimately appears
-// on either end of a calls/invokes edge.
+// at the callee end of a calls/invokes edge, and, with isCaller, at its start.
 func isCallable(t types.NodeType) bool {
 	switch t {
 	case types.NodeFunction, types.NodeMethod, types.NodeCallSite:

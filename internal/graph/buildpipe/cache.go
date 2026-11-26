@@ -244,7 +244,27 @@ import (
 // references) counted every use twice in packages with in-package tests,
 // whose production files were walked again through the test variant; counts
 // change, so force a cold rebuild.
-const SchemaVersion = "1.37"
+// Bumped from "1.37" to "1.38": node identity and coverage changed. A call
+// site is named and keyed by its start and end byte (the calls of a chain no
+// longer share one node), embedded fields and the fields of anonymous nested
+// structs have Field nodes, a method of a generic type is named after its
+// type, field uses are tied to the field's declaration position (a use of a
+// function-local struct's field no longer points at the same-named
+// package-level field), statement-link counts no longer double in packages
+// with in-package tests, and handles_message edges need a net/rpc import.
+// Added in the same version: a package-level variable is the caller of the
+// calls in its initialiser, whose statements and call sites have nodes; a
+// local declaration is named under its function; fields of anonymous struct
+// types have Field nodes; a name made by := or a range clause is a
+// LocalVariable node with references edges from its function; uses_type
+// covers receivers, bodies and type declarations (interface signatures,
+// defined types). Solidity in the same version: node ids are keyed by file,
+// a node spans its whole declaration, members are named under and defined by
+// their contract, names resolve in the scope of the contract that uses them,
+// and errors, struct members, enum values, imports, calls, reverts_with and
+// state variable reads and writes have nodes and edges. Node IDs, edges and
+// scores change; force a cold rebuild.
+const SchemaVersion = "1.38"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

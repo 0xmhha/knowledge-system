@@ -75,7 +75,7 @@ func (v *declVisitor) runCrossContractFnPointerCall() {
 				continue
 			}
 			v.pending = append(v.pending, parse.PendingRef{
-				SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+				SrcID:        v.declID(fnQ, fnStart),
 				EdgeType:     types.EdgeInvokes, // routed by DispatchKind; never emitted
 				TargetQName:  receiverName + "|" + methodName,
 				Line:         int(memberNode.StartPosition().Row) + 1,

@@ -140,19 +140,11 @@ func (v *declVisitor) runOperatorFormRecovery() {
 			if !ok {
 				continue
 			}
-			containerName := nearestContractName(&node, v.src)
-			if containerName == "" {
-				continue
-			}
-			// Find the container node's name-position byte to compute
-			// the SrcID. nearestContractName returned the name text;
-			// we need the identifier node for MakeID consistency with
-			// runContractDecl / runLibraryDecl / runInterfaceDecl.
-			containerStart, ok := nearestContractNameStart(&node, v.src)
+			// The source is the enclosing contract, library or interface.
+			srcID, _, ok := v.containerOf(&node)
 			if !ok {
 				continue
 			}
-			srcID := parse.MakeID(containerName, "sol", containerStart)
 			line := int(node.StartPosition().Row) + 1
 			byteOff := int(node.StartByte())
 
@@ -190,21 +182,4 @@ func (v *declVisitor) runOperatorFormRecovery() {
 			})
 		}
 	}
-}
-
-// nearestContractNameStart walks the parent chain like
-// nearestContractName but returns the StartByte of the container's
-// name identifier so callers can mint a SrcID matching the container
-// node emitted by runContractDecl / runLibraryDecl / runInterfaceDecl.
-func nearestContractNameStart(n *sitter.Node, src []byte) (int, bool) {
-	for cur := n; cur != nil; cur = cur.Parent() {
-		switch cur.Kind() {
-		case "contract_declaration", "library_declaration", "interface_declaration":
-			id := cur.ChildByFieldName("name")
-			if id != nil {
-				return int(id.StartByte()), true
-			}
-		}
-	}
-	return 0, false
 }

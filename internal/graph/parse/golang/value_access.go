@@ -59,25 +59,21 @@ func EmitValueAccessEdges(pkgs []*packages.Package, nodes []types.Node) []types.
 	}
 
 	decls := newDeclIndex(nodes)
+	fields := newFieldIndex(fsetOf(pkgs), nodes)
+	locals := newLocalIndex(fsetOf(pkgs), nodes)
 	acc := &accessCollector{seen: map[accessKey]int{}}
-	// A package with in-package tests is loaded twice: as itself and as its
-	// test variant, which holds the same production files again. Walking a
-	// file twice counted every use twice (count 2 on 9,654 writes_field and
-	// 22,631 reads_field edges of go-stablenet), so each file is walked once.
-	walked := map[string]bool{}
+	// Each file is walked once (see fileVisits): walking the test variant's
+	// copy as well counted every use twice (count 2 on 9,654 writes_field and
+	// 22,631 reads_field edges of go-stablenet).
+	walked := fileVisits{}
 	for _, pkg := range pkgs {
 		if pkg == nil || pkg.Types == nil || pkg.TypesInfo == nil {
 			continue
 		}
 		info := pkg.TypesInfo
 		for _, f := range pkg.Syntax {
-			if f == nil {
+			if f == nil || !walked.first(pkg, f) {
 				continue
-			}
-			if name := pkg.Fset.Position(f.Pos()).Filename; walked[name] {
-				continue
-			} else {
-				walked[name] = true
 			}
 			for _, decl := range f.Decls {
 				switch d := decl.(type) {
@@ -87,7 +83,7 @@ func EmitValueAccessEdges(pkgs []*packages.Package, nodes []types.Node) []types.
 					}
 					src := decls.at(goCanonicalID(info.Defs[d.Name]), funcDeclQname(pkg.Types.Name(), d), pkg.Fset.Position(d.Pos()))
 					if src != nil {
-						acc.walk(src, d.Body, info, pkg.Fset, byCanonical)
+						acc.walk(src, d.Body, info, pkg.Fset, byCanonical, fields, locals)
 					}
 				case *ast.GenDecl:
 					if d.Tok != token.VAR && d.Tok != token.CONST {
@@ -101,12 +97,9 @@ func EmitValueAccessEdges(pkgs []*packages.Package, nodes []types.Node) []types.
 						// `var a, b = f()` has one value for two names; the
 						// initializer is attributed to the first name.
 						for i, v := range vs.Values {
-							name := vs.Names[0]
-							if i < len(vs.Names) {
-								name = vs.Names[i]
-							}
+							name := vs.Names[initialiserOwner(i, len(vs.Names))]
 							if src := byCanonical[goCanonicalID(info.Defs[name])]; src != nil {
-								acc.walk(src, v, info, pkg.Fset, byCanonical)
+								acc.walk(src, v, info, pkg.Fset, byCanonical, fields, locals)
 							}
 						}
 					}
@@ -119,7 +112,7 @@ func EmitValueAccessEdges(pkgs []*packages.Package, nodes []types.Node) []types.
 
 func funcDeclQname(pkgName string, fd *ast.FuncDecl) string {
 	if fd.Recv != nil && len(fd.Recv.List) > 0 {
-		return pkgName + "." + exprName(fd.Recv.List[0].Type) + "." + fd.Name.Name
+		return pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
 	}
 	return pkgName + "." + fd.Name.Name
 }
@@ -153,7 +146,7 @@ func (a *accessCollector) emit(src, dst *types.Node, typ types.EdgeType, kind st
 }
 
 // walk records every value use under root as an access by src.
-func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Info, fset *token.FileSet, byCanonical map[string]*types.Node) {
+func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Info, fset *token.FileSet, byCanonical map[string]*types.Node, fields fieldIndex, locals localIndex) {
 	writes := map[ast.Expr]bool{}
 	var markWrite func(e ast.Expr)
 	markWrite = func(e ast.Expr) {
@@ -192,10 +185,10 @@ func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Inf
 				if writes[x] {
 					typ = types.EdgeWritesField
 				}
-				a.emit(src, byCanonical[selectedFieldCanonical(sel)], typ, "", line(x.Sel.Pos()))
+				a.emit(src, fields.node(sel.Obj()), typ, "", line(x.Sel.Pos()))
 			}
 		case *ast.CompositeLit:
-			named, st := literalStruct(info.TypeOf(x))
+			_, st := literalStruct(info.TypeOf(x))
 			if st == nil {
 				return true
 			}
@@ -211,12 +204,24 @@ func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Inf
 					field = st.Field(i)
 				}
 				if field != nil && field.IsField() {
-					a.emit(src, byCanonical[fieldCanonical(named, field)], types.EdgeWritesField, "", line(pos))
+					a.emit(src, fields.node(field), types.EdgeWritesField, "", line(pos))
 				}
 			}
 		case *ast.Ident:
 			obj := info.Uses[x]
-			if obj == nil || obj.Pkg() == nil || obj.Parent() != obj.Pkg().Scope() {
+			if obj == nil || obj.Pkg() == nil {
+				return true
+			}
+			if obj.Parent() != obj.Pkg().Scope() {
+				// A name declared inside a body: tied to its node by the
+				// position of the declaration (a parameter has no node).
+				if o, ok := obj.(*gotypes.Var); ok && !o.IsField() {
+					kind := "read"
+					if writes[x] {
+						kind = "write"
+					}
+					a.emit(src, locals.node(o), types.EdgeReferences, kind, line(x.Pos()))
+				}
 				return true
 			}
 			switch o := obj.(type) {
@@ -237,25 +242,6 @@ func (a *accessCollector) walk(src *types.Node, root ast.Node, info *gotypes.Inf
 	})
 }
 
-// selectedFieldCanonical is the canonical id of the field a selection
-// reaches, following embedded structs for a promoted field.
-func selectedFieldCanonical(sel *gotypes.Selection) string {
-	t := sel.Recv()
-	idx := sel.Index()
-	for i, k := range idx {
-		named, st := literalStruct(t)
-		if st == nil || k >= st.NumFields() {
-			return ""
-		}
-		f := st.Field(k)
-		if i == len(idx)-1 {
-			return fieldCanonical(named, f)
-		}
-		t = f.Type()
-	}
-	return ""
-}
-
 // literalStruct returns the named type (nil if anonymous) and the struct
 // type that t, or what t points to, denotes.
 func literalStruct(t gotypes.Type) (*gotypes.Named, *gotypes.Struct) {
@@ -269,17 +255,4 @@ func literalStruct(t gotypes.Type) (*gotypes.Named, *gotypes.Struct) {
 	named, _ := t.(*gotypes.Named)
 	st, _ := t.Underlying().(*gotypes.Struct)
 	return named, st
-}
-
-// fieldCanonical is the canonical id the declaration pass gives a struct
-// field: <importpath>.<Type>.<Field>. Fields of anonymous structs have none.
-func fieldCanonical(owner *gotypes.Named, f *gotypes.Var) string {
-	if owner == nil {
-		return ""
-	}
-	obj := owner.Origin().Obj()
-	if obj == nil || obj.Pkg() == nil {
-		return ""
-	}
-	return obj.Pkg().Path() + "." + obj.Name() + "." + f.Name()
 }
