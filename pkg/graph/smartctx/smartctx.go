@@ -181,7 +181,14 @@ type scoredNode struct {
 func BuildContext(store persist.StoreReader, query string, opt Options) (map[string]any, error) {
 	opt = opt.withDefaults()
 
-	cands, err := store.Search(query, opt.CandidateLimit)
+	// The task description is words, not full-text query syntax: 14 of 26
+	// descriptions holding ( : - * " or an operator word failed with an FTS5
+	// syntax error when passed as they were.
+	words := persist.SearchWords(query)
+	if words == "" {
+		return emptyResult(query), nil
+	}
+	cands, err := store.Search(words, opt.CandidateLimit)
 	if err != nil {
 		return nil, err
 	}

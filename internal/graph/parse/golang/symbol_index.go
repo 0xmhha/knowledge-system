@@ -20,25 +20,28 @@ import (
 // function body has the same qualified name as a package-level one. Indexing
 // by that name let the first node seen win, so references to core.Genesis
 // resolved to the gencodec type declared inside (Genesis).MarshalJSON.
+//
+// A declaration without a canonical id (a type declared inside a function) is
+// found by where it is declared (posIndex).
 type symbolIndex struct {
 	// byCanonical keeps every node per canonical id: several declarations can
 	// share one (the init functions of a package, a function declared in two
 	// files behind different build tags), and the first one is not the answer.
 	byCanonical map[string][]types.Node
 	byQname     map[string]string
-	fset        *token.FileSet
+	// local holds the indexed nodes without a canonical id.
+	local posIndex
+	fset  *token.FileSet
 }
 
 // newSymbolIndex indexes the nodes of the given kinds. fset positions the
 // go/types objects passed to lookup; nil disables position matching.
 func newSymbolIndex(fset *token.FileSet, nodes []types.Node, kinds ...types.NodeType) symbolIndex {
-	want := make(map[types.NodeType]bool, len(kinds))
-	for _, k := range kinds {
-		want[k] = true
-	}
+	want := ofTypes(kinds...)
 	idx := symbolIndex{byCanonical: map[string][]types.Node{}, byQname: map[string]string{}, fset: fset}
-	for _, n := range nodes {
-		if !want[n.Type] {
+	for i := range nodes {
+		n := nodes[i]
+		if !want(&n) {
 			continue
 		}
 		if n.CanonicalID != "" {
@@ -48,6 +51,7 @@ func newSymbolIndex(fset *token.FileSet, nodes []types.Node, kinds ...types.Node
 			idx.byQname[n.QualifiedName] = n.ID
 		}
 	}
+	idx.local = newPosIndex(fset, nodes, func(n *types.Node) bool { return n.CanonicalID == "" && want(n) })
 	return idx
 }
 
@@ -55,10 +59,10 @@ func newSymbolIndex(fset *token.FileSet, nodes []types.Node, kinds ...types.Node
 // canonical match counts; a miss means the declaration is not in the graph.
 // When several nodes share the canonical id, the one whose file and lines
 // contain obj's position wins. An object without a canonical id that go/types
-// knows (a function-local type) has no package-level node, so it does not
-// fall back to the short qualified name, which would bind it to a
-// package-level declaration of the same name. The qname is used only when
-// there is no object (AST-only builds).
+// knows (a function-local type) is the node its declaring identifier
+// declares (posIndex.declaredAt); it does not fall back to the short qualified name, which would
+// bind it to a package-level declaration of the same name. The qname is used
+// only when there is no object (AST-only builds).
 func (s symbolIndex) lookup(obj gotypes.Object, qname string) (string, bool) {
 	if cid := goCanonicalID(obj); cid != "" {
 		cands := s.byCanonical[cid]
@@ -81,6 +85,9 @@ func (s symbolIndex) lookup(obj gotypes.Object, qname string) (string, bool) {
 		return cands[0].ID, true
 	}
 	if obj != nil && obj.Pkg() != nil {
+		if n := s.local.declaredAt(obj.Name(), obj.Pos()); n != nil {
+			return n.ID, true
+		}
 		return "", false
 	}
 	id, ok := s.byQname[qname]

@@ -3,6 +3,7 @@ package solidity
 import (
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
@@ -66,20 +67,47 @@ const (
 	importWildcard = "*"
 )
 
+// namedImport is one item between the braces of an import directive: the
+// name the imported file declares and the alias the importing file gives it,
+// "" when it keeps its name.
+type namedImport struct {
+	name  string
+	alias string
+}
+
+// namedImports returns the items between the braces of an import directive,
+// in source order (`import { A, B as C } from "./x.sol"` gives A and B as
+// C), and the directive without the braces. A directive without braces
+// names no symbol. It reads the directive's text, which is on the Import
+// node, so the symbols of an unchanged file are known on an incremental
+// build.
+func namedImports(directive string) (items []namedImport, outside string) {
+	open, end := strings.IndexByte(directive, '{'), strings.IndexByte(directive, '}')
+	if open < 0 || end < open {
+		return nil, directive
+	}
+	for _, item := range strings.Split(directive[open+1:end], ",") {
+		switch words := strings.Fields(item); {
+		case len(words) == 1:
+			items = append(items, namedImport{name: words[0]})
+		case len(words) == 3 && words[1] == keywordAs:
+			items = append(items, namedImport{name: words[0], alias: words[2]})
+		}
+	}
+	return items, directive[:open] + " " + directive[end+1:]
+}
+
 // importAliasesOf returns the names an import directive introduces, read
 // from its text: alias → imported name for `{ Name as Alias }`, and alias →
 // "" for a whole-file alias (`import "./x.sol" as X`, `import * as X from
 // "./x.sol"`).
 func importAliasesOf(directive string) map[string]string {
 	out := map[string]string{}
-	outside := directive
-	if open, end := strings.IndexByte(directive, '{'), strings.IndexByte(directive, '}'); open >= 0 && end > open {
-		for _, item := range strings.Split(directive[open+1:end], ",") {
-			if words := strings.Fields(item); len(words) == 3 && words[1] == keywordAs {
-				out[words[2]] = words[0]
-			}
+	items, outside := namedImports(directive)
+	for _, item := range items {
+		if item.alias != "" {
+			out[item.alias] = item.name
 		}
-		outside = directive[:open] + " " + directive[end+1:]
 	}
 	words := strings.Fields(outside)
 	for i := 1; i+1 < len(words); i++ {
@@ -168,6 +196,22 @@ func (f *fileIndex) confidence(srcID, dstID string) types.Confidence {
 	return types.ConfExtracted
 }
 
+// stampEdges gives every edge without a file the file of its site. In
+// Solidity the site of a relation is inside the declaration the edge starts
+// at (a call in a function body, a base in a contract header, a symbol in an
+// import directive), so that is the file of the source node, written like a
+// node's path: relative to the source root. Only the edges Pass 1 makes
+// (defines, file to import) had a file; the 1,223 relation edges of the
+// system contracts had none, and a reader had to join the source node to
+// learn where a call is.
+func (f *fileIndex) stampEdges(edges []types.Edge) {
+	for i := range edges {
+		if edges[i].FilePath == "" {
+			edges[i].FilePath = f.byNode[edges[i].Src]
+		}
+	}
+}
+
 // relativeImportTarget returns the file a relative import path (`./x.sol`,
 // `../x.sol`) names, seen from importer, or "" for any other path.
 func relativeImportTarget(importer, importPath string) string {
@@ -235,8 +279,6 @@ type scopeIndex struct {
 	// name; parent maps each of those back to its struct or enum.
 	children map[string]map[string]string
 	parent   map[string]string
-	// structs maps a struct name to every struct of that name.
-	structs map[string][]string
 }
 
 // newScopeIndex builds the index from nodes alone. Membership is read from
@@ -258,7 +300,6 @@ func newScopeIndex(nodes []types.Node, files *fileIndex) *scopeIndex {
 		mro:       map[string][]string{},
 		children:  map[string]map[string]string{},
 		parent:    map[string]string{},
-		structs:   map[string][]string{},
 	}
 	containerAt := map[string]string{}
 	typeAt := map[string]string{}
@@ -268,10 +309,7 @@ func newScopeIndex(nodes []types.Node, files *fileIndex) *scopeIndex {
 		switch {
 		case isContainerType(n.Type):
 			containerAt[n.FilePath+refSep+n.Name] = n.ID
-		case n.Type == types.NodeStruct:
-			typeAt[n.FilePath+refSep+n.QualifiedName] = n.ID
-			s.structs[n.Name] = append(s.structs[n.Name], n.ID)
-		case n.Type == types.NodeEnum:
+		case n.Type == types.NodeStruct, n.Type == types.NodeEnum:
 			typeAt[n.FilePath+refSep+n.QualifiedName] = n.ID
 		}
 	}
@@ -557,15 +595,32 @@ func inheritStateVarTypes(stateVarTypes stateVarTypeMap, mro map[string][]string
 
 // contextOf returns the container and the file in whose scope a name written
 // at a declaration is looked up: the declaration's container (the container
-// of its struct or enum for a member or a value), or "" at file level.
+// of its struct or enum for a member or a value), or "" at file level. A
+// container is the scope of what its own directives name (`using L for S`,
+// where S is a struct the container declares or inherits).
 func (s *scopeIndex) contextOf(id string) (containerID, file string) {
 	if parentID, nested := s.parent[id]; nested {
 		id = parentID
 	}
-	if n := s.node[id]; n != nil {
-		file = n.FilePath
+	n := s.node[id]
+	if n == nil {
+		return s.owner[id], ""
 	}
-	return s.owner[id], file
+	if isContainerType(n.Type) {
+		return id, n.FilePath
+	}
+	return s.owner[id], n.FilePath
+}
+
+// membersInOrder returns the members of a struct, or the values of an enum,
+// in the order the source declares them.
+func (s *scopeIndex) membersInOrder(parentID string) []string {
+	ids := make([]string, 0, len(s.children[parentID]))
+	for _, id := range s.children[parentID] {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(a, b int) bool { return s.node[ids[a]].StartByte < s.node[ids[b]].StartByte })
+	return ids
 }
 
 // isTypeDeclaration reports whether t is a kind that can be named as a type:
@@ -601,23 +656,14 @@ func (s *scopeIndex) typeDeclaration(containerID, file, name string) string {
 }
 
 // structOf resolves the struct a type name means, or returns "". The name is
-// looked up as written in the given scope. A declared type is stored on
-// some nodes without its qualifier (`Set` for `SetLib.Set`); when the scope
-// has no struct of that name, the only struct of that name in the files the
-// scope's file can see is taken.
+// looked up as written (`Set`, `SetLib.Set`) in the scope it was written in,
+// and nowhere else: every declaration stores its type with the qualifier the
+// source has. When types were stored without it, a name the scope did not
+// have fell back to the only struct of that name in sight, which is a guess
+// and found nothing as soon as two libraries declared one.
 func (s *scopeIndex) structOf(containerID, file, typeName string) string {
-	if id := s.typeDeclaration(containerID, file, typeName); id != "" {
-		if s.node[id].Type == types.NodeStruct {
-			return id
-		}
-		return ""
-	}
-	candidates := s.structs[lastSegment(strings.TrimSpace(typeName))]
-	if near := s.files.nearest(candidates, file); len(near) == 1 {
-		return near[0]
-	}
-	if len(candidates) == 1 {
-		return candidates[0]
+	if id := s.typeDeclaration(containerID, file, typeName); id != "" && s.node[id].Type == types.NodeStruct {
+		return id
 	}
 	return ""
 }

@@ -153,6 +153,10 @@ type Options struct {
 	// non-empty FilesFromPath.
 	Filter *filterlist.FilterList
 
+	// FileRoles gives the role of each file of the build scope (ckg build
+	// --scope): whether its nodes are test code follows the role instead of
+	// the file's path. nil (a build without a scope) keeps the path rule.
+	FileRoles FileRoles
 	// GoBuild is the Go build configuration the graph is built for (from a
 	// build scope, ckg build --scope). It sets the platform, cgo and tags of
 	// both Go discovery and type checking; nil keeps the host defaults.
@@ -352,13 +356,13 @@ func runCold(opt Options, log *slog.Logger,
 	var goFuncFieldTouches map[string]map[string]struct{}
 	if shouldRun("go", opt.Languages) && len(goFiles) > 0 {
 		log.Debug("pass1.start", "language", "go", "files", len(goFiles))
-		rg, pending, fieldTouches, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, log)
+		rg, pending, fieldTouches, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, opt.FileRoles, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("go pipeline: %w", err)
 		}
 		parseErrs += n
 		logResolveSummary(log, "go", rg)
-		if rg, err = goThroughContract(log, rg); err != nil {
+		if rg, err = goThroughContract(log, rg, opt.FileRoles); err != nil {
 			return persist.Manifest{}, err
 		}
 		resolved = append(resolved, rg)
@@ -530,7 +534,7 @@ func runCold(opt Options, log *slog.Logger,
 			"security_nodes", len(secNodes), "has_security_pattern_edges", len(secEdges))
 	}
 	log.Debug("persist.end")
-	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, opt.FileRoles, log); err != nil {
 		return persist.Manifest{}, err
 	}
 

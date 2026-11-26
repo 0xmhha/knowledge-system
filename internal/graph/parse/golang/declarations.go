@@ -1,13 +1,13 @@
 package golang
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
 	"go/printer"
 	"go/token"
 	gotypes "go/types"
-	"path"
-	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
@@ -31,6 +31,12 @@ type declVisitor struct {
 	edges     []types.Edge
 	pending   []parse.PendingRef
 	typesInfo *gotypes.Info
+	// src and comments are the file's bytes and its comment groups in
+	// source order; funcSpan reads the comment after a function from them.
+	// src is nil when the caller has no source, and a function then ends
+	// at its last token.
+	src      []byte
+	comments []*ast.CommentGroup
 	// scope is the function whose body is being walked; zero at package
 	// level. A type, var or const declared inside a body is named under the
 	// function and defined by it (see declOwner).
@@ -39,17 +45,12 @@ type declVisitor struct {
 	// have nodes, so the walk does not emit them a second time when it
 	// reaches the expression itself (see emitStructFields).
 	structsDone map[*ast.StructType]bool
-	// inInitialiser is set while a package-level initialiser is walked: the
-	// code then belongs to a Variable, not to a function.
-	inInitialiser bool
+	// ifacesDone holds the interface type expressions whose methods already
+	// have nodes (see emitInterfaceMethods).
+	ifacesDone map[*ast.InterfaceType]bool
 	// netRPC says the build uses net/rpc, so a method with the net/rpc
 	// handler shape may be a handler (see maybeEmitJSONRPCHandler).
 	netRPC bool
-	// mutexNodeIDs maps a *types.Object (the var/field declaration of a
-	// sync.Mutex/RWMutex) to the Mutex node ID emitted by emitConcurrencyDecls.
-	// Populated during decl walk; consumed by Lock/Unlock detection so
-	// acquires_lock edges resolve to the same Mutex node the field declared.
-	mutexNodeIDs map[gotypes.Object]string
 	// fieldNodeIDs maps a *types.Object (a struct Field declaration) to its
 	// NodeField ID. Populated during emitFields when typesInfo is available.
 	// Consumed by the accessed_under_lock pass to translate
@@ -93,12 +94,13 @@ type declVisitor struct {
 	// space from real `language="go"` Endpoints minted by the server-side
 	// RegisterXXXServer pass. Schema 1.9.
 	grpcClientPlaceholderIDs map[string]string
-	// chanVarIDs maps a channel variable name (within the current function scope)
-	// to the Channel node ID emitted by emitChannelFromMake. Used to wire
+	// chanVarIDs maps a channel variable of the current function to the
+	// Channel node ID emitted by emitChannelFromMake. Used to wire
 	// sends_to/recvs_from edges to the actual Channel node instead of an
-	// anonymous CallSite. Key = variable name string (AST-level, not qualified).
-	// Re-initialized per function scope in emitFunctionBodyPos.
-	chanVarIDs map[string]string
+	// anonymous CallSite. The key is chanVar's: the variable's object, or its
+	// name without type information. Re-initialized per function scope in
+	// emitBodyPos.
+	chanVarIDs map[any]string
 	// funcFieldTouches records, for each Function/Method node ID emitted by
 	// visitFuncDecl, the set of struct-Field node IDs whose values are
 	// read or written anywhere inside the body. Populated even when the
@@ -122,7 +124,7 @@ func newDeclVisitor(fset *token.FileSet, relPath, pkgName string) *declVisitor {
 	pkgQ := pkgName
 	// One package node per package directory: files of one package share it,
 	// two packages that declare the same name do not.
-	v.pkgID = parse.NodeID("go", path.Dir(filepath.ToSlash(relPath)), pkgQ, 0)
+	v.pkgID = packageNodeID(relPath, pkgName)
 	v.nodes = append(v.nodes, types.Node{
 		ID: v.pkgID, Type: types.NodePackage,
 		Name: pkgName, QualifiedName: pkgQ,
@@ -180,16 +182,24 @@ func (v *declVisitor) Visit(n ast.Node) ast.Visitor {
 		return nil
 	case *ast.StructType:
 		v.emitAnonymousStruct(d)
+	case *ast.InterfaceType:
+		v.emitAnonymousInterface(d)
 	case *ast.AssignStmt:
 		if d.Tok == token.DEFINE {
 			for _, lhs := range d.Lhs {
-				v.emitLocalName(lhs, d.End())
+				v.emitLocalName(lhs, d.End(), false)
 			}
 		}
 	case *ast.RangeStmt:
 		if d.Tok == token.DEFINE {
-			v.emitLocalName(d.Key, d.X.End())
-			v.emitLocalName(d.Value, d.X.End())
+			v.emitLocalName(d.Key, d.X.End(), false)
+			v.emitLocalName(d.Value, d.X.End(), false)
+		}
+	case *ast.TypeSwitchStmt:
+		// switch v := x.(type): v is declared by the header, and every case
+		// clause has a variable of its own type at that one identifier.
+		if guard, ok := d.Assign.(*ast.AssignStmt); ok && guard.Tok == token.DEFINE && len(guard.Lhs) == 1 {
+			v.emitLocalName(guard.Lhs[0], guard.End(), true)
 		}
 	}
 	return v
@@ -226,8 +236,68 @@ func (v *declVisitor) emitAnonymousStruct(st *ast.StructType) {
 	v.emitStructFields(definer, fmt.Sprintf("%s.struct@%d", prefix, startByte), "", st)
 }
 
+// emitAnonymousInterface emits the methods of an interface type that is
+// written where it is used and so belongs to no type declaration: a parameter
+// type (func Slot(b interface{ Bytes() []byte })), the type of an assertion.
+// The methods are named "<owner>.interface@<start byte>.<Method>" and defined
+// by the owner, as the fields of an anonymous struct are. They have no
+// canonical id; a call finds them by position (posIndex). go-stablenet has 12
+// such methods, called at 9 sites.
+func (v *declVisitor) emitAnonymousInterface(it *ast.InterfaceType) {
+	if v.ifacesDone[it] {
+		return
+	}
+	prefix, definer := v.declOwner()
+	v.emitInterfaceMethods(definer, anonymousInterfaceQname(prefix, v, it), "", it)
+}
+
+// anonymousInterfaceQname names an interface type written without a name
+// under the node whose qualified name is prefix.
+func anonymousInterfaceQname(prefix string, v *declVisitor, it *ast.InterfaceType) string {
+	_, startByte := v.pos(it.Pos())
+	return fmt.Sprintf("%s.interface@%d", prefix, startByte)
+}
+
+// emitInterfaceMethods emits the Method nodes of the interface type it under
+// the node parentID and records it as done.
+func (v *declVisitor) emitInterfaceMethods(parentID, parentQname, parentCanonical string, it *ast.InterfaceType) {
+	if it == nil || it.Methods == nil {
+		return
+	}
+	if v.ifacesDone == nil {
+		v.ifacesDone = map[*ast.InterfaceType]bool{}
+	}
+	v.ifacesDone[it] = true
+	for _, f := range it.Methods.List {
+		v.emitInterfaceMethod(parentID, parentQname, parentCanonical, f)
+	}
+}
+
+// emitInterfacesUnder emits the methods of the unnamed interface types
+// written under root, a part of the declaration named parentQname: the type
+// of a struct field, an element type, the constraint of a type parameter
+// (type Set[T interface{ Key() string }]). Package-level declarations are not
+// walked by Visit, so their type expressions are read here.
+//
+// The methods are named under the declaration and defined by it, as the
+// methods of an interface written in a function's signature are defined by
+// the function: every method of an unnamed interface belongs to the
+// declaration that holds the interface.
+func (v *declVisitor) emitInterfacesUnder(parentID, parentQname string, root ast.Node) {
+	ast.Inspect(root, func(n ast.Node) bool {
+		if it, ok := n.(*ast.InterfaceType); ok && !v.ifacesDone[it] {
+			v.emitInterfaceMethods(parentID, anonymousInterfaceQname(parentQname, v, it), "", it)
+		}
+		return true
+	})
+}
+
+// A short variable declaration has no keyword: its node starts at the name
+// (the first token of what declares it) and its id is keyed there too.
+//
 // emitLocalName emits a LocalVariable node for a name that a short variable
-// declaration (x := ...) or a range clause (for k, v := range ...) declares.
+// declaration (x := ...), a range clause (for k, v := range ...) or the
+// header of a type switch (switch v := x.(type), with guard set) declares.
 // The node is named "<function>.<name>", spans the name up to end, and is
 // defined by the function, or by the variable whose initialiser holds it.
 //
@@ -235,9 +305,17 @@ func (v *declVisitor) emitAnonymousStruct(st *ast.StructType) {
 // `a, err := f()` an err that already exists in the scope is assigned, not
 // declared. Without type information the two cannot be told apart, so an
 // AST-only build emits no local names. The blank identifier names nothing.
-func (v *declVisitor) emitLocalName(e ast.Expr, end token.Pos) {
+//
+// go/types records no definition for the name in a type switch header: each
+// case clause has an implicit variable instead, all positioned at the header
+// identifier. The node stands there, so the uses in every clause reach it
+// (83 such variables with 602 uses in go-stablenet had neither node nor edge).
+func (v *declVisitor) emitLocalName(e ast.Expr, end token.Pos, guard bool) {
 	id, ok := e.(*ast.Ident)
-	if !ok || id.Name == "_" || v.typesInfo == nil || v.typesInfo.Defs[id] == nil || v.scope.id == "" {
+	if !ok || id.Name == "_" || v.typesInfo == nil || v.scope.id == "" {
+		return
+	}
+	if !guard && v.typesInfo.Defs[id] == nil {
 		return
 	}
 	qname := v.scope.qname + "." + id.Name
@@ -273,21 +351,168 @@ func (v *declVisitor) visitGenDecl(d *ast.GenDecl) {
 	for _, spec := range d.Specs {
 		switch s := spec.(type) {
 		case *ast.TypeSpec:
-			v.emitTypeSpec(s, d.Doc)
+			v.emitTypeSpec(s, spanOf(d, s), specDoc(d, s.Doc))
 		case *ast.ValueSpec:
-			v.emitValueSpec(s, d.Tok)
+			v.emitValueSpec(s, d.Tok, spanOf(d, s), specDoc(d, s.Doc))
 		case *ast.ImportSpec:
-			v.emitImportSpec(s)
+			v.emitImportSpec(s, spanOf(d, s))
 		}
 	}
 }
 
-func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
+// declSpan is the part of a file that a declaration node covers.
+type declSpan struct {
+	start, end token.Pos
+}
+
+// spanOf returns the span of the node of the specification spec of the
+// declaration d. It applies the span rule of every Go declaration node:
+//
+//	A declaration's span starts at its first token and runs through the
+//	comment that follows it on its last line.
+//
+// Where it starts. For a function the first token is `func`. For a type,
+// var, const or import that stands alone (`type T struct{...}`, `var x = 1`,
+// also inside a function body) it is the keyword too. In a parenthesised
+// group (`var ( a = 1; b = 2 )`) each specification is a declaration of its
+// own and starts at its first token, the name. A struct field and an
+// interface method start at their first token as well.
+//
+// Where it ends. The comment after a declaration on its last line
+// (`MaxSkeletonSize = 128 // Number of ...`) describes that declaration and
+// belongs to no other node, so the span includes it (withComment). The
+// syntax tree attaches such a comment to a specification, a struct field and
+// an interface method. It attaches none to a function, so for a function or
+// method the file's comment list decides (funcSpan): the span runs through
+// the comments that start on the line of its last token with only blanks
+// between (`func (s *Ethereum) IsListening() bool { return true } // Always
+// listening`), as the syntax tree groups a line comment. A comment on a
+// later line is not one of them: it is the next declaration's doc or stands
+// alone.
+//
+// Names that share a declaration. Every name of one specification
+// (`var a, b = f()`) and of one field declaration (`rmu, wmu sync.Mutex`)
+// spans the whole of it, so the text stored for each name is the complete
+// declaration. Such nodes have the same span, and blank names (`var _, _ =
+// f()`) the same name and qualified name too: the Signature of each says
+// which name it is, "name 2 of 4" (ordinalSignature). A Mutex node has the
+// span of the Variable or Field that declares the mutex.
+//
+// While type, var and const nodes started at their name, the keyword was in
+// no node's text: a search for `type \w+ struct` found 0 of the 1,091
+// production struct declarations of go-stablenet, and a name after the first
+// in a specification held a text that began in the middle of it. While they
+// ended at their last token, the comment after 367 package-level
+// specifications was in no node's text.
+//
+// A node's id does not follow its span: it stays keyed by the offset of the
+// declaring identifier (declID), which is unique where two names share one
+// span, and which is how a use finds a declaration without a canonical id
+// (posIndex.declaredAt).
+func spanOf(d *ast.GenDecl, spec ast.Spec) declSpan {
+	sp := declSpan{start: d.Pos(), end: spec.End()}
+	if d.Lparen.IsValid() {
+		sp.start = spec.Pos()
+	}
+	switch s := spec.(type) {
+	case *ast.ValueSpec:
+		sp.end = withComment(sp.end, s.Comment)
+	case *ast.TypeSpec:
+		sp.end = withComment(sp.end, s.Comment)
+	case *ast.ImportSpec:
+		sp.end = withComment(sp.end, s.Comment)
+	}
+	return sp
+}
+
+// fieldSpan is the span of a struct field or an interface method (see
+// spanOf for the rule).
+func fieldSpan(f *ast.Field) declSpan {
+	return declSpan{start: f.Pos(), end: withComment(f.End(), f.Comment)}
+}
+
+// funcSpan is the span of a function or method declaration (see spanOf for
+// the rule): from `func` through the comments that follow its last token on
+// that line, with only blanks between.
+func (v *declVisitor) funcSpan(d *ast.FuncDecl) declSpan {
+	sp := declSpan{start: d.Pos(), end: d.End()}
+	tf := v.fset.File(sp.end)
+	if tf == nil || len(v.src) == 0 {
+		return sp
+	}
+	// The first comment group after the declaration's last token.
+	i := sort.Search(len(v.comments), func(i int) bool { return v.comments[i].Pos() >= sp.end })
+	if i == len(v.comments) {
+		return sp
+	}
+	line := tf.Line(sp.end)
+	for _, c := range v.comments[i].List {
+		if tf.Line(c.Pos()) != line || !blankBetween(v.src, tf.Offset(sp.end), tf.Offset(c.Pos())) {
+			break
+		}
+		sp.end = c.End()
+		line = tf.Line(c.End())
+	}
+	return sp
+}
+
+// lineBlanks are the bytes that may stand between a function's last token
+// and the comment after it (funcSpan).
+const lineBlanks = " \t"
+
+// blankBetween reports whether src holds only spaces and tabs from byte from
+// up to byte to.
+func blankBetween(src []byte, from, to int) bool {
+	if from < 0 || to > len(src) || from > to {
+		return false
+	}
+	return len(bytes.Trim(src[from:to], lineBlanks)) == 0
+}
+
+// withComment returns the end of a declaration that ends at end and is
+// followed on its last line by the comment c (nil for none).
+func withComment(end token.Pos, c *ast.CommentGroup) token.Pos {
+	if c != nil && c.End() > end {
+		return c.End()
+	}
+	return end
+}
+
+// ordinalSignature is the Signature of name i (from 0) of the n names that
+// one declaration declares: "" for a single name, else "name 2 of 4". It is
+// what tells apart nodes that share a span (see spanOf).
+func ordinalSignature(i, n int) string {
+	if n < 2 {
+		return ""
+	}
+	return fmt.Sprintf("name %d of %d", i+1, n)
+}
+
+// specDoc returns the doc comment of one specification of the declaration d,
+// whose own comment is own.
+//
+// A comment above a single declaration (`// Limit is ...` over `const Limit =
+// 10`) is attached to the declaration, not to its specification. In a group
+// (`type ( ... )`) the declaration's comment describes the group and each
+// member has its own or none. Reading only the specification lost the comment
+// of 658 single var and const declarations of go-stablenet; reading only the
+// declaration gave 13 grouped types the group's comment and lost 12 others.
+func specDoc(d *ast.GenDecl, own *ast.CommentGroup) *ast.CommentGroup {
+	if own != nil || d.Lparen.IsValid() {
+		return own
+	}
+	return d.Doc
+}
+
+// emitTypeSpec emits the node of a type declaration with the span sp
+// (spanOf).
+func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, sp declSpan, doc *ast.CommentGroup) {
 	prefix, definer := v.declOwner()
 	qname := prefix + "." + s.Name.Name
-	startLine, startByte := v.pos(s.Pos())
-	endLine, endByte := v.pos(s.End())
-	id := v.declID(qname, startByte)
+	startLine, startByte := v.pos(sp.start)
+	endLine, endByte := v.pos(sp.end)
+	_, nameByte := v.pos(s.Name.Pos())
+	id := v.declID(qname, nameByte)
 	// canonical id for the type itself: <importpath>.<Type> (symbol
 	// identity). Empty in AST-only mode. Passed down so fields and interface
 	// methods qualify against the type's canonical id, not the short pkg name.
@@ -306,17 +531,26 @@ func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
 		nodeType = types.NodeInterface
 		v.appendNode(id, nodeType, s.Name.Name, qname, startLine, endLine, startByte, endByte, exported(s.Name.Name), commentText(doc), "")
 		v.setLastCanonicalID(cid)
-		for _, f := range t.Methods.List {
-			v.emitInterfaceMethod(id, qname, cid, f)
-		}
+		v.emitInterfaceMethods(id, qname, cid, t)
 	default:
+		// Every other named type is a TypeAlias node; the sub kind says
+		// whether it is another name for a type (type A = B) or a type of
+		// its own (type A B), which has its own method set.
 		nodeType = types.NodeTypeAlias
 		v.appendNode(id, nodeType, s.Name.Name, qname, startLine, endLine, startByte, endByte, exported(s.Name.Name), commentText(doc), "")
+		v.nodes[len(v.nodes)-1].SubKind = types.SubKindDefinedType
+		if s.Assign.IsValid() {
+			v.nodes[len(v.nodes)-1].SubKind = types.SubKindAlias
+		}
 		v.setLastCanonicalID(cid)
 		// A defined type over an anonymous struct (`type Rows []struct{..}`):
 		// the struct's fields belong to the type.
 		v.emitStructFields(id, qname, cid, anonymousStruct(s.Type))
 	}
+	if s.TypeParams != nil {
+		v.emitInterfacesUnder(id, qname, s.TypeParams)
+	}
+	v.emitInterfacesUnder(id, qname, s.Type)
 	v.edges = append(v.edges, types.Edge{
 		Src: definer, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 	})
@@ -352,14 +586,15 @@ func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, 
 		}
 		names = []*ast.Ident{id}
 	}
-	for _, name := range names {
+	sp := fieldSpan(f)
+	for i, name := range names {
 		qname := parentQname + "." + name.Name
-		startLine, startByte := v.pos(f.Pos())
-		endLine, endByte := v.pos(f.End())
+		startLine, startByte := v.pos(sp.start)
+		endLine, endByte := v.pos(sp.end)
 		id := v.declID(qname, startByte)
 		v.appendNode(id, types.NodeField, name.Name, qname,
 			startLine, endLine, startByte, endByte,
-			exported(name.Name), commentText(f.Doc), "")
+			exported(name.Name), commentText(f.Doc), ordinalSignature(i, len(names)))
 		if embedded {
 			v.nodes[len(v.nodes)-1].SubKind = subKindEmbedded
 		}
@@ -412,10 +647,11 @@ func anonymousStruct(e ast.Expr) *ast.StructType {
 }
 
 func (v *declVisitor) emitInterfaceMethod(parentID, parentQname, parentCanonical string, f *ast.Field) {
+	sp := fieldSpan(f)
 	for _, name := range f.Names {
 		qname := parentQname + "." + name.Name
-		startLine, startByte := v.pos(f.Pos())
-		endLine, endByte := v.pos(f.End())
+		startLine, startByte := v.pos(sp.start)
+		endLine, endByte := v.pos(sp.end)
 		id := v.declID(qname, startByte)
 		v.appendNode(id, types.NodeMethod, name.Name, qname,
 			startLine, endLine, startByte, endByte,
@@ -431,20 +667,23 @@ func (v *declVisitor) emitInterfaceMethod(parentID, parentQname, parentCanonical
 	}
 }
 
-func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
+// emitValueSpec emits one node per name of a var or const specification, all
+// with the span sp (spanOf).
+func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token, sp declSpan, doc *ast.CommentGroup) {
 	prefix, definer := v.declOwner()
 	owners := make([]declScope, 0, len(s.Names))
-	for _, name := range s.Names {
+	for i, name := range s.Names {
 		qname := prefix + "." + name.Name
-		startLine, startByte := v.pos(name.Pos())
-		endLine, endByte := v.pos(s.End())
-		id := v.declID(qname, startByte)
+		startLine, startByte := v.pos(sp.start)
+		endLine, endByte := v.pos(sp.end)
+		_, nameByte := v.pos(name.Pos())
+		id := v.declID(qname, nameByte)
 		nt := types.NodeVariable
 		if tok == token.CONST {
 			nt = types.NodeConstant
 		}
 		v.appendNode(id, nt, name.Name, qname, startLine, endLine, startByte, endByte,
-			exported(name.Name), commentText(s.Doc), "")
+			exported(name.Name), commentText(doc), ordinalSignature(i, len(s.Names)))
 		// canonical id only for PACKAGE-LEVEL const/var: the AST walk also
 		// reaches `var x = …` declared inside function bodies, whose id
 		// <importpath>.<name> is neither unique (many funcs declare `gspec`,
@@ -464,6 +703,7 @@ func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
 		// (`var Config struct{..}`): the struct's fields belong to it.
 		if s.Type != nil {
 			v.emitStructFields(id, qname, "", anonymousStruct(s.Type))
+			v.emitInterfacesUnder(id, qname, s.Type)
 		}
 	}
 	// A package-level initialiser runs outside any function: its statements,
@@ -474,10 +714,10 @@ func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
 	}
 	for i, value := range s.Values {
 		owner := owners[initialiserOwner(i, len(owners))]
-		v.scope, v.inInitialiser = owner, true
+		v.scope = owner
 		v.emitBodyPos(owner.qname, owner.id, value)
 		ast.Walk(v, value)
-		v.scope, v.inInitialiser = declScope{}, false
+		v.scope = declScope{}
 	}
 }
 
@@ -491,12 +731,14 @@ func initialiserOwner(i, names int) int {
 	return 0
 }
 
-func (v *declVisitor) emitImportSpec(s *ast.ImportSpec) {
+// emitImportSpec emits the node of an import with the span sp (spanOf).
+func (v *declVisitor) emitImportSpec(s *ast.ImportSpec, sp declSpan) {
 	pathLit := strings.Trim(s.Path.Value, "\"")
 	qname := "import:" + pathLit
-	startLine, startByte := v.pos(s.Pos())
-	endLine, endByte := v.pos(s.End())
-	id := v.declID(qname, startByte)
+	startLine, startByte := v.pos(sp.start)
+	endLine, endByte := v.pos(sp.end)
+	_, specByte := v.pos(s.Pos())
+	id := v.declID(qname, specByte)
 	v.appendNode(id, types.NodeImport, pathLit, qname,
 		startLine, endLine, startByte, endByte, "", "", "")
 	v.edges = append(v.edges, types.Edge{
@@ -510,8 +752,9 @@ func (v *declVisitor) visitFuncDecl(d *ast.FuncDecl) {
 		nt = types.NodeMethod
 	}
 	id, qname := v.funcDeclIDQname(d)
-	startLine, startByte := v.pos(d.Pos())
-	endLine, endByte := v.pos(d.End())
+	sp := v.funcSpan(d)
+	startLine, startByte := v.pos(sp.start)
+	endLine, endByte := v.pos(sp.end)
 	sig := v.formatSignature(d)
 	v.appendNode(id, nt, d.Name.Name, qname, startLine, endLine, startByte, endByte,
 		exported(d.Name.Name), commentText(d.Doc), sig)
@@ -522,10 +765,6 @@ func (v *declVisitor) visitFuncDecl(d *ast.FuncDecl) {
 		Src: v.fileID, Dst: id, Type: types.EdgeDefines, Count: 1, Confidence: types.ConfExtracted,
 	})
 	v.emitFunctionBodyPos(qname, id, d.Body)
-	// Emit accessed_under_lock(field, mutex) for fields
-	// referenced inside a function that holds at least one lock. No-op when
-	// typesInfo is nil or the body holds no lock — keeps AST-only mode safe.
-	v.emitAccessedUnderLock(id, d.Body)
 	// Lock propagation (opt-in via --lock-propagation): record funcID → fields
 	// touched for ALL functions (lock-holding or not). buildpipe's
 	// propagateLockedFieldAccessDFS reads this map after Pass 2 to walk the
@@ -583,11 +822,25 @@ func commentText(g *ast.CommentGroup) string {
 // Generic functions and methods resolve to their origin, so a call on an
 // instantiated type (Prque[int, string].Push) has the declaration's id.
 //
-// Returns "" when the object has no package (builtins), is the blank
+// A method declared on an alias (type E = fe12; func (e *E) One()) belongs to
+// the aliased type and has its id, <importpath>.(*fe12).One: the receiver is
+// unaliased first. Left as written, the alias is not a named type, the id was
+// empty, and the 9 calls of such methods in go-stablenet had no edge.
+//
+// The Error method of the builtin error interface has no package; it gets
+// BuiltinErrorMethodID so that err.Error() has a target (222 calls).
+//
+// Returns "" when the object has no package (other builtins), is the blank
 // identifier, or is not package level, so callers leave the node's CanonicalID
 // empty rather than emitting an ambiguous id.
 func goCanonicalID(obj gotypes.Object) string {
-	if obj == nil || obj.Pkg() == nil {
+	if obj == nil {
+		return ""
+	}
+	if obj.Pkg() == nil {
+		if obj == builtinErrorMethod {
+			return BuiltinErrorMethodID
+		}
 		return ""
 	}
 	// The blank identifier `_` is not an addressable symbol — many package-level
@@ -612,14 +865,11 @@ func goCanonicalID(obj gotypes.Object) string {
 		}
 		return pkgPath + "." + fn.Name()
 	}
-	rt := sig.Recv().Type()
-	star := ""
-	if ptr, ok := rt.(*gotypes.Pointer); ok {
-		rt = ptr.Elem()
-		star = "*"
-	}
-	named, ok := rt.(*gotypes.Named)
-	if !ok || named.Obj() == nil {
+	named, star := receiverBase(sig.Recv().Type())
+	if named == nil || named.Obj() == nil || !isPackageLevel(named.Obj()) {
+		// A method of an interface declared inside a function has no id,
+		// like the interface: <importpath>.<Interface>.<Method> would be the
+		// id of a package-level interface of that name.
 		return ""
 	}
 	if gotypes.IsInterface(named) {
@@ -627,6 +877,33 @@ func goCanonicalID(obj gotypes.Object) string {
 	}
 	return pkgPath + ".(" + star + named.Obj().Name() + ")." + fn.Name()
 }
+
+// isPackageLevel reports whether obj is declared in the scope of its package.
+func isPackageLevel(obj gotypes.Object) bool {
+	return obj.Pkg() != nil && obj.Parent() == obj.Pkg().Scope()
+}
+
+// receiverBase returns the named type a receiver of type rt belongs to and
+// "*" when the receiver is a pointer, looking through aliases on both levels
+// ((e *E) with type E = fe12 gives fe12, "*"). nil for an unnamed receiver
+// type (a method of an interface written without a name).
+func receiverBase(rt gotypes.Type) (named *gotypes.Named, star string) {
+	rt = gotypes.Unalias(rt)
+	if ptr, ok := rt.(*gotypes.Pointer); ok {
+		rt, star = gotypes.Unalias(ptr.Elem()), "*"
+	}
+	named, _ = rt.(*gotypes.Named)
+	return named, star
+}
+
+// builtinErrorMethod is the Error method of the builtin error interface.
+var builtinErrorMethod = func() gotypes.Object {
+	iface, ok := gotypes.Universe.Lookup("error").Type().Underlying().(*gotypes.Interface)
+	if !ok || iface.NumMethods() == 0 {
+		return nil
+	}
+	return iface.Method(0)
+}()
 
 // recvTypeName is the type name of a method receiver: T for (t T), (t *T),
 // and for the generic receivers (t *T[K]) and (t *T[K, V]), whose type

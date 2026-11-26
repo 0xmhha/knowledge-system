@@ -126,6 +126,35 @@ func TestFidelity(t *testing.T) {
 		{"names made by := and range are LocalVariable nodes", checkLocalNames},
 		{"uses of a local name have references edges", checkLocalNameUses},
 		{"receiver, interface, defined type and body type references have edges", checkTypeReferences},
+		{"an existing name on the left of := is written", checkRedeclareWrite},
+		{"a lock on a mutex declared in another file has an edge", checkCrossFileLock},
+		{"a mutex declared by a composite literal or new has a node", checkMutexFromValue},
+		{"type references in package-level var and const declarations have edges", checkValueSpecTypeRefs},
+		{"a type declared in a function is the target of a type reference", checkLocalTypeRef},
+		{"new of an alias instantiates the alias", checkAliasInstantiates},
+		{"a uses_type edge carries the line of the reference", checkTypeRefLine},
+		{"a call of the builtin error method has an edge", checkErrorMethodCall},
+		{"a method on an alias receiver has a canonical id and is called", checkAliasReceiver},
+		{"methods of local and unnamed interfaces have nodes and are called", checkLocalInterfaceCalls},
+		{"the method of a type parameter's unnamed constraint has a node and is called", checkConstraintMethod},
+		{"a closure called in a package-level initialiser is recorded", checkInitialiserClosure},
+		{"a call through an embedded interface is an interface call", checkEmbeddedInterfaceCall},
+		{"the variable of a type switch has a node and its uses have edges", checkTypeSwitchVariable},
+		{"reads of local constants and of array-length constants have edges", checkConstantReads},
+		{"every make(chan) has a Channel node with its element type", checkChannelNodes},
+		{"a range over a channel is a receive", checkRangeOverChannel},
+		{"statements and channel sites lie in the statement around them", checkEncloses},
+		{"single and grouped declarations keep their own doc comment", checkDocComments},
+		{"a named type that is not a struct or interface says alias or defined", checkTypeAliasSubKind},
+		{"a composite literal in a package-level initialiser instantiates its type", checkInitialiserInstantiates},
+		{"a send on a local channel inside a go literal has its edge and line", checkGoLiteralChannelOp},
+		{"an operation on a parameter that hides a local channel is a site", checkShadowedChannel},
+		{"a read in a function literal in a statement header is a read of the header", checkHeaderLiteralRead},
+		{"a lock through a method that returns the mutex has an edge", checkLockThroughCall},
+		{"a declaration's span starts at its first token", checkDeclarationSpans},
+		{"the names of one specification say which one they are", checkSpecNamePositions},
+		{"a Mutex node spans the declaration of its variable or field", checkMutexSpans},
+		{"a declaration's span runs through the comment after it", checkTrailingComments},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) { tc.check(t, g) })
@@ -216,9 +245,11 @@ func checkInitialiserStatements(t *testing.T, g *fidelityGraph) {
 	if !linked {
 		t.Errorf("no site_calls edge from a call site inside %s to %s", hook.QualifiedName, val.QualifiedName)
 	}
-	// A variable makes calls but is never called: no call edge may end at one.
+	// A variable makes calls but is never called: no call edge from another
+	// node may end at one. Its own marker for a closure it calls names no
+	// callee (checkInitialiserClosure).
 	for _, e := range g.edges {
-		if (e.Type == types.EdgeCalls || e.Type == types.EdgeInvokes) && g.byID[e.Dst].Type == types.NodeVariable {
+		if (e.Type == types.EdgeCalls || e.Type == types.EdgeInvokes) && g.byID[e.Dst].Type == types.NodeVariable && e.Src != e.Dst {
 			t.Errorf("%s edge from %s ends at the variable %s", e.Type, g.byID[e.Src].QualifiedName, g.byID[e.Dst].QualifiedName)
 		}
 	}

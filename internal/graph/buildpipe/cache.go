@@ -264,7 +264,46 @@ import (
 // and errors, struct members, enum values, imports, calls, reverts_with and
 // state variable reads and writes have nodes and edges. Node IDs, edges and
 // scores change; force a cold rebuild.
-const SchemaVersion = "1.38"
+//
+// 1.39 (2026-11-26): the Go graph agrees with its source where an independent
+// comparison on go-stablenet found it did not. An existing name on the left
+// of := is written, not read (1,117 uses). Lock edges and accessed_under_lock
+// are made after Resolve, so a lock on a mutex declared in another file has
+// its edge (171 sites); a mutex declared by a composite literal or new has a
+// node. uses_type also starts at package-level variables and constants
+// (1,854 references), ends at types declared inside a function, and carries
+// the line of the reference; new(T) of an alias instantiates the alias. Code
+// of the module that the build scope leaves out and the builtin error method
+// are External nodes (445 calls, 71 type references, 222 err.Error() calls).
+// Methods on an alias receiver have a canonical id; methods of interfaces
+// declared in a function or written without a name have nodes and are called
+// by position; a call through an interface embedded in a struct is invokes;
+// a closure called in a package-level initialiser leaves its marker on the
+// variable. The variable of a type switch is a LocalVariable; local constants
+// and array-length constants in signatures and type declarations are read.
+// implements covers types of test files and types declared in functions;
+// extends reaches interfaces outside the build. Every make(chan) has a
+// Channel node with its element type, a range over a channel is a receive,
+// send and receive sites and statements in function literals have encloses
+// edges, and the calls in a go statement's arguments belong to the Goroutine.
+// Single var, const and type declarations keep their doc comment and grouped
+// ones their own. TypeAlias nodes say alias or defined in sub_kind. is_test
+// follows the build scope's file role when a scope is given
+// (Options.FileRoles). In the same version: the span of a type, var, const
+// or import declaration starts at its first token, the keyword when it
+// stands alone, and every name of one specification spans the whole
+// specification (node ids stay keyed by the declaring identifier, and the
+// signature of each such name says which it is, "name 2 of 4"); the span of
+// a specification, a struct field, an interface method, a function and a
+// method runs through the comment after it on its last line; a Mutex node has the span of its
+// Variable or Field; a package
+// node shows its first file that is not test code; instantiates also starts
+// at the Variable of a package-level initialiser; a channel operation in a go
+// literal has an edge from its function; a read or call in a function
+// literal written in a statement header belongs to that header; a lock on a
+// mutex returned by a getter has its edge. Nodes, edges and scores change;
+// force a cold rebuild.
+const SchemaVersion = "1.39"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int

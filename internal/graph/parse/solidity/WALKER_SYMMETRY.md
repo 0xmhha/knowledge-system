@@ -28,6 +28,8 @@
 | `high_level_self_call.go` (`runHighLevelSelfCallMarker`) | Sol typed dispatch self-call detection | `HasHighLevelSelfCall` |
 | `yul_low_level_calls.go` (`runYulLowLevelCalls`) | Yul `call` / `delegatecall` / `staticcall` from inline assembly | `HasLowLevelCall`, `HasSelfReentrantCall`, `HasSelfDelegatecallDead` |
 | `chained_external_call.go` | Sol chained `getTarget().call(...)` shape | `HasExternalCall` |
+| `low_level_call_marker.go` (`runLowLevelCallMarker`) | every Sol `.call` / `.delegatecall` / `.staticcall` / `.send` / `.transfer`; a global address receiver (`msg.sender.call(...)`) | `HasLowLevelCall`, `HasValueTransfer`, `HasExternalCall` |
+| `external_call.go` (`lowLevelReceiver`, `resolveAddressReceiver`) | Sol low-level call on a member or an element of a variable (`route.hop.call(...)`, `targets[i].call(...)`), decided in Pass 2 by the type the path ends at; states what `HasExternalCall` means and which walker reads which receiver shape | `HasExternalCall` |
 | `assembly_marker.go` | inline-assembly presence + Yul opcode catalogue | `HasAssembly`, `YulBuiltins` |
 
 ## Symmetry pairs (invariant equivalence)

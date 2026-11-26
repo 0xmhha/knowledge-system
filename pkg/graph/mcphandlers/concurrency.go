@@ -24,7 +24,10 @@ func RegisterConcurrencyImpact(s *server.MCPServer, reader store.Reader) {
 				"Concurrency blast radius for a symbol: modules that affect or are affected by it via "+
 				"goroutine/channel/lock edges (spawns, sends_to, recvs_from, acquires_lock, accessed_under_lock). "+
 				"Seed a Channel/Mutex/Field node to recover producer<->consumer or lock-sharing peers; a function "+
-				"seed reaches its own goroutine and the channel it writes, but not the peer across the channel.",
+				"seed reaches its own goroutine and the channel it writes, but not the peer across the channel. "+
+				"A mutex is seeded by the qualified name of the field or variable that declares it, with or without \"#mutex\" after it, the same for a struct field, a package-level variable and a local variable "+
+				"(\"pkg.T.mu\" or \"pkg.T.mu#mutex\", \"pkg.mu\" or \"pkg.mu#mutex\", \"pkg.F.mu\" or \"pkg.F.mu#mutex\"); it leads to the functions that lock it and the fields it guards, and mutex names its Mutex node. "+
+				"seed_qname may be a canonical id, a qualified name or a bare name; an ambiguous bare name returns its candidates.",
 		),
 		mcp.WithString("seed_qname"),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),

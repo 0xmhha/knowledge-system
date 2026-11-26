@@ -244,6 +244,29 @@ func rewriteFTSQuery(q string) string {
 	return strings.Join(parts, " OR ")
 }
 
+// SearchWords returns text reduced to its words (runs of ASCII letters,
+// digits and underscores, joined by spaces, without the full-text operators
+// AND, OR, NOT and NEAR), or "" when it holds none. Search accepts the result
+// whatever characters text holds: a task description is prose, and passed as
+// it was, "foo(bar", "x:y" or "a AND" reached FTS5 as query syntax and came
+// back as a syntax error. Text with non-ASCII characters is returned
+// unchanged: Search answers it by substring, which has no syntax.
+func SearchWords(text string) string {
+	if hasNonASCII(text) {
+		return text
+	}
+	fields := strings.FieldsFunc(text, func(r rune) bool {
+		return (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '_'
+	})
+	words := fields[:0]
+	for _, f := range fields {
+		if !isFTS5Reserved(f) {
+			words = append(words, f)
+		}
+	}
+	return strings.Join(words, " ")
+}
+
 // isFTS5Reserved returns true for tokens that FTS5 interprets as operators
 // or column names rather than search terms. Passing these through
 // rewriteFTSQuery causes "no such column" or syntax errors.

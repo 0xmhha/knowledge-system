@@ -9,8 +9,9 @@ import (
 )
 
 // fakeReader implements store.Reader by embedding the interface (nil) and
-// overriding only the two methods Analyze calls. Any other method would
-// panic, proving Analyze depends on exactly FindSymbol + NeighborhoodByQname.
+// overriding only the methods Analyze calls. Any other method would panic,
+// proving Analyze depends on exactly the name lookups (FindByCanonicalID,
+// FindSymbol) and NeighborhoodByIDs.
 type fakeReader struct {
 	store.Reader
 	nodes map[string]types.Node
@@ -27,11 +28,21 @@ func (f *fakeReader) FindSymbol(name string, _ bool, _ store.FindSymbolOptions) 
 	return out, nil
 }
 
-// NeighborhoodByQname faithfully mirrors the sqlite reader: resolve roots via
-// FindSymbol (include them), BFS to depth in one direction, filter by edge
-// type, return the union node set + every traversed edge.
-func (f *fakeReader) NeighborhoodByQname(qname string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
-	roots, _ := f.FindSymbol(qname, true, store.FindSymbolOptions{})
+// FindByCanonicalID finds nothing: the fixture nodes carry no canonical id.
+func (f *fakeReader) FindByCanonicalID(string) (types.Node, bool, error) {
+	return types.Node{}, false, nil
+}
+
+// NeighborhoodByIDs faithfully mirrors the sqlite reader: start from the
+// nodes with the given ids (include them), BFS to depth in one direction,
+// filter by edge type, return the union node set + every traversed edge.
+func (f *fakeReader) NeighborhoodByIDs(ids []string, depth int, reverse bool, edgeTypes ...string) ([]types.Node, []types.Edge, error) {
+	var roots []types.Node
+	for _, id := range ids {
+		if n, ok := f.nodes[id]; ok {
+			roots = append(roots, n)
+		}
+	}
 	if len(roots) == 0 {
 		return nil, nil, nil
 	}
@@ -218,6 +229,70 @@ func TestAnalyze_FunctionSeed_ForwardCallSiteTopology(t *testing.T) {
 	}
 }
 
+// mutexFixture is a struct with a mutex field as the graph stores it: the
+// Field node and a Mutex node named <field>#mutex, the lockers' acquires_lock
+// edges to the Mutex node and the guarded fields' accessed_under_lock edges
+// to it. A second type has a method of the same name.
+func mutexFixture() *fakeReader {
+	nodes := []types.Node{
+		node("n_field", "mu", "pkg.State.mu", "c.go", 30, types.NodeField),
+		node("n_mutex", "mu", "pkg.State.mu#mutex", "c.go", 30, types.NodeMutex),
+		node("n_bal", "balance", "pkg.State.balance", "c.go", 31, types.NodeField),
+		node("n_add", "Add", "pkg.State.Add", "c.go", 35, types.NodeMethod),
+		node("n_get", "Get", "pkg.State.Get", "d.go", 12, types.NodeMethod),
+		node("n_other", "Add", "pkg.Other.Add", "e.go", 5, types.NodeMethod),
+	}
+	m := map[string]types.Node{}
+	for _, n := range nodes {
+		m[n.ID] = n
+	}
+	return &fakeReader{
+		nodes: m,
+		edges: []types.Edge{
+			edge("n_add", "n_mutex", types.EdgeAcquiresLock, 36),
+			edge("n_get", "n_mutex", types.EdgeAcquiresLock, 13),
+			edge("n_field", "n_mutex", types.EdgeAccessedUnderLock, 0),
+			edge("n_bal", "n_mutex", types.EdgeAccessedUnderLock, 0),
+		},
+	}
+}
+
+// TestAnalyze_MutexFieldSeed: seeding the field that is a mutex leads to its
+// Mutex node and so to the functions that lock it and the fields it guards.
+// On go-stablenet a mutex field seed returned none of its lockers (0 of 183
+// at depth 1 and 2): the lock edges end at the Mutex node, not at the field.
+func TestAnalyze_MutexFieldSeed(t *testing.T) {
+	for _, tc := range []struct {
+		seed  string
+		depth int
+	}{
+		{"pkg.State.mu", 1},
+		{"pkg.State.mu", 2},
+		{"pkg.State.mu#mutex", 1},
+	} {
+		res, err := concurrency.Analyze(mutexFixture(), tc.seed, concurrency.Options{Depth: tc.depth})
+		if err != nil {
+			t.Fatalf("Analyze(%s): %v", tc.seed, err)
+		}
+		mods := qnames(res.Modules)
+		for _, want := range []string{"pkg.State.Add", "pkg.State.Get", "pkg.State.balance"} {
+			if m, ok := mods[want]; !ok || m.Direction != "affects" {
+				t.Errorf("Analyze(%s, depth %d): %s missing or not \"affects\": %+v", tc.seed, tc.depth, want, res.Modules)
+			}
+		}
+		if _, ok := mods["pkg.Other.Add"]; ok {
+			t.Errorf("Analyze(%s): a method that does not lock the mutex is listed", tc.seed)
+		}
+	}
+	res, err := concurrency.Analyze(mutexFixture(), "pkg.State.mu", concurrency.Options{Depth: 1})
+	if err != nil {
+		t.Fatalf("Analyze: %v", err)
+	}
+	if res.Mutex != "pkg.State.mu#mutex" {
+		t.Errorf("a mutex field seed must name its Mutex node: %q", res.Mutex)
+	}
+}
+
 func TestAnalyze_NotFound(t *testing.T) {
 	res, err := concurrency.Analyze(fixture(), "pkg.DoesNotExist", concurrency.Options{Depth: 2})
 	if err != nil {
@@ -242,5 +317,60 @@ func TestAnalyze_MaxTotalAndDeterministicSort(t *testing.T) {
 	// Sorted by qname: "pkg.State.balance" < "pkg.State.mu".
 	if got := res.Modules[0].Qname; got != "pkg.State.balance" {
 		t.Errorf("first module qname = %q, want pkg.State.balance (deterministic sort)", got)
+	}
+}
+
+// TestAnalyze_MutexSeedForms: a mutex is a Field, a package-level Variable or
+// a LocalVariable with a Mutex node beside it. The Go extractor names the
+// Mutex node of a field "<field>#mutex" and that of a variable after the
+// variable itself (node names are kept: ids and stored graphs depend on
+// them). Every mutex is accepted as a seed in both forms, its declaring
+// name and that name with "#mutex", and every answer names its Mutex node.
+// "pkg.registry#mutex" and "pkg.Guard.made#mutex" were not found.
+func TestAnalyze_MutexSeedForms(t *testing.T) {
+	nodes := []types.Node{
+		node("n_field", "mu", "pkg.State.mu", "c.go", 30, types.NodeField),
+		node("n_fmutex", "mu", "pkg.State.mu#mutex", "c.go", 30, types.NodeMutex),
+		node("n_var", "registry", "pkg.registry", "c.go", 5, types.NodeVariable),
+		node("n_vmutex", "registry", "pkg.registry", "c.go", 5, types.NodeMutex),
+		node("n_guard", "Guard", "pkg.Guard", "c.go", 40, types.NodeFunction),
+		node("n_local", "made", "pkg.Guard.made", "c.go", 41, types.NodeLocalVariable),
+		node("n_lmutex", "made", "pkg.Guard.made", "c.go", 41, types.NodeMutex),
+		node("n_add", "Add", "pkg.State.Add", "c.go", 35, types.NodeMethod),
+		node("n_scan", "Scan", "pkg.Scan", "c.go", 10, types.NodeFunction),
+	}
+	m := map[string]types.Node{}
+	for _, n := range nodes {
+		m[n.ID] = n
+	}
+	r := &fakeReader{nodes: m, edges: []types.Edge{
+		edge("n_add", "n_fmutex", types.EdgeAcquiresLock, 36),
+		edge("n_scan", "n_vmutex", types.EdgeAcquiresLock, 11),
+		edge("n_guard", "n_lmutex", types.EdgeAcquiresLock, 42),
+	}}
+	for _, tc := range []struct {
+		seed, mutex, locker string
+	}{
+		{"pkg.State.mu", "pkg.State.mu#mutex", "pkg.State.Add"},
+		{"pkg.State.mu#mutex", "pkg.State.mu#mutex", "pkg.State.Add"},
+		{"pkg.registry", "pkg.registry", "pkg.Scan"},
+		{"pkg.registry#mutex", "pkg.registry", "pkg.Scan"},
+		{"pkg.Guard.made", "pkg.Guard.made", "pkg.Guard"},
+		{"pkg.Guard.made#mutex", "pkg.Guard.made", "pkg.Guard"},
+	} {
+		res, err := concurrency.Analyze(r, tc.seed, concurrency.Options{Depth: 1})
+		if err != nil {
+			t.Fatalf("Analyze(%s): %v", tc.seed, err)
+		}
+		if res.NotFound || res.Mutex != tc.mutex {
+			t.Errorf("Analyze(%s): not_found %v, mutex %q, want %q", tc.seed, res.NotFound, res.Mutex, tc.mutex)
+		}
+		if m, ok := qnames(res.Modules)[tc.locker]; !ok || m.Direction != "affects" {
+			t.Errorf("Analyze(%s): locker %s missing: %+v", tc.seed, tc.locker, res.Modules)
+		}
+	}
+	// A name with the suffix that names no mutex stays not found.
+	if res, err := concurrency.Analyze(r, "pkg.Scan#mutex", concurrency.Options{Depth: 1}); err != nil || !res.NotFound {
+		t.Errorf("Analyze(pkg.Scan#mutex) = %+v, %v; want not found", res, err)
 	}
 }

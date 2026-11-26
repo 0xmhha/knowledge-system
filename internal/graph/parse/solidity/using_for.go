@@ -73,6 +73,7 @@ func (v *declVisitor) runUsingFor() {
 	defer func() { cur.Close() }()
 	matches := cur.Matches(query, v.root, v.src)
 	names := query.CaptureNames()
+	boundTypeQueued := map[uint]bool{}
 	for {
 		m := matches.Next()
 		if m == nil {
@@ -145,6 +146,15 @@ func (v *declVisitor) runUsingFor() {
 			Line:         line,
 			DispatchKind: dispatchKindUsingForTypeBind,
 		})
+		// The bound type is named by the directive: the container uses it.
+		// The using_for edge ends at the library only, so GovCouncil's
+		// `using AddressSetLib for AddressSetLib.AddressSet` did not reach
+		// the struct. One directive can match once per identifier of its
+		// library name; the type is queued once.
+		if typeNode != nil && !boundTypeQueued[typeNode.StartByte()] {
+			boundTypeQueued[typeNode.StartByte()] = true
+			v.queueTypeUses(srcID, typeNode)
+		}
 	}
 }
 

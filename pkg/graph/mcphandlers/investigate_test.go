@@ -229,3 +229,40 @@ func TestFooterCompact(t *testing.T) {
 		t.Errorf("footer = %q", f)
 	}
 }
+
+// TestInvestigate_TestsExcludedFromCallers: with tests excluded, as the
+// header says, a card lists no caller from test code. Test code is what the
+// build recorded as such (nodes.is_test: the build scope's file role, the
+// path rule without a scope). The card of core.TxIndexer.run listed
+// core.TestTxIndexer under a header that said "tests excluded".
+func TestInvestigate_TestsExcludedFromCallers(t *testing.T) {
+	const caller = "logger.TestPrepare"
+	card := func(t *testing.T, s persist.StoreReader, tests string) string {
+		t.Helper()
+		srv := newInvServer(t, s)
+		head := callTextOn(t, srv, "investigate", map[string]any{"words": "Prepare", "tests": tests})
+		if want := "tests " + tests + "d"; !strings.Contains(head, want) {
+			t.Fatalf("header does not say %q:\n%s", want, head)
+		}
+		return callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:state.StateDB.Prepare"})
+	}
+	recorded := toolStore(t)
+	if err := recorded.RebuildReviewIndex([]string{fxLoggerFile}); err != nil {
+		t.Fatal(err)
+	}
+	if got := card(t, recorded, "exclude"); strings.Contains(got, caller) {
+		t.Errorf("tests excluded, yet the card lists the test caller:\n%s", got)
+	}
+	if got := card(t, recorded, "include"); !strings.Contains(got, caller) {
+		t.Errorf("tests included, yet the card lacks the test caller:\n%s", got)
+	}
+	// The build's record decides, not the file name: a build that
+	// classified no file as test code keeps the caller.
+	none := toolStore(t)
+	if err := none.RebuildReviewIndex(nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := card(t, none, "exclude"); !strings.Contains(got, caller) {
+		t.Errorf("no file is test code in this build, yet the card drops %s:\n%s", caller, got)
+	}
+}

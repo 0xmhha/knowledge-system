@@ -18,7 +18,17 @@
 //   - releases_lock is intentionally excluded. The unlock half of a lock
 //     pair adds no "what is affected" signal over acquires_lock.
 //
-//   - store.Reader.NeighborhoodByQname is single-direction per call, so a
+//   - A field that is a mutex is two nodes: the Field and a Mutex node named
+//     "<field>#mutex", where the lock edges end. A field seed that has such
+//     a node starts from both, so it reaches its lockers and the fields the
+//     mutex guards; Result.Mutex names the Mutex node. A package-level or
+//     local variable that is a mutex is a Variable or LocalVariable and a
+//     Mutex node with the variable's own name, so its name resolves to both.
+//     The node names differ and stay (ids and stored graphs depend on them);
+//     the seed forms do not: every mutex is seeded by its declaring name, or
+//     by that name with "#mutex".
+//
+//   - The store's neighbourhood walk is single-direction per call, so a
 //     FUNCTION seed reaches its own goroutine and the channel it writes,
 //     but NOT the peer goroutine across the channel (crossing a channel
 //     requires switching edge direction at the Channel node). To recover

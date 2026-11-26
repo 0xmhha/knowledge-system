@@ -42,11 +42,14 @@ const (
 	fieldSource            = "source"
 )
 
-// NatSpec comment markers.
+// NatSpec comment markers, and the two comments that start like one and are
+// plain: an empty block and a line of four slashes.
 const (
-	natSpecLine       = "///"
-	natSpecBlockOpen  = "/**"
-	natSpecBlockClose = "*/"
+	natSpecLine        = "///"
+	natSpecBlockOpen   = "/**"
+	natSpecBlockClose  = "*/"
+	emptyBlockComment  = "/**/"
+	plainLineOfSlashes = "////"
 )
 
 // declSpec describes one declaration node to emit.
@@ -108,12 +111,23 @@ func (v *declVisitor) emitCallable(decl *sitter.Node, subKind string) string {
 	if decl.Kind() == kindModifierDef {
 		nt = types.NodeModifier
 	}
-	return v.emitDecl(declSpec{
-		nt: nt, name: name, qname: v.memberQName(decl, name), decl: decl,
+	qname := v.memberQName(decl, name)
+	id := v.emitDecl(declSpec{
+		nt: nt, name: name, qname: qname, decl: decl,
 		idByte: idByte, definer: v.definerOf(decl), subKind: subKind,
 		signature:  declHeader(decl, v.src),
 		visibility: visibilityOf(decl, v.src),
 	})
+	if nt == types.NodeFunction {
+		// Canonical id (ADR-0001): Solidity has no import path, so the
+		// relative file path is the qualifier, and the parameter types tell
+		// overloads apart: <relpath>:<Contract>.<name>(<types>). Every
+		// Function node gets it here; it used to be set for functions only,
+		// so the id of a constructor had no parameter list. A modifier
+		// cannot be overloaded and keeps <relpath>:<Contract>.<name>.
+		v.lastNode().CanonicalID = v.rel + ":" + qname + funcParamSignature(decl, v.src)
+	}
+	return id
 }
 
 // lastNode returns the node emitDecl appended last, so a caller can set the
@@ -183,25 +197,45 @@ func hasKeywordChild(decl *sitter.Node, kind string) bool {
 	return false
 }
 
-// natSpecOf returns the NatSpec comment written directly above a declaration:
-// the run of `///` lines or the `/** */` block that ends on the line before
-// it. Comment markers are removed and lines are joined by newlines. A plain
-// `//` comment or a blank line ends the run.
+// natSpecOf returns the NatSpec comment that documents a declaration, by the
+// compiler's rule: of the comments between the token before the declaration
+// and the declaration, the last documentation comment, which is a `/** */`
+// block or a run of `///` lines. Blank lines and plain comments (`//`,
+// `/* */`) after it do not detach it, and a run of `///` lines continues
+// over blank lines but not over another comment. Comment markers are removed
+// and lines are joined by newlines.
+//
+// The run used to end at a blank line, so the block above
+// NativeCoinAdapter.__coinManager, which a blank line follows, was dropped.
 func natSpecOf(decl *sitter.Node, src []byte) string {
-	var blocks []string
-	nextRow := decl.StartPosition().Row
-	for c := decl.PrevSibling(); c != nil && c.Kind() == kindComment; c = c.PrevSibling() {
-		if c.EndPosition().Row+1 < nextRow {
-			break
-		}
-		text := c.Utf8Text(src)
-		if !strings.HasPrefix(text, natSpecLine) && !strings.HasPrefix(text, natSpecBlockOpen) {
-			break
-		}
-		blocks = append([]string{cleanNatSpec(text)}, blocks...)
-		nextRow = c.StartPosition().Row
+	c := decl.PrevSibling()
+	for c != nil && c.Kind() == kindComment && docCommentKind(c.Utf8Text(src)) == "" {
+		c = c.PrevSibling()
 	}
-	return strings.TrimSpace(strings.Join(blocks, "\n"))
+	if c == nil || c.Kind() != kindComment {
+		return ""
+	}
+	if docCommentKind(c.Utf8Text(src)) == natSpecBlockOpen {
+		return cleanNatSpec(c.Utf8Text(src))
+	}
+	var lines []string
+	for ; c != nil && c.Kind() == kindComment && docCommentKind(c.Utf8Text(src)) == natSpecLine; c = c.PrevSibling() {
+		lines = append([]string{cleanNatSpec(c.Utf8Text(src))}, lines...)
+	}
+	return strings.TrimSpace(strings.Join(lines, "\n"))
+}
+
+// docCommentKind tells what a comment is to NatSpec: natSpecBlockOpen for a
+// `/** */` block, natSpecLine for a `///` line, and "" for a plain comment.
+// `/**/` is an empty plain comment and `////` starts a plain line comment.
+func docCommentKind(text string) string {
+	switch {
+	case strings.HasPrefix(text, natSpecBlockOpen) && text != emptyBlockComment:
+		return natSpecBlockOpen
+	case strings.HasPrefix(text, natSpecLine) && !strings.HasPrefix(text, plainLineOfSlashes):
+		return natSpecLine
+	}
+	return ""
 }
 
 // cleanNatSpec removes the comment markers of one NatSpec comment.

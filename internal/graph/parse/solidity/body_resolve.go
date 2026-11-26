@@ -9,9 +9,9 @@ import (
 
 // Dispatch kinds of the invokes edges made for a call through a variable
 // whose declared type is an interface or a contract (`token.mint(x)`). The
-// address the variable holds decides the code that runs, so the edge ends at
-// the method of the declared type with confidence AMBIGUOUS, like the cast
-// shape `IToken(addr).mint(x)`.
+// address the variable holds decides the code that runs; the edge ends at
+// the method of the declared type, which is what the source names, and the
+// edge type invokes (not calls) says that the code is chosen at run time.
 const (
 	dispatchKindInterfaceMethod = "interface_method"
 	dispatchKindContractMethod  = "contract_method"
@@ -52,13 +52,18 @@ type scopedResolver struct {
 	arity map[string]int
 	// parents maps a container to its direct bases, in source order.
 	parents map[string][]string
-	// paramTypes and localVarTypes hold the declared type of the parameters
-	// and locals of each callable, for the root of a member access.
-	paramTypes    paramTypeMap
-	localVarTypes localVarTypeMap
+	// paramTypeTexts and localVarTypes hold the declared type, as written,
+	// of the parameters and locals of each callable, for the root of a
+	// member access.
+	paramTypeTexts paramTypeMap
+	localVarTypes  localVarTypeMap
 	// edges holds the edges made so far. Each reference is one site in the
 	// source, so repeats are folded into a count before they join the graph.
 	edges []types.Edge
+	// externalCallers holds the callables found to make a low-level call to
+	// an address (see external_call.go). Resolve owns the set and marks the
+	// nodes.
+	externalCallers map[string]bool
 }
 
 // newScopedResolver reads the number of parameters of every function from
@@ -76,15 +81,16 @@ func newScopedResolver(scope *scopeIndex, out *parse.ResolvedGraph) *scopedResol
 	return r
 }
 
-// handles reports whether kind is a reference kind this resolver owns.
-func (r *scopedResolver) handles(kind string) bool {
+// isScopedKind reports whether kind is a reference kind the scoped resolver
+// owns.
+func isScopedKind(kind string) bool {
 	switch kind {
 	case refEmit, refModifier, refRevert, refRead, refWrite, refTypeUse,
 		refEncodeCall, refSelector, refImplicitOverride, refImport, refUnfollowedPointer, dispatchKindInherit:
 		return true
 	}
 	base, _, _ := strings.Cut(kind, refSep)
-	return base == refNameCall || base == refMemberRead || base == refMemberWrite
+	return base == refNameCall || base == refMemberRead || base == refMemberWrite || base == refAddressReceiver
 }
 
 // edge appends an edge from the reference's source to dst.
@@ -156,6 +162,8 @@ func (r *scopedResolver) resolve(pr parse.PendingRef) {
 			}
 		case refMemberRead, refMemberWrite:
 			r.resolveMember(pr, detail, base == refMemberWrite)
+		case refAddressReceiver:
+			r.resolveAddressReceiver(pr, detail)
 		}
 	}
 }
@@ -216,9 +224,32 @@ func (r *scopedResolver) resolveNameCall(pr parse.PendingRef, argc int) {
 	case t == types.NodeFunction:
 		r.callEdges(pr, types.EdgeCalls, r.byArity(r.scope.filter(ids, isType(types.NodeFunction)), argc), "")
 	case isTypeDeclaration(t):
-		// A cast (`IToken(addr)`) or a struct constructor (`Item(...)`)
-		// names the type.
-		r.edge(pr, types.EdgeUsesType, ids[0])
+		r.typeCall(pr, ids[0])
+	}
+}
+
+// typeCall emits the edges of `T(...)` where T is a type. A cast
+// (`IToken(addr)`) names the type: uses_type. A struct constructor names the
+// struct and initialises its members, so each member is written at the line
+// of the constructor. Both forms set every member: `Item(a, b)` by position
+// and `Item({owner: a, size: b})` by name, where the language demands all of
+// them. A mapping member is the exception: before 0.7 the constructor of a
+// struct with a mapping leaves it out, and from 0.7 such a struct cannot be
+// constructed at all.
+//
+// Only the struct had an edge: the system contracts initialise 43 struct
+// members in constructors, and `Proposal.status` showed no write where every
+// proposal gets its first status.
+func (r *scopedResolver) typeCall(pr parse.PendingRef, typeID string) {
+	r.edge(pr, types.EdgeUsesType, typeID)
+	if r.scope.node[typeID].Type != types.NodeStruct {
+		return
+	}
+	for _, memberID := range r.scope.membersInOrder(typeID) {
+		if strings.HasPrefix(r.scope.node[memberID].Signature, mappingKeyword) {
+			continue
+		}
+		r.edge(pr, types.EdgeWritesField, memberID)
 	}
 }
 
@@ -246,14 +277,16 @@ func (r *scopedResolver) byArity(ids []string, argc int) []string {
 	return ids
 }
 
-// callEdges emits a call edge to each target. One target is the callee;
-// several are overloads the argument count could not tell apart, and each
-// edge is then AMBIGUOUS, as is every invokes edge: the address held at run
-// time decides the code that runs.
+// callEdges emits a call edge to each target. One target is the callee and
+// gets the confidence of every resolved name (EXTRACTED inside a file,
+// INFERRED across files); several are overloads the argument count could not
+// tell apart, and each edge is then AMBIGUOUS. The rule is the same for calls
+// and invokes: the 15 invokes edges of the system contracts each had one
+// target and were all AMBIGUOUS, which said the method was not known.
 func (r *scopedResolver) callEdges(pr parse.PendingRef, et types.EdgeType, targets []string, kind string) {
 	for _, dst := range targets {
 		conf := r.scope.files.confidence(pr.SrcID, dst)
-		if len(targets) > 1 || et == types.EdgeInvokes {
+		if len(targets) > 1 {
 			conf = types.ConfAmbiguous
 		}
 		r.edges = append(r.edges, types.Edge{
@@ -263,15 +296,29 @@ func (r *scopedResolver) callEdges(pr parse.PendingRef, et types.EdgeType, targe
 	}
 }
 
-// resolveAccess resolves a value identifier. Only a state variable, a
-// constant or a mapping in scope makes an edge; any other name (a type, a
-// function used as a value) is not a storage access and is dropped.
+// resolveAccess resolves a value identifier. A state variable, a constant or
+// a mapping in scope is read or written. A name that is read and is a type
+// (an enum, a struct, a contract, a library, an interface) is named in an
+// expression: `Phase.Open` names Phase, `Lib.f(x)` and `Lib.LIMIT` name Lib,
+// `abi.encodeCall(IFoo.bar, ...)` names IFoo. That is a uses_type edge, the
+// one a cast `IFoo(addr)` and a type in a declaration make. Any other name
+// (a function used as a value) is dropped.
+//
+// The type used to be dropped too: the system contracts name an enum through
+// one of its values at 36 places and a library or an interface as a
+// qualifier at 22, and only the value or the member had an edge.
 func (r *scopedResolver) resolveAccess(pr parse.PendingRef) {
-	ids := r.lookup(pr, pr.TargetQName, isStorageType)
-	if len(ids) == 0 {
+	write := pr.DispatchKind == refWrite
+	if ids := r.lookup(pr, pr.TargetQName, isStorageType); len(ids) > 0 {
+		r.edge(pr, accessEdgeType(r.scope.node[ids[0]].Type, write), ids[0])
 		return
 	}
-	r.edge(pr, accessEdgeType(r.scope.node[ids[0]].Type, pr.DispatchKind == refWrite), ids[0])
+	if write {
+		return
+	}
+	if ids := r.lookup(pr, pr.TargetQName, isTypeDeclaration); len(ids) > 0 {
+		r.edge(pr, types.EdgeUsesType, ids[0])
+	}
 }
 
 // Dispatch kinds of the references edges to a function named for a
@@ -361,7 +408,7 @@ func (r *scopedResolver) resolveMemberCall(pr parse.PendingRef, receiver, receiv
 				return true
 			case isTypeDeclaration(t):
 				// `Shapes.Box(...)`: a struct constructor or a cast.
-				r.edge(pr, types.EdgeUsesType, targets[0])
+				r.typeCall(pr, targets[0])
 				return true
 			}
 		}
@@ -446,7 +493,15 @@ func hasWord(text, word string) bool {
 // keeps its node and is counted as unresolved. The walk is over nodes, not
 // over pending references, so the imports of unchanged files are known on an
 // incremental build; their edges come out again and the graph keeps one.
-func linkImports(out *parse.ResolvedGraph, files *fileIndex) {
+//
+// An import that names symbols (`import { A, B as C } from "./x.sol"`) also
+// gets an imports edge, of kind import_symbol, to the declaration of each
+// one, as the imported file sees the name: declared there or imported there
+// in turn. The system contracts import 27 symbols by name, and only the file
+// was linked: nothing told which files import GovBase. The edge carries the
+// line of the directive, the only line an Import node keeps. A name the
+// imported file does not have is counted as unresolved.
+func linkImports(out *parse.ResolvedGraph, scope *scopeIndex) {
 	fileNode := map[string]string{}
 	known := map[string]bool{}
 	for _, n := range out.Nodes {
@@ -455,6 +510,10 @@ func linkImports(out *parse.ResolvedGraph, files *fileIndex) {
 			known[n.FilePath] = true
 		}
 	}
+	// followed maps an Import node to the file it names. The symbols are
+	// resolved after every import is recorded: a name can reach the
+	// imported file through that file's own imports.
+	followed := map[string]string{}
 	for _, n := range out.Nodes {
 		if n.Type != types.NodeImport {
 			continue
@@ -464,16 +523,42 @@ func linkImports(out *parse.ResolvedGraph, files *fileIndex) {
 			out.CountUnresolved(parse.UnresolvedOutsideGraph, n.Name, n.FilePath, n.StartLine)
 			continue
 		}
-		files.addImport(n.FilePath, target)
+		followed[n.ID] = target
+		scope.files.addImport(n.FilePath, target)
 		for alias, name := range importAliasesOf(n.Signature) {
-			files.addAlias(n.FilePath, alias, target, name)
+			scope.files.addAlias(n.FilePath, alias, target, name)
 		}
 		out.Edges = append(out.Edges, types.Edge{
 			Src: n.ID, Dst: fileNode[target], Type: types.EdgeImports,
 			Line: n.StartLine, Count: 1, Confidence: types.ConfExtracted,
 		})
 	}
+	for _, n := range out.Nodes {
+		target, ok := followed[n.ID]
+		if !ok {
+			continue
+		}
+		symbols, _ := namedImports(n.Signature)
+		for _, symbol := range symbols {
+			ids := scope.lookupFileLevel(target, symbol.name, anyType)
+			if len(ids) == 0 {
+				out.CountUnresolved(parse.UnresolvedNoMatch, symbol.name, n.FilePath, n.StartLine)
+				continue
+			}
+			for _, dst := range ids {
+				out.Edges = append(out.Edges, types.Edge{
+					Src: n.ID, Dst: dst, Type: types.EdgeImports,
+					Line: n.StartLine, Count: 1, DispatchKind: dispatchKindImportSymbol,
+					Confidence: scope.files.confidence(n.ID, dst),
+				})
+			}
+		}
+	}
 }
+
+// dispatchKindImportSymbol marks the imports edge from an Import node to a
+// declaration its directive names, as opposed to the one to the file.
+const dispatchKindImportSymbol = "import_symbol"
 
 // linkInheritance emits the extends and implements edges of every container
 // from the bases its header lists, each resolved as the container's file

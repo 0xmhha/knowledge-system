@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -75,4 +76,32 @@ func mustT(s string) time.Time {
 		panic(err)
 	}
 	return t
+}
+
+// TestHistoryUnavailable: a graph built from a source without git history
+// (its manifest records no source commit) says so in change_history and
+// evidence_for_intent, so that an empty answer is not read as "no change
+// matched". A graph with history carries no such key.
+func TestHistoryUnavailable(t *testing.T) {
+	s := toolStore(t)
+	calls := []struct {
+		tool string
+		args map[string]any
+	}{
+		{"change_history", map[string]any{"qname": "state.StateDB.Prepare"}},
+		{"evidence_for_intent", map[string]any{"intent": "reset the logs"}},
+	}
+	for _, c := range calls {
+		if out := callTool(t, s, c.tool, c.args); out[historyKey] != historyUnavailable {
+			t.Errorf("%s without git history: %s = %v, want %q", c.tool, historyKey, out[historyKey], historyUnavailable)
+		}
+	}
+	if err := s.SetManifest(persist.Manifest{SchemaVersion: "1.39", SrcCommit: "0123456789abcdef0123456789abcdef01234567"}); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range calls {
+		if out := callTool(t, s, c.tool, c.args); out[historyKey] != nil {
+			t.Errorf("%s with git history: %s = %v, want none", c.tool, historyKey, out[historyKey])
+		}
+	}
 }

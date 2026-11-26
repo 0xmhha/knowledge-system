@@ -11,41 +11,51 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// uses_type.go emits `uses_type` edges from a Function /
-// Method / Struct field declaration to the named Type it references.
+// uses_type.go emits `uses_type` edges from a declaration to the named types
+// it refers to.
 //
-// Granularity:
-//   - Function arg type    : each parameter's named type → Function uses_type Type
-//   - Function return type : each result's named type   → Function uses_type Type
-//   - Struct field type    : every field's named type   → Struct   uses_type Type
-//   - Var declaration type : (skipped in this initial pass — captured by the
-//                             field/param paths above for the common cases)
+// The user of a type is the declaration whose text names it:
+//   - a Function or Method, for its receiver, its signature and every type
+//     its body names (a conversion, a type assertion, a variable's declared
+//     type, a type argument, a composite literal);
+//   - a package-level Variable or Constant, for its declared type and the
+//     types its initialiser names (var walletCommand = &cli.Command{...});
+//   - a type declaration, for the types its type expression and its type
+//     parameters name (struct fields, interface method signatures, the
+//     target of a defined type or of an alias).
+//
+// The referred type is a package-level type of the build, a type declared
+// inside a function (found by position, it has no canonical id), or a type
+// outside the build, which gets an External node through the pending refs
+// this pass returns.
 //
 // Why a post-Resolve pass (mirroring EmitImplementsEdges):
-//   - Cross-package satisfaction needs the union of every package's Scope to
-//     resolve a *gotypes.Named to its declaring package's qname.
-//   - Per-file Pass 1 doesn't have the typed package handle for stdlib /
-//     foreign-package types — those types resolve only against the post-load
-//     packages slice.
-//   - Running here lets us emit a `pending_refs` row for unresolved cross-package
-//     references so the partial-cache rebuild
-//     replays the same input set the cold path saw.
+//   - Cross-package references need the union of every package's nodes.
+//   - Running here lets us emit a `pending_refs` row for unresolved
+//     cross-package references so the partial-cache rebuild replays the same
+//     input set the cold path saw.
 //
-// Skip rules (avoids edge-explosion / pure noise):
-//   - Builtin primitives (int, string, error, etc.) — not nodes in the graph.
-//   - Anonymous types (struct{...}, interface{...}, slice/map literals) —
-//     no qname → no node.
-//   - Self-references (Function uses_type its own receiver Type, etc.).
+// Skip rules:
+//   - Builtin types (int, string, error) and type parameters are not nodes.
+//   - Anonymous types have no name to refer to; the names inside them are
+//     references of their own.
+//   - A declaration does not use itself. A recursive type (type Type struct
+//     { Elem *Type }; 36 such references in go-stablenet) would be an edge
+//     from the node to itself, and score.Compute counts every edge: the
+//     loop would raise the node's in and out degree and, in PageRank, hand
+//     the type a share of its own rank back each round, so a type would
+//     rank higher for containing itself. No edge is made until the score
+//     computation leaves self-loops out.
+//
+// One edge per (user, type); its line is the line of the first reference in
+// the user's text.
 
-// EmitUsesTypeEdges scans every loaded package's top-level declarations and
-// emits `uses_type` edges from Function/Method/Struct nodes to the named
-// types they reference (params, results, fields).
+// EmitUsesTypeEdges returns the uses_type edges of the loaded packages.
 //
 // Returns:
 //   - edges: the resolved uses_type edges
-//   - pending: cross-package PendingRefs for types not present in the node
-//     index (q4=A — pending_refs row so the next partial build replays the
-//     same input set).
+//   - pending: PendingRefs for types not present in the node index (types
+//     outside the build), which ExternalEdges binds to External nodes.
 //
 // Idempotent — safe to call multiple times against the same nodes/pkgs.
 func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Edge, []parse.PendingRef) {
@@ -53,25 +63,14 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		return nil, nil
 	}
 
-	// Build qname → emitted node ID map for every type that can legitimately
-	// appear as a uses_type DST. We index Struct / Interface / TypeAlias /
-	// Enum nodes (the same set EmitImplementsEdges uses) so post-pass
-	// resolution matches.
+	// Every type that can be a uses_type DST: Struct / Interface / TypeAlias /
+	// Enum nodes (the same set EmitImplementsEdges uses).
 	typeIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
-
-	// Index the symbols that can be a uses_type SRC: Function, Method
-	// (callers using it as param/return), Struct (caller using it as field
-	// type's container).
-	srcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct,
-		types.NodeInterface, types.NodeTypeAlias)
 	// The struct pass walks the fields of a type's underlying struct. A
 	// defined type over a struct (`type snapHandler handler`) has that
 	// underlying struct too but names only handler, so the pass looks its
 	// sources up among Struct nodes alone.
 	structIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct)
-	// Functions are found the way the other post-Resolve passes find them:
-	// several init functions of a package share one canonical id.
-	decls := newDeclIndex(nodes)
 
 	// An edge's file is the file of the node it leaves, relative to the source
 	// root as every node path is. The compiled file name the walkers pass as
@@ -81,7 +80,7 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		fileOf[nodes[i].ID] = nodes[i].FilePath
 	}
 
-	emitted := make(map[edgeDedupKey]struct{}, len(srcIndex.byQname)*2)
+	emitted := map[edgeDedupKey]struct{}{}
 	var edges []types.Edge
 	var pending []parse.PendingRef
 
@@ -91,7 +90,7 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		}
 		if dstID, ok := typeIndex.lookup(dst, dstQname); ok {
 			k := edgeDedupKey{src: srcID, dst: dstID}
-			if _, dup := emitted[k]; dup {
+			if _, dup := emitted[k]; dup || srcID == dstID {
 				return
 			}
 			emitted[k] = struct{}{}
@@ -102,6 +101,10 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 			})
 			return
 		}
+		cid := goCanonicalID(dst)
+		if cid == "" {
+			return // a function-local type without a node: nothing can bind it later
+		}
 		// Unresolved cross-package type → q4=A: emit pending_ref so the
 		// incremental partial-cache rebuild can replay this resolution
 		// against a future build's full type universe.
@@ -109,167 +112,37 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 			SrcID:             srcID,
 			EdgeType:          types.EdgeUsesType,
 			TargetQName:       dstQname,
-			TargetCanonicalID: goCanonicalID(dst),
+			TargetCanonicalID: cid,
 			HintFile:          hintFile,
 			Line:              line,
 		})
 	}
 
+	// The references written in the source, with their lines. On go-stablenet
+	// 10,754 of the 24,653 type references go/types sees are in function
+	// bodies and 1,854 in package-level var and const declarations.
+	forEachOwnedCode(pkgs, nodes, func(c ownedCode) {
+		hintFile := c.pkg.Fset.Position(c.root.Pos()).Filename
+		forEachTypeNameUnder(c.info(), c.root, func(tn *gotypes.TypeName, qname string, pos token.Pos) {
+			addEdge(c.owner.ID, tn, qname, c.line(pos), hintFile)
+		})
+	})
+	// The types of struct fields as go/types sees them. They are the written
+	// ones, which the walk above has recorded with their lines, and what an
+	// alias in a field type stands for.
 	for _, pkg := range pkgs {
-		if pkg == nil || pkg.Types == nil {
+		if pkg == nil || pkg.Types == nil || pkg.Types.Scope() == nil {
 			continue
 		}
-		pkgName := pkg.Types.Name()
-		scope := pkg.Types.Scope()
-		if scope == nil {
-			continue
-		}
-		// Functions and methods (Function/Method nodes): walk param + result
-		// signatures.
-		emitUsesTypeForFunctions(pkg, pkgName, decls, addEdge)
-		// Struct field types.
-		emitUsesTypeForStructs(scope, pkgName, structIndex, addEdge)
-		// The types a type declaration names: an interface's method
-		// signatures, the target of a defined type or alias.
-		emitUsesTypeForTypeSpecs(pkg, pkgName, srcIndex, addEdge)
+		emitUsesTypeForStructs(pkg.Types.Scope(), pkg.Types.Name(), structIndex, addEdge)
 	}
 
 	return edges, pending
 }
 
-// emitUsesTypeForFunctions walks every FuncDecl in pkg.Syntax and emits
-// edges for parameters / results whose type is a *gotypes.Named.
-//
-// Why pkg.Syntax (not scope.Names()): scope iterates package-scope objects
-// only. Methods are scope-less from the package's point of view (they hang
-// off types). FuncDecls in the syntax trees give us the AST positions for
-// edge.line and the same qname construction declarations.go uses.
-func emitUsesTypeForFunctions(
-	pkg *packages.Package, pkgName string,
-	decls declIndex,
-	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
-) {
-	if pkg.TypesInfo == nil || pkg.Fset == nil {
-		return
-	}
-	for fileIdx, f := range pkg.Syntax {
-		if f == nil {
-			continue
-		}
-		var hintFile string
-		if fileIdx < len(pkg.CompiledGoFiles) {
-			hintFile = pkg.CompiledGoFiles[fileIdx]
-		}
-		for _, decl := range f.Decls {
-			fd, ok := decl.(*ast.FuncDecl)
-			if !ok || fd.Type == nil {
-				continue
-			}
-			// Construct the function's qname (mirrors visitFuncDecl in
-			// declarations.go). For methods, the receiver type slot uses
-			// exprName which strips pointer/selector.
-			var srcQname string
-			if fd.Recv != nil && len(fd.Recv.List) > 0 {
-				srcQname = pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
-			} else {
-				srcQname = pkgName + "." + fd.Name.Name
-			}
-			src := decls.at(goCanonicalID(pkg.TypesInfo.Defs[fd.Name]), srcQname, pkg.Fset.Position(fd.Pos()))
-			if src == nil {
-				continue
-			}
-			srcID := src.ID
-			line := pkg.Fset.Position(fd.Pos()).Line
-			// Parameters
-			if fd.Type.Params != nil {
-				for _, field := range fd.Type.Params.List {
-					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(tn *gotypes.TypeName, qname string) {
-						if qname != srcQname {
-							addEdge(srcID, tn, qname, line, hintFile)
-						}
-					})
-				}
-			}
-			// Results
-			if fd.Type.Results != nil {
-				for _, field := range fd.Type.Results.List {
-					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(tn *gotypes.TypeName, qname string) {
-						if qname != srcQname {
-							addEdge(srcID, tn, qname, line, hintFile)
-						}
-					})
-				}
-			}
-			// The receiver type and every type the body names (a
-			// conversion, a type assertion, a variable's declared type, a
-			// type argument): on go-stablenet 10,754 of the 24,653 type
-			// references go/types sees were outside the signatures and
-			// struct fields walked above.
-			named := func(tn *gotypes.TypeName, qname string, pos token.Pos) {
-				addEdge(srcID, tn, qname, pkg.Fset.Position(pos).Line, hintFile)
-			}
-			if fd.Recv != nil {
-				forEachTypeNameUnder(pkg.TypesInfo, fd.Recv, named)
-			}
-			forEachTypeNameUnder(pkg.TypesInfo, fd.Type, named)
-			if fd.Body != nil {
-				forEachTypeNameUnder(pkg.TypesInfo, fd.Body, named)
-			}
-		}
-	}
-}
-
-// emitUsesTypeForTypeSpecs emits a uses_type edge from each package-level
-// type declaration to the types its type expression names: the parameter and
-// result types of an interface's methods and the interfaces it embeds, the
-// target of a defined type (`type List []Item`) or of an alias, the
-// parameters of a function type. Struct fields are also covered by
-// emitUsesTypeForStructs; the edge is deduplicated.
-func emitUsesTypeForTypeSpecs(
-	pkg *packages.Package, pkgName string,
-	srcIndex symbolIndex,
-	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
-) {
-	if pkg.TypesInfo == nil || pkg.Fset == nil {
-		return
-	}
-	for fileIdx, f := range pkg.Syntax {
-		if f == nil {
-			continue
-		}
-		var hintFile string
-		if fileIdx < len(pkg.CompiledGoFiles) {
-			hintFile = pkg.CompiledGoFiles[fileIdx]
-		}
-		for _, decl := range f.Decls {
-			gd, ok := decl.(*ast.GenDecl)
-			if !ok || gd.Tok != token.TYPE {
-				continue
-			}
-			for _, spec := range gd.Specs {
-				ts, ok := spec.(*ast.TypeSpec)
-				if !ok || ts.Type == nil {
-					continue
-				}
-				self := pkg.TypesInfo.Defs[ts.Name]
-				srcID, ok := srcIndex.lookup(self, pkgName+"."+ts.Name.Name)
-				if !ok {
-					continue
-				}
-				forEachTypeNameUnder(pkg.TypesInfo, ts.Type, func(tn *gotypes.TypeName, qname string, pos token.Pos) {
-					if gotypes.Object(tn) != self {
-						addEdge(srcID, tn, qname, pkg.Fset.Position(pos).Line, hintFile)
-					}
-				})
-			}
-		}
-	}
-}
-
-// forEachTypeNameUnder yields every package-level named type that an
-// identifier under root names, with the identifier's position. Type
-// parameters and types declared inside a function are not package-level and
-// are skipped.
+// forEachTypeNameUnder yields every named type that an identifier under root
+// names, with the identifier's position: package-level types and types
+// declared inside a function. Builtin types and type parameters are skipped.
 func forEachTypeNameUnder(info *gotypes.Info, root ast.Node, yield func(tn *gotypes.TypeName, qname string, pos token.Pos)) {
 	if info == nil || root == nil {
 		return
@@ -280,7 +153,10 @@ func forEachTypeNameUnder(info *gotypes.Info, root ast.Node, yield func(tn *goty
 			return true
 		}
 		tn, ok := info.Uses[id].(*gotypes.TypeName)
-		if !ok || tn.Pkg() == nil || tn.Parent() != tn.Pkg().Scope() {
+		if !ok || tn.Pkg() == nil {
+			return true
+		}
+		if _, isParam := tn.Type().(*gotypes.TypeParam); isParam {
 			return true
 		}
 		yield(tn, tn.Pkg().Name()+"."+tn.Name(), id.Pos())
@@ -314,34 +190,13 @@ func emitUsesTypeForStructs(
 		if !ok {
 			continue
 		}
-		// scope.Lookup returns an obj whose Pos is the type-decl token.
-		line := 0 // line is populated only for func-anchored edges
-		hintFile := ""
+		// A field's type has no position of its own here: line 0.
 		for i := 0; i < st.NumFields(); i++ {
-			field := st.Field(i)
-			forEachNamedTypeInType(field.Type(), func(ftn *gotypes.TypeName, qname string) {
-				if qname != srcQname {
-					addEdge(srcID, ftn, qname, line, hintFile)
-				}
+			forEachNamedTypeInType(st.Field(i).Type(), func(ftn *gotypes.TypeName, qname string) {
+				addEdge(srcID, ftn, qname, 0, "")
 			})
 		}
 	}
-}
-
-// forEachNamedTypeInExpr walks an *ast.Expr (a parameter / result type
-// expression) using types.Info to resolve identifiers / selectors to
-// *gotypes.Named, then yields each distinct (pkgName + "." + typeName)
-// qname encountered. Pointer / slice / map / chan layers are stripped to
-// reach the underlying named element.
-func forEachNamedTypeInExpr(info *gotypes.Info, e ast.Expr, yield func(tn *gotypes.TypeName, qname string)) {
-	if info == nil || e == nil {
-		return
-	}
-	t := info.TypeOf(e)
-	if t == nil {
-		return
-	}
-	forEachNamedTypeInType(t, yield)
 }
 
 // forEachNamedTypeInType walks a *gotypes.Type to find every named-type
@@ -388,8 +243,8 @@ func forEachNamedTypeInType(t gotypes.Type, yield func(tn *gotypes.TypeName, qna
 	}
 }
 
-// edgeDedupKey collapses (src, dst) pairs across the uses_type pass so a
-// function with two `pkg.T` params produces only one edge.
+// edgeDedupKey collapses (src, dst) pairs across a pass so that a function
+// with two `pkg.T` params produces only one edge.
 type edgeDedupKey struct {
 	src, dst string
 }

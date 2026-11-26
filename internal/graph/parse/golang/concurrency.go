@@ -9,56 +9,41 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// concurrency.go implements the Go concurrency pass (spec §2): emit Mutex nodes for
-// sync.Mutex / sync.RWMutex declarations, acquires_lock / releases_lock
-// edges for Lock/Unlock/RLock/RUnlock calls, and improve Channel
-// emission with direction + buffer + elem-type attributes (in Signature).
+// concurrency.go implements the declaration side of the Go concurrency pass
+// (spec §2): Mutex nodes for sync.Mutex / sync.RWMutex declarations and
+// Channel nodes for make(chan T) with direction, buffer and element type (in
+// Signature).
 //
-// Cross-function lock chain analysis lives in buildpipe's lock propagation
-// pass, and accessed_under_lock detection lives in concurrency_underlock.go.
+// The edges that tie a Lock or Unlock call and a field access to a Mutex
+// node are made after Resolve (lock_edges.go): the mutex may be declared in
+// another file than the call. Cross-function lock chain analysis lives in
+// buildpipe's lock propagation pass.
 //
-// Receiver resolution: when typesInfo is non-nil, every detection uses
-// types.Info.ObjectOf / types.Info.TypeOf to confirm receivers belong to
-// sync.Mutex or sync.RWMutex (handles embedded mutexes, type aliases,
-// pointer-vs-value distinction). When typesInfo is nil, falls back to
-// name-based matching with INFERRED confidence; this is the AST-only
-// path used by tests that call ParseFile directly without a *packages.Package.
+// With typesInfo, a declaration is a mutex when go/types says its type is
+// sync.Mutex or sync.RWMutex (through pointers and aliases). Without it
+// (AST-only, used by tests that call ParseFile without packages) the type
+// expression is matched by name and the node is INFERRED.
 
 // emitConcurrencyDecls is the per-file entry point for the concurrency
-// pass. Walks the file's top-level declarations to find sync.Mutex /
-// sync.RWMutex fields and locals, emits Mutex nodes, and records
-// var/field → node-ID mapping (consumed later by maybeEmitLockEdge).
-//
-// Idempotent: repeated invocation overwrites mutexNodeIDs, leaks no
-// additional nodes (caller controls v.nodes lifetime).
+// pass: it emits a Mutex node for every sync.Mutex / sync.RWMutex struct
+// field, package-level variable and local variable the file declares.
 func (v *declVisitor) emitConcurrencyDecls(f *ast.File) {
-	if v.mutexNodeIDs == nil {
-		v.mutexNodeIDs = map[gotypes.Object]string{}
-	}
 	for _, decl := range f.Decls {
-		gen, ok := decl.(*ast.GenDecl)
-		if !ok {
-			continue
-		}
-		for _, spec := range gen.Specs {
-			switch s := spec.(type) {
-			case *ast.TypeSpec:
-				v.scanStructForMutex(s)
-			case *ast.ValueSpec:
-				v.scanValueSpecForMutex(s)
+		switch d := decl.(type) {
+		case *ast.GenDecl:
+			for _, spec := range d.Specs {
+				switch s := spec.(type) {
+				case *ast.TypeSpec:
+					v.scanStructForMutex(s)
+				case *ast.ValueSpec:
+					v.scanValueSpecForMutex(v.pkgName, s, spanOf(d, s))
+				}
+			}
+		case *ast.FuncDecl:
+			if d.Body != nil {
+				v.scanFuncBodyForMutexLocals(d)
 			}
 		}
-	}
-	// Local-var mutex declarations live inside function bodies — walk all
-	// function bodies one more time to pick those up (the standard ast.Walk
-	// over the file already visited them, but we need an explicit pass for
-	// var foo sync.Mutex within functions).
-	for _, decl := range f.Decls {
-		fd, ok := decl.(*ast.FuncDecl)
-		if !ok || fd.Body == nil {
-			continue
-		}
-		v.scanFuncBodyForMutexLocals(fd)
 	}
 }
 
@@ -85,81 +70,100 @@ func (v *declVisitor) scanStructForMutex(s *ast.TypeSpec) {
 			// the Mutex node, leaving acquires_lock edges pointing at a Field
 			// node instead of the Mutex node).
 			name := embeddedMutexName(f.Type)
-			id := v.emitMutexNode(name, structQname+"."+name+"#mutex", kind, f.Pos(), f.End())
-			if v.typesInfo != nil {
-				if obj := v.typesInfo.Defs[asTypeIdent(f.Type)]; obj != nil {
-					v.mutexNodeIDs[obj] = id
-				}
-			}
+			v.emitMutexNode(name, structQname+"."+name+mutexQnameSuffix, kind, f.Pos(), fieldSpan(f))
 			continue
 		}
 		for _, name := range f.Names {
 			// Same #mutex suffix as the embedded branch above — see the
 			// comment there for the collision-avoidance rationale.
-			id := v.emitMutexNode(name.Name, structQname+"."+name.Name+"#mutex", kind, name.Pos(), f.End())
-			if v.typesInfo != nil {
-				if obj := v.typesInfo.Defs[name]; obj != nil {
-					v.mutexNodeIDs[obj] = id
-				}
-			}
+			v.emitMutexNode(name.Name, structQname+"."+name.Name+mutexQnameSuffix, kind, name.Pos(), fieldSpan(f))
 		}
 	}
 }
 
-// scanValueSpecForMutex catches package-level `var foo sync.Mutex` decls.
-func (v *declVisitor) scanValueSpecForMutex(s *ast.ValueSpec) {
-	if s.Type == nil {
-		return
-	}
-	kind := v.classifyMutexExpr(s.Type)
-	if kind == "" {
-		return
-	}
-	for _, name := range s.Names {
-		qn := v.pkgName + "." + name.Name
-		id := v.emitMutexNode(name.Name, qn, kind, name.Pos(), s.End())
-		if v.typesInfo != nil {
-			if obj := v.typesInfo.Defs[name]; obj != nil {
-				v.mutexNodeIDs[obj] = id
-			}
+// mutexQnameSuffix ends the qualified name of a struct field's Mutex node,
+// which stands at the same place as the field's Field node.
+const mutexQnameSuffix = "#mutex"
+
+// scanValueSpecForMutex emits a Mutex node for each name of a var
+// declaration that declares a mutex; prefix is the package name for a
+// package-level declaration and the function's qualified name for a local one.
+//
+// The declaration says so by its type (`var mu sync.Mutex`) or, when it has
+// none, by its value (`var mu = sync.RWMutex{}`): read by the type alone, two
+// package-level mutexes of go-stablenet had no node and their 4 lock sites no
+// edge.
+//
+// sp is the span of the specification, which the Mutex node shares with the
+// Variable node of the same name.
+func (v *declVisitor) scanValueSpecForMutex(prefix string, s *ast.ValueSpec, sp declSpan) {
+	for i, name := range s.Names {
+		kind := ""
+		switch {
+		case s.Type != nil:
+			kind = v.classifyMutexExpr(s.Type)
+		case len(s.Values) == len(s.Names):
+			kind = v.mutexValueKind(s.Values[i])
+		}
+		if kind != "" && name.Name != "_" {
+			v.emitMutexNode(name.Name, prefix+"."+name.Name, kind, name.Pos(), sp)
 		}
 	}
+}
+
+// mutexValueKind returns "mutex" / "rwmutex" when the expression e creates a
+// mutex (sync.Mutex{}, &sync.Mutex{}, new(sync.Mutex)), "" otherwise. A value
+// that merely refers to a mutex declared elsewhere (mu := &s.mu) creates
+// none.
+func (v *declVisitor) mutexValueKind(e ast.Expr) string {
+	e = ast.Unparen(e)
+	if u, ok := e.(*ast.UnaryExpr); ok && u.Op == token.AND {
+		e = ast.Unparen(u.X)
+	}
+	switch x := e.(type) {
+	case *ast.CompositeLit:
+		if x.Type != nil {
+			return v.classifyMutexExpr(x.Type)
+		}
+	case *ast.CallExpr:
+		if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "new" && len(x.Args) == 1 &&
+			(v.typesInfo == nil || v.isBuiltinCall(x.Fun)) {
+			return v.classifyMutexExpr(x.Args[0])
+		}
+	}
+	return ""
 }
 
 // scanFuncBodyForMutexLocals walks a function body for local declarations
-// (`var mu sync.Mutex`, `mu := sync.Mutex{}`) and emits Mutex nodes.
-// The qualified-name uses pkg.func.localVar to disambiguate same-named
-// locals across different functions.
+// (`var mu sync.Mutex`, `mu := sync.Mutex{}`, `mu := new(sync.Mutex)`) and
+// emits Mutex nodes. The qualified-name uses pkg.func.localVar to
+// disambiguate same-named locals across different functions.
 func (v *declVisitor) scanFuncBodyForMutexLocals(fd *ast.FuncDecl) {
-	funcQname := v.pkgName + "." + fd.Name.Name
-	if fd.Recv != nil && len(fd.Recv.List) > 0 {
-		funcQname = v.pkgName + "." + recvTypeName(fd.Recv.List[0].Type) + "." + fd.Name.Name
-	}
+	funcQname := funcDeclQname(v.pkgName, fd)
 	ast.Inspect(fd.Body, func(n ast.Node) bool {
-		decl, ok := n.(*ast.DeclStmt)
-		if !ok {
-			return true
-		}
-		gen, ok := decl.Decl.(*ast.GenDecl)
-		if !ok || gen.Tok != token.VAR {
-			return true
-		}
-		for _, spec := range gen.Specs {
-			vs, ok := spec.(*ast.ValueSpec)
-			if !ok || vs.Type == nil {
-				continue
+		switch s := n.(type) {
+		case *ast.DeclStmt:
+			gen, ok := s.Decl.(*ast.GenDecl)
+			if !ok || gen.Tok != token.VAR {
+				return true
 			}
-			kind := v.classifyMutexExpr(vs.Type)
-			if kind == "" {
-				continue
+			for _, spec := range gen.Specs {
+				if vs, ok := spec.(*ast.ValueSpec); ok {
+					v.scanValueSpecForMutex(funcQname, vs, spanOf(gen, vs))
+				}
 			}
-			for _, name := range vs.Names {
-				qn := funcQname + "." + name.Name
-				id := v.emitMutexNode(name.Name, qn, kind, name.Pos(), vs.End())
-				if v.typesInfo != nil {
-					if obj := v.typesInfo.Defs[name]; obj != nil {
-						v.mutexNodeIDs[obj] = id
-					}
+		case *ast.AssignStmt:
+			if s.Tok != token.DEFINE || len(s.Lhs) != len(s.Rhs) {
+				return true
+			}
+			for i, lhs := range s.Lhs {
+				id, ok := lhs.(*ast.Ident)
+				if !ok || id.Name == "_" || (v.typesInfo != nil && v.typesInfo.Defs[id] == nil) {
+					continue // not a new name
+				}
+				if kind := v.mutexValueKind(s.Rhs[i]); kind != "" {
+					// The span of the LocalVariable node of the same name.
+					v.emitMutexNode(id.Name, funcQname+"."+id.Name, kind, id.Pos(), declSpan{start: id.Pos(), end: s.End()})
 				}
 			}
 		}
@@ -170,13 +174,19 @@ func (v *declVisitor) scanFuncBodyForMutexLocals(fd *ast.FuncDecl) {
 // emitMutexNode appends a NodeMutex to v.nodes and a defines-edge from the
 // enclosing file. Returns the new node's ID. Confidence is EXTRACTED when
 // typesInfo confirmed the type, INFERRED in AST-only mode.
-func (v *declVisitor) emitMutexNode(name, qname, subKind string, startPos, endPos token.Pos) string {
-	startLn, startBy := v.pos(startPos)
-	endLn, endBy := v.pos(endPos)
+//
+// sp is the span of the declaration that declares the mutex: a Mutex node
+// describes the same declaration as its Variable or Field and has its span
+// (see spanOf). namePos keys the id: the mutex's own identifier, or the start
+// of an embedded field.
+func (v *declVisitor) emitMutexNode(name, qname, subKind string, namePos token.Pos, sp declSpan) string {
+	startLn, startBy := v.pos(sp.start)
+	endLn, endBy := v.pos(sp.end)
+	_, nameBy := v.pos(namePos)
 	// The node kind is part of the id key: a package-level `var mu
 	// sync.Mutex` is also a Variable node with the same qualified name and
-	// start byte, and sharing one id made graph.Build keep only one of them.
-	id := v.declID("mutex:"+qname, startBy)
+	// identifier, and sharing one id made graph.Build keep only one of them.
+	id := v.declID("mutex:"+qname, nameBy)
 	conf := types.ConfExtracted
 	if v.typesInfo == nil {
 		conf = types.ConfInferred
@@ -221,7 +231,9 @@ func classifyMutexType(t gotypes.Type) string {
 	if t == nil {
 		return ""
 	}
-	// Strip pointer layers — `*sync.Mutex` and `sync.Mutex` are both mutexes.
+	// Strip pointer layers — `*sync.Mutex` and `sync.Mutex` are both mutexes —
+	// and aliases.
+	t = gotypes.Unalias(t)
 	if ptr, ok := t.(*gotypes.Pointer); ok {
 		return classifyMutexType(ptr.Elem())
 	}
@@ -308,48 +320,13 @@ func asTypeIdent(e ast.Expr) *ast.Ident {
 	return nil
 }
 
-// maybeEmitLockEdge inspects a CallExpr; if it's `<recv>.Lock()`,
-// `<recv>.Unlock()`, `<recv>.RLock()` or `<recv>.RUnlock()` AND the
-// receiver resolves to a *sync.Mutex / *sync.RWMutex, emits an
-// acquires_lock / releases_lock edge from parentFuncID to the matching
-// Mutex node.
-//
-// Resolution path:
-//   - typesInfo present: receiver's *types.Object is looked up in
-//     mutexNodeIDs (matches the field/var declaration's object). Fast,
-//     accurate, EXTRACTED confidence.
-//   - typesInfo nil: AST-only fallback — receiver IS-a-known-mutex check
-//     uses the string form of the selector chain. INFERRED confidence.
-//
-// No edge is emitted when the receiver doesn't resolve to a mutex node
-// (e.g. user-defined `Lock()` method on an unrelated type — false-positive
-// guard required by spec §2 R2.1).
-func (v *declVisitor) maybeEmitLockEdge(parentFuncID string, call *ast.CallExpr) {
-	method, ok := lockMethodName(call)
-	if !ok {
-		return
-	}
-	sel := call.Fun.(*ast.SelectorExpr) // safe: lockMethodName already verified
-	mutexID, conf := v.resolveMutexReceiver(sel.X)
-	if mutexID == "" {
-		return
-	}
-	edgeType := types.EdgeAcquiresLock
-	switch method {
-	case "Unlock", "RUnlock":
-		edgeType = types.EdgeReleasesLock
-	}
-	// The R-prefix variant (RLock/RUnlock) is captured on the Mutex node's
-	// sub_kind ("rwmutex"), not on the edge — the edge schema has no
-	// sub_kind column. Consumers that need to distinguish read/write locks
-	// can look up the destination Mutex node.
-	pos := v.fset.Position(call.Pos())
-	v.edges = append(v.edges, types.Edge{
-		Src: parentFuncID, Dst: mutexID, Type: edgeType,
-		Line: pos.Line, Count: 1, Confidence: conf,
-		FilePath: v.relPath,
-	})
-}
+// The methods of sync.Mutex and sync.RWMutex that take or give up the lock.
+const (
+	lockMethodLock    = "Lock"
+	lockMethodUnlock  = "Unlock"
+	lockMethodRLock   = "RLock"
+	lockMethodRUnlock = "RUnlock"
+)
 
 // lockMethodName returns the called method name and true when call is of
 // the form `<expr>.Lock()` / `Unlock()` / `RLock()` / `RUnlock()` with no
@@ -363,139 +340,85 @@ func lockMethodName(call *ast.CallExpr) (string, bool) {
 		return "", false
 	}
 	switch sel.Sel.Name {
-	case "Lock", "Unlock", "RLock", "RUnlock":
+	case lockMethodLock, lockMethodUnlock, lockMethodRLock, lockMethodRUnlock:
 		return sel.Sel.Name, true
 	}
 	return "", false
 }
 
-// resolveMutexReceiver returns the Mutex node ID for the receiver expression
-// `recv` and the appropriate confidence label, or ("", "") if recv doesn't
-// resolve to a known mutex.
-//
-// types.Info path: walks the receiver chain and uses ObjectOf to look up
-// the declaration in mutexNodeIDs. For embedded mutexes (`s.Lock()` where
-// the embedded *sync.Mutex provides the method), falls back to TypeOf to
-// confirm the underlying receiver is a mutex.
-//
-// AST-only fallback: returns "" — without type info we can't reliably
-// distinguish `mu.Lock()` (real mutex) from `controller.Lock()` (user
-// method named Lock). False-positive avoidance > coverage for v0.
-func (v *declVisitor) resolveMutexReceiver(recv ast.Expr) (string, types.Confidence) {
-	if v.typesInfo == nil {
-		return "", types.ConfInferred
-	}
-	// Direct receiver: `mu.Lock()` where mu is the mutex variable/field.
-	if id := v.lookupMutexByExpr(recv); id != "" {
-		return id, types.ConfExtracted
-	}
-	// Embedded receiver: `s.Lock()` where s is a struct with embedded
-	// sync.Mutex. The receiver TYPE chain doesn't directly include sync.Mutex,
-	// but the method set does — confirm by checking the resolved selection's
-	// receiver type.
-	if t := v.typesInfo.TypeOf(recv); t != nil {
-		if classifyMutexType(t) != "" {
-			// recv itself IS a mutex value (e.g. dereferenced pointer) but
-			// we couldn't find the declaration object — emit unresolved.
-			// Returning "" keeps downstream graph consistent (no dangling
-			// edges); accept the coverage loss.
-			return "", types.ConfInferred
-		}
-		// Look at the named struct's fields for an embedded mutex.
-		if id := v.findEmbeddedMutexInType(t); id != "" {
-			return id, types.ConfExtracted
-		}
-	}
-	return "", types.ConfInferred
+// chanMake describes a make(chan T, n) call.
+type chanMake struct {
+	dir  string // bidi, send or recv
+	elem string // the element type
+	// named is the channel type when make is given a type name instead of a
+	// `chan T` literal (make(blockingIter)); the signature shows the type as
+	// the source writes it.
+	named string
+	buf   int // 0 unbuffered, -1 when the size is not an integer literal
 }
 
-// lookupMutexByExpr maps an ast.Expr (Ident, SelectorExpr) to a Mutex node
-// ID via types.Info.ObjectOf. Returns "" when no match.
-func (v *declVisitor) lookupMutexByExpr(e ast.Expr) string {
-	switch x := e.(type) {
-	case *ast.Ident:
-		if obj := v.typesInfo.ObjectOf(x); obj != nil {
-			return v.mutexNodeIDs[obj]
-		}
-	case *ast.SelectorExpr:
-		if obj := v.typesInfo.ObjectOf(x.Sel); obj != nil {
-			return v.mutexNodeIDs[obj]
-		}
-	case *ast.StarExpr:
-		return v.lookupMutexByExpr(x.X)
-	}
-	return ""
-}
+// unqualified writes type names without their package, as the element type
+// of a Channel signature always was ("chan Header" for chan *types.Header).
+func unqualified(*gotypes.Package) string { return "" }
 
-// findEmbeddedMutexInType walks the struct fields of t (after dereferencing
-// pointer / named) looking for an embedded sync.Mutex / sync.RWMutex.
-// Returns the matching mutex node ID (looked up in mutexNodeIDs by the
-// field's *types.Var) or "" when not found.
-func (v *declVisitor) findEmbeddedMutexInType(t gotypes.Type) string {
-	if ptr, ok := t.(*gotypes.Pointer); ok {
-		return v.findEmbeddedMutexInType(ptr.Elem())
-	}
-	named, ok := t.(*gotypes.Named)
-	if !ok {
-		return ""
-	}
-	st, ok := named.Underlying().(*gotypes.Struct)
-	if !ok {
-		return ""
-	}
-	for f := range st.Fields() {
-		if !f.Embedded() {
-			continue
-		}
-		if classifyMutexType(f.Type()) == "" {
-			continue
-		}
-		if id, ok := v.mutexNodeIDs[f]; ok {
-			return id
-		}
-	}
-	return ""
-}
-
-// concurrency_channel.go-style helpers below: improve Channel emission to
-// stamp direction + buffer + elem type into Signature so callers (viewer,
-// MCP) can introspect channel attributes without re-parsing Go source.
+// chanMake reports whether e is a call of the builtin make that makes a
+// channel, and describes the channel.
 //
-// Implementation note (deferred): currently statements.go emits Channel
-// nodes only via the GoStmt handler — there's no direct Channel node when
-// you have `ch := make(chan int, 10)`. The existing code emits a CallSite
-// for `make`. We could extend that to emit a Channel sibling-node with
-// the parsed type info; doing so is included in this commit but lives in
-// emitChannelFromMake (called from statements.go's CallExpr case).
-
-// emitChannelFromMake checks if a CallExpr is `make(chan T, n)` and, if so,
-// emits a Channel node with direction/elem/buffer encoded in Signature.
-// Direction and elem come from the *ast.ChanType argument; buffer from the
-// optional second argument when it's an integer literal (best-effort —
-// non-literal buffers stay BufferSize=-1 for "unknown").
-//
-// Returns the new node ID, or "" if call is not a `make(chan ...)` form.
-func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr) string {
-	if call == nil || len(call.Args) == 0 {
-		return ""
+// With type information the argument's type decides, so a channel made
+// through a named type (make(blockingIter) with type blockingIter chan
+// struct{}) is one, and the element type is the one go/types prints: struct{},
+// []byte, *Header. Taken from the syntax as a single name, the element type
+// was "?" on 312 of the 708 Channel nodes of go-stablenet. Without type
+// information only a literal `chan T` argument is recognised and the element
+// is its name.
+func (v *declVisitor) chanMake(e ast.Expr) (*ast.CallExpr, chanMake, bool) {
+	call, ok := e.(*ast.CallExpr)
+	if !ok || len(call.Args) == 0 {
+		return nil, chanMake{}, false
 	}
-	id, ok := call.Fun.(*ast.Ident)
-	if !ok || id.Name != "make" {
-		return ""
+	if id, ok := call.Fun.(*ast.Ident); !ok || id.Name != "make" {
+		return nil, chanMake{}, false
 	}
-	chType, ok := call.Args[0].(*ast.ChanType)
-	if !ok {
-		return ""
-	}
-	dir := channelDirection(chType.Dir)
-	elem := exprName(chType.Value)
-	var buf int
+	cm := chanMake{}
 	if len(call.Args) >= 2 {
-		buf = literalIntValue(call.Args[1])
-	} else {
-		buf = 0
+		cm.buf = literalIntValue(call.Args[1])
 	}
-	sig := formatChannelSignature(dir, elem, buf)
+	if v.typesInfo == nil {
+		chType, ok := call.Args[0].(*ast.ChanType)
+		if !ok {
+			return nil, chanMake{}, false
+		}
+		cm.dir, cm.elem = channelDirection(chType.Dir), exprName(chType.Value)
+		return call, cm, true
+	}
+	t := v.typesInfo.TypeOf(call.Args[0])
+	if t == nil || !v.isBuiltinCall(call.Fun) {
+		return nil, chanMake{}, false
+	}
+	ch, ok := t.Underlying().(*gotypes.Chan)
+	if !ok {
+		return nil, chanMake{}, false
+	}
+	switch ch.Dir() {
+	case gotypes.SendOnly:
+		cm.dir = chanDirSend
+	case gotypes.RecvOnly:
+		cm.dir = chanDirRecv
+	default:
+		cm.dir = chanDirBidi
+	}
+	cm.elem = gotypes.TypeString(ch.Elem(), unqualified)
+	if _, literal := ast.Unparen(call.Args[0]).(*ast.ChanType); !literal {
+		cm.named = gotypes.TypeString(t, unqualified)
+	}
+	return call, cm, true
+}
+
+// emitChannelFromMake emits the Channel node of the make(chan T, n) call that
+// cm describes (see chanMake), with direction, element type and buffer size
+// encoded in Signature, and returns its ID.
+func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr, cm chanMake) string {
+	sig := formatChannelSignature(cm)
 	startLn, startBy := v.pos(call.Pos())
 	endLn, endBy := v.pos(call.End())
 	qname := fmt.Sprintf("chan@%s:%d", v.relPath, startBy)
@@ -506,7 +429,7 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr) s
 		FilePath: v.relPath, StartLine: startLn, EndLine: endLn,
 		StartByte: startBy, EndByte: endBy,
 		Language: "go", Confidence: types.ConfExtracted,
-		SubKind: dir, Signature: sig,
+		SubKind: cm.dir, Signature: sig,
 	})
 	v.edges = append(v.edges, types.Edge{
 		Src: parentID, Dst: nodeID, Type: types.EdgeContains, Count: 1,
@@ -520,15 +443,6 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr) s
 // for any channel sends/recvs whose channel variable is in chanVarIDs.
 // Only handles inline `go func() { ... }()` literals; named-function goroutines
 // require cross-file resolution and are silently skipped.
-//
-// Also emits acquires_lock / releases_lock edges for Lock /
-// Unlock / RLock / RUnlock CallExprs nested inside the goroutine body. The
-// outer body walker (emitFunctionBodyPos) returns false on *ast.GoStmt to
-// avoid double-walking, which previously dropped every lock call inside a
-// goroutine literal (the canonical "spawn worker, lock counter" pattern).
-// Lock edges are anchored at the *enclosing function* (parentFuncID) — same
-// semantics as the non-goroutine path — because that's the symbol that
-// owns the critical section's start/end pair.
 func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.CallExpr) {
 	if call == nil {
 		return
@@ -537,17 +451,16 @@ func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.Ca
 	if !ok {
 		return // named-function goroutines: cross-file resolution needed
 	}
-	// parentFuncID is the function that contains this goroutine. We don't
-	// have it threaded as a parameter (refactor-cost vs. value), so derive
-	// it from the goroutine node's edge: every Goroutine has a `spawns`
-	// edge from its parent. Linear scan is fine here — emits per goroutine
-	// are bounded by the body's call density. We recover the parent by
-	// looking up the most-recent `spawns` edge whose Dst is goroutineID.
-	parentFuncID := ""
-	for i := len(v.edges) - 1; i >= 0; i-- {
-		if v.edges[i].Type == types.EdgeSpawns && v.edges[i].Dst == goroutineID {
-			parentFuncID = v.edges[i].Src
-			break
+	link := func(et types.EdgeType, ch ast.Expr) {
+		key := v.chanVar(ch)
+		if key == nil {
+			return
+		}
+		if chanID, ok := v.chanVarIDs[key]; ok {
+			v.edges = append(v.edges, types.Edge{
+				Src: goroutineID, Dst: chanID, Type: et, Count: 1,
+				Confidence: types.ConfInferred,
+			})
 		}
 	}
 	ast.Inspect(fn.Body, func(n ast.Node) bool {
@@ -555,39 +468,22 @@ func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.Ca
 		case *ast.GoStmt:
 			return false // nested goroutines not recursively tracked here
 		case *ast.SendStmt:
-			if chanName := channelVarName(s.Chan); chanName != "" {
-				if chanID, ok := v.chanVarIDs[chanName]; ok {
-					v.edges = append(v.edges, types.Edge{
-						Src: goroutineID, Dst: chanID,
-						Type: types.EdgeSendsTo, Count: 1,
-						Confidence: types.ConfInferred,
-					})
-				}
-			}
+			link(types.EdgeSendsTo, s.Chan)
 		case *ast.UnaryExpr:
 			if s.Op == token.ARROW {
-				if chanName := channelVarName(s.X); chanName != "" {
-					if chanID, ok := v.chanVarIDs[chanName]; ok {
-						v.edges = append(v.edges, types.Edge{
-							Src: goroutineID, Dst: chanID,
-							Type: types.EdgeRecvsFrom, Count: 1,
-							Confidence: types.ConfInferred,
-						})
-					}
-				}
-			}
-		case *ast.CallExpr:
-			// Lock edges inside goroutine bodies. Anchored on
-			// parentFuncID (the function that spawned the goroutine), which
-			// matches the non-goroutine path emitted by maybeEmitLockEdge.
-			// No-op when parentFuncID couldn't be recovered (defensive).
-			if parentFuncID != "" {
-				v.maybeEmitLockEdge(parentFuncID, s)
+				link(types.EdgeRecvsFrom, s.X)
 			}
 		}
 		return true
 	})
 }
+
+// Directions of a Channel node (its sub kind).
+const (
+	chanDirBidi = "bidi"
+	chanDirSend = "send"
+	chanDirRecv = "recv"
+)
 
 // channelDirection maps ast.ChanDir to the spec's string tag.
 //
@@ -597,11 +493,11 @@ func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.Ca
 func channelDirection(d ast.ChanDir) string {
 	switch d {
 	case ast.SEND:
-		return "send"
+		return chanDirSend
 	case ast.RECV:
-		return "recv"
+		return chanDirRecv
 	}
-	return "bidi"
+	return chanDirBidi
 }
 
 // literalIntValue parses an *ast.BasicLit as an int. Returns -1 on any
@@ -623,28 +519,32 @@ func literalIntValue(e ast.Expr) int {
 
 // formatChannelSignature returns a concise human-readable channel
 // description suitable for the existing Signature field — schema-free way
-// to surface direction/buffer/elem in the viewer without a node.go bump.
+// to surface direction/buffer/elem in the viewer without a node.go bump. It
+// is the channel type as the make call writes it, with the buffer size:
 //
-// Examples:
-//
-//	("bidi", "int", 10) → "chan int (buf=10)"
-//	("send", "Msg", 0)  → "chan<- Msg"
-//	("recv", "T", -1)   → "<-chan T (buf=?)"
-func formatChannelSignature(dir, elem string, buf int) string {
-	prefix := "chan"
-	switch dir {
-	case "send":
-		prefix = "chan<-"
-	case "recv":
-		prefix = "<-chan"
-	}
+//	make(chan int, 10)   → "chan int (buf=10)"
+//	make(chan<- Msg)     → "chan<- Msg"
+//	make(<-chan T, n)    → "<-chan T (buf=?)"
+//	make(blockingIter)   → "blockingIter"
+func formatChannelSignature(cm chanMake) string {
 	bufPart := ""
 	switch {
-	case buf > 0:
-		bufPart = fmt.Sprintf(" (buf=%d)", buf)
-	case buf < 0:
+	case cm.buf > 0:
+		bufPart = fmt.Sprintf(" (buf=%d)", cm.buf)
+	case cm.buf < 0:
 		bufPart = " (buf=?)"
 	}
+	if cm.named != "" {
+		return cm.named + bufPart
+	}
+	prefix := "chan"
+	switch cm.dir {
+	case chanDirSend:
+		prefix = "chan<-"
+	case chanDirRecv:
+		prefix = "<-chan"
+	}
+	elem := cm.elem
 	if elem == "" {
 		elem = "?"
 	}

@@ -63,6 +63,12 @@ const (
 	// declared in another file). Target: the pointer's name. It makes no
 	// edge; Pass 2 counts it.
 	refUnfollowedPointer = "sol_unfollowed_pointer"
+	// refAddressReceiver: a low-level call whose receiver is a member or an
+	// element of a variable (`route.hop.call(...)`, `targets[i].call(...)`).
+	// Target: the variable's name. The kind carries the receiver's path
+	// (`sol_address_receiver|route.hop`). It makes no edge: Pass 2 marks the
+	// callable as making an external call when the path ends at an address.
+	refAddressReceiver = "sol_address_receiver"
 	// refImplicitOverride: a function declared without `override` in a
 	// contract that has bases. Target: the function name. Pass 2 links it to
 	// the interface function it implements, if any.
@@ -71,6 +77,103 @@ const (
 
 // refSep separates the parts of a pending reference's target.
 const refSep = "|"
+
+// Separators of a packed kind (see packRefs): packSep stands between the
+// kinds folded into one reference, repeatSep before the number of times a
+// kind occurs. Neither can occur in a kind, which is made of identifiers,
+// digits, refSep and the steps of an access path.
+const (
+	packSep   = ";"
+	repeatSep = "*"
+)
+
+// refKey is what the graph store keeps one pending reference per file for:
+// its source, edge type, target and line. The kind is not part of it.
+type refKey struct {
+	src    string
+	et     types.EdgeType
+	target string
+	line   int
+}
+
+// packRefs folds the scoped references that share a source, an edge type, a
+// target and a line into one reference whose kind lists the kinds of all of
+// them, each with the number of times it occurs: two reads of `x` on a line
+// become one reference of kind `sol_read*2`, `f(a) + f(a, b)` one of kind
+// `sol_name_call|1;sol_name_call|2`. unpackRefs is the inverse. The first
+// reference of a group gives the position, the byte offset and the order.
+//
+// The store keeps one row per such group and drops the others. On an
+// incremental build an unchanged file's references are read back from it to
+// resolve again the ones that point into a changed file: without packing, a
+// type named twice on a line came back once and its edge had count 1 where a
+// full build has 2, and of a read and a write of one name on a line one was
+// lost. Packed, what is read back is what Pass 1 queued.
+//
+// Only the kinds the scoped resolver owns are packed. The using-for and cast
+// references keep their own byte offset, which their resolvers use to tell
+// same-named locals of one line apart.
+func packRefs(refs []parse.PendingRef) []parse.PendingRef {
+	type group struct {
+		at    int            // index in out
+		kinds []string       // in order of first occurrence
+		count map[string]int // by kind
+	}
+	out := make([]parse.PendingRef, 0, len(refs))
+	groups := map[refKey]*group{}
+	for _, pr := range refs {
+		if !isScopedKind(pr.DispatchKind) {
+			out = append(out, pr)
+			continue
+		}
+		key := refKey{pr.SrcID, pr.EdgeType, pr.TargetQName, pr.Line}
+		g := groups[key]
+		if g == nil {
+			g = &group{at: len(out), count: map[string]int{}}
+			groups[key] = g
+			out = append(out, pr)
+		}
+		if g.count[pr.DispatchKind] == 0 {
+			g.kinds = append(g.kinds, pr.DispatchKind)
+		}
+		g.count[pr.DispatchKind]++
+	}
+	for _, g := range groups {
+		parts := make([]string, len(g.kinds))
+		for i, kind := range g.kinds {
+			parts[i] = kind
+			if n := g.count[kind]; n > 1 {
+				parts[i] += repeatSep + strconv.Itoa(n)
+			}
+		}
+		out[g.at].DispatchKind = strings.Join(parts, packSep)
+	}
+	return out
+}
+
+// unpackRefs returns the references packRefs folded, one per occurrence, in
+// place of each packed reference. A reference that is not packed is returned
+// as it is.
+func unpackRefs(refs []parse.PendingRef) []parse.PendingRef {
+	out := make([]parse.PendingRef, 0, len(refs))
+	for _, pr := range refs {
+		for _, part := range strings.Split(pr.DispatchKind, packSep) {
+			kind, repeats, repeated := strings.Cut(part, repeatSep)
+			n := 1
+			if repeated {
+				if parsed, err := strconv.Atoi(repeats); err == nil && parsed > 0 {
+					n = parsed
+				}
+			}
+			one := pr
+			one.DispatchKind = kind
+			for i := 0; i < n; i++ {
+				out = append(out, one)
+			}
+		}
+	}
+	return out
+}
 
 // queue appends a pending reference from srcID, located at the line of at.
 func (v *declVisitor) queue(srcID string, et types.EdgeType, kind, target string, at *sitter.Node) {

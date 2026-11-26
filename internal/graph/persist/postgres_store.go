@@ -654,8 +654,8 @@ func (s *pgStore) RebuildFTS() error {
 // ──────────────────────────────────────────────────────────────────────────────
 
 // FindSymbol returns nodes whose qualified_name matches name. When exact is
-// false, a LIKE '%.<name>' suffix match is also accepted. Capped at 100
-// rows (same as SQLite implementation).
+// false, a LIKE '%.<name>' suffix match is also accepted (ILIKE with
+// opts.IgnoreCase). Ordered and capped as the SQLite implementation.
 //
 // opts.Language pushes a `language = $N` predicate when non-empty.
 // opts.Kinds pushes a `type IN ($N, $N+1, ...)` predicate when non-empty,
@@ -663,10 +663,14 @@ func (s *pgStore) RebuildFTS() error {
 func (s *pgStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
 	args := []any{}
 	q := `SELECT ` + pgNodeColumns + ` FROM nodes WHERE 1=1 `
-	if exact {
+	switch {
+	case exact:
 		q += `AND qualified_name = $1 `
 		args = append(args, name)
-	} else {
+	case opts.IgnoreCase:
+		q += `AND (qualified_name = $1 OR qualified_name ILIKE $2) `
+		args = append(args, name, "%."+name)
+	default:
 		q += `AND (qualified_name = $1 OR qualified_name LIKE $2) `
 		args = append(args, name, "%."+name)
 	}
@@ -682,7 +686,11 @@ func (s *pgStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([
 		}
 		q += `AND type IN (` + strings.Join(placeholders, ",") + `) `
 	}
-	q += `LIMIT 100`
+	q += `ORDER BY qualified_name, id `
+	if limit := opts.rowLimit(); limit != FindSymbolNoLimit {
+		args = append(args, limit)
+		q += fmt.Sprintf(`LIMIT $%d`, len(args))
+	}
 	rows, err := s.pool.Query(background, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("find symbol %q: %w", name, err)

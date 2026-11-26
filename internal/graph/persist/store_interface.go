@@ -167,6 +167,26 @@ type StoreReader interface {
 	Review(qname string, opts ReviewOptions) (Review, error)
 }
 
+// TestFileReader is implemented by stores that hold the build's record of
+// which files are test code (nodes.is_test, schema 1.24): the build scope's
+// file role when the build had a scope, the path rule otherwise. TestFiles
+// returns those files and whether the graph holds the record at all. It is
+// not part of StoreReader, so that readers without the record need not
+// implement it; callers fall back to the path rule (see TestFiles).
+type TestFileReader interface {
+	TestFiles() (files []string, recorded bool, err error)
+}
+
+// TestFiles returns r's record of test files when r holds one (see
+// TestFileReader); recorded is false otherwise.
+func TestFiles(r StoreReader) (files []string, recorded bool, err error) {
+	tr, ok := r.(TestFileReader)
+	if !ok {
+		return nil, false, nil
+	}
+	return tr.TestFiles()
+}
+
 // StoreWriter is the write surface used by buildpipe to materialise a graph
 // end-to-end (Migrate → Insert* → RebuildFTS → SetManifest).
 type StoreWriter interface {

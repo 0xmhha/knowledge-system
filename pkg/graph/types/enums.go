@@ -132,6 +132,17 @@ const (
 	NodeError NodeType = "Error"
 )
 
+// Sub kinds of a Go TypeAlias node. The node type covers every named type
+// that is neither a struct nor an interface; the sub kind tells the two Go
+// declarations apart.
+const (
+	// SubKindAlias is `type A = B`: another name for the type B.
+	SubKindAlias = "alias"
+	// SubKindDefinedType is `type A B`: a new type with B's underlying type
+	// and its own method set.
+	SubKindDefinedType = "defined"
+)
+
 // ExternalFilePath is the file_path of every External node. It names no file
 // of the repository, so per-file deletes and reloads never touch these nodes.
 const ExternalFilePath = "(external)"
@@ -276,13 +287,12 @@ const (
 	// Schema 1.1 (concurrency lock semantics) — emitted by the Go
 	// concurrency pass:
 	//   acquires_lock / releases_lock: from
-	//     internal/parse/golang/concurrency.go:maybeEmitLockEdge — matches
-	//     sync.Mutex.Lock/Unlock/RLock/RUnlock by object-identity on the
-	//     receiver (types.Info path, EXTRACTED) or by name match (AST-only,
-	//     INFERRED). False-positive guarded against user-defined Lock() on
-	//     non-mutex types (spec §2 R2.1).
-	//   accessed_under_lock: from
-	//     internal/parse/golang/concurrency_underlock.go — intra-function
+	//     internal/graph/parse/golang/lock_edges.go — a Lock/Unlock/RLock/
+	//     RUnlock call whose receiver go/types resolves to a declaration
+	//     with a Mutex node, in whichever file it is declared (EXTRACTED).
+	//     A user-defined Lock() on a non-mutex type matches nothing (spec
+	//     §2 R2.1).
+	//   accessed_under_lock: from the same pass — intra-function
 	//     lexical heuristic (any field access in a body that holds any lock
 	//     gets one edge per (field, mutex) pair). Cross-function chain
 	//     propagation is a separate pass behind the --lock-propagation

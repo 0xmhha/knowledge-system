@@ -3,6 +3,7 @@ package concurrency
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
@@ -43,19 +44,50 @@ type Module struct {
 	Direction string         `json:"direction"`          // affects | affected_by | both
 }
 
+// mutexSuffix ends the qualified name of the Mutex node the Go extractor
+// makes for a struct field that is a mutex ("pkg.T.mu#mutex" next to the
+// Field node "pkg.T.mu"). The Mutex node of a package-level or local
+// variable carries the variable's own name ("pkg.mu", "pkg.F.mu"). Node
+// names stay as they are (ids and stored graphs depend on them); a seed
+// names any mutex in either form, its declaring name or that name with the
+// suffix (see Analyze).
+const mutexSuffix = "#mutex"
+
 // Result is the payload cks's concurrency_impact tool consumes.
 type Result struct {
-	Seed     string         `json:"seed"`
-	NotFound bool           `json:"not_found"`
-	Depth    int            `json:"depth"`
-	Modules  []Module       `json:"modules"`
-	Edges    [][]any        `json:"edges"` // [src, dst, type, line] tuples, sorted
-	Totals   map[string]any `json:"totals"`
+	Seed     string `json:"seed"`
+	NotFound bool   `json:"not_found"`
+	// Ambiguous and Candidates report a bare seed name that matched several
+	// qualified names; the caller retries with one of them.
+	Ambiguous  bool     `json:"ambiguous,omitempty"`
+	Candidates []string `json:"candidates,omitempty"`
+	// OtherCase lists names that differ from an unresolved seed only in case.
+	OtherCase []string `json:"other_case,omitempty"`
+	// PromotedFrom and SeedNote are set when the seed named the copy of a
+	// promoted method: the method the answer is for, and a sentence saying
+	// so (the keys every seed tool uses, store.SeedKeyPromotedFrom and
+	// store.SeedKeyNote). Seed is then that method.
+	PromotedFrom string `json:"promoted_from,omitempty"`
+	SeedNote     string `json:"seed_note,omitempty"`
+	// Mutex is the qualified name of the Mutex node the seed is or led to,
+	// when the seed names a mutex: its lockers and guarded fields are in
+	// Modules.
+	Mutex   string         `json:"mutex,omitempty"`
+	Depth   int            `json:"depth"`
+	Modules []Module       `json:"modules"`
+	Edges   [][]any        `json:"edges"` // [src, dst, type, line] tuples, sorted
+	Totals  map[string]any `json:"totals"`
 }
 
 // Analyze returns the concurrency blast radius of symbol: every module that
 // affects or is affected by it via the five ConcurrencyEdgeTypes, BFS to
-// depth in both directions, backed by store.Reader.NeighborhoodByQname.
+// depth in both directions, backed by store.Reader.NeighborhoodByIDs.
+//
+// symbol is resolved by store.ResolveName, as in every tool that takes a
+// symbol name: a canonical id, a qualified name or a bare name. A field that
+// is a mutex also starts the walk from its Mutex node: the lock edges end
+// there, not at the field, so the field alone reached none of its lockers
+// (0 of 183 on go-stablenet).
 //
 // Deterministic: modules are sorted by qname (tiebreak id), edges by
 // (type, src, dst, line), so cks's prompt cache stays stable.
@@ -73,25 +105,47 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 
 	res := Result{Seed: symbol, Depth: d, Modules: []Module{}, Edges: [][]any{}}
 
-	roots, err := r.FindSymbol(symbol, true, store.FindSymbolOptions{})
+	name, err := resolveSeed(r, symbol)
 	if err != nil {
 		return Result{}, err
 	}
-	if len(roots) == 0 {
-		res.NotFound = true
+	if !name.Found() {
+		res.NotFound = !name.Ambiguous()
+		res.Ambiguous, res.Candidates, res.OtherCase = name.Ambiguous(), name.Candidates, name.OtherCase
 		res.Totals = map[string]any{"modules": 0, "edges": 0}
 		return res, nil
 	}
-	rootIDs := make(map[string]bool, len(roots))
-	for _, n := range roots {
-		rootIDs[n.ID] = true
+	if note := name.SeedNote(); note != "" {
+		res.Seed, res.PromotedFrom, res.SeedNote = name.QName, name.QName, note
 	}
-
-	fwdN, fwdE, err := r.NeighborhoodByQname(symbol, d, false, ConcurrencyEdgeTypes...)
+	roots := name.Nodes
+	mutexes, err := mutexNodes(r, roots)
 	if err != nil {
 		return Result{}, err
 	}
-	revN, revE, err := r.NeighborhoodByQname(symbol, d, true, ConcurrencyEdgeTypes...)
+	if len(mutexes) > 0 {
+		roots = append(append([]types.Node{}, roots...), mutexes...)
+	}
+	for _, n := range roots {
+		if n.Type == types.NodeMutex {
+			res.Mutex = n.QualifiedName
+			break
+		}
+	}
+	rootIDs := make(map[string]bool, len(roots))
+	ids := make([]string, 0, len(roots))
+	for _, n := range roots {
+		if !rootIDs[n.ID] {
+			rootIDs[n.ID] = true
+			ids = append(ids, n.ID)
+		}
+	}
+
+	fwdN, fwdE, err := r.NeighborhoodByIDs(ids, d, false, ConcurrencyEdgeTypes...)
+	if err != nil {
+		return Result{}, err
+	}
+	revN, revE, err := r.NeighborhoodByIDs(ids, d, true, ConcurrencyEdgeTypes...)
 	if err != nil {
 		return Result{}, err
 	}
@@ -179,4 +233,55 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 	res.Edges = edges
 	res.Totals = map[string]any{"modules": len(modules), "edges": len(edges)}
 	return res, nil
+}
+
+// resolveSeed resolves symbol as store.ResolveName does, and accepts the
+// "#mutex" form for every mutex: a name with the suffix that resolves to
+// nothing is the declaring name of a package-level or local variable whose
+// Mutex node carries that name without the suffix, and resolves to that
+// Mutex node alone, as "pkg.T.mu#mutex" does for a field.
+func resolveSeed(r store.Reader, symbol string) (store.NameResolution, error) {
+	name, err := store.ResolveName(r, symbol, "")
+	if err != nil || name.Found() || name.Ambiguous() {
+		return name, err
+	}
+	declaring, ok := strings.CutSuffix(symbol, mutexSuffix)
+	if !ok || declaring == "" {
+		return name, nil
+	}
+	alt, err := store.ResolveName(r, declaring, "")
+	if err != nil || !alt.Found() {
+		return name, err
+	}
+	var mutexes []types.Node
+	for _, n := range alt.Nodes {
+		if n.Type == types.NodeMutex {
+			mutexes = append(mutexes, n)
+		}
+	}
+	if len(mutexes) == 0 {
+		return name, nil
+	}
+	return store.NameResolution{QName: alt.QName, Nodes: mutexes, ByID: true}, nil
+}
+
+// mutexNodes returns the Mutex nodes of the fields among seeds that are
+// mutexes: for the field "pkg.T.mu" the node "pkg.T.mu#mutex".
+func mutexNodes(r store.Reader, seeds []types.Node) ([]types.Node, error) {
+	var out []types.Node
+	for _, n := range seeds {
+		if n.Type != types.NodeField {
+			continue
+		}
+		nodes, err := r.FindSymbol(n.QualifiedName+mutexSuffix, true, store.FindSymbolOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("mutex node of %s: %w", n.QualifiedName, err)
+		}
+		for _, m := range nodes {
+			if m.Type == types.NodeMutex {
+				out = append(out, m)
+			}
+		}
+	}
+	return out, nil
 }

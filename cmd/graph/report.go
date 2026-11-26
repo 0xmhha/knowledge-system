@@ -287,7 +287,7 @@ func edgeToAxis(t types.EdgeType) string {
 		types.EdgeImplements, types.EdgeExtends,
 		types.EdgeReadsField, types.EdgeWritesField,
 		types.EdgeReadsMapping, types.EdgeWritesMapping,
-		types.EdgeEmitsEvent, types.EdgeHasModifier, types.EdgeHasDecorator:
+		types.EdgeEmitsEvent, types.EdgeRevertsWith, types.EdgeHasModifier, types.EdgeHasDecorator:
 		return "G2"
 	case types.EdgeCalls, types.EdgeInvokes, types.EdgeTimeoutPath, types.EdgeCancellationPath:
 		return "G3"

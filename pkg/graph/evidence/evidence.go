@@ -85,6 +85,10 @@ type Options struct {
 type Pack struct {
 	Intent string `json:"intent"`
 	Hits   []Hit  `json:"hits"`
+	// History, when set, says why the pack holds no history at all: the
+	// graph was built from a source without git history. The tool layer
+	// sets it; BuildPack leaves it empty.
+	History string `json:"history,omitempty"`
 }
 
 type Hit struct {

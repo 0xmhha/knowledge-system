@@ -46,7 +46,7 @@ func (v *declVisitor) runTypeUses() {
 			return
 		case kindUserDefinedType:
 			if owner, ok := v.typeUseOwner(n); ok {
-				v.queue(owner, types.EdgeUsesType, refTypeUse, dottedTypeName(n, v.src), n)
+				v.queueTypeUses(owner, n)
 			}
 			return
 		}
@@ -57,6 +57,21 @@ func (v *declVisitor) runTypeUses() {
 		}
 	}
 	visit(v.root)
+}
+
+// queueTypeUses queues one type use from owner per user-defined type named
+// under n. It serves the places a type is named outside the walk of
+// runTypeUses: the type a using directive binds.
+func (v *declVisitor) queueTypeUses(owner string, n *sitter.Node) {
+	if n.Kind() == kindUserDefinedType {
+		v.queue(owner, types.EdgeUsesType, refTypeUse, dottedTypeName(n, v.src), n)
+		return
+	}
+	for i := uint(0); i < n.NamedChildCount(); i++ {
+		if c := n.NamedChild(i); c != nil {
+			v.queueTypeUses(owner, c)
+		}
+	}
 }
 
 // dottedTypeName returns the name of a user_defined_type node as written,

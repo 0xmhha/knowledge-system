@@ -40,6 +40,10 @@ func safeReader(r store.Reader) store.Reader {
 	return &llmSafeReader{Reader: r}
 }
 
+// TestFiles forwards the build's record of test files of the wrapped reader
+// (store.TestFiles); it holds no Hunk or Commit node.
+func (s *llmSafeReader) TestFiles() ([]string, bool, error) { return store.TestFiles(s.Reader) }
+
 func (s *llmSafeReader) FindSymbol(name string, exact bool, opts store.FindSymbolOptions) ([]types.Node, error) {
 	out, err := s.Reader.FindSymbol(name, exact, opts)
 	return filterLLMSafe(out), err

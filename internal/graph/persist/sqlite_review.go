@@ -126,6 +126,40 @@ func (s *sqliteStore) Review(qname string, opts ReviewOptions) (Review, error) {
 	return r, nil
 }
 
+// TestFiles implements TestFileReader: the files whose nodes the build
+// marked as test code (nodes.is_test), sorted. recorded is false for a graph
+// that holds no such record: one without the review index (built before
+// schema 1.24), or one where the index was never filled (no code edge and no
+// test node).
+func (s *sqliteStore) TestFiles() (files []string, recorded bool, err error) {
+	has, err := s.hasReviewIndex()
+	if err != nil || !has {
+		return nil, false, err
+	}
+	if err := s.db.QueryRow(`SELECT EXISTS (SELECT 1 FROM code_edges) OR EXISTS (SELECT 1 FROM nodes WHERE is_test = 1)`).Scan(&recorded); err != nil {
+		return nil, false, fmt.Errorf("test files: check the record: %w", err)
+	}
+	if !recorded {
+		return nil, false, nil
+	}
+	rows, err := s.db.Query(`SELECT DISTINCT file_path FROM nodes WHERE is_test = 1 ORDER BY file_path`)
+	if err != nil {
+		return nil, false, fmt.Errorf("test files: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	for rows.Next() {
+		var f string
+		if err := rows.Scan(&f); err != nil {
+			return nil, false, fmt.Errorf("test files: scan: %w", err)
+		}
+		files = append(files, f)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, false, fmt.Errorf("test files: %w", err)
+	}
+	return files, true, nil
+}
+
 func (s *sqliteStore) hasReviewIndex() (bool, error) {
 	var n int
 	if err := s.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name IN ('code_edges', 'node_commits')`).Scan(&n); err != nil {

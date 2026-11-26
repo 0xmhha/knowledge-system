@@ -85,9 +85,9 @@ func TestReviewStoragePointers(t *testing.T) {
 	}{
 		{"pointer bound to a mapping entry", "Pointers.vote",
 			[]string{"17 Pointers.proposals@11", "18 Pointers.proposals@11", "20 Pointers.proposals@11", "21 Pointers.proposals@11"},
-			[]string{"16 Pointers.proposals@11"}},
+			[]string{"16 Pointers.proposals@11", "19 Pointers.proposals@11"}},
 		{"pointer returned by a function, named and unnamed", "Pointers.grow",
-			[]string{"37 Pointers.lists@12", "39 Pointers.lists@12"}, nil},
+			[]string{"37 Pointers.lists@12", "39 Pointers.lists@12"}, []string{"40 Pointers.lists@12"}},
 		{"binding again is not a write", "Pointers.rebind",
 			[]string{"46 Pointers.proposals@11"},
 			[]string{"44 Pointers.proposals@11", "45 Pointers.proposals@11"}},
@@ -132,10 +132,16 @@ func TestReviewUseSites(t *testing.T) {
 			"44 Uses.Item.size@30",
 			"45 Uses.Item.box@31", "45 Shapes.Box.width@15",
 			"47 Uses.registry@35",
+			// The two struct constructors of line 49 initialise every member.
+			"49 Uses.Item.owner@29", "49 Uses.Item.size@30", "49 Uses.Item.box@31",
+			"49 Shapes.Box.width@15", "49 Shapes.Box.kind@16",
 			"50 Uses.list@37",
 		}},
 		{"types named in a function", types.EdgeUsesType, open, []string{
 			"40 Uses.Phase@23", "42 Uses.Item@28", "47 IRegistry@4", "49 Uses.Item@28", "49 Shapes.Box@14",
+			// Named inside an expression: the enum of a value, the library
+			// of a constant, of an enum and of a struct.
+			"41 Uses.Phase@23", "44 Shapes@8", "46 Shapes@8", "46 Shapes.Kind@9", "49 Shapes@8", "49 Shapes.Kind@9",
 		}},
 		{"type of an enum state variable", types.EdgeUsesType, endpoint{fileUses, "Uses.phase"}, []string{"34 Uses.Phase@23"}},
 		{"type of an interface state variable", types.EdgeUsesType, endpoint{fileUses, "Uses.registry"}, []string{"35 IRegistry@4"}},

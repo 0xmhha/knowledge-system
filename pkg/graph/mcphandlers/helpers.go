@@ -263,15 +263,32 @@ func textResult(payload any) *mcp.CallToolResult {
 // dispatches_to (schema 1.31) carries a dynamic call on to the code it can
 // run: from an interface method to its implementations, and from a function
 // that calls a function value to the functions the value can hold.
-var callEdgeTypes = []string{"calls", "invokes", "dispatches_to"}
+//
+// has_modifier, emits_event and reverts_with are what a Solidity function
+// runs besides its calls: the modifiers it applies, the events it emits and
+// the errors it reverts with. Without them the tools returned none of 70
+// modifier applications, 58 emits and 128 reverts of go-stablenet's
+// contracts, and an event, an error or a modifier had no callers at all.
+var callEdgeTypes = []string{
+	string(types.EdgeCalls), string(types.EdgeInvokes), string(types.EdgeDispatchesTo),
+	string(types.EdgeHasModifier), string(types.EdgeEmitsEvent), string(types.EdgeRevertsWith),
+}
 
 // seedRef is a resolved traversal seed: the qualified name reported back to
-// the caller and, when the seed named one exact node (a canonical id), that
-// node's id. Traversals start from IDs when they are set, so a canonical id
-// walks only its own node even when other nodes share its qualified name.
+// the caller and, when the seed named exact nodes (a canonical id, a promoted
+// method's declaration), their ids. Traversals start from IDs when they are
+// set, so a canonical id walks only its own node even when other nodes share
+// its qualified name.
 type seedRef struct {
 	QName string
 	IDs   []string
+	// Note is set when the caller named the copy of a promoted method: the
+	// seed is then the method it copies and Note says so
+	// (store.NameResolution.SeedNote).
+	Note string
+	// OtherCase lists names that differ from the input only in case; set
+	// only when the seed did not resolve.
+	OtherCase []string
 }
 
 // neighborhood walks from the seed: from its node ids when the seed is
@@ -316,75 +333,75 @@ func (s seedRef) nodes(reader store.Reader) ([]types.Node, error) {
 }
 
 // result adds the seed to a traversal payload: seed_qname always, seed_id
-// when the traversal started from one exact node.
+// when the traversal started from one exact node, and promoted_from when the
+// caller named the copy of a promoted method and got the method it copies.
 func (s seedRef) result(payload map[string]any) map[string]any {
 	payload["seed_qname"] = s.QName
 	if len(s.IDs) == 1 {
 		payload["seed_id"] = s.IDs[0]
+	}
+	if s.Note != "" {
+		payload[store.SeedKeyPromotedFrom] = s.QName
+		payload[store.SeedKeyNote] = s.Note
 	}
 	return payload
 }
 
 // resolveSeed maps a user-supplied seed — a canonical id, a fully-qualified
 // name ("a.Greet") or a bare short name ("Greet") — to the seed the
-// graph-traversal tools (find_callers / find_callees / get_subgraph /
-// change_history) walk from. It mirrors find_symbol's exact-or-suffix logic
-// so an agent that located a symbol via find_symbol(exact=false) can feed
-// the same bare name to the traversal tools instead of silently getting an
-// empty result.
-//
-// Resolution order:
-//  0. exact match on canonical_id — globally unique (ADR-0001), so a hit is
-//     unambiguous by construction; the seed is that one node.
-//  1. exact match on qualified_name — the common, unambiguous case.
-//  2. suffix match (bare name) when exact found nothing.
+// graph-traversal tools (find_callers / find_callees / find_references /
+// get_subgraph / change_history) walk from. The rule is store.ResolveName,
+// the one resolver every tool that takes a symbol name uses.
 //
 // Return contract:
-//   - ok=true, seed set             exactly one node (step 0) or one distinct
-//     qname matched.
-//   - ambiguous=true, candidates set the suffix matched >1 distinct qname;
-//     the caller should surface them so the agent can retry with a full
-//     qname (ADR-0001: a multi-match is reported, never silently picked).
-//   - all-zero (ok=false)           nothing matched (not_found).
+//   - ok=true, seed set             one canonical id or one distinct qname.
+//   - ambiguous=true, candidates set a bare name matched more than one
+//     distinct qname; the caller surfaces them so the agent can retry with a
+//     full qname (ADR-0001: a multi-match is reported, never silently picked).
+//   - ok=false                      nothing matched (not_found); the seed
+//     carries the names that differ only in case, if any.
 //
 // Several nodes sharing ONE qualified_name (e.g. the same symbol across
 // languages) is not ambiguous for a qname seed: every such node becomes a
 // traversal root. A canonical id seed starts from its own node only.
+//
+// A seed that names the copy of a promoted method ("logger.dummy.Prepare"
+// for state.StateDB.Prepare) is the method it copies: the copy has no edges
+// but the one from its type, so walking from it answered "no callers".
 func resolveSeed(reader store.Reader, seed, lang string) (resolved seedRef, candidates []string, ambiguous bool, ok bool) {
-	if seed == "" {
+	res, err := store.ResolveName(reader, seed, lang)
+	switch {
+	case err != nil:
 		return seedRef{}, nil, false, false
+	case res.Ambiguous():
+		return seedRef{}, res.Candidates, true, false
+	case !res.Found():
+		return seedRef{OtherCase: res.OtherCase}, nil, false, false
 	}
-	opts := store.FindSymbolOptions{Language: lang}
-
-	// 0. exact canonical_id — unambiguous; the seed is that node.
-	if n, found, err := reader.FindByCanonicalID(seed); err == nil && found {
-		return seedRef{QName: n.QualifiedName, IDs: []string{n.ID}}, nil, false, true
-	}
-
-	// 1. exact qualified_name.
-	if nodes, err := reader.FindSymbol(seed, true, opts); err == nil && len(nodes) > 0 {
-		return seedRef{QName: seed}, nil, false, true
-	}
-
-	// 2. suffix fallback for bare names.
-	nodes, err := reader.FindSymbol(seed, false, opts)
-	if err != nil || len(nodes) == 0 {
-		return seedRef{}, nil, false, false
-	}
-	seen := map[string]struct{}{}
-	distinct := make([]string, 0, len(nodes))
-	for _, n := range nodes {
-		if _, dup := seen[n.QualifiedName]; dup {
-			continue
+	ref := seedRef{QName: res.QName, Note: res.SeedNote()}
+	if res.ByID {
+		for _, n := range res.Nodes {
+			ref.IDs = append(ref.IDs, n.ID)
 		}
-		seen[n.QualifiedName] = struct{}{}
-		distinct = append(distinct, n.QualifiedName)
 	}
-	if len(distinct) == 1 {
-		return seedRef{QName: distinct[0]}, nil, false, true
+	return ref, nil, false, true
+}
+
+// seedMiss returns the payload a traversal tool answers with when its seed
+// did not resolve to one symbol (ambiguous, or not found), and nil when it
+// did. One function, so every tool reports a miss the same way.
+func seedMiss(seed string, resolved seedRef, candidates []string, ambiguous, ok bool) map[string]any {
+	switch {
+	case ambiguous:
+		return seedAmbiguousResult(seed, candidates)
+	case !ok:
+		out := seedNotFoundResult(seed)
+		if len(resolved.OtherCase) > 0 {
+			out["other_case"] = resolved.OtherCase
+		}
+		return out
 	}
-	sort.Strings(distinct) // deterministic order keeps cks's prompt cache stable
-	return seedRef{}, distinct, true, false
+	return nil
 }
 
 // seedNotFoundResult is the uniform payload the traversal tools return
@@ -429,9 +446,21 @@ func attachBlobs(reader store.Reader, nodes []types.Node, include bool) []map[st
 			"qname":       n.QualifiedName,
 			"file":        n.FilePath,
 			"line":        n.StartLine,
+			"end_line":    n.EndLine,
 			"confidence":  n.Confidence,
 			"signature":   n.Signature,
 			"usage_score": n.UsageScore,
+		}
+		// A promoted copy has the declared method's file and lines; say
+		// which method it is so the two are not taken for two declarations.
+		if from, ok := store.PromotedFrom(n); ok {
+			m["promoted_from"] = from
+		}
+		// sub_kind refines the type: a TypeAlias node is every type that is
+		// not a struct or an interface, and sub_kind says whether it is an
+		// alias (type A = B) or a defined type (type A B).
+		if n.SubKind != "" {
+			m["sub_kind"] = n.SubKind
 		}
 		// canonical_id (ADR-0001): the globally-unique, import-path-qualified
 		// identity. Included only when present (empty for builtins, AST-only

@@ -218,7 +218,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// (3) Per-language Pass 1 + reload cached nodes. pending_refs are only
 	// loaded for dirty + reverse-dirty files.
 	resolved, dirtyPending, parseErrs, _, solParser, err := runLanguagePipelines(
-		opt.SrcRoot, opt.GoBuild, dirtyByLang, cachedByLang, reverseDirtySet, store, log)
+		opt.SrcRoot, opt.GoBuild, opt.FileRoles, dirtyByLang, cachedByLang, reverseDirtySet, store, log)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -339,7 +339,7 @@ func runIncremental(opt Options, log *slog.Logger,
 
 	// The review index depends on the whole graph (test-only packages,
 	// endpoints of every code edge), so it is recomputed, not patched.
-	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, log); err != nil {
+	if err := rebuildReviewIndex(store, opt.SrcRoot, g.Nodes, opt.FileRoles, log); err != nil {
 		return persist.Manifest{}, err
 	}
 
@@ -397,7 +397,7 @@ func partitionByLang(decisions CacheDecisions) (dirty, cached map[string][]strin
 //
 // reverseDirty: set of cached file paths whose pending_refs need
 // re-resolving because a dirty/removed file changed their target qnames.
-func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached map[string][]string,
+func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, roles FileRoles, dirty, cached map[string][]string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) ([]*parse.ResolvedGraph, []persist.PendingRefRow, int, bool, *solp.Parser, error) {
 	resolved := []*parse.ResolvedGraph{}
 	dirtyPending := []persist.PendingRefRow{}
@@ -406,13 +406,13 @@ func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached
 	var solParser *solp.Parser
 
 	if files := dirty["go"]; len(files) > 0 || hasCached(cached, "go") {
-		rg, pending, n, err := runGoPipelineIncremental(srcRoot, goBuild, files, cached["go"], reverseDirty, store, log)
+		rg, pending, n, err := runGoPipelineIncremental(srcRoot, goBuild, roles, files, cached["go"], reverseDirty, store, log)
 		if err != nil {
 			return nil, nil, 0, false, nil, fmt.Errorf("go incremental: %w", err)
 		}
 		parseErrs += n
 		logResolveSummary(log, "go", rg)
-		if rg, err = goThroughContract(log, rg); err != nil {
+		if rg, err = goThroughContract(log, rg, roles); err != nil {
 			return nil, nil, 0, false, nil, err
 		}
 		resolved = append(resolved, rg)
@@ -629,7 +629,7 @@ func hasCached(m map[string][]string, lang string) bool {
 // their edges to dirty-file qnames were cascade-deleted and must be re-resolved.
 // Non-reverse-dirty cached files contribute nodes only; their edges are intact
 // in DB and will be reloaded by reloadCachedEdges, skipping a DB round-trip.
-func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFiles, cachedFiles []string,
+func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, roles FileRoles, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
 	p := gop.New(srcRoot)
 	loadStart := time.Now()
@@ -685,9 +685,9 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 	// incremental build (those edges were dropped by DeleteEdgesByType in
 	// runIncremental step (1) and nothing repopulates them).
 	if err == nil && rg != nil {
-		implEdges := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
+		implEdges, implPending := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, implEdges...)
-		log.Debug("implements emitted (incremental)", "count", len(implEdges))
+		log.Debug("implements emitted (incremental)", "count", len(implEdges), "outside_build", len(implPending))
 		// uses_type — same wiring as cold path. Pending refs
 		// for dirty files surface as additional dirtyPending rows so the
 		// next partial build picks them up; cached files' uses_type pending
@@ -695,7 +695,7 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 		usesEdges, usesPending := gop.EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, usesEdges...)
 		// Types outside the build get External nodes, as on the cold path.
-		extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+		extNodes, extEdges := p.ExternalEdges(append(append([]parse.PendingRef{}, usesPending...), implPending...), rg.Nodes)
 		rg.Nodes = append(rg.Nodes, extNodes...)
 		rg.Edges = append(rg.Edges, extEdges...)
 		log.Debug("uses_type emitted (incremental)", "edges", len(usesEdges), "pending", len(usesPending))
@@ -742,6 +742,13 @@ func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFile
 		rg.Nodes = append(rg.Nodes, promNodes...)
 		rg.Edges = append(rg.Edges, promEdges...)
 		log.Debug("promoted methods emitted (incremental)", "nodes", len(promNodes))
+
+		// Package paths — same rule as cold path.
+		gop.CanonicalPackagePaths(rg.Nodes, roles.testFile)
+
+		// Lock edges — same wiring as cold path; per-file FilePath, so dirty
+		// files' rows go with the CASCADE and cached rows win dedup.
+		rg.Edges = append(rg.Edges, gop.EmitLockEdges(p.Pkgs(), rg.Nodes)...)
 
 		// Value uses (reads_field / writes_field / references) — same wiring as cold path.
 		vaEdges := gop.EmitValueAccessEdges(p.Pkgs(), rg.Nodes)

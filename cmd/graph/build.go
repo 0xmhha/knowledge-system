@@ -62,6 +62,9 @@ func newBuildCmd() *cobra.Command {
 			// exclusive with --files-from (an explicit filter file).
 			var generatedFilter *filterlist.FilterList
 			var goBuild *detect.GoBuild
+			// fileRoles carries each scoped file's role to the build, so
+			// is_test follows the scope and not the file's name alone.
+			var fileRoles buildpipe.FileRoles
 			if scopePath != "" {
 				if filesFrom != "" || len(filesFromMain) > 0 {
 					return fmt.Errorf("--scope cannot be combined with --files-from or --files-from-main")
@@ -71,6 +74,10 @@ func newBuildCmd() *cobra.Command {
 					return err
 				}
 				generatedFilter, goBuild = fl, b
+				fileRoles = make(buildpipe.FileRoles, len(s.Files))
+				for _, f := range s.Files {
+					fileRoles[f.Path] = buildpipe.FileRole(f.Role)
+				}
 				_, _ = fmt.Fprintf(os.Stderr, "ckg: scope %s: %d files for %s/%s cgo=%s\n",
 					s.ConfigID, len(s.Files), b.GOOS, b.GOARCH, b.CGOEnabled)
 			}
@@ -102,6 +109,7 @@ func newBuildCmd() *cobra.Command {
 				FilesFromPath:       filesFrom,
 				Filter:              generatedFilter,
 				GoBuild:             goBuild,
+				FileRoles:           fileRoles,
 				LockPropagation:     lockPropagation,
 				PolicyFile:          policyFile,
 				SecurityPatternFile: securityPatternFile,

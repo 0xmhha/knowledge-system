@@ -76,6 +76,9 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	r.StaticCalls = compare(truth.StaticCalls, calls, declNode, idx, opts.Samples)
 	r.InterfaceCalls = compare(truth.InterfaceCalls, calls, declNode, idx, opts.Samples)
 	r.TypeRefs = compare(truth.TypeRefs, typeEdges, declNode, idx, opts.Samples)
+	external := externalNodes(nodes)
+	r.OutsideCalls = compareOutside(truth.OutsideCalls, calls, declNode, external, opts.Samples)
+	r.OutsideTypeRefs = compareOutside(truth.OutsideTypeRefs, typeEdges, declNode, external, opts.Samples)
 	r.DynamicCallSites = truth.DynamicCallSites
 	r.CallsOutsideFuncs = truth.CallsOutsideFuncs
 	r.Unexpected = unexpected(truth, calls, typeEdges, declNode, opts.Samples)
@@ -142,6 +145,14 @@ func (r *Report) matchDecls(t *Truth, idx nodeIndex, samples int) map[string]str
 		}
 		r.Decls.Matched++
 		out[key] = hit.ID
+		if hit.StartByte != d.StartByte || hit.EndByte != d.EndByte {
+			r.Decls.OtherSpan++
+			if len(r.Decls.OtherSpanSamples) < samples {
+				r.Decls.OtherSpanSamples = append(r.Decls.OtherSpanSamples,
+					fmt.Sprintf("%s (%s:%d): node spans bytes %d-%d, declaration %d-%d", cid, d.File, d.Line,
+						hit.StartByte, hit.EndByte, d.StartByte, d.EndByte))
+			}
+		}
 	}
 	return out
 }
@@ -210,6 +221,44 @@ func compare(pairs []Pair, edges map[string]map[string]bool, declNode map[string
 				where = " (in a function literal)"
 			}
 			s.MissingSamples = append(s.MissingSamples, fmt.Sprintf("%s -> %s at %s:%d%s", p.From, p.To, p.File, p.Line, where))
+		}
+	}
+	return s
+}
+
+// externalNodes maps the canonical id of each External node to its node id.
+func externalNodes(nodes []types.Node) map[string]string {
+	out := map[string]string{}
+	for _, n := range nodes {
+		if n.Type == types.NodeExternal && n.CanonicalID != "" {
+			out[n.CanonicalID] = n.ID
+		}
+	}
+	return out
+}
+
+// compareOutside classifies the truth pairs whose target is outside the
+// covered files: matched when the graph has an edge from the source's node to
+// the External node of the target, missing when it has no such node or edge.
+func compareOutside(pairs []Pair, edges map[string]map[string]bool, declNode, external map[string]string, samples int) RelationStats {
+	var s RelationStats
+	for _, p := range pairs {
+		s.Truth++
+		from, ok := declNode[p.From]
+		if !ok {
+			s.EndpointMissing++
+			continue
+		}
+		if to, ok := external[p.To]; ok && edges[from][to] {
+			s.Matched++
+			continue
+		}
+		s.Missing++
+		if p.InClosure {
+			s.MissingInClosure++
+		}
+		if len(s.MissingSamples) < samples {
+			s.MissingSamples = append(s.MissingSamples, fmt.Sprintf("%s -> %s at %s:%d", p.From, p.To, p.File, p.Line))
 		}
 	}
 	return s

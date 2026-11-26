@@ -70,10 +70,12 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		p.abiMu.Unlock()
 	}
 	return &parse.ParseResult{
-		Path:    rel,
-		Nodes:   v.nodes,
-		Edges:   v.edges,
-		Pending: v.pending,
+		Path:  rel,
+		Nodes: v.nodes,
+		Edges: v.edges,
+		// Folded to what the graph store keeps one row for, so that the
+		// references read back from it are the ones queued here.
+		Pending: packRefs(v.pending),
 	}, nil
 }
 

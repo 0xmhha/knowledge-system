@@ -81,10 +81,10 @@ func TestResolve_ByCanonicalID(t *testing.T) {
 }
 
 // TestResolve_CountsUnresolvedReasons: references Resolve drops are counted by
-// reason instead of disappearing. testdata/samename calls err.Error() (a bare
-// name go/types gives no declaration in the graph), converts with uint(3) and
-// calls a func variable (targets cleared), and calls fmt-free code only, so
-// the reasons below must show up.
+// reason instead of disappearing. testdata/samename converts with uint(3) and
+// calls a func variable (targets cleared), so the reason below must show up.
+// Its err.Error() call is not dropped: the builtin error method has an
+// External node.
 func TestResolve_CountsUnresolvedReasons(t *testing.T) {
 	g, err := gop.LoadAndResolve("testdata/samename")
 	if err != nil {
@@ -93,8 +93,12 @@ func TestResolve_CountsUnresolvedReasons(t *testing.T) {
 	if g.Unresolved["no_target"] == 0 {
 		t.Errorf("no_target = 0, want the conversion and the func-variable call: %v", g.Unresolved)
 	}
-	if g.Unresolved["outside_graph"]+g.Unresolved["bare_name"] == 0 {
-		t.Errorf("err.Error() not counted: %v", g.Unresolved)
+	bound := false
+	for _, n := range g.Nodes {
+		bound = bound || (n.Type == types.NodeExternal && n.CanonicalID == gop.BuiltinErrorMethodID)
+	}
+	if !bound {
+		t.Errorf("err.Error() has no External node for the builtin error method; unresolved: %v", g.Unresolved)
 	}
 	for reason, n := range g.Unresolved {
 		if len(g.UnresolvedSamples[reason]) == 0 || len(g.UnresolvedSamples[reason]) > n {

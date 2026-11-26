@@ -26,6 +26,7 @@ func RegisterImpactOfChange(s *server.MCPServer, reader store.Reader) {
 		mcp.WithDescription(
 			"What breaks if this symbol or file changes: reverse-dependency closure. Returns nodes/edges grouped by impact category "+
 				"(callers, interface_impact, type_users, distributed, concurrent, other_refs). "+
+				"seed_qname may be a canonical id, a qualified name or a bare name; an ambiguous bare name returns its candidates. "+
 				"If results look empty for a Go concrete-method seed, retry with the interface method qname "+
 				"(Go's call graph binds invocations to the interface, not the concrete receiver).",
 		),

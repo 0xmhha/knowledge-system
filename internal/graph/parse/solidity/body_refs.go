@@ -156,8 +156,9 @@ func (w *bodyWalker) walk(n *sitter.Node) {
 		w.revert(n)
 		return
 	case kindEmitStatement:
-		// The event name is queued by runEmits; only the arguments hold
-		// uses.
+		// The event name is queued by runEmits; the arguments hold uses,
+		// and so does the qualifier of the name (`emit Lib.Done(x)`).
+		w.qualifier(unwrapExpression(n.ChildByFieldName(fieldName)))
 		for i := uint(0); i < n.NamedChildCount(); i++ {
 			if c := n.NamedChild(i); c != nil && c.Kind() == kindCallArgument {
 				w.walk(c)
@@ -305,12 +306,26 @@ func (w *bodyWalker) revert(n *sitter.Node) {
 		if name := dottedName(errExpr, w.v.src); name != "" {
 			w.v.queue(w.srcID, types.EdgeRevertsWith, refRevert, name, errExpr)
 		}
+		w.qualifier(errExpr)
 	}
 	for i := uint(0); i < n.NamedChildCount(); i++ {
 		c := n.NamedChild(i)
 		if c != nil && n.FieldNameForNamedChild(uint32(i)) != fieldError {
 			w.walk(c)
 		}
+	}
+}
+
+// qualifier walks what stands before the last dot of a qualified name
+// (`Lib` of `Lib.NotOwner`), where the name itself is queued by its own
+// reference (a revert, an emit). The qualifier names a library or a
+// contract, which the walk queues like any other identifier.
+func (w *bodyWalker) qualifier(name *sitter.Node) {
+	if name == nil || name.Kind() != kindMemberExpression {
+		return
+	}
+	if object := name.ChildByFieldName(fieldObject); object != nil {
+		w.walk(object)
 	}
 }
 
@@ -354,34 +369,41 @@ func (w *bodyWalker) valueIdentifier(n *sitter.Node) {
 		return
 	}
 	write, rebind := writeTarget(n, w.v.src)
-	if w.locals[name] {
-		if write && !rebind {
-			w.pointerWrite(n, name)
-		}
-		return
-	}
 	kind := refRead
 	if write {
 		kind = refWrite
 	}
+	if w.locals[name] {
+		// Binding a pointer again (`p = items[k]`) uses nothing it pointed
+		// to; the right side is walked on its own.
+		if !rebind {
+			w.pointerAccess(n, name, kind)
+		}
+		return
+	}
 	w.v.queue(w.srcID, types.EdgeReadsField, kind, name, n)
 }
 
-// pointerWrite queues a write through the local name, when it is a storage
-// pointer, as a write of each state variable it can point to. A pointer
-// declared in the callable whose binding could not be followed is queued as
-// such, so the write is counted instead of lost without a trace; a pointer
-// that is a parameter is bound by the caller and queues nothing.
-func (w *bodyWalker) pointerWrite(at *sitter.Node, name string) {
+// pointerAccess queues a use of the local name, when it is a storage
+// pointer, as a use of each state variable it can point to: a read
+// (`p.owner`, `list.length`, `f(p)`) or a write (`p.owner = x`), by kind. A
+// pointer declared in the callable whose binding could not be followed is
+// queued as such, so the use is counted instead of lost without a trace; a
+// pointer that is a parameter is bound by the caller and queues nothing.
+//
+// Only writes used to go through here. GovBase reads through a pointer at 49
+// places and none had an edge: `_addMember` and `_removeMember` showed no
+// read of `versionedMemberList` at all.
+func (w *bodyWalker) pointerAccess(at *sitter.Node, name, kind string) {
 	if w.pointers == nil || !w.pointers.isPointer[name] {
 		return
 	}
 	roots := w.pointers.roots[name]
 	if len(roots) == 0 && !w.pointers.isParameter[name] {
-		w.v.queue(w.srcID, types.EdgeWritesField, refUnfollowedPointer, name, at)
+		w.v.queue(w.srcID, types.EdgeReadsField, refUnfollowedPointer, name, at)
 	}
 	for _, root := range roots {
-		w.v.queue(w.srcID, types.EdgeWritesField, refWrite, root, at)
+		w.v.queue(w.srcID, types.EdgeReadsField, kind, root, at)
 	}
 }
 

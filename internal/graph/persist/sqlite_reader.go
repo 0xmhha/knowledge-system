@@ -333,9 +333,10 @@ func (s *sqliteStore) GetBlob(id string) ([]byte, error) {
 }
 
 // FindSymbol returns nodes whose qualified_name matches name. When exact is
-// true, only equality matches are returned; when false, a LIKE '%.<name>'
-// suffix match is also accepted (so "Foo" hits "pkg.Foo"). Capped at 100
-// rows to bound MCP response size.
+// true, only equality matches are returned; when false, a suffix match is
+// also accepted (so "Foo" hits "pkg.Foo"), in the case the caller wrote unless
+// opts.IgnoreCase is set. Rows come ordered by qualified name, then id, capped
+// at opts.Limit (DefaultFindSymbolLimit when zero).
 //
 // opts.Language pushes a `language = ?` predicate when non-empty.
 // opts.Kinds pushes a `type IN (...)` predicate when non-empty — this
@@ -353,9 +354,12 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
 
 // findSymbolQuery builds FindSymbol's statement. The suffix match ("Foo" hits
 // "pkg.Foo") is a UNION of two indexed lookups, qualified_name and
-// simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
-// one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
-// the whole nodes table on every MCP seed resolution.
+// simple_name: as one "qualified_name = ? OR simple_name = ?" predicate
+// SQLite 3.53 scanned the whole nodes table on every MCP seed resolution.
+//
+// idx_nodes_simple_name is a COLLATE NOCASE index, so the lookup compares
+// without case and a second, binary comparison then keeps the caller's case
+// (dropped for opts.IgnoreCase). Without it "Pack" returned "pack".
 //
 // A dotted name ("Type.Method") is a suffix of "pkg.Type.Method" that
 // simple_name, holding only the last segment, can never equal. The old
@@ -371,14 +375,25 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
 		q += `qualified_name = ? `
 		args = append(args, name)
 	} else {
+		sameCase, suffixCollation := ` AND simple_name = ?`, ``
+		if opts.IgnoreCase {
+			sameCase, suffixCollation = ``, ` COLLATE NOCASE`
+		}
 		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE`
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE` + sameCase
 		args = append(args, name, name)
+		if !opts.IgnoreCase {
+			args = append(args, name)
+		}
 		if i := strings.LastIndexByte(name, '.'); i > 0 && i < len(name)-1 {
 			q += `
-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE
-				AND substr(qualified_name, -?) = ? COLLATE NOCASE`
-			args = append(args, name[i+1:], len(name)+1, "."+name)
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE` + sameCase + `
+				AND substr(qualified_name, -?) = ?` + suffixCollation
+			args = append(args, name[i+1:])
+			if !opts.IgnoreCase {
+				args = append(args, name[i+1:])
+			}
+			args = append(args, len(name)+1, "."+name)
 		}
 		q += `) `
 	}
@@ -392,7 +407,8 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
 			args = append(args, string(k))
 		}
 	}
-	return q + `LIMIT 100`, args
+	// Ordered so that a capped result is the same rows on every call.
+	return q + `ORDER BY qualified_name, id LIMIT ?`, append(args, opts.rowLimit())
 }
 
 // NeighborhoodByQname returns BFS expansion up to depth starting from any

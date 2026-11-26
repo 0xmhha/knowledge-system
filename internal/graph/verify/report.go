@@ -16,6 +16,10 @@ type Report struct {
 	StaticCalls    RelationStats `json:"static_calls"`
 	InterfaceCalls RelationStats `json:"interface_calls"`
 	TypeRefs       RelationStats `json:"type_refs"`
+	// OutsideCalls and OutsideTypeRefs compare the calls and type references
+	// that leave the covered files with the edges to External nodes.
+	OutsideCalls    RelationStats `json:"outside_calls"`
+	OutsideTypeRefs RelationStats `json:"outside_type_refs"`
 	// DynamicCallSites are calls through function values, method values and
 	// closures. go/types gives them no callee, so they are counted, not checked.
 	DynamicCallSites  int             `json:"dynamic_call_sites"`
@@ -50,6 +54,11 @@ type DeclStats struct {
 	Matched        int      `json:"matched"`
 	Missing        int      `json:"missing"`
 	MissingSamples []string `json:"missing_samples,omitempty"`
+	// OtherSpan counts matched declarations whose node does not span the
+	// declaration: from its first token through the comment after it
+	// (Decl.StartByte, Decl.EndByte).
+	OtherSpan        int      `json:"other_span"`
+	OtherSpanSamples []string `json:"other_span_samples,omitempty"`
 }
 
 // RelationStats compares one relation family.
@@ -111,11 +120,12 @@ func (r Report) WriteJSON(w io.Writer) error {
 func (r Report) WriteText(w io.Writer) error {
 	p := func(format string, a ...any) { _, _ = fmt.Fprintf(w, format, a...) }
 	p("ckg verify (go): %d files\n", r.Files)
-	p("declarations: truth %d, matched %d, missing %d\n", r.Decls.Truth, r.Decls.Matched, r.Decls.Missing)
+	p("declarations: truth %d, matched %d, missing %d, node spans other bytes %d\n", r.Decls.Truth, r.Decls.Matched, r.Decls.Missing, r.Decls.OtherSpan)
 	for _, rel := range []struct {
 		name string
 		s    RelationStats
-	}{{"static calls", r.StaticCalls}, {"interface calls", r.InterfaceCalls}, {"type refs", r.TypeRefs}} {
+	}{{"static calls", r.StaticCalls}, {"interface calls", r.InterfaceCalls}, {"type refs", r.TypeRefs},
+		{"calls to code outside the graph", r.OutsideCalls}, {"type refs to types outside the graph", r.OutsideTypeRefs}} {
 		p("%s: truth %d, matched %d, misresolved %d, missing %d (in closures %d), endpoint missing %d, recall %.4f\n",
 			rel.name, rel.s.Truth, rel.s.Matched, rel.s.Misresolved, rel.s.Missing, rel.s.MissingInClosure,
 			rel.s.EndpointMissing, rel.s.Recall())
@@ -150,12 +160,15 @@ func (r Report) WriteText(w io.Writer) error {
 		}
 	}
 	section("missing declarations", r.Decls.MissingSamples)
+	section("declarations whose node spans other bytes", r.Decls.OtherSpanSamples)
 	section("misresolved static calls", r.StaticCalls.MisresolvedSamples)
 	section("missing static calls", r.StaticCalls.MissingSamples)
 	section("misresolved interface calls", r.InterfaceCalls.MisresolvedSamples)
 	section("missing interface calls", r.InterfaceCalls.MissingSamples)
 	section("misresolved type refs", r.TypeRefs.MisresolvedSamples)
 	section("missing type refs", r.TypeRefs.MissingSamples)
+	section("missing calls to code outside the graph", r.OutsideCalls.MissingSamples)
+	section("missing type refs to types outside the graph", r.OutsideTypeRefs.MissingSamples)
 	section("unexpected call edges", r.Unexpected.CallSamples)
 	section("unexpected type-ref edges", r.Unexpected.TypeRefSamples)
 	section("declaration nodes with no package-level declaration", r.LocalDeclNodes.Samples)

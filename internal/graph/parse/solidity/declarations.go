@@ -2,6 +2,7 @@ package solidity
 
 import (
 	"strings"
+	"unicode"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
@@ -363,21 +364,20 @@ func (v *declVisitor) emitVariable(decl *sitter.Node) {
 	// kind and a slot; it is compiled into the code and has neither.
 	nt := types.NodeField
 	subKind := ""
-	// The type is stored in Signature: Pass 2 reads a Field's
-	// Signature to find the type of a receiver (`set.add(x)`), and a
-	// reader sees the declared type. A mapping keeps its whole type
-	// expression; it never is a using-for receiver.
-	signature := ""
+	// The type is stored in Signature as the source has it, qualifier
+	// included (`SetLib.Set`): a reader sees the declared type, and Pass 2
+	// resolves it in the scope of the declaration to find the members of
+	// a struct or the receiver of `set.add(x)`. Only the last segment used
+	// to be kept, so GovCouncil's `AddressSetLib.AddressSet` and
+	// GovValidator's `EnumerableSet.AddressSet` both read `AddressSet`.
+	signature := typeText(typeNode, v.src)
 	switch {
 	case isMapping:
 		nt = types.NodeMapping
-		signature = typeText(typeNode, v.src)
 	case isConstant:
 		nt = types.NodeConstant
 		subKind = subKindConstant
-		signature = extractTypeNameText(typeNode, v.src)
 	default:
-		signature = extractTypeNameText(typeNode, v.src)
 		// Sub kind precedence: immutable, then the written
 		// visibility; no visibility stays empty so a reader can
 		// tell "written internal" from "not written".
@@ -968,48 +968,48 @@ func (v *declVisitor) runStructFieldMeta() {
 // Resolver sweeps these into structFieldTypes index — no graph edge.
 const dispatchKindUsingForStructField = "using_for_struct_field"
 
-// extractTypeNameText returns the user-written type expression for a
-// state_variable_declaration's type_name child. Used by using-for to
-// stamp NodeField.Signature with the declared type so Pass 2 can resolve
-// `<stateVar>.<method>(...)` against the using-for binding map.
-//
-// Three shapes covered:
-//   - primitive_type / user_defined_type → identifier text (`uint256`,
-//     `MyContract`).
-//   - mapping → returns "" (mapping receivers don't participate in
-//     using-for dispatch; the resolver naturally drops them).
-//   - other compound types (array_type, function_type) → raw subtree text
-//     normalised by stripping outer whitespace. This is a permissive
-//     fallback so future receiver shapes don't crash the parse; the
-//     binding map lookup will simply miss when the typeName doesn't match
-//     any directive's bound type.
+// extractTypeNameText returns the key under which the type of a type_name
+// node is looked up in the using-for tables (see usingForTypeKey). The
+// directive that binds a type and the declarations whose type is a receiver
+// both take their key from here or, in Pass 2, from the stored type text
+// through the same function, so the two sides compare equal.
 func extractTypeNameText(typeNode *sitter.Node, src []byte) string {
-	if typeNode == nil {
+	return usingForTypeKey(typeText(typeNode, src))
+}
+
+// usingForTypeKey reduces a type as written to the key the using-for tables
+// use: the last segment of a user-defined type (`Set` for `SetLib.Set`), ""
+// for a mapping (a mapping is never a using-for receiver), and the text
+// itself for every other type (`uint256`, `address payable`, `Item[]`).
+//
+// The using-for resolvers match these keys as strings against the bound
+// type of a `using L for T` directive, and they are the only readers that
+// need the reduced form. Everything else keeps the type as the source has
+// it, so this function is the one place the qualifier is dropped.
+func usingForTypeKey(typeName string) string {
+	typeName = strings.TrimSpace(typeName)
+	switch {
+	case strings.HasPrefix(typeName, mappingKeyword):
 		return ""
+	case isDottedName(typeName):
+		return lastSegment(typeName)
 	}
-	if typeNameIsMapping(typeNode, src) {
-		return ""
+	return typeName
+}
+
+// isDottedName reports whether text is identifiers joined by dots (`A.B`):
+// a qualified user-defined type, as opposed to an array, a function type or
+// an elementary type of two words.
+func isDottedName(text string) bool {
+	if !strings.Contains(text, qnameSep) {
+		return false
 	}
-	// First, look for a direct named child (primitive_type /
-	// user_defined_type). The grammar wraps these in type_name; the inner
-	// named child is the one carrying the identifier we care about.
-	for i := uint(0); i < uint(typeNode.NamedChildCount()); i++ {
-		c := typeNode.NamedChild(i)
-		switch c.Kind() {
-		case "primitive_type":
-			return strings.TrimSpace(string(src[c.StartByte():c.EndByte()]))
-		case "user_defined_type":
-			// user_defined_type may be `Foo` or `Ns.Foo` — this takes the
-			// trailing identifier (same idiom as TS heritage resolution).
-			if id := lastIdentifier(c); id != nil {
-				return id.Utf8Text(src)
-			}
-			return strings.TrimSpace(string(src[c.StartByte():c.EndByte()]))
+	for _, r := range text {
+		if r != '.' && r != '_' && r != '$' && !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			return false
 		}
 	}
-	// Permissive fallback — raw subtree text. Whitespace-trimmed so
-	// downstream string compares stay clean.
-	return strings.TrimSpace(string(src[typeNode.StartByte():typeNode.EndByte()]))
+	return true
 }
 
 // lastIdentifier returns the rightmost identifier-like named child under n,

@@ -176,7 +176,7 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // kicks in — AST-only mode has no reliable way to map field references to
 // Field node IDs (parser.go comment). The propagator then no-ops, which
 // matches the existing INFERRED-confidence semantics of AST-only builds.
-func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
+func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, roles FileRoles, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
 	p := gop.New(srcRoot)
 	loadStart := time.Now()
 	loadErrs := 0
@@ -195,9 +195,9 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 	// scopes to query. Soft no-op when Resolve failed or pkgs are unavailable
 	// (AST-only fallback) — preserves existing buildpipe error semantics.
 	if err == nil && rg != nil {
-		implEdges := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
+		implEdges, implPending := gop.EmitImplementsEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, implEdges...)
-		log.Debug("implements emitted", "count", len(implEdges))
+		log.Debug("implements emitted", "count", len(implEdges), "outside_build", len(implPending))
 		// uses_type post-pass. Same wiring rationale as
 		// implements above. Cross-package types without a node (stdlib,
 		// vendored deps) become PendingRefs — appended to the pending
@@ -207,7 +207,11 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 		// Types outside the build (time.Timer, big.Int) get External nodes
 		// (schema 1.36). The refs stay pending as well, so an incremental
 		// build that re-resolves the file binds them again.
-		extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+		// An interface that embeds one from outside the build (io.Reader)
+		// extends that interface's External node; the post-Resolve pass
+		// finds these again on every build, so they are not stored as
+		// pending refs.
+		extNodes, extEdges := p.ExternalEdges(append(append([]parse.PendingRef{}, usesPending...), implPending...), rg.Nodes)
 		rg.Nodes = append(rg.Nodes, extNodes...)
 		rg.Edges = append(rg.Edges, extEdges...)
 		log.Debug("uses_type emitted", "edges", len(usesEdges), "pending", len(usesPending))
@@ -252,6 +256,18 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log 
 		rg.Nodes = append(rg.Nodes, promNodes...)
 		rg.Edges = append(rg.Edges, promEdges...)
 		log.Debug("promoted methods emitted", "nodes", len(promNodes))
+
+		// A package is shown by its first file that is not test code, so
+		// its is_test flag says "all files are tests" (see
+		// gop.CanonicalPackagePaths).
+		gop.CanonicalPackagePaths(rg.Nodes, roles.testFile)
+
+		// Lock edges: acquires_lock / releases_lock from the function to the
+		// Mutex node, wherever the mutex is declared, and accessed_under_lock.
+		// Before the contract pass and lock propagation, which read them.
+		lockEdges := gop.EmitLockEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, lockEdges...)
+		log.Debug("lock edges emitted", "count", len(lockEdges))
 
 		// Value uses: reads_field / writes_field (function -> struct field) and
 		// references (function or initializer -> package-level var/const).

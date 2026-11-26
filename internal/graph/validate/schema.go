@@ -243,8 +243,11 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 			// Schema 1.36: a call to a symbol outside the build ends at an
-			// External node, which never starts one.
-			if !isCallable(dst.Type) && dst.Type != types.NodeExternal {
+			// External node, which never starts one. Schema 1.39: a caller
+			// that calls a closure or a function value carries a marker, an
+			// invokes edge to itself with the dispatch kind; it names no
+			// callee, so a Variable may carry one for its initialiser.
+			if !isCallable(dst.Type) && dst.Type != types.NodeExternal && !isDispatchMarker(e) {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-dst",
 					Message:  "calls/invokes dst is not a callable kind (got " + string(dst.Type) + ")",
@@ -314,6 +317,12 @@ func isCaller(t types.NodeType) bool {
 		return true
 	}
 	return isCallable(t)
+}
+
+// isDispatchMarker reports whether e is the marker of a dynamic call: an
+// invokes edge from a node to itself that carries the dispatch kind.
+func isDispatchMarker(e types.Edge) bool {
+	return e.Type == types.EdgeInvokes && e.Src == e.Dst && e.DispatchKind != ""
 }
 
 // isCallable reports whether t is a node type that legitimately appears

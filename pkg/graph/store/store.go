@@ -58,6 +58,98 @@ type SearchFTSOptions = persist.SearchFTSOptions
 // (Language, Kinds). Zero value means "no filter".
 type FindSymbolOptions = persist.FindSymbolOptions
 
+// DefaultFindSymbolLimit is the number of rows Reader.FindSymbol returns when
+// FindSymbolOptions.Limit is zero; FindSymbolNoLimit as Limit returns every
+// match.
+const (
+	DefaultFindSymbolLimit = persist.DefaultFindSymbolLimit
+	FindSymbolNoLimit      = persist.FindSymbolNoLimit
+)
+
+// NameResolution is what ResolveName returns: the qualified name and nodes a
+// caller-supplied name resolved to, or the candidates of an ambiguous bare
+// name. See persist.NameResolution.
+type NameResolution = persist.NameResolution
+
+// NameClass says what a node matched by name is (a declaration of the build,
+// a promoted copy, a function-local name, an External stub). See
+// persist.NameClass.
+type NameClass = persist.NameClass
+
+// The classes of a node matched by name, in the order a bare name prefers.
+const (
+	NameDeclared = persist.NameDeclared
+	NamePromoted = persist.NamePromoted
+	NameLocal    = persist.NameLocal
+	NameExternal = persist.NameExternal
+	NameOther    = persist.NameOther
+)
+
+// ResolveName maps a canonical id, a qualified name or a bare name to nodes.
+// It is the one resolver behind every tool that takes a symbol name; see
+// persist.ResolveName for the order.
+func ResolveName(r Reader, name, language string) (NameResolution, error) {
+	return persist.ResolveName(r, name, language)
+}
+
+// ClassifyNames returns the class of each of nodes by id. See
+// persist.ClassifyNames.
+func ClassifyNames(r Reader, nodes []types.Node) (map[string]NameClass, error) {
+	return persist.ClassifyNames(r, nodes)
+}
+
+// InFunctionBody reports whether n is declared inside a function body, given
+// the enclosers of its file (IsEncloser): the one rule for "known only inside
+// one function". See persist.InFunctionBody.
+func InFunctionBody(n types.Node, enclosers []types.Node) bool {
+	return persist.InFunctionBody(n, enclosers)
+}
+
+// TestFiles returns the files the build recorded as test code
+// (nodes.is_test: the build scope's file role, the path rule without a
+// scope) and whether r holds that record. See persist.TestFiles.
+func TestFiles(r Reader) (files []string, recorded bool, err error) { return persist.TestFiles(r) }
+
+// IsCallable reports whether n is a function, method, modifier or constructor
+// declaration.
+func IsCallable(n types.Node) bool { return persist.IsCallable(n) }
+
+// IsEncloser reports whether other declarations can be declared inside n, the
+// nodes InFunctionBody takes as enclosers: a callable or a variable. See
+// persist.IsEncloser.
+func IsEncloser(n types.Node) bool { return persist.IsEncloser(n) }
+
+// PromotedFrom reports whether n is the copy of a promoted method and, if so,
+// the qualified name of the method it copies.
+func PromotedFrom(n types.Node) (string, bool) { return persist.PromotedFrom(n) }
+
+// DeclSite is where a method is declared; a promoted copy has the site of
+// the method it copies. See persist.DeclSite.
+type DeclSite = persist.DeclSite
+
+// SiteOf returns the declaration site of n.
+func SiteOf(n types.Node) DeclSite { return persist.SiteOf(n) }
+
+// EmbeddingType returns the qualified name of the type a promoted copy is
+// listed under.
+func EmbeddingType(promotedCopy types.Node) string { return persist.EmbeddingType(promotedCopy) }
+
+// PromotedTo returns, by method id, the types that get each of methods
+// through an embedded field. See persist.PromotedTo.
+func PromotedTo(r Reader, methods []types.Node) (map[string][]string, error) {
+	return persist.PromotedTo(r, methods)
+}
+
+// BlankName is the name of a declaration that binds nothing (`var _ = x`).
+const BlankName = persist.BlankName
+
+// The keys a tool adds to its answer when the caller named the copy of a
+// promoted method; NameResolution.SeedNote is the text of the second.
+const (
+	SeedKeyPromotedFrom = persist.SeedKeyPromotedFrom
+	SeedKeyNote         = persist.SeedKeyNote
+)
+
 // PRRef is the public alias for the build-time-derived PR breadcrumb
 // stored per node. External consumers (cks, ckv) read this via
 // Reader.GetNodePRs; see pkg/types.PRRef for the field semantics and

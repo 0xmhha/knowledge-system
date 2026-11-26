@@ -11,17 +11,20 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
-	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
-// reviewTestFiles classifies the graph's source files as test code: the
-// testpath rule, plus Go packages of this module that only test code
-// imports, when they are internal or test-named (internal/testlog,
-// p/testrand). Public packages are left alone because callers outside the
-// repository may import them. The import rule is applied until no package
-// changes, so a helper used only by another test helper is caught too.
-func reviewTestFiles(srcRoot string, nodes []types.Node) []string {
+// reviewTestFiles classifies the graph's source files as test code.
+//
+// A file the build scope lists has the role the scope gives it (roles).
+// Any other file is judged by the testpath rule, plus Go packages of this
+// module that only test code imports, when they are internal or test-named
+// (internal/testlog, p/testrand). Public packages are left alone because
+// callers outside the repository may import them. The import rule is applied
+// until no package changes, so a helper used only by another test helper is
+// caught too; it never overrides a role the scope gave.
+func reviewTestFiles(srcRoot string, nodes []types.Node, roles FileRoles) []string {
 	files := map[string]bool{}
+	scoped := map[string]bool{} // directories with a file whose role the scope gives
 	dirFiles := map[string][]string{}
 	importers := map[string][]string{} // import path -> importing files
 	for _, n := range nodes {
@@ -32,11 +35,13 @@ func reviewTestFiles(srcRoot string, nodes []types.Node) []string {
 			importers[n.Name] = append(importers[n.Name], n.FilePath)
 			continue
 		}
-		if !files[n.FilePath] {
-			files[n.FilePath] = testpath.IsTest(n.FilePath)
+		if _, seen := files[n.FilePath]; !seen {
+			test, fromScope := roles.isTest(n.FilePath)
+			files[n.FilePath] = test
 			if strings.HasSuffix(n.FilePath, ".go") {
 				d := path.Dir(filepath.ToSlash(n.FilePath))
 				dirFiles[d] = append(dirFiles[d], n.FilePath)
+				scoped[d] = scoped[d] || fromScope
 			}
 		}
 	}
@@ -45,7 +50,7 @@ func reviewTestFiles(srcRoot string, nodes []types.Node) []string {
 			changed = false
 			for imp, from := range importers {
 				dir, ok := strings.CutPrefix(imp, module+"/")
-				if !ok || len(dirFiles[dir]) == 0 || !testOnlyCandidate(dir) || files[dirFiles[dir][0]] {
+				if !ok || len(dirFiles[dir]) == 0 || scoped[dir] || !testOnlyCandidate(dir) || files[dirFiles[dir][0]] {
 					continue
 				}
 				onlyTests := true
@@ -104,8 +109,8 @@ func goModulePath(srcRoot string) string {
 
 // rebuildReviewIndex classifies test files and recomputes the review index
 // (schema 1.24) once every node and edge of the build is stored.
-func rebuildReviewIndex(store persist.StoreWriter, srcRoot string, nodes []types.Node, log *slog.Logger) error {
-	testFiles := reviewTestFiles(srcRoot, nodes)
+func rebuildReviewIndex(store persist.StoreWriter, srcRoot string, nodes []types.Node, roles FileRoles, log *slog.Logger) error {
+	testFiles := reviewTestFiles(srcRoot, nodes, roles)
 	if err := store.RebuildReviewIndex(testFiles); err != nil {
 		return err
 	}

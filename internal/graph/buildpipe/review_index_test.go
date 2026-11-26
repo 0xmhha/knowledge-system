@@ -13,6 +13,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/contract"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -37,14 +38,73 @@ func TestReviewTestFiles(t *testing.T) {
 		imp("p/a.go", "example.com/m/internal/used"),
 		imp("p/a_test.go", "golang.org/x/internal/testlog"), // another module
 	}
-	got := reviewTestFiles(root, nodes)
+	got := reviewTestFiles(root, nodes, nil)
 	want := []string{"internal/h2/h.go", "internal/testlog/log.go", "p/a_test.go"}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("test files = %v, want %v", got, want)
 	}
 	// Without go.mod only the path rule applies.
-	if got := reviewTestFiles(t.TempDir(), nodes); !reflect.DeepEqual(got, []string{"p/a_test.go"}) {
+	if got := reviewTestFiles(t.TempDir(), nodes, nil); !reflect.DeepEqual(got, []string{"p/a_test.go"}) {
 		t.Fatalf("without go.mod = %v", got)
+	}
+}
+
+// With a build scope a file is test code when the scope says so. The path
+// rule alone flags helper names and test directories, which a scope may list
+// as production: systemcontracts/test/*.go, triedb/pathdb/testutils.go and
+// consensus/wbft/testutil.go of go-stablenet are compiled into packages no
+// test file belongs to.
+func TestReviewTestFilesFollowsScopeRoles(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "go.mod"), []byte("module example.com/m\n\ngo 1.22\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	fn := func(file string) types.Node { return types.Node{Type: types.NodeFunction, FilePath: file} }
+	imp := func(from, path string) types.Node {
+		return types.Node{Type: types.NodeImport, Name: path, FilePath: from}
+	}
+	nodes := []types.Node{
+		fn("sys/test/helpers.go"), fn("db/testutils.go"), fn("db/db.go"), fn("db/db_test.go"),
+		fn("internal/testlog/log.go"), fn("sol/test/Mock.sol"), fn("unlisted/testutil.go"),
+		imp("db/db_test.go", "example.com/m/internal/testlog"), // only a test imports it
+	}
+	scope := FileRoles{
+		"sys/test/helpers.go":     FileRoleProduction,
+		"db/testutils.go":         FileRoleProduction,
+		"db/db.go":                FileRoleProduction,
+		"db/db_test.go":           FileRoleTest,
+		"internal/testlog/log.go": FileRoleProduction,
+		"sol/test/Mock.sol":       FileRoleProduction,
+	}
+	cases := []struct {
+		name  string
+		roles FileRoles
+		want  []string
+	}{
+		{"path rule without a scope", nil,
+			[]string{"db/db_test.go", "db/testutils.go", "internal/testlog/log.go", "sol/test/Mock.sol", "sys/test/helpers.go", "unlisted/testutil.go"}},
+		// A file the scope does not list keeps the path rule.
+		{"scope roles", scope, []string{"db/db_test.go", "unlisted/testutil.go"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := reviewTestFiles(root, nodes, tc.roles); !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("test files = %v, want %v", got, tc.want)
+			}
+		})
+	}
+	layers := []struct {
+		file string
+		want contract.Layer
+	}{
+		{"sys/test/helpers.go", contract.LayerProduction},
+		{"db/db_test.go", contract.LayerTest},
+		{"unlisted/testutil.go", contract.LayerTest},
+	}
+	for _, tc := range layers {
+		if got := scope.layer(tc.file); got != tc.want {
+			t.Errorf("layer of %s = %s, want %s", tc.file, got, tc.want)
+		}
 	}
 }
 

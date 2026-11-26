@@ -121,16 +121,9 @@ func (v *declVisitor) runFunctionDecl() {
 		// A function without virtual or override has sub kind "function",
 		// so the taxonomy is explicit (a plain contract has "contract").
 		ident := nameNode.Utf8Text(v.src)
-		qname := v.memberQName(nameNode, ident)
 
 		isVirtual, override := scanFunctionModifiers(declNode, v.src)
 		id := v.emitCallable(declNode, functionSubKind(isVirtual, override.present))
-		// canonical id (ADR-0001): no import path in Solidity, so the
-		// relative file path is the qualifier and the parameter-type
-		// signature separates overloads — <relpath>:<Contract>.<func>(<types>).
-		// The file path also separates same-named contracts across
-		// version dirs (e.g. contracts/v1 vs contracts/v2).
-		v.lastNode().CanonicalID = v.rel + ":" + qname + funcParamSignature(declNode, v.src)
 
 		// Emit parameter name→type PendingRefs
 		// so Pass 2 can index (funcID, paramName) → typeName for
@@ -303,11 +296,14 @@ func (v *declVisitor) runModifierOverride() {
 // SrcID = function's node ID so Pass 2 can resolve the meta refs against
 // the same funcID space used by containerIDByFuncID.
 // funcParamSignature returns the parenthesised parameter-type list of a
-// function_definition node, e.g. "(address,uint256)" or "()". It feeds the
+// callable declaration, e.g. "(address,uint256)" or "()". It feeds the
 // canonical id (ADR-0001) so Solidity overloads — which differ only by
 // parameter types — get distinct ids. Parameter NAMES are intentionally
 // ignored (anonymous parameters still contribute their type), matching how the
-// Solidity ABI computes a function selector.
+// Solidity ABI computes a function selector. A type is the text the source
+// has (`Lib.Set`, `mapping(address => uint256)`): the last segment alone gave
+// overloads on `A.Set` and `B.Set` one id, and a mapping parameter was left
+// out of the list.
 func funcParamSignature(declNode *sitter.Node, src []byte) string {
 	if declNode == nil {
 		return "()"
@@ -322,7 +318,7 @@ func funcParamSignature(declNode *sitter.Node, src []byte) string {
 		if typeNode == nil {
 			continue
 		}
-		if t := extractTypeNameText(typeNode, src); t != "" {
+		if t := typeText(typeNode, src); t != "" {
 			paramTypes = append(paramTypes, t)
 		}
 	}
@@ -347,7 +343,10 @@ func emitParameterMetaPending(v *declVisitor, funcID string, declNode *sitter.No
 			continue // shouldn't happen — type is required per grammar
 		}
 		paramName := nameNode.Utf8Text(v.src)
-		typeName := extractTypeNameText(typeNode, v.src)
+		// The type as written, qualifier included. Pass 2 keeps it for
+		// member accesses through the parameter and reduces it to the
+		// using-for key itself (usingForTypeKey).
+		typeName := typeText(typeNode, v.src)
 		if paramName == "" || typeName == "" {
 			continue
 		}
@@ -462,7 +461,7 @@ func emitNamedReturnParamMetaPending(v *declVisitor, funcID string, declNode *si
 			continue
 		}
 		paramName := nameNode.Utf8Text(v.src)
-		typeName := extractTypeNameText(typeNode, v.src)
+		typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 		if paramName == "" || typeName == "" {
 			continue
 		}
@@ -644,7 +643,7 @@ func emitTryReturnsBinding(v *declVisitor, funcID string, p *sitter.Node, scopeE
 		return
 	}
 	varName := nameNode.Utf8Text(v.src)
-	typeName := extractTypeNameText(typeNode, v.src)
+	typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 	if varName == "" || typeName == "" {
 		return
 	}
@@ -688,7 +687,7 @@ func emitLocalVarBinding(v *declVisitor, funcID string, decl *sitter.Node) {
 		return
 	}
 	varName := nameNode.Utf8Text(v.src)
-	typeName := extractTypeNameText(typeNode, v.src)
+	typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 	if varName == "" || typeName == "" {
 		return
 	}

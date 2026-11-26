@@ -47,7 +47,9 @@ var (
 	// here rather than getting their own group: a change to the seed triggers
 	// a "go re-read this importer" examination just like `references` does,
 	// and a dedicated `module` bucket would be empty for every Go-only graph.
-	edgesOtherRefs = []string{"references", "emits_event", "has_modifier", "has_decorator", "imports", "exports"}
+	// reverts_with (schema 1.38): changing a Solidity error touches every
+	// function that reverts with it, as changing an event touches its emitters.
+	edgesOtherRefs = []string{"references", "emits_event", "reverts_with", "has_modifier", "has_decorator", "imports", "exports"}
 )
 
 type group struct {
@@ -107,8 +109,13 @@ type Options struct {
 //	seed         object?            — single-seed envelope (qname mode)
 //	seeds        []object?          — multi-seed envelope (file mode)
 //	seed_file    string?            — echoed file path (file mode)
-//	seed_qname   string?            — echoed seed qname when not_found
+//	seed_qname   string?            — echoed seed qname when not_found or ambiguous
 //	not_found    bool?              — true when the seed did not resolve
+//	other_case   []string?          — names differing from an unresolved seed only in case
+//	promoted_from, seed_note       — set when the seed named the copy of a promoted
+//	                                  method: the method answered for, and a sentence
+//	ambiguous    bool?              — true when a bare seed name matched several qnames
+//	candidates   []string?          — those qnames, to retry with
 //	impact       map[string][]node  — keys: callers, interface_impact,
 //	                                  type_users, distributed, concurrent,
 //	                                  other_refs (always all six, possibly
@@ -125,9 +132,19 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 		depth = DepthCap
 	}
 
-	seeds, primary, err := resolveSeeds(store, seedQname, seedFile)
+	seeds, primary, name, err := resolveSeeds(store, seedQname, seedFile)
 	if err != nil {
 		return nil, err
+	}
+	if name.Ambiguous() {
+		// The other tools answer an ambiguous bare name with its candidates;
+		// this one answered not_found (25 of 25 on go-stablenet).
+		return map[string]any{
+			"ambiguous":  true,
+			"candidates": name.Candidates,
+			"seed_qname": seedQname,
+			"depth":      depth,
+		}, nil
 	}
 	if len(seeds) == 0 {
 		// Echo whichever seed identifier the caller supplied so a client
@@ -141,6 +158,9 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 		}
 		if seedFile != "" {
 			out["seed_file"] = seedFile
+		}
+		if len(name.OtherCase) > 0 {
+			out["other_case"] = name.OtherCase
 		}
 		return out, nil
 	}
@@ -180,7 +200,10 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 		if seed.QualifiedName == "" {
 			continue
 		}
-		nbNodes, nbEdges, err := store.NeighborhoodByQname(seed.QualifiedName, depth, true /*reverse*/, unionEdges...)
+		// The walk starts from the seed node itself, not from its qualified
+		// name: every node of a qualified name is a seed already, and a
+		// canonical id or a file names nodes, not every node sharing a name.
+		nbNodes, nbEdges, err := store.NeighborhoodByIDs([]string{seed.ID}, depth, true /*reverse*/, unionEdges...)
 		if err != nil {
 			return nil, err
 		}
@@ -194,14 +217,7 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 		for _, e := range nbEdges {
 			inEdges[e.Dst] = append(inEdges[e.Dst], e)
 		}
-		// Roots are the nodes the store resolved this qname to (exact qname
-		// match), mirroring NeighborhoodByQname's own FindSymbol seeding.
-		var roots []string
-		for _, n := range nbNodes {
-			if n.QualifiedName == seed.QualifiedName {
-				roots = append(roots, n.ID)
-			}
-		}
+		roots := []string{seed.ID}
 
 		for _, g := range groups() {
 			edgeSet := make(map[string]bool, len(g.edges))
@@ -330,6 +346,12 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 	if primary != nil {
 		resp["seed"] = seedSummary(*primary)
 	}
+	// A seed that named the copy of a promoted method was answered for the
+	// method it copies; say so with the keys every seed tool uses.
+	if note := name.SeedNote(); note != "" {
+		resp[persist.SeedKeyPromotedFrom] = name.QName
+		resp[persist.SeedKeyNote] = note
+	}
 	if seedFile != "" && seedQname == "" {
 		// Sort seeds by id so the multi-rooted echo is stable across
 		// calls (NodesByFilePath ordering is implementation-defined).
@@ -353,42 +375,41 @@ func Compute(store persist.StoreReader, seedQname, seedFile string, opt Options)
 // primary node) a pointer to that node. seed_qname takes precedence; when
 // only seed_file is given, every node in the file becomes a seed.
 //
-// Returns (nil, nil, nil) when nothing matched — the caller surfaces this
-// as `not_found: true` in the response.
-func resolveSeeds(store persist.StoreReader, seedQname, seedFile string) ([]types.Node, *types.Node, error) {
+// seed_qname is resolved by persist.ResolveName, the resolver every tool that
+// takes a symbol name uses: a canonical id, a qualified name or a bare name.
+// The resolution is returned so the caller can report an ambiguous name with
+// its candidates.
+//
+// Returns no seeds when nothing matched — the caller surfaces this as
+// `not_found: true` in the response.
+func resolveSeeds(store persist.StoreReader, seedQname, seedFile string) ([]types.Node, *types.Node, persist.NameResolution, error) {
 	if seedQname != "" {
-		nodes, err := store.FindSymbol(seedQname, true, persist.FindSymbolOptions{})
-		if err != nil {
-			return nil, nil, err
+		name, err := persist.ResolveName(store, seedQname, "")
+		if err != nil || !name.Found() {
+			return nil, nil, name, err
 		}
-		if len(nodes) == 0 {
-			return nil, nil, nil
-		}
-		// FindSymbol can return multiple rows when the same qname exists
-		// across languages (rare); pick the first as the primary for the
-		// seed envelope and keep all as roots for traversal.
-		primary := nodes[0]
-		return nodes, &primary, nil
+		// Several nodes can carry one qname (the same symbol across
+		// languages, rare); the first is the primary for the seed envelope
+		// and all are roots for traversal.
+		primary := name.Nodes[0]
+		return name.Nodes, &primary, name, nil
 	}
 	if seedFile != "" {
 		nodes, err := store.NodesByFilePath(seedFile)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, persist.NameResolution{}, err
 		}
-		// Drop nodes without a qname (StartLine-anonymous fragments etc.)
-		// — NeighborhoodByQname needs a qname to resolve roots.
+		// Drop nodes without a qname (StartLine-anonymous fragments etc.):
+		// they are not symbols a change is asked about.
 		filtered := nodes[:0]
 		for _, n := range nodes {
 			if n.QualifiedName != "" {
 				filtered = append(filtered, n)
 			}
 		}
-		if len(filtered) == 0 {
-			return nil, nil, nil
-		}
-		return filtered, nil, nil
+		return filtered, nil, persist.NameResolution{}, nil
 	}
-	return nil, nil, nil
+	return nil, nil, persist.NameResolution{}, nil
 }
 
 // nodeToImpactEntry projects a Node into the per-bucket impact entry. It

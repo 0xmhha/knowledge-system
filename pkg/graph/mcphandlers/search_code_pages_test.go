@@ -103,14 +103,18 @@ func TestSearchCode_Index(t *testing.T) {
 		}
 		withUses = withUses || h["uses"] != nil
 	}
+	// with_lines and names_only add up to the rows listed; a row with
+	// matched lines is never counted as names_only.
 	carry := 0
 	for _, r := range out["hits"].([]any) {
 		if r.(map[string]any)["at"] != nil {
 			carry++
 		}
 	}
-	if int(hdr["with_lines"].(float64)) != carry {
-		t.Errorf("header with_lines = %v, rows carrying lines = %d", hdr["with_lines"], carry)
+	namesOnly, _ := hdr["names_only"].(float64)
+	if with := int(hdr["with_lines"].(float64)); with+int(namesOnly) != len(out["hits"].([]any)) || carry > with {
+		t.Errorf("header with_lines = %v, names_only = %v, rows = %d, rows carrying lines = %d",
+			hdr["with_lines"], hdr["names_only"], len(out["hits"].([]any)), carry)
 	}
 	if !withUses {
 		t.Errorf("no index row carries uses; the rows lost why they matter (header %v, full %d bytes)", hdr, len(fullRaw))

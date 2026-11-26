@@ -3,7 +3,6 @@ package mcphandlers
 import (
 	"context"
 	"sort"
-	"strings"
 
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
@@ -13,16 +12,51 @@ import (
 )
 
 // valueEdgeTypes are the edges from a user to a value it reads or writes:
-// struct fields (reads_field / writes_field) and package-level variables and
-// constants (references, dispatch_kind read or write).
-var valueEdgeTypes = []string{string(types.EdgeReadsField), string(types.EdgeWritesField), string(types.EdgeReferences)}
+// struct fields and Solidity state variables (reads_field / writes_field),
+// Solidity mappings (reads_mapping / writes_mapping; 39 mapping state
+// variables of go-stablenet with 168 uses returned nothing without them) and
+// package-level variables and constants (references, dispatch_kind read or
+// write).
+var valueEdgeTypes = []string{
+	string(types.EdgeReadsField), string(types.EdgeWritesField),
+	string(types.EdgeReadsMapping), string(types.EdgeWritesMapping),
+	string(types.EdgeReferences),
+}
 
 const defaultReferenceLimit = 100
+
+// accessWrite and accessRead are the two values of a user row's "access".
+const (
+	accessWrite = "write"
+	accessRead  = "read"
+)
 
 // isValueNode reports whether uses of nodes of type t are recorded as value
 // edges, not as calls.
 func isValueNode(t types.NodeType) bool {
-	return t == types.NodeField || t == types.NodeVariable || t == types.NodeConstant
+	switch t {
+	case types.NodeField, types.NodeVariable, types.NodeConstant, types.NodeMapping, types.NodeLocalVariable:
+		return true
+	}
+	return false
+}
+
+// valueAccess returns how a value edge uses its target: accessWrite,
+// accessRead, or "" for an edge that is not a value use. It is the one place
+// that says which edges write.
+func valueAccess(e types.Edge) string {
+	switch e.Type {
+	case types.EdgeWritesField, types.EdgeWritesMapping:
+		return accessWrite
+	case types.EdgeReadsField, types.EdgeReadsMapping:
+		return accessRead
+	case types.EdgeReferences:
+		if e.DispatchKind == accessWrite {
+			return accessWrite
+		}
+		return accessRead
+	}
+	return ""
 }
 
 // RegisterFindReferences lists the code that reads or writes a field, a
@@ -31,11 +65,11 @@ func RegisterFindReferences(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader)
 	tool := nsTool("find_references",
 		mcp.WithReadOnlyHintAnnotation(true),
-		mcp.WithDescription("Who reads or writes a value: the functions (and package-level initializers) that use a struct field, a package-level variable or a constant, "+
+		mcp.WithDescription("Who reads or writes a value: the functions (and package-level initializers) that use a struct field, a package-level variable, a constant or a Solidity state variable (mappings included), "+
 			"each with the file, every line it uses the value on (lines; line is the first), the number of uses and access=read|write. Writers come first, production code before tests (test=true). "+
 			"Use it to follow a value to where it is set and where it is consumed; calls are in find_callers. "+
 			"qname may be a canonical id, a qualified name (\"render.Options.Width\", \"log.DefaultLevel\") or a bare name. "+
-			"Recorded for Go; other languages and local variables have no value edges."),
+			"Recorded for Go and Solidity; other languages have no value edges."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithString("access", mcp.Description("read, write or all (default)")),
 		mcp.WithNumber("limit", mcp.DefaultNumber(defaultReferenceLimit)),
@@ -44,11 +78,8 @@ func RegisterFindReferences(s *server.MCPServer, reader store.Reader) {
 		q := req.GetString("qname", "")
 		resolved, cands, ambiguous, ok := resolveSeed(reader, q, "")
 		traceSeed(traceFrom(ctx), reader, q, resolved, cands, ambiguous, ok)
-		if ambiguous {
-			return textResult(seedAmbiguousResult(q, cands)), nil
-		}
-		if !ok {
-			return textResult(seedNotFoundResult(q)), nil
+		if miss := seedMiss(q, resolved, cands, ambiguous, ok); miss != nil {
+			return textResult(miss), nil
 		}
 		out, err := valueUsers(reader, resolved, req.GetString("access", "all"), int(req.GetFloat("limit", defaultReferenceLimit)))
 		if err != nil {
@@ -77,7 +108,7 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 	}
 	out := map[string]any{"users": []map[string]any{}, "total": 0}
 	if len(values) == 0 {
-		out["note"] = "value uses are recorded for fields, package-level variables and constants; this symbol is " +
+		out["note"] = "value uses are recorded for fields, variables, constants and Solidity state variables; this symbol is " +
 			joinKinds(kinds) + ". Use find_callers for the callers of a function or method."
 		return out, nil
 	}
@@ -102,12 +133,8 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 		if _, ok := values[e.Dst]; !ok {
 			continue
 		}
-		kind := "read"
-		switch {
-		case e.Type == types.EdgeWritesField, e.Type == types.EdgeReferences && e.DispatchKind == "write":
-			kind = "write"
-		}
-		if access == "read" && kind != "read" || access == "write" && kind != "write" {
+		kind := valueAccess(e)
+		if kind == "" || access == accessRead && kind != accessRead || access == accessWrite && kind != accessWrite {
 			continue
 		}
 		src, ok := byID[e.Src]
@@ -136,7 +163,7 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 		if src.Signature != "" {
 			row["signature"] = src.Signature
 		}
-		if strings.HasSuffix(file, "_test.go") {
+		if isTestFile(file) {
 			row["test"] = true
 		}
 		rows[k] = row

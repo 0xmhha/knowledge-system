@@ -690,19 +690,30 @@ func TestFindSymbol_SuffixMatch(t *testing.T) {
 	}
 }
 
-// TestFindSymbol_SuffixMatchCaseInsensitive locks the contract that suffix
-// matching is case-insensitive, as the original leading-wildcard LIKE was.
-// The simple_name equi-join must use COLLATE NOCASE so a lowercase query still
-// hits a CamelCase symbol (e.g. "funcb" → "mypkg.FuncB").
-func TestFindSymbol_SuffixMatchCaseInsensitive(t *testing.T) {
+// TestFindSymbol_SuffixMatchKeepsCase locks the contract that a suffix match
+// compares the case the caller wrote: "funcb" is not "FuncB". In 472
+// bare-name queries against go-stablenet the earlier case-insensitive match
+// returned 2,649 nodes of another case ("pack" for "Pack"). IgnoreCase asks
+// for names that differ only in case.
+func TestFindSymbol_SuffixMatchKeepsCase(t *testing.T) {
 	s := newFixtureStore(t)
 
-	nodes, err := s.FindSymbol("funcb", false, persist.FindSymbolOptions{})
-	if err != nil {
-		t.Fatalf("FindSymbol case-insensitive suffix: %v", err)
-	}
-	if !containsID(nodeIDs(nodes), "funcB00000000000") {
-		t.Errorf("case-insensitive suffix 'funcb' did not hit mypkg.FuncB: %v", nodeIDs(nodes))
+	for _, tc := range []struct {
+		name string
+		opts persist.FindSymbolOptions
+		want bool
+	}{
+		{"FuncB", persist.FindSymbolOptions{}, true},
+		{"funcb", persist.FindSymbolOptions{}, false},
+		{"funcb", persist.FindSymbolOptions{IgnoreCase: true}, true},
+	} {
+		nodes, err := s.FindSymbol(tc.name, false, tc.opts)
+		if err != nil {
+			t.Fatalf("FindSymbol(%q): %v", tc.name, err)
+		}
+		if got := containsID(nodeIDs(nodes), "funcB00000000000"); got != tc.want {
+			t.Errorf("FindSymbol(%q, %+v) hit mypkg.FuncB = %v, want %v", tc.name, tc.opts, got, tc.want)
+		}
 	}
 }
 

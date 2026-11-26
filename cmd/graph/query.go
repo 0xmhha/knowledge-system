@@ -18,6 +18,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -230,7 +231,17 @@ func buildEdgeIndex(edges []types.Edge) edgeIndex {
 	return idx
 }
 
-func renderQueryAnswer(w *os.File, question string,
+// A neighbourhood line names the node the walk came from, the relation and
+// the node it reached. The arrow points the way the relation goes: forward
+// when the first node has it to the second, reverse when the second has it to
+// the first.
+const (
+	queryLineForward = "- `%s` —[%s]→ `%s` · %s:%d\n"
+	queryLineReverse = "- `%s` ←[%s]— `%s` · %s:%d\n"
+	queryLegend      = "_`a` —[r]→ `b`: a has relation r to b. `a` ←[r]— `b`: b has it to a._\n\n"
+)
+
+func renderQueryAnswer(w io.Writer, question string,
 	seeds []types.Node, allNodes []types.Node,
 	adj map[string][]string, eidx edgeIndex,
 	depth, tokenBudget int) {
@@ -257,6 +268,7 @@ func renderQueryAnswer(w *os.File, question string,
 	tokens := 0
 	rendered := strings.Builder{}
 	rendered.WriteString("### Neighbourhood (BFS)\n\n")
+	rendered.WriteString(queryLegend)
 bfs:
 	for d := 0; d < depth && len(frontier) > 0; d++ {
 		next := make([]string, 0, len(frontier))
@@ -275,12 +287,17 @@ bfs:
 				if other.ID == "" {
 					continue
 				}
-				line := fmt.Sprintf("- `%s` —[%s]→ `%s` · %s:%d\n",
-					cur.Name, e.Type, other.Name, other.FilePath, other.StartLine)
+				// The walk crosses edges both ways; the arrow follows the
+				// relation, not the walk.
+				format := queryLineForward
+				if e.Src != src {
+					format = queryLineReverse
+				}
+				line := fmt.Sprintf(format, cur.Name, e.Type, other.Name, other.FilePath, other.StartLine)
 				if (rendered.Len()+len(line))/charsPerToken > tokenBudget {
 					rendered.WriteString("- _… token budget reached; rerun with --budget=N for more._\n")
 					tokens = rendered.Len() / charsPerToken
-					_, _ = w.WriteString(rendered.String())
+					_, _ = io.WriteString(w, rendered.String())
 					_, _ = fmt.Fprintf(w, "\n_~%d tokens, %d nodes visited_\n", tokens, len(visited))
 					return
 				}
@@ -295,6 +312,6 @@ bfs:
 		}
 	}
 	tokens = rendered.Len() / charsPerToken
-	_, _ = w.WriteString(rendered.String())
+	_, _ = io.WriteString(w, rendered.String())
 	_, _ = fmt.Fprintf(w, "\n_~%d tokens, %d nodes visited_\n", tokens, len(visited))
 }

@@ -30,28 +30,40 @@ type accessState struct {
 
 // resolveMember emits the edge of one member access: reads_field or
 // writes_field to the struct member, enum value, constant or state variable
-// the access names. An access that names none of them (`list.length`,
+// the access names, or uses_type to the enum or struct it names inside a
+// container. An access that names none of them (`list.length`,
 // `x.selector`, a member of a type the graph does not declare) is not a use
 // of a declaration and is dropped.
 func (r *scopedResolver) resolveMember(pr parse.PendingRef, path string, write bool) {
-	root, steps := splitAccessPath(path)
-	state, ok := r.rootState(pr, root)
-	for _, step := range steps {
-		if !ok {
-			return
-		}
-		state, ok = r.advance(state, step)
-	}
+	state, ok := r.stateAt(pr, path)
 	if !ok {
 		return
 	}
 	target := r.memberOf(state, pr.TargetQName)
-	if target == nil || !isStorageType(target.Type) {
-		// An enum reached through its container (`Shapes.Kind`) is a
-		// step towards a value, not a value that is read.
-		return
+	switch {
+	case target == nil:
+	case isStorageType(target.Type):
+		r.edge(pr, accessEdgeType(target.Type, write), target.ID)
+	case !write:
+		// An enum or a struct reached through its container (`Shapes.Kind`
+		// in `Shapes.Kind.Circle`) is a type named in the expression.
+		r.edge(pr, types.EdgeUsesType, target.ID)
 	}
-	r.edge(pr, accessEdgeType(target.Type, write), target.ID)
+}
+
+// stateAt walks an access path made by accessPath, as written in the
+// callable or variable that made the reference, and returns what the whole
+// path stands for. ok is false when a step names nothing the graph declares.
+func (r *scopedResolver) stateAt(pr parse.PendingRef, path string) (accessState, bool) {
+	root, steps := splitAccessPath(path)
+	state, ok := r.rootState(pr, root)
+	for _, step := range steps {
+		if !ok {
+			return accessState{}, false
+		}
+		state, ok = r.advance(state, step)
+	}
+	return state, ok
 }
 
 // splitAccessPath splits a path made by accessPath into its root name and
@@ -85,8 +97,7 @@ func splitAccessPath(path string) (root string, steps []string) {
 // enum in scope.
 func (r *scopedResolver) rootState(pr parse.PendingRef, name string) (accessState, bool) {
 	containerID, file := r.scope.contextOf(pr.SrcID)
-	if typeName, isLocal := lookupReceiver(name, "", pr.SrcID, pr.Line, pr.ByteOffset,
-		nil, r.paramTypes, r.localVarTypes); isLocal {
+	if typeName, isLocal := r.localType(pr, name); isLocal {
 		return accessState{typeName: typeName, containerID: containerID, file: file}, true
 	}
 	ids := r.scope.lookup(containerID, file, name, anyType)
@@ -94,6 +105,24 @@ func (r *scopedResolver) rootState(pr parse.PendingRef, name string) (accessStat
 		return accessState{}, false
 	}
 	return r.stateOf(r.scope.node[ids[0]])
+}
+
+// localType returns the declared type, as written, of a local variable or a
+// parameter of the callable that made the reference; ok is false when name
+// is neither. The line and the byte of the reference pick the declaration in
+// scope when a local name is declared in more than one block.
+//
+// The type used to be the last segment only (`Limits` for `Rules.Limits`),
+// which named another struct when the callable's contract declares one of
+// that name and nothing when two libraries do.
+func (r *scopedResolver) localType(pr parse.PendingRef, name string) (typeName string, ok bool) {
+	if decls := r.localVarTypes[pr.SrcID][name]; len(decls) > 0 {
+		if d, inScope := selectLocalDecl(decls, pr.Line, pr.ByteOffset); inScope {
+			return d.typeText, true
+		}
+	}
+	typeName, ok = r.paramTypeTexts[pr.SrcID][name]
+	return typeName, ok
 }
 
 // stateOf turns a declaration an access path reached into the state to go
@@ -128,7 +157,8 @@ func (r *scopedResolver) advance(state accessState, step string) (accessState, b
 
 // memberOf returns the declaration `name` means after state: a member of
 // the struct a value has as its type, a value of an enum, or a member of a
-// container (a constant, a state variable, an enum). nil when there is none.
+// container (a constant, a state variable, an enum, a struct). nil when
+// there is none.
 func (r *scopedResolver) memberOf(state accessState, name string) *types.Node {
 	switch {
 	case state.decl == nil:
@@ -138,7 +168,7 @@ func (r *scopedResolver) memberOf(state accessState, name string) *types.Node {
 		return r.scope.node[r.scope.children[state.decl.ID][name]]
 	}
 	ids := r.scope.lookupInherited(r.scope.linearisation(state.decl.ID), name, func(t types.NodeType) bool {
-		return isStorageType(t) || t == types.NodeEnum
+		return isStorageType(t) || t == types.NodeEnum || t == types.NodeStruct
 	})
 	if len(ids) == 0 {
 		return nil

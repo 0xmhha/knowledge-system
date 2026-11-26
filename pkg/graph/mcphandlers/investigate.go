@@ -163,12 +163,35 @@ func isTestFile(f string) bool {
 	return strings.HasSuffix(f, "_test.go") || strings.Contains(f, "/testdata/")
 }
 
+// testFileRule returns what investigate takes for test code: the files the
+// build recorded as test code (store.TestFiles: the build scope's file role,
+// or the build's path rule without a scope), or isTestFile for a graph that
+// holds no such record.
+func testFileRule(reader store.Reader) (func(string) bool, error) {
+	files, recorded, err := store.TestFiles(reader)
+	if err != nil {
+		return nil, fmt.Errorf("test files: %w", err)
+	}
+	if !recorded {
+		return isTestFile, nil
+	}
+	set := make(map[string]bool, len(files))
+	for _, f := range files {
+		set[f] = true
+	}
+	return func(f string) bool { return set[f] }, nil
+}
+
 func buildInvIndex(reader store.Reader) (*invIndex, error) {
 	code, err := codeIndexFor(reader)
 	if err != nil {
 		return nil, err
 	}
 	all, err := reader.AllNodes()
+	if err != nil {
+		return nil, err
+	}
+	isTest, err := testFileRule(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +204,7 @@ func buildInvIndex(reader store.Reader) (*invIndex, error) {
 			continue
 		}
 		x.nodes[n.ID] = n
-		x.test[n.ID] = isTestFile(n.FilePath)
+		x.test[n.ID] = isTest(n.FilePath)
 		leaf := leafName(n.QualifiedName)
 		x.byLeaf[leaf] = append(x.byLeaf[leaf], n.ID)
 		x.byFold[strings.ToLower(leaf)] = append(x.byFold[strings.ToLower(leaf)], n.ID)
@@ -658,7 +681,7 @@ func (x *invIndex) header(id string) string {
 // writes, and its callers. Full: every line that uses something or holds a
 // word. Compact: the signature, the lines with a word, a call, a write, a
 // new value or goroutine; reads on other lines are summed up in one line.
-func (x *invIndex) funcCard(id string, words []*invWord, compact bool) string {
+func (x *invIndex) funcCard(id string, words []*invWord, withTests, compact bool) string {
 	n := x.nodes[id]
 	var b strings.Builder
 	b.WriteString(x.header(id) + "\n")
@@ -730,7 +753,7 @@ func (x *invIndex) funcCard(id string, words []*invWord, compact bool) string {
 	var callers []string
 	seen := map[string]bool{}
 	for _, e := range x.adj[id] {
-		if e.out || e.typ != types.EdgeCalls && e.typ != types.EdgeInvokes || seen[e.other] {
+		if e.out || e.typ != types.EdgeCalls && e.typ != types.EdgeInvokes || seen[e.other] || !withTests && x.test[e.other] {
 			continue
 		}
 		seen[e.other] = true
@@ -995,7 +1018,7 @@ func (x *invIndex) typeCard(id string, withTests, compact bool) string {
 func (x *invIndex) card(id string, words []*invWord, withTests, compact bool) string {
 	switch x.nodes[id].Type {
 	case types.NodeFunction, types.NodeMethod:
-		return x.funcCard(id, words, compact)
+		return x.funcCard(id, words, withTests, compact)
 	case types.NodeField, types.NodeVariable, types.NodeConstant, types.NodeChannel:
 		return x.valueCard(id, withTests, compact)
 	default:
@@ -1501,7 +1524,7 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 			"Cards shown earlier in the session are not repeated. Give the names you expect, joined with | (\"Flush|Writer|bufSize\"); "+
 			"a wildcard between two parts (\"Read\\\\w*Buffer\") matches names of that shape."),
 		mcp.WithString("words", mcp.Required(), mcp.Description("identifiers or words, separated by |, commas or spaces")),
-		mcp.WithString("tests", mcp.Description("exclude (default) or include test code")),
+		mcp.WithString("tests", mcp.Description("exclude (default) or include test code: the files the build recorded as test code (the build scope's file role; without a scope, the file's path), in every part of the result, callers included")),
 		mcp.WithNumber("budget", mcp.Description("response size in characters (default 24000)")),
 	)
 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {

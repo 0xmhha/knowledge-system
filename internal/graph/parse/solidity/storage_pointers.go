@@ -8,9 +8,9 @@ import (
 
 // Storage pointers. A local declared `storage` is another name for a state
 // variable, or for a part of one: after `Proposal storage p = proposals[id];`
-// the statement `p.approved = n` writes `proposals`. The body walker asks
-// this file what each such local can point to and records a write through it
-// as a write of that state variable.
+// the statement `p.approved = n` writes `proposals` and `p.approved > 0`
+// reads it. The body walker asks this file what each such local can point to
+// and records a use through it as a use of that state variable.
 //
 // A pointer is followed when it is bound, in a declaration or by a later
 // assignment, to

@@ -215,6 +215,8 @@ func TestSchemaValidator_VariableCallEnds(t *testing.T) {
 			{Src: "v", Dst: "f", Type: types.EdgeCalls, Line: 1, Confidence: types.ConfExtracted},
 			{Src: "v", Dst: "f", Type: types.EdgeInvokes, Line: 2, Confidence: types.ConfExtracted},
 			{Src: "f", Dst: "v", Type: types.EdgeCalls, Line: 3, Confidence: types.ConfExtracted},
+			// The marker of a closure the initialiser calls names no callee.
+			{Src: "v", Dst: "v", Type: types.EdgeInvokes, Line: 4, Confidence: types.ConfExtracted, DispatchKind: "closure"},
 		},
 	}
 	r, err := NewSchemaValidator().Validate(context.Background(), g, nil)

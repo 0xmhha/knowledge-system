@@ -31,12 +31,26 @@ import (
 //	encloses     a statement -> each statement node directly inside it
 //	             (dispatch_kind cond, then, else, body, case, go)
 //
-// Line is the line of the use. A function literal's body is walked as its
-// own top level: it runs when it is called, not where it is written; the
-// literal of a go statement belongs to its Goroutine node. A statement
-// without a node (none is made inside a goroutine literal except call
-// sites) is transparent: what lies inside it belongs to the statement
-// around it.
+// Line is the line of the use. A statement without a node is transparent:
+// what lies inside it belongs to the statement around it.
+//
+// The parts of a statement are regions of the source text, and a function
+// literal does not end a region. A statement written in a literal that is
+// written in a loop lies in that loop, and encloses says so (1,136 statements
+// of go-stablenet had no encloses edge because the literal cut them off). A
+// value read or a function called in a literal that stands in a statement's
+// header (for _, tc := range []test{{run: func() { use(x) }}}) is in the
+// header: cond_reads and cond_calls start at the innermost statement whose
+// header holds the use, across literals and the statements inside them (13
+// such reads of go-stablenet had no edge). body_writes alone stops at a
+// literal: a branch that only defines a function writes nothing when it runs. The literal of a go
+// statement belongs to its Goroutine node, and so do the calls the go
+// statement makes itself to evaluate its function and its arguments.
+//
+// The pass also resolves the calls the declaration pass cannot: a method of
+// an interface declared inside a function, or written without a name, has no
+// canonical id, so its node is found by position (posIndex). Such a call gets
+// its site_calls edge here and its invokes edge from the function as well.
 
 // StatementStats summarises one run of the pass for the build log.
 type StatementStats struct {
@@ -75,64 +89,32 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 		case types.NodeIfStmt, types.NodeLoopStmt, types.NodeSwitchStmt, types.NodeReturnStmt, types.NodeGoroutine:
 			stmts[stmtKey{n.FilePath, n.StartByte, 0, n.Type}] = n
 		case types.NodeCallSite:
-			if n.SubKind == "" { // send and recv sites are channel operations, not calls
-				stmts[stmtKey{n.FilePath, n.StartByte, n.EndByte, n.Type}] = n
-			}
+			// A call and a channel operation never share a span: a send
+			// ends after its value, a receive starts at the arrow, and a
+			// range over a channel starts at the range keyword.
+			stmts[stmtKey{n.FilePath, n.StartByte, n.EndByte, n.Type}] = n
 		}
 	}
-	decls := newDeclIndex(nodes)
 	fields := newFieldIndex(fsetOf(pkgs), nodes)
+	// Methods without a canonical id: those of interfaces declared inside a
+	// function or written without a name.
+	methods := newPosIndex(fsetOf(pkgs), nodes, func(n *types.Node) bool {
+		return n.Type == types.NodeMethod && n.CanonicalID == ""
+	})
 	c := &stmtCollector{seen: map[stmtEdgeKey]int{}}
-	// Each file is walked once (see fileVisits): walking the test variant's
-	// copy as well gave count 2 to 21,681 site_calls edges of go-stablenet.
-	walked := fileVisits{}
-	for _, pkg := range pkgs {
-		if pkg == nil || pkg.Types == nil || pkg.TypesInfo == nil {
-			continue
+	// The initialiser of a package-level variable holds statements and call
+	// sites of its own (schema 1.38); a constant's holds no code that runs.
+	forEachOwnedCode(pkgs, nodes, func(oc ownedCode) {
+		if !oc.part.runs() || oc.tok == token.CONST {
+			return
 		}
-		for _, f := range pkg.Syntax {
-			if f == nil || !walked.first(pkg, f) {
-				continue
-			}
-			walk := func(src *types.Node, body ast.Node) {
-				w := &stmtWalker{c: c, st: &st, info: pkg.TypesInfo, fset: pkg.Fset, file: src.FilePath,
-					stmts: stmts, byCanonical: byCanonical, fields: fields, lhs: writtenIn(body)}
-				w.region(body, ctl{})
-			}
-			for _, decl := range f.Decls {
-				switch d := decl.(type) {
-				case *ast.FuncDecl:
-					if d.Body == nil {
-						continue
-					}
-					src := decls.at(goCanonicalID(pkg.TypesInfo.Defs[d.Name]), funcDeclQname(pkg.Types.Name(), d), pkg.Fset.Position(d.Pos()))
-					if src == nil {
-						continue
-					}
-					st.Functions++
-					walk(src, d.Body)
-				case *ast.GenDecl:
-					// The initialiser of a package-level variable holds
-					// statements and call sites of its own (schema 1.38).
-					if d.Tok != token.VAR {
-						continue
-					}
-					for _, spec := range d.Specs {
-						vs, ok := spec.(*ast.ValueSpec)
-						if !ok {
-							continue
-						}
-						for i, value := range vs.Values {
-							name := vs.Names[initialiserOwner(i, len(vs.Names))]
-							if src := byCanonical[goCanonicalID(pkg.TypesInfo.Defs[name])]; src != nil {
-								walk(src, value)
-							}
-						}
-					}
-				}
-			}
+		if oc.part == partBody {
+			st.Functions++
 		}
-	}
+		w := &stmtWalker{c: c, st: &st, info: oc.info(), fset: oc.pkg.Fset, file: oc.owner.FilePath, owner: oc.owner,
+			stmts: stmts, byCanonical: byCanonical, fields: fields, methods: methods, lhs: assignedExprs(oc.root, oc.info(), true)}
+		w.region(oc.root, ctl{})
+	})
 	return c.edges, st
 }
 
@@ -140,7 +122,32 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 type ctl struct {
 	node *types.Node
 	kind string // cond, then, else, body, case, go
+	// lit is set inside a function literal written in the statement: the
+	// statement still encloses what the literal holds, but the literal's
+	// writes are not the statement's.
+	lit bool
+	// hdr is the statement whose header holds this region from further out:
+	// set for the parts of a statement that is itself written inside a
+	// function literal in that header.
+	hdr *types.Node
 }
+
+// writes reports whether what the region writes is recorded for the
+// statement's body.
+func (c ctl) writes() bool { return c.node != nil && !c.lit && c.kind != "cond" }
+
+// header returns the innermost statement whose header holds the region, or
+// nil: the statement itself in its own header, otherwise the one from
+// further out.
+func (c ctl) header() *types.Node {
+	if c.kind == "cond" && c.node != nil {
+		return c.node
+	}
+	return c.hdr
+}
+
+// inLiteral is c for the body of a function literal written in the region.
+func (c ctl) inLiteral() ctl { return ctl{node: c.node, kind: c.kind, lit: true, hdr: c.hdr} }
 
 type stmtEdgeKey struct {
 	src, dst string
@@ -174,47 +181,12 @@ type stmtWalker struct {
 	info        *gotypes.Info
 	fset        *token.FileSet
 	file        string
+	owner       *types.Node // the function or variable whose code is walked
 	stmts       map[stmtKey]*types.Node
 	byCanonical map[string]*types.Node
 	fields      fieldIndex
-	lhs         map[ast.Expr]bool // the left sides of assignments and increments in the body
-}
-
-// writtenIn marks what the assignments and increments of body write
-// (x.F, pkg.V, V, and m[k] into m), so a condition's reads leave them out:
-// "if w.v, err = f(); err != nil" writes w.v.
-func writtenIn(body ast.Node) map[ast.Expr]bool {
-	out := map[ast.Expr]bool{}
-	var mark func(e ast.Expr)
-	mark = func(e ast.Expr) {
-		switch x := e.(type) {
-		case *ast.Ident:
-			out[x] = true
-		case *ast.SelectorExpr:
-			out[x] = true
-			out[x.Sel] = true
-		case *ast.IndexExpr:
-			mark(x.X)
-		case *ast.ParenExpr:
-			mark(x.X)
-		case *ast.StarExpr:
-			mark(x.X)
-		}
-	}
-	ast.Inspect(body, func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.AssignStmt:
-			if x.Tok != token.DEFINE {
-				for _, l := range x.Lhs {
-					mark(l)
-				}
-			}
-		case *ast.IncDecStmt:
-			mark(x.X)
-		}
-		return true
-	})
-	return out
+	methods     posIndex
+	lhs         map[ast.Expr]bool // what the assignments and increments in the body write (assignedExprs)
 }
 
 func (w *stmtWalker) line(p token.Pos) int { return w.fset.Position(p).Line }
@@ -236,13 +208,20 @@ func (w *stmtWalker) site(x *ast.CallExpr) *types.Node {
 	return n
 }
 
+// opSite returns the site node of the channel operation spanning [from, to),
+// or nil: an operation on a local channel bound to its make site has an edge
+// to the Channel node and no site.
+func (w *stmtWalker) opSite(from, to token.Pos) *types.Node {
+	return w.stmts[stmtKey{w.file, w.fset.Position(from).Offset, w.fset.Position(to).Offset, types.NodeCallSite}]
+}
+
 // inner is the context for the parts of a statement: the statement itself
 // when it has a node, otherwise the context around it.
 func inner(n *types.Node, outer ctl, kind string) ctl {
 	if n == nil {
 		return outer
 	}
-	return ctl{n, kind}
+	return ctl{node: n, kind: kind, hdr: outer.header()}
 }
 
 func (w *stmtWalker) enclose(c ctl, child *types.Node, p token.Pos) {
@@ -262,7 +241,7 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 		case nil:
 			return false
 		case *ast.FuncLit:
-			w.region(x.Body, ctl{})
+			w.region(x.Body, c.inLiteral())
 			return false
 		case *ast.IfStmt:
 			w.ifStmt(x, c)
@@ -279,7 +258,11 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 		case *ast.RangeStmt:
 			s := w.node(types.NodeLoopStmt, x.Pos())
 			w.enclose(c, s, x.Pos())
-			w.region(x.X, inner(s, c, "cond"))
+			cc := inner(s, c, "cond")
+			// A range over a channel receives; its site is part of the
+			// loop header, as a call in the range expression is.
+			w.enclose(cc, w.opSite(x.Range, x.X.End()), x.Range)
+			w.region(x.X, cc)
 			w.region(x.Body, inner(s, c, "body"))
 			return false
 		case *ast.SwitchStmt:
@@ -303,37 +286,45 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 			return false
 		case *ast.ReturnStmt:
 			w.enclose(c, w.node(types.NodeReturnStmt, x.Pos()), x.Pos())
+		case *ast.SendStmt:
+			// Send and receive sites lie in the statement around them
+			// like call sites (841 of go-stablenet had no encloses edge).
+			w.enclose(c, w.opSite(x.Pos(), x.End()), x.Pos())
+		case *ast.UnaryExpr:
+			if x.Op == token.ARROW {
+				w.enclose(c, w.opSite(x.Pos(), x.End()), x.Pos())
+			}
 		case *ast.CallExpr:
-			callee, kind := w.callee(x)
+			callee, kind := w.resolve(x)
 			if s := w.site(x); s != nil {
 				w.enclose(c, s, x.Pos())
 				w.c.emit(s, callee, types.EdgeSiteCalls, kind, w.line(x.Pos()))
 			}
 			if callee == nil {
 				w.st.Unresolved++
-			} else if c.kind == "cond" {
-				w.c.emit(c.node, callee, types.EdgeCondCalls, "", w.line(x.Pos()))
+			} else if h := c.header(); h != nil {
+				w.c.emit(h, callee, types.EdgeCondCalls, "", w.line(x.Pos()))
 			}
 		case *ast.AssignStmt:
-			if c.node != nil && c.kind != "cond" && x.Tok != token.DEFINE {
+			if c.writes() && x.Tok != token.DEFINE {
 				for _, lhs := range x.Lhs {
 					w.written(lhs, c)
 				}
 			}
 		case *ast.IncDecStmt:
-			if c.node != nil && c.kind != "cond" {
+			if c.writes() {
 				w.written(x.X, c)
 			}
 		case *ast.SelectorExpr:
-			if c.kind == "cond" && !w.lhs[x] {
+			if h := c.header(); h != nil && !w.lhs[x] {
 				if sel := w.info.Selections[x]; sel != nil && sel.Kind() == gotypes.FieldVal {
-					w.c.emit(c.node, w.fields.node(sel.Obj()), types.EdgeCondReads, "", w.line(x.Sel.Pos()))
+					w.c.emit(h, w.fields.node(sel.Obj()), types.EdgeCondReads, "", w.line(x.Sel.Pos()))
 				}
 			}
 		case *ast.Ident:
-			if c.kind == "cond" && !w.lhs[x] {
+			if h := c.header(); h != nil && !w.lhs[x] {
 				if v := w.pkgValue(x); v != nil {
-					w.c.emit(c.node, v, types.EdgeCondReads, "", w.line(x.Pos()))
+					w.c.emit(h, v, types.EdgeCondReads, "", w.line(x.Pos()))
 				}
 			}
 		}
@@ -375,18 +366,23 @@ func (w *stmtWalker) goStmt(x *ast.GoStmt, c ctl) {
 	if x.Call == nil {
 		return
 	}
+	// The go statement evaluates its function expression and its arguments
+	// itself, before the goroutine starts: the calls in them are its own,
+	// not the surrounding statement's (13 encloses edges of go-stablenet
+	// started at the statement around the go statement).
+	own := inner(g, c, "go")
 	if lit, ok := x.Call.Fun.(*ast.FuncLit); ok {
-		w.region(lit.Body, inner(g, ctl{}, "go"))
+		w.region(lit.Body, own)
 	} else {
-		callee, kind := w.callee(x.Call)
+		callee, kind := w.resolve(x.Call)
 		if callee == nil {
 			w.st.Unresolved++
 		}
 		w.c.emit(g, callee, types.EdgeSiteCalls, kind, w.line(x.Pos()))
-		w.region(x.Call.Fun, c) // a receiver or function expression evaluated here
+		w.region(x.Call.Fun, own)
 	}
-	for _, a := range x.Call.Args { // arguments are evaluated by the go statement itself
-		w.region(a, c)
+	for _, a := range x.Call.Args {
+		w.region(a, own)
 	}
 }
 
@@ -433,6 +429,23 @@ func (w *stmtWalker) pkgValue(id *ast.Ident) *types.Node {
 	return nil
 }
 
+// Dispatch kinds of a site_calls edge.
+const (
+	dispatchStatic          = "static"
+	dispatchInterfaceMethod = "interface_method"
+)
+
+// resolve is callee, and records the call for the owner when the declaration
+// pass could not: the callee has no canonical id for Resolve to match (a
+// method of a local or unnamed interface, always an interface call).
+func (w *stmtWalker) resolve(call *ast.CallExpr) (*types.Node, string) {
+	callee, kind := w.callee(call)
+	if callee != nil && callee.CanonicalID == "" && kind == dispatchInterfaceMethod {
+		w.c.emit(w.owner, callee, types.EdgeInvokes, kind, w.line(call.Pos()))
+	}
+	return callee, kind
+}
+
 // callee resolves the declaration a call names: a function, a method, or
 // an interface method. Function values, builtins and conversions give nil.
 func (w *stmtWalker) callee(call *ast.CallExpr) (*types.Node, string) {
@@ -444,7 +457,7 @@ func (w *stmtWalker) callee(call *ast.CallExpr) (*types.Node, string) {
 		fun = x.X
 	}
 	var obj gotypes.Object
-	kind := "static"
+	kind := dispatchStatic
 	switch x := fun.(type) {
 	case *ast.Ident:
 		obj = w.info.Uses[x]
@@ -454,12 +467,8 @@ func (w *stmtWalker) callee(call *ast.CallExpr) (*types.Node, string) {
 				return nil, ""
 			}
 			obj = sel.Obj()
-			// Declared by an interface: a call on an interface value, or on a
-			// struct that embeds one (b.Write() with HookedBatch{Batch}).
-			if f, ok := obj.(*gotypes.Func); ok {
-				if sig, ok := f.Type().(*gotypes.Signature); ok && sig.Recv() != nil && gotypes.IsInterface(sig.Recv().Type()) {
-					kind = "interface_method"
-				}
+			if f, ok := obj.(*gotypes.Func); ok && isInterfaceMethod(f) {
+				kind = dispatchInterfaceMethod
 			}
 		} else {
 			obj = w.info.Uses[x.Sel] // pkg.Func
@@ -469,8 +478,14 @@ func (w *stmtWalker) callee(call *ast.CallExpr) (*types.Node, string) {
 	if !ok {
 		return nil, ""
 	}
-	if n := w.byCanonical[goCanonicalID(fn)]; n != nil {
+	cid := goCanonicalID(fn)
+	if n := w.byCanonical[cid]; n != nil {
 		return n, kind
+	}
+	if cid == "" {
+		if n := w.methods.declaredAt(fn.Name(), fn.Pos()); n != nil {
+			return n, kind
+		}
 	}
 	return nil, ""
 }

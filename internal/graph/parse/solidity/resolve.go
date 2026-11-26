@@ -47,12 +47,17 @@ type structFieldTypeMap map[string]map[string]string
 // `declLine > bestDeclLine` left first-appended outer winning).
 // Byte fields are zero when the parser omitted them (defensive
 // fallback to line-only behavior).
+//
+// typeName is the using-for key of the declared type (usingForTypeKey) and
+// typeText the type as written (`SetLib.Set`): the using-for resolvers match
+// the key, a member access resolves the text in scope.
 type localDecl struct {
 	declLine      int
 	scopeEndLine  int
 	declStartByte int
 	scopeEndByte  int
 	typeName      string
+	typeText      string
 }
 
 // localVarTypeMap: funcID → varName → []localDecl. Each
@@ -115,9 +120,13 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	containerNameByID := map[string]string{}
 	containerIDByFuncID := map[string]string{}
 
-	for _, r := range results {
+	// pending holds the references of each result, one per occurrence in the
+	// source: Pass 1 hands them over folded (see packRefs).
+	pending := make([][]parse.PendingRef, len(results))
+	for i, r := range results {
 		out.Nodes = append(out.Nodes, r.Nodes...)
 		out.Edges = append(out.Edges, r.Edges...)
+		pending[i] = unpackRefs(r.Pending)
 	}
 	for _, n := range out.Nodes {
 		nodeFile.byNode[n.ID] = n.FilePath
@@ -140,13 +149,13 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		}
 	}
 
-	// Imports first: every later name lookup asks which files a file sees.
-	linkImports(out, nodeFile)
-
 	// The scope index holds membership (which container declares which
 	// member). Membership used to be guessed from the qualified-name prefix
 	// plus the file, once per consumer; it is read from one place now.
 	scope := newScopeIndex(out.Nodes, nodeFile)
+	// Imports before any other name: every later lookup asks which files a
+	// file sees.
+	linkImports(out, scope)
 	scoped := newScopedResolver(scope, out)
 
 	// fresh holds the files parsed in this run. On an incremental build an
@@ -170,13 +179,16 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 		case types.NodeFunction, types.NodeModifier:
 			containerIDByFuncID[id] = cid
 		case types.NodeField, types.NodeConstant:
-			if n.Signature == "" {
+			// The node holds the type as written; the using-for resolvers
+			// look a receiver up by its key.
+			key := usingForTypeKey(n.Signature)
+			if key == "" {
 				continue
 			}
 			if stateVarTypes[cid] == nil {
 				stateVarTypes[cid] = map[string]string{}
 			}
-			stateVarTypes[cid][n.Name] = n.Signature
+			stateVarTypes[cid][n.Name] = key
 		}
 	}
 
@@ -212,6 +224,9 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// parameter-receiver method calls can resolve their receiver's
 	// declared type the same way state-variable receivers do.
 	paramTypes := paramTypeMap{}
+	// paramTypeTexts: (funcID, paramName) → the type as written, for the
+	// root of a member access (`given.high`, where given is `Lib.Limits`).
+	paramTypeTexts := paramTypeMap{}
 	// Pre-build funcID → first-return typeName so
 	// `<fn>().<method>` chained dispatch can look up the inner
 	// function's return type as the receiver type.
@@ -225,8 +240,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// dispatch can resolve x's declared type. Fallback chain on receivers:
 	// stateVarTypes → paramTypes → localVarTypes.
 	localVarTypes := localVarTypeMap{}
-	for _, r := range results {
-		for _, pr := range r.Pending {
+	for _, refs := range pending {
+		for _, pr := range refs {
 			switch pr.DispatchKind {
 			case dispatchKindUsingForTypeBind:
 				// TargetQName encoding from runUsingFor: `libraryName|typeName`.
@@ -252,10 +267,22 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 				paramName := pr.TargetQName[:sep]
 				typeName := pr.TargetQName[sep+1:]
+				// The record holds the type as written. A member access
+				// through the parameter resolves that text in scope; the
+				// using-for resolvers get its key, and no entry for a
+				// mapping, which is never a using-for receiver.
+				if paramTypeTexts[pr.SrcID] == nil {
+					paramTypeTexts[pr.SrcID] = map[string]string{}
+				}
+				paramTypeTexts[pr.SrcID][paramName] = typeName
+				key := usingForTypeKey(typeName)
+				if key == "" {
+					continue
+				}
 				if paramTypes[pr.SrcID] == nil {
 					paramTypes[pr.SrcID] = map[string]string{}
 				}
-				paramTypes[pr.SrcID][paramName] = typeName
+				paramTypes[pr.SrcID][paramName] = key
 			case dispatchKindUsingForFnReturn:
 				// TargetQName encoding from emitFunctionReturnMetaPending:
 				// bare `typeName` (no `|`). First return value only.
@@ -306,14 +333,15 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 						scopeEndLine:  scopeEnd,
 						declStartByte: declStartByte,
 						scopeEndByte:  scopeEndByte,
-						typeName:      typeName,
+						typeName:      usingForTypeKey(typeName),
+						typeText:      typeName,
 					},
 				)
 			}
 		}
 	}
 
-	scoped.paramTypes, scoped.localVarTypes = paramTypes, localVarTypes
+	scoped.paramTypeTexts, scoped.localVarTypes = paramTypeTexts, localVarTypes
 
 	// Propagate inherited
 	// bindings down the inheritance graph so a child contract picks
@@ -401,6 +429,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// HasLowLevelCall (any low-level call) because consumers often
 	// care about arbitrary-address dispatch surfaces specifically.
 	externalCallSrcs := map[string]bool{}
+	scoped.externalCallers = externalCallSrcs
 
 	// Dedup EdgeUsesFor emit. Multiple
 	// walkers can pattern-match the same ERROR-wrapped misparse,
@@ -437,11 +466,11 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	// Pass 2b — everything except inheritance (already done) and any
 	// future detector-specific branches go through this loop. Overrides
 	// rely on the `parents` index built between the two sub-passes.
-	for _, r := range results {
-		for _, pr := range r.Pending {
+	for _, refs := range pending {
+		for _, pr := range refs {
 			// Names resolved in the scope of the contract that uses them:
 			// emits, modifiers, calls by name, reverts, reads and writes.
-			if scoped.handles(pr.DispatchKind) {
+			if isScopedKind(pr.DispatchKind) {
 				scoped.resolve(pr)
 				continue
 			}
@@ -574,7 +603,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 					continue
 				}
 				rt2 := funcReturnTypes[fn2ID]
-				if rt2 == "address" || rt2 == "address payable" {
+				if isAddressType(rt2) {
 					externalCallSrcs[pr.SrcID] = true
 				}
 				continue
@@ -605,7 +634,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				if innerFuncID == "" {
 					continue
 				}
-				if rt := funcReturnTypes[innerFuncID]; rt == "address" || rt == "address payable" {
+				if isAddressType(funcReturnTypes[innerFuncID]) {
 					externalCallSrcs[pr.SrcID] = true
 				}
 				continue
@@ -863,6 +892,7 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 	}
+	nodeFile.stampEdges(out.Edges)
 	return out, nil
 }
 
@@ -1059,8 +1089,8 @@ func lookupReceiver(
 	localVarTypes localVarTypeMap,
 ) (typeName string, isLocal bool) {
 	if decls := localVarTypes[funcID][name]; len(decls) > 0 {
-		if t := selectLocalDecl(decls, useSiteLine, useSiteByte); t != "" {
-			return t, true
+		if d, ok := selectLocalDecl(decls, useSiteLine, useSiteByte); ok && d.typeName != "" {
+			return d.typeName, true
 		}
 	}
 	if t := paramTypes[funcID][name]; t != "" {
@@ -1128,10 +1158,13 @@ func resolveBindingLib(
 // shadow cases where the line-based `declLine > bestDeclLine` strict-`>`
 // tiebreak left the first-appended outer winning. Falls back to
 // line-only selection when bytes are absent.
-func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) string {
+//
+// ok is false when no declaration is in scope at the use site. decls must
+// not be empty.
+func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) (decl localDecl, ok bool) {
 	if useSiteLine == 0 {
 		// Defensive fallback — first-decl-wins.
-		return decls[0].typeName
+		return decls[0], true
 	}
 	// Byte-precision path: only when use-site AND every decl
 	// carries non-zero byte ranges. Mixed populations fall back to
@@ -1150,7 +1183,7 @@ func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) string {
 			}
 		}
 		if bestIdx >= 0 {
-			return decls[bestIdx].typeName
+			return decls[bestIdx], true
 		}
 		// No byte-containment match — fall through to line-based
 		// (handles edge cases like use site before any decl on the
@@ -1169,9 +1202,9 @@ func selectLocalDecl(decls []localDecl, useSiteLine, useSiteByte int) string {
 		}
 	}
 	if bestIdx < 0 {
-		return ""
+		return localDecl{}, false
 	}
-	return decls[bestIdx].typeName
+	return decls[bestIdx], true
 }
 
 // allHaveBytes returns true iff every decl has both
@@ -1310,7 +1343,7 @@ func resolveLowLevelCallRefExt(
 	if typeName == "" {
 		return types.Edge{}, false, false
 	}
-	isAddress := typeName == "address" || typeName == "address payable"
+	isAddress := isAddressType(typeName)
 	// Try Interface first then Contract — interface-typed receivers are
 	// the more common shape for low-level call patterns (proxies). Same
 	// byName candidate-pick rule as interface dispatch.

@@ -28,6 +28,9 @@ import (
 // The walker is shape-only (no receiver resolution), so it triggers
 // on any member_expression whose property text matches one of the
 // six method names AND whose parent unwraps to a call_expression.
+// It is the one walk that sees every low-level call, so it also hands
+// each receiver to lowLevelReceiver, which decides the receiver shapes
+// no other walker reads for HasExternalCall (see external_call.go).
 // Yul-internal builtins (assembly delegatecall, sstore, ...) are
 // out of scope here — they live under the HasAssembly marker and the
 // Yul builtin / low-level call walkers.
@@ -64,6 +67,7 @@ func (v *declVisitor) runLowLevelCallMarker() {
 
 	hasLowLevel := map[string]bool{}
 	hasValue := map[string]bool{}
+	hasExternal := map[string]bool{}
 
 	for {
 		m := matches.Next()
@@ -105,6 +109,11 @@ func (v *declVisitor) runLowLevelCallMarker() {
 			id := v.declID(fnQ, fnStart)
 			if isLow {
 				hasLowLevel[id] = true
+				// Whether the call goes to an address is a question of
+				// its receiver (see external_call.go).
+				if v.lowLevelReceiver(id, &memberNode) {
+					hasExternal[id] = true
+				}
 			}
 			if isVal {
 				hasValue[id] = true
@@ -121,6 +130,9 @@ func (v *declVisitor) runLowLevelCallMarker() {
 		}
 		if hasValue[v.nodes[i].ID] {
 			v.nodes[i].HasValueTransfer = true
+		}
+		if hasExternal[v.nodes[i].ID] {
+			v.nodes[i].HasExternalCall = true
 		}
 	}
 }

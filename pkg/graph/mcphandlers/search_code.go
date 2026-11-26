@@ -100,17 +100,124 @@ func SetSearchCodePageBytes(n int) {
 
 // searchCodeKinds are the declarations whose source is searched. A matched
 // line belongs to the innermost one that contains it (a Solidity function,
-// not its contract).
+// not its contract). A Solidity state variable is a Field node and is decided
+// by searchable.
 var searchCodeKinds = map[types.NodeType]bool{
 	types.NodeFunction: true, types.NodeMethod: true, types.NodeStruct: true, types.NodeInterface: true,
 	types.NodeTypeAlias: true, types.NodeConstant: true, types.NodeVariable: true, types.NodeContract: true,
 	types.NodeModifier: true, types.NodeEvent: true, types.NodeMapping: true, types.NodeEnum: true,
+	types.NodeError: true,
+}
+
+// langSolidity and subKindStructMember tell a Solidity state variable from a
+// member of a struct: both are Field nodes.
+const (
+	langSolidity        = "sol"
+	subKindStructMember = "struct_member"
+)
+
+// searchable reports whether n is a declaration the code search answers
+// with: a kind of searchCodeKinds declared in a file of the build. enclosers
+// are the functions, methods and variables of n's file (store.IsEncloser).
+//
+// Left out, because their text is searched as part of another declaration:
+// a variable declared inside a function body or inside a function literal of
+// a package-level variable's initialiser (store.InFunctionBody; a type or a
+// constant declared there is a hit of its own, as it is at package level),
+// a struct member (a Go field or a Solidity one; a Solidity state variable is
+// a declaration of its contract and is kept), and the copy of a promoted
+// method, which is the declared method under another type's name. A blank
+// package-level declaration (`var _ I = (*T)(nil)`) is searched like any
+// other: it has no name, but its text is source text (0 of 64 such lines of
+// go-stablenet were found while blank variables were left out).
+func searchable(n types.Node, enclosers []types.Node) bool {
+	switch n.Type {
+	case types.NodeVariable:
+		if store.InFunctionBody(n, enclosers) {
+			return false
+		}
+	case types.NodeField:
+		return n.Language == langSolidity && n.SubKind != subKindStructMember
+	}
+	_, promoted := store.PromotedFrom(n)
+	return searchCodeKinds[n.Type] && !promoted
 }
 
 type codeDecl struct {
-	node  types.Node
+	node types.Node
+	// lines are the declaration's lines, each from where the declaration
+	// has it to the end of the file's line (see addFile).
 	lines []string
-	test  bool
+	// header is the declaration's own first line, without what follows the
+	// declaration on that line and without comments (declHeader); in=name
+	// matches it.
+	header string
+	test   bool
+	// promotedTo are the types that get this method through an embedded
+	// field, by qualified name, sorted.
+	promotedTo []string
+	// lateCalls maps a callee's node id to the lines, after the line its
+	// call starts on, that name the callee (see addLateCalls).
+	lateCalls map[string][]int
+	// own maps a line (offset into lines) on which a declaration inside
+	// this one starts or continues to the number of leading bytes that are
+	// still this declaration's; a line not in the map is all its own (see
+	// markOwnership).
+	own map[int]int
+	// twins are the declarations that share this one's lines and text (the
+	// names of `var a, b = f()` when each starts at the keyword), this one
+	// included, in the order of their names; nil when there is none.
+	twins []int
+	// mute marks a blank name of a multi-name declaration that has named
+	// ones: its text is theirs, and nothing is reported under it.
+	mute bool
+	// full maps a line (offset into lines) to the fullest text stored for
+	// that line of the file, when this declaration starts later on the line
+	// (it is inside another one). The pattern is matched against it, so that
+	// the anchors for line start and line end mean the line and not the
+	// declaration's part of it.
+	full map[int]string
+	// guard maps a line to the sides (guardLead, guardTrail) on which other
+	// stored text of the file stands on the same line without being part of
+	// the text matched: two declarations on one line, neither inside the
+	// other. A line anchor does not match on such a side.
+	guard map[int]uint8
+}
+
+// The sides of a line's stored text beyond which the source line goes on.
+const (
+	guardLead uint8 = 1 << iota
+	guardTrail
+)
+
+// lineFiller stands for source text that is not stored, next to a line's
+// stored text: with it there, the pattern's line anchors do not match where
+// the source line goes on.
+const lineFiller = "\x00"
+
+// matchLine returns the matches of rx on text, a line's stored text. On a
+// guarded side the source line goes on: no line anchor matches there, and a
+// match does not start outside the stored text.
+func matchLine(rx *regexp.Regexp, text string, guard uint8) [][]int {
+	if guard == 0 {
+		return rx.FindAllStringIndex(text, -1)
+	}
+	padded, lead := text, 0
+	if guard&guardLead != 0 {
+		padded, lead = lineFiller+padded, len(lineFiller)
+	}
+	if guard&guardTrail != 0 {
+		padded += lineFiller
+	}
+	var out [][]int
+	for _, loc := range rx.FindAllStringIndex(padded, -1) {
+		from, to := loc[0]-lead, min(loc[1]-lead, len(text))
+		if from < 0 || from > len(text) || from == len(text) && guard&guardTrail != 0 {
+			continue
+		}
+		out = append(out, []int{from, to})
+	}
+	return out
 }
 
 type codeIndex struct {
@@ -121,11 +228,10 @@ type codeIndex struct {
 }
 
 // buildCodeIndex loads every searchable declaration and its source.
-// Function-local variables (no canonical id) are left out: their text is in
-// their function.
 func buildCodeIndex(reader store.Reader) (*codeIndex, error) {
 	idx := &codeIndex{byFile: map[string][]int{}}
 	seenFile := map[string]bool{}
+	var longCalls []types.Node
 	for _, lang := range []string{"go", "sol", "ts", "js"} {
 		files, err := reader.DistinctFilePaths(lang)
 		if err != nil {
@@ -136,29 +242,516 @@ func buildCodeIndex(reader store.Reader) (*codeIndex, error) {
 				continue
 			}
 			seenFile[f] = true
-			nodes, err := reader.NodesByFilePath(f)
+			sites, err := idx.addFile(reader, f)
 			if err != nil {
 				return nil, err
 			}
-			blobs, err := reader.BlobsByFilePath(f)
-			if err != nil {
-				return nil, err
+			longCalls = append(longCalls, sites...)
+		}
+	}
+	// One lookup for the call sites of every file: edges are indexed by
+	// their ends, not by file, and a lookup per file made the index build
+	// ten times slower on go-stablenet (29 s instead of 3 s).
+	if err := idx.addLateCalls(reader, longCalls); err != nil {
+		return nil, err
+	}
+	return idx, nil
+}
+
+// addFile adds the searchable declarations of file f and returns the file's
+// call sites that span several lines, for addLateCalls.
+func (x *codeIndex) addFile(reader store.Reader, f string) ([]types.Node, error) {
+	nodes, err := reader.NodesByFilePath(f)
+	if err != nil {
+		return nil, err
+	}
+	blobs, err := reader.BlobsByFilePath(f)
+	if err != nil {
+		return nil, err
+	}
+	first := len(x.decls)
+	copies := map[store.DeclSite][]string{}
+	var longCalls, enclosers []types.Node
+	for _, n := range nodes {
+		if store.IsEncloser(n) {
+			enclosers = append(enclosers, n)
+		}
+	}
+	for _, n := range nodes {
+		if _, ok := store.PromotedFrom(n); ok {
+			copies[store.SiteOf(n)] = append(copies[store.SiteOf(n)], store.EmbeddingType(n))
+			continue
+		}
+		if n.Type == types.NodeCallSite && n.EndLine > n.StartLine {
+			longCalls = append(longCalls, n)
+			continue
+		}
+		src, ok := blobs[n.ID]
+		if !searchable(n, enclosers) || !ok || len(src) == 0 {
+			continue
+		}
+		x.byFile[f] = append(x.byFile[f], len(x.decls))
+		x.decls = append(x.decls, codeDecl{node: n, lines: strings.Split(string(src), "\n"), test: isTestFile(f)})
+	}
+	added := x.decls[first:]
+	// A nested declaration's source ends where the declaration ends, so the
+	// rest of its last line (the comment after an interface method or an
+	// enum value) is only in the enclosing declaration's source. Each line
+	// of a declaration is extended to the end of the file's line: 16 lines
+	// of go-stablenet matched only in that text and were reported under no
+	// declaration.
+	whole := map[int]lineText{}
+	for _, d := range added {
+		at := d.node.StartByte
+		for k, text := range d.lines {
+			if l := d.node.StartLine + k; len(text) > len(whole[l].text) {
+				whole[l] = lineText{text: text, at: at}
 			}
-			for _, n := range nodes {
-				if !searchCodeKinds[n.Type] || (n.Type == types.NodeVariable && n.CanonicalID == "") {
-					continue
+			at += len(text) + 1
+		}
+	}
+	// apart collects, per line, the stored texts that are not part of the
+	// line's fullest text: another declaration on the same line that is not
+	// inside the first (`type A struct{}; type B struct{}`).
+	apart := map[int][]lineText{}
+	for i := range added {
+		d := &added[i]
+		d.header = declHeader(d.lines[0])
+		at := d.node.StartByte
+		for k, own := range d.lines {
+			l := d.node.StartLine + k
+			w := whole[l]
+			d.lines[k] = toLineEnd(w, own, at)
+			switch {
+			case d.lines[k] == w.text:
+			case strings.HasSuffix(w.text, d.lines[k]):
+				if d.full == nil {
+					d.full = map[int]string{}
 				}
-				src, ok := blobs[n.ID]
-				if !ok || len(src) == 0 {
-					continue
+				d.full[k] = w.text
+			default:
+				apart[l] = append(apart[l], lineText{text: own, at: at})
+			}
+			at += len(own) + 1
+		}
+		if to := copies[store.SiteOf(d.node)]; d.node.Type == types.NodeMethod && len(to) > 0 {
+			sort.Strings(to)
+			d.promotedTo = to
+		}
+	}
+	if len(apart) > 0 {
+		guardLines(added, whole, apart)
+	}
+	x.markOwnership(x.byFile[f])
+	return longCalls, nil
+}
+
+// guardLines marks, on the lines that hold several stored texts side by
+// side, the sides of each text beyond which the line goes on (codeDecl.guard):
+// the texts of a line are ordered by where they start, and every side that
+// faces another text is guarded.
+func guardLines(decls []codeDecl, whole map[int]lineText, apart map[int][]lineText) {
+	for l, texts := range apart {
+		texts = append(texts, whole[l])
+		sort.SliceStable(texts, func(a, b int) bool { return texts[a].at < texts[b].at })
+		side := map[string]uint8{}
+		for pos, t := range texts {
+			var g uint8
+			if pos > 0 {
+				g |= guardLead
+			}
+			if pos < len(texts)-1 {
+				g |= guardTrail
+			}
+			side[t.text] |= g
+		}
+		for i := range decls {
+			d := &decls[i]
+			k := l - d.node.StartLine
+			if k < 0 || k >= len(d.lines) {
+				continue
+			}
+			text := d.lines[k]
+			if w, ok := d.full[k]; ok {
+				text = w
+			}
+			if g := side[text]; g != 0 {
+				if d.guard == nil {
+					d.guard = map[int]uint8{}
 				}
-				idx.byFile[f] = append(idx.byFile[f], len(idx.decls))
-				idx.decls = append(idx.decls, codeDecl{node: n, lines: strings.Split(string(src), "\n"),
-					test: isTestFile(f)})
+				d.guard[k] = g
 			}
 		}
 	}
-	return idx, nil
+}
+
+// lineText is the longest text any declaration of a file has for one line,
+// and the byte offset in the file at which that text starts.
+type lineText struct {
+	text string
+	at   int
+}
+
+// toLineEnd returns own, a declaration's part of a line that starts at byte
+// offset at of the file, extended to the end of that line: the text of whole
+// from where own starts. The byte offsets say where that is; when they do not
+// fit (a graph without them) the first occurrence of own in whole is taken.
+// own is returned unchanged when it is empty or not found in whole.
+func toLineEnd(whole lineText, own string, at int) string {
+	if own == "" {
+		return own
+	}
+	if col := at - whole.at; col >= 0 && col <= len(whole.text) && strings.HasPrefix(whole.text[col:], own) {
+		return whole.text[col:]
+	}
+	if i := strings.Index(whole.text, own); i >= 0 {
+		return whole.text[i:]
+	}
+	return own
+}
+
+// declHeader returns the part of a declaration's first stored line that
+// in=name matches besides the qualified name: the line from the
+// declaration's first token, with every comment on it left out and the
+// blanks before them trimmed.
+//
+// While a declaration's stored text ended at its last token, this line ran
+// to the end of the source line for a declaration that goes on below it, and
+// to its last token for one that ends on it. Since the text runs through the
+// comment after the last token, that comment was matched as a name: on
+// go-stablenet `timeout` returned ethapi.Backend.RPCEVMTimeout and `t`
+// returned rawdb.opMax from the words of their comments. A name search
+// matches names and code, so no comment is part of the header, the one on
+// the first line of a longer declaration (`type T struct { // ...`)
+// included. The body search still finds every comment.
+func declHeader(line string) string {
+	var b strings.Builder
+	quote := byte(0) // the delimiter of the literal being read, 0 outside one
+	for i := 0; i < len(line); i++ {
+		c := line[i]
+		switch {
+		case quote != 0:
+			b.WriteByte(c)
+			if c == '\\' && quote != '`' && i+1 < len(line) {
+				i++
+				b.WriteByte(line[i])
+			} else if c == quote {
+				quote = 0
+			}
+		case c == '"' || c == '\'' || c == '`':
+			quote = c
+			b.WriteByte(c)
+		case strings.HasPrefix(line[i:], lineCommentOpen):
+			return strings.TrimRight(b.String(), headerBlanks)
+		case strings.HasPrefix(line[i:], blockCommentOpen):
+			end := strings.Index(line[i+len(blockCommentOpen):], blockCommentClose)
+			if end < 0 {
+				return strings.TrimRight(b.String(), headerBlanks)
+			}
+			i += len(blockCommentOpen) + end + len(blockCommentClose) - 1
+		default:
+			b.WriteByte(c)
+		}
+	}
+	return strings.TrimRight(b.String(), headerBlanks)
+}
+
+// The comment delimiters of Go and Solidity, and the blanks trimmed where a
+// comment is left out of a header (declHeader).
+const (
+	lineCommentOpen   = "//"
+	blockCommentOpen  = "/*"
+	blockCommentClose = "*/"
+	headerBlanks      = " \t"
+)
+
+// markOwnership records, for the declarations of one file (indexes into
+// decls, ordered by start line), which part of each line every declaration
+// owns, so that a match is reported under one declaration: the one that owns
+// its first character.
+//
+// The rule: a declaration inside another one owns its lines from where its
+// text starts to the end of the line, and the indentation in front of it;
+// other text in front of it on its first line stays with the enclosing
+// declaration. So in
+//
+//	func Slot(key interface{ Bytes() []byte }) common.Hash {
+//
+// "func Slot(key" is found under the function and "Bytes()" under the
+// interface method, and in `var a, b = f()` each name is found under its own
+// declaration. Before, the innermost declaration took the whole line and the
+// text in front of it was unsearchable (4 of 4 signature lines with an inline
+// interface on go-stablenet; 8 of 69 names of multi-name declarations).
+//
+// Declarations with the same lines and the same text (twins) share a line;
+// see twinOwner.
+func (x *codeIndex) markOwnership(file []int) {
+	for pos, i := range file {
+		outer := &x.decls[i]
+		// Declarations that start within outer's lines sit next to it in
+		// the list: walk back over those starting on its first line, then
+		// forward to the last one starting before its end.
+		lo := pos
+		for lo > 0 && x.decls[file[lo-1]].node.StartLine == outer.node.StartLine {
+			lo--
+		}
+		for _, j := range file[lo:] {
+			inner := &x.decls[j]
+			if inner.node.StartLine > outer.node.EndLine {
+				break
+			}
+			if j == i {
+				continue
+			}
+			switch nesting(outer, inner) {
+			case nestedTwin:
+				if outer.twins == nil {
+					outer.twins = []int{i}
+				}
+				outer.twins = append(outer.twins, j)
+			case nestedInside:
+				outer.yield(inner)
+			}
+		}
+		// Twins in the order their names stand in the declaration, so
+		// that "the first" is the first name written.
+		sort.Slice(outer.twins, func(a, b int) bool {
+			pa, pb := x.namePos(outer.twins[a]), x.namePos(outer.twins[b])
+			if pa != pb {
+				return pa < pb
+			}
+			return outer.twins[a] < outer.twins[b]
+		})
+		// A blank among the names (`x, _ = f()`) is no name: the line is
+		// reported under the named ones and they do not list it.
+		var named []int
+		for _, t := range outer.twins {
+			if x.decls[t].node.Name != store.BlankName {
+				named = append(named, t)
+			}
+		}
+		if len(named) > 0 && len(named) < len(outer.twins) {
+			outer.mute = outer.node.Name == store.BlankName
+			outer.twins = named
+			if len(named) == 1 && !outer.mute {
+				outer.twins = nil
+			}
+		}
+	}
+}
+
+// namePos returns where declaration i's name first stands, as a whole
+// identifier, in its first line, or the line's length when it does not.
+func (x *codeIndex) namePos(i int) int {
+	line, name := x.decls[i].lines[0], x.decls[i].node.Name
+	for p := 0; name != "" && p < len(line); {
+		at := strings.Index(line[p:], name)
+		if at < 0 {
+			break
+		}
+		at += p
+		if end := at + len(name); (at == 0 || !isIdentByte(line[at-1])) && (end == len(line) || !isIdentByte(line[end])) {
+			return at
+		}
+		p = at + 1
+	}
+	return len(line)
+}
+
+// The ways a declaration that starts within another one's lines relates to it.
+const (
+	nestedNot    = iota // not inside it (it encloses it, or only overlaps)
+	nestedInside        // inside it: it takes its lines from where it starts
+	nestedTwin          // same lines and same text: another name of one declaration
+)
+
+// nesting says how inner, which starts within outer's lines, relates to
+// outer. With the same lines, the one whose first line starts later in the
+// line is inside the other.
+func nesting(outer, inner *codeDecl) int {
+	o, n := outer.node, inner.node
+	if n.StartLine < o.StartLine || n.EndLine > o.EndLine {
+		return nestedNot
+	}
+	if n.StartLine != o.StartLine || n.EndLine != o.EndLine {
+		return nestedInside
+	}
+	switch {
+	case inner.lines[0] == outer.lines[0]:
+		return nestedTwin
+	case len(inner.lines[0]) < len(outer.lines[0]) && strings.HasSuffix(outer.lines[0], inner.lines[0]):
+		return nestedInside
+	}
+	return nestedNot
+}
+
+// yield gives the lines of inner, a declaration inside d, to inner: all of
+// each line but, on inner's first line, what stands in front of inner.
+func (d *codeDecl) yield(inner *codeDecl) {
+	if d.own == nil {
+		d.own = map[int]int{}
+	}
+	for l := inner.node.StartLine; l <= inner.node.EndLine; l++ {
+		k := l - d.node.StartLine
+		if k < 0 || k >= len(d.lines) {
+			continue
+		}
+		keep := 0
+		if l == inner.node.StartLine && strings.HasSuffix(d.lines[k], inner.lines[0]) {
+			keep = len(d.lines[k]) - len(inner.lines[0])
+			// Indentation is not text in front of a declaration.
+			if strings.TrimSpace(d.lines[k][:keep]) == "" {
+				keep = 0
+			}
+		}
+		if old, ok := d.own[k]; !ok || keep < old {
+			d.own[k] = keep
+		}
+	}
+}
+
+// lineText returns line k (offset into lines) of the declaration as a
+// result shows it: its own part of the line together with the indentation
+// in front of it, which belongs to a nested declaration as much as the
+// matches in it do (markOwnership). Other text in front of it is the
+// enclosing declaration's and is left out.
+func (d *codeDecl) lineText(k int) string {
+	own := d.lines[k]
+	if w, ok := d.full[k]; ok && strings.TrimSpace(w[:len(w)-len(own)]) == "" {
+		return w
+	}
+	return own
+}
+
+// owns reports whether the match at bytes [from, to) of line k of declaration
+// i is reported under that declaration: it starts in the part of the line the
+// declaration owns and, among twins, it is this twin's.
+func (x *codeIndex) owns(i, k, from, to int) bool {
+	d := &x.decls[i]
+	if keep, limited := d.own[k]; d.mute || limited && from >= keep {
+		return false
+	}
+	return d.twins == nil || x.twinOwner(d, k, from, to) == i
+}
+
+// declaredWith returns the qualified names of the other declarations that
+// share declaration i's lines and text: the other names of a multi-name
+// declaration.
+func (x *codeIndex) declaredWith(i int) []string {
+	var out []string
+	for _, t := range x.decls[i].twins {
+		if t != i {
+			out = append(out, x.decls[t].node.QualifiedName)
+		}
+	}
+	return out
+}
+
+// twinOwner picks, among twins that share a line, the one a match on it is
+// reported under: on the first line, the twin whose name the match touches,
+// so that each name of `var a, b = f()` is found under its own declaration;
+// otherwise the first twin, so that the line is reported once. Every match
+// is counted once; each hit names the others in declared_with.
+func (x *codeIndex) twinOwner(d *codeDecl, k, from, to int) int {
+	if k > 0 {
+		return d.twins[0]
+	}
+	// twins are in the order of their names, so the first that the match
+	// touches is the earliest.
+	for _, t := range d.twins {
+		at := x.namePos(t)
+		end := at + len(x.decls[t].node.Name)
+		if at < len(d.lines[0]) && (from < end && to > at || from == to && from >= at && from < end) {
+			return t
+		}
+	}
+	return d.twins[0]
+}
+
+// addLateCalls records, for the call sites that span several lines, the
+// later lines that name the callee. A call edge carries the line its call
+// starts on, so a call written as
+//
+//	abi.Arguments{
+//		...
+//	}.Pack(a, b)
+//
+// was listed on the first line only and a search for "\.Pack\(" matched a
+// line without it (8 calls on go-stablenet).
+func (x *codeIndex) addLateCalls(reader store.Reader, sites []types.Node) error {
+	if len(sites) == 0 {
+		return nil
+	}
+	long := make([]string, len(sites))
+	for i, s := range sites {
+		long[i] = s.ID
+	}
+	edges, err := reader.QueryEdgesForNodes(long)
+	if err != nil {
+		return err
+	}
+	callees := map[string][]string{} // call site id -> callee ids
+	var ids []string
+	for _, e := range edges {
+		if e.Type == types.EdgeSiteCalls {
+			callees[e.Src] = append(callees[e.Src], e.Dst)
+			ids = append(ids, e.Dst)
+		}
+	}
+	targets, err := reader.NodesByIDs(ids)
+	if err != nil {
+		return err
+	}
+	name := make(map[string]string, len(targets))
+	for _, n := range targets {
+		name[n.ID] = n.Name
+	}
+	for _, s := range sites {
+		di := x.owner(s.FilePath, s.StartLine)
+		if di < 0 {
+			continue
+		}
+		d := &x.decls[di]
+		for _, callee := range callees[s.ID] {
+			for l := s.StartLine + 1; l <= s.EndLine; l++ {
+				if off := l - d.node.StartLine; off < len(d.lines) && namesCall(d.lines[off], name[callee]) {
+					if d.lateCalls == nil {
+						d.lateCalls = map[string][]int{}
+					}
+					d.lateCalls[callee] = append(d.lateCalls[callee], l)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// namesCall reports whether line holds a call written with name: the name as
+// a whole identifier followed by "(".
+func namesCall(line, name string) bool {
+	if name == "" {
+		return false
+	}
+	for from := 0; ; {
+		i := strings.Index(line[from:], name+"(")
+		if i < 0 {
+			return false
+		}
+		i += from
+		if i == 0 || !isIdentByte(line[i-1]) {
+			return true
+		}
+		from = i + 1
+	}
+}
+
+// lateCallLines returns the lines after the first on which declaration src
+// names callee dst in a call that spans several lines.
+func (x *codeIndex) lateCallLines(src, dst string) []int {
+	if i, ok := x.byNodeID()[src]; ok {
+		return x.decls[i].lateCalls[dst]
+	}
+	return nil
 }
 
 // owner returns the innermost declaration of file f that spans line.
@@ -241,7 +834,7 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 		mcp.WithBoolean("fixed", mcp.Description("treat pattern as a literal string")),
 		mcp.WithBoolean("ignore_case", mcp.Description("case-insensitive match")),
 		mcp.WithBoolean("word", mcp.Description("match whole words only")),
-		mcp.WithString("in", mcp.Description("body (default: declaration source, signature included), name (qualified name or the declaration's first line, e.g. \"func (t *Template) Render(\"), or both")),
+		mcp.WithString("in", mcp.Description("body (default: declaration source, signature included), name (the qualified name, or the declaration's first line from its first token with its comments left out, e.g. \"func (t *Template) Render(\"; never comment text), or both")),
 		mcp.WithString("path", mcp.Description("only files under this path prefix, or matching this glob (* and **)")),
 		mcp.WithArray("expand", mcp.Description("attach for each hit: callers, callees, references (who reads or writes a value)"), mcp.WithStringItems()),
 		mcp.WithBoolean("resolve", mcp.Description("list the calls and value uses on each matched line (default true)")),
@@ -390,12 +983,14 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 			skippedTests++
 			continue
 		}
-		if a.in == "name" || a.in == "both" {
+		// A blank declaration (`var _ I = (*T)(nil)`) has text to search
+		// but no name to match.
+		if (a.in == "name" || a.in == "both") && n.Name != store.BlankName {
 			// The name is the qualified name or the declaration's first
 			// line, so "func .*Round\w*\(" works as it does in grep.
 			m := rx.FindString(n.QualifiedName)
-			if m == "" && len(d.lines) > 0 {
-				m = rx.FindString(d.lines[0])
+			if m == "" {
+				m = rx.FindString(d.header)
 			}
 			if m != "" {
 				h := hit(i)
@@ -408,20 +1003,41 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 		if a.in == "name" {
 			continue
 		}
-		for k, line := range d.lines {
-			ms := rx.FindAllString(line, -1)
-			if len(ms) == 0 {
+		for k, own := range d.lines {
+			// The pattern runs over the fullest text stored for the line,
+			// so that its line anchors mean the line; in is where this
+			// declaration's part starts in it.
+			line, in := own, 0
+			if w, ok := d.full[k]; ok {
+				line, in = w, len(w)-len(own)
+			}
+			locs := matchLine(rx, line, d.guard[k])
+			if len(locs) == 0 {
 				continue
 			}
-			abs := n.StartLine + k
-			// A line inside a nested declaration belongs to that one.
-			owner := idx.owner(n.FilePath, abs)
-			if owner >= 0 && owner != i {
+			// A match belongs to the declaration that owns its first
+			// character (markOwnership): text inside a nested declaration
+			// is that one's, with the indentation in front of it; other
+			// text in front of it is the enclosing declaration's.
+			var ms []string
+			for _, loc := range locs {
+				from, to := loc[0]-in, max(loc[1]-in, 0)
+				if from < 0 {
+					if strings.TrimSpace(line[:in]) != "" {
+						continue
+					}
+					from = 0
+				}
+				if idx.owns(i, k, from, to) {
+					ms = append(ms, line[loc[0]:loc[1]])
+				}
+			}
+			if len(ms) == 0 {
 				nestedLines++
 				continue
 			}
 			h := hit(i)
-			h.lines = append(h.lines, abs)
+			h.lines = append(h.lines, n.StartLine+k)
 			h.matches += len(ms)
 			totalMatches += len(ms)
 			for _, m := range ms {
@@ -478,7 +1094,13 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 		kept := make([]*codeHit, 0, len(a.only))
 		for _, h := range ranked {
 			n := idx.decls[h.decl].node
-			for _, k := range []string{n.CanonicalID, n.QualifiedName} {
+			// A promoted method may be asked for under an embedding type's
+			// name; it is this declaration.
+			keys := []string{n.CanonicalID, n.QualifiedName}
+			for _, to := range idx.decls[h.decl].promotedTo {
+				keys = append(keys, to+"."+n.Name)
+			}
+			for _, k := range keys {
 				if k != "" && want[k] {
 					found[k] = true
 					kept = append(kept, h)
@@ -505,7 +1127,7 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 	var lineUses map[string]map[int][]string
 	var lineExt map[string]map[int][]types.ExternalPackage
 	if (a.resolve || a.trace.on()) && len(ids) > 0 {
-		lineUses, lineExt = usesByLineExt(reader, ids)
+		lineUses, lineExt = usesByLineExt(reader, ids, idx.lateCallLines)
 	}
 	shownExt := map[string]types.ExternalPackage{}
 	var views []map[string]any
@@ -532,6 +1154,14 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 		if h.inName {
 			row["name_match"] = true
 		}
+		if len(d.promotedTo) > 0 {
+			row["promoted_to"] = d.promotedTo
+		}
+		// The other names of a multi-name declaration share this one's
+		// lines; a shared match is reported under one of them only.
+		if with := idx.declaredWith(h.decl); len(with) > 0 {
+			row["declared_with"] = with
+		}
 		var shown []map[string]any
 		for k, ln := range h.lines {
 			if a.linesPerHit > 0 && k == a.linesPerHit {
@@ -542,7 +1172,8 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 			var text []string
 			for l := from; l <= to; l++ {
 				if off := l - n.StartLine; off >= 0 && off < len(d.lines) {
-					text = append(text, strings.TrimRight(d.lines[off], " \t"))
+					// The line as it is in the file, trailing blanks included.
+					text = append(text, d.lineText(off))
 				}
 			}
 			m := map[string]any{"line": ln, "text": strings.Join(text, "\n")}
@@ -606,16 +1237,28 @@ func searchCode(reader store.Reader, idx *codeIndex, a searchCodeArgs) (map[stri
 // the resolved edges that start at each node. Calls and value uses have one
 // edge per line, so every line that calls or uses something has its entry.
 func usesByLine(reader store.Reader, ids []string) map[string]map[int][]string {
-	out, _ := usesByLineExt(reader, ids)
+	out, _ := usesByLineExt(reader, ids, nil)
 	return out
 }
+
+// The verbs of the uses a Solidity function has besides calls and value uses.
+const (
+	useEmits    = "emits "
+	useReverts  = "reverts with "
+	useModifier = "applies modifier "
+	useCalls    = "calls "
+)
 
 // usesByLineExt is usesByLine plus, per node and line, the packages of the
 // External targets (schema 1.36) named on that line, so a response can list
 // each package it mentions once. An External target is named by its package
 // name ("time.AfterFunc"); when two packages of the targets share a name
 // (math/rand, crypto/rand) both are named by import path instead.
-func usesByLineExt(reader store.Reader, ids []string) (map[string]map[int][]string, map[string]map[int][]types.ExternalPackage) {
+//
+// late, when not nil, returns the lines after a call's first line on which
+// the caller names the callee (codeIndex.lateCallLines); the call is listed
+// on those lines too.
+func usesByLineExt(reader store.Reader, ids []string, late func(src, dst string) []int) (map[string]map[int][]string, map[string]map[int][]types.ExternalPackage) {
 	edges, err := reader.QueryEdgesForNodes(ids)
 	if err != nil {
 		return nil, nil
@@ -656,6 +1299,35 @@ func usesByLineExt(reader store.Reader, ids []string) (map[string]map[int][]stri
 	out := map[string]map[int][]string{}
 	outExt := map[string]map[int][]types.ExternalPackage{}
 	seen := map[string]bool{}
+	// list records use u of edge e on a line, once per line.
+	list := func(e types.Edge, line int, u string) {
+		k := fmt.Sprint(e.Src, line, u)
+		if seen[k] {
+			return
+		}
+		seen[k] = true
+		if out[e.Src] == nil {
+			out[e.Src] = map[int][]string{}
+		}
+		out[e.Src][line] = append(out[e.Src][line], u)
+		if ep, ok := ext[e.Dst]; ok {
+			if outExt[e.Src] == nil {
+				outExt[e.Src] = map[int][]types.ExternalPackage{}
+			}
+			outExt[e.Src][line] = append(outExt[e.Src][line], ep)
+		}
+	}
+	// listCall is list for a call: also on the later lines that name the
+	// callee when the call spans several.
+	listCall := func(e types.Edge, u string) {
+		list(e, e.Line, u)
+		if late == nil {
+			return
+		}
+		for _, line := range late(e.Src, e.Dst) {
+			list(e, line, u)
+		}
+	}
 	for _, e := range edges {
 		if !want[e.Src] || e.Line == 0 || name[e.Dst] == "" {
 			continue
@@ -678,54 +1350,29 @@ func usesByLineExt(reader store.Reader, ids []string) (map[string]map[int][]stri
 			}
 			continue
 		}
-		if e.Type == types.EdgeDispatchesTo {
-			continue // shown with the call it belongs to
-		}
-		verb := ""
 		switch e.Type {
+		case types.EdgeDispatchesTo:
+			// shown with the call it belongs to
 		case types.EdgeInvokes:
-			verb = "calls "
 			if r := runs[e.Dst]; r != "" && e.DispatchKind == "interface_method" {
-				u := verb + name[e.Dst] + " (may run " + r + ")"
-				k := fmt.Sprint(e.Src, e.Line, u)
-				if !seen[k] {
-					seen[k] = true
-					if out[e.Src] == nil {
-						out[e.Src] = map[int][]string{}
-					}
-					out[e.Src][e.Line] = append(out[e.Src][e.Line], u)
-				}
+				listCall(e, useCalls+name[e.Dst]+" (may run "+r+")")
 				continue
 			}
+			listCall(e, useCalls+name[e.Dst])
 		case types.EdgeCalls:
-			verb = "calls "
-		case types.EdgeReadsField:
-			verb = "reads "
-		case types.EdgeWritesField:
-			verb = "writes "
-		case types.EdgeReferences:
-			verb = "reads "
-			if e.DispatchKind == "write" {
-				verb = "writes "
-			}
+			listCall(e, useCalls+name[e.Dst])
+		case types.EdgeEmitsEvent:
+			list(e, e.Line, useEmits+name[e.Dst])
+		case types.EdgeRevertsWith:
+			list(e, e.Line, useReverts+name[e.Dst])
+		case types.EdgeHasModifier:
+			list(e, e.Line, useModifier+name[e.Dst])
 		default:
-			continue
-		}
-		u := verb + name[e.Dst]
-		k := fmt.Sprint(e.Src, e.Line, u)
-		if seen[k] {
-			continue
-		}
-		seen[k] = true
-		if out[e.Src] == nil {
-			out[e.Src] = map[int][]string{}
-		}
-		out[e.Src][e.Line] = append(out[e.Src][e.Line], u)
-		if ep, ok := ext[e.Dst]; ok {
-			if outExt[e.Src] == nil {
-				outExt[e.Src] = map[int][]types.ExternalPackage{}
+			// "reads X" / "writes X" for the value edges, Solidity
+			// mappings included; other edges are not uses on a line.
+			if access := valueAccess(e); access != "" {
+				list(e, e.Line, access+"s "+name[e.Dst])
 			}
-			outExt[e.Src][e.Line] = append(outExt[e.Src][e.Line], ep)
 		}
 	}
 	for _, m := range out {
@@ -1039,9 +1686,11 @@ func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) 
 }
 
 // renderIndex renders an index response: rows 0..k-1 with their lines,
-// k..m-1 by name, the rest counted per file. with_lines in the header counts
-// the rows that do carry matched lines (a row matched in its name only has
-// none).
+// k..m-1 by name, the rest counted per file. with_lines in the header is k,
+// the rows given in full, so that with_lines and names_only add up to the
+// rows listed. A row matched in its name only is one of them and has no
+// lines to carry: counting only rows with lines left such rows in neither
+// number (137 rows against with_lines 131 in one go-stablenet response).
 func renderIndex(rows, withLines, nameOnly []map[string]any, base map[string]any, k, m int, tool string) ([]byte, map[string]any) {
 	rest := make(map[string]any, len(base)+2)
 	for key, v := range base {
@@ -1051,13 +1700,7 @@ func renderIndex(rows, withLines, nameOnly []map[string]any, base map[string]any
 	index = append(index, withLines[:k]...)
 	index = append(index, nameOnly[k:m]...)
 	rest["hits"] = index
-	carry := 0
-	for _, r := range withLines[:k] {
-		if r["at"] != nil {
-			carry++
-		}
-	}
-	header := map[string]any{"declarations": len(rows), "with_lines": carry}
+	header := map[string]any{"declarations": len(rows), "with_lines": k}
 	if m > k {
 		header["names_only"] = m - k
 	}
@@ -1192,10 +1835,13 @@ func rankBefore(da, db codeDecl, a, b *codeHit) bool {
 }
 
 // reasonEdges link a declaration to its graph neighbours for reasons:
-// calls either way and value reads and writes either way.
+// calls either way and value reads and writes either way, and for Solidity
+// the modifiers applied, events emitted and errors reverted with.
 var reasonEdges = map[types.EdgeType]bool{
 	types.EdgeCalls: true, types.EdgeInvokes: true, types.EdgeReadsField: true,
 	types.EdgeWritesField: true, types.EdgeReferences: true,
+	types.EdgeReadsMapping: true, types.EdgeWritesMapping: true,
+	types.EdgeHasModifier: true, types.EdgeEmitsEvent: true, types.EdgeRevertsWith: true,
 }
 
 // reasonWords lowercases the reasons, drops words shorter than 3 characters

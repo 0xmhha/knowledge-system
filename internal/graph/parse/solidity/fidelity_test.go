@@ -749,8 +749,15 @@ func TestFidelityIncrementalResolve(t *testing.T) {
 				}
 			}
 			for _, n := range got.Nodes {
-				if want := coldNode[n.ID]; n.SlotIndex != want.SlotIndex {
+				want := coldNode[n.ID]
+				if n.SlotIndex != want.SlotIndex {
 					t.Errorf("%s %s slot %d, want %d as in a full build", n.FilePath, n.QualifiedName, n.SlotIndex, want.SlotIndex)
+				}
+				// Pass 2 decides this marker for a receiver whose type another
+				// file declares (`route.hop.call(...)`).
+				if n.HasExternalCall != want.HasExternalCall {
+					t.Errorf("%s %s external call marker %v, want %v as in a full build",
+						n.FilePath, n.QualifiedName, n.HasExternalCall, want.HasExternalCall)
 				}
 			}
 		})
