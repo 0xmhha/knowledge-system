@@ -207,7 +207,7 @@ func rankNamed(reader store.Reader, nodes []types.Node, all bool) (kept []types.
 func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("find_callers",
-		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to); for a Solidity modifier, event or error, the functions that apply, emit or revert with it; for a field, package-level variable, constant or Solidity state variable it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
+		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to, also for interfaces declared in a function or written inline in a type assertion, interface{ Bytes() []byte }); goroutines that run the function (go f(x), or a go literal that calls it) are listed apart under goroutine_callers, each with the function that starts it (spawned_by), and never counted among the callers; calls that run because a message arrives on a channel are listed under handled_by: the receive whose range holds the call, and the senders that can wake it (sender, line of the send, channel, and goroutines: the goroutines that run the sender), or no_sender_in_build when no send in the build reaches the channel (time.Tick, a library channel); for a Solidity modifier, event or error, the functions that apply, emit or revert with it; for a field, package-level variable, constant or Solidity state variable it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
@@ -247,6 +247,9 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 				"users are the code that reads or writes it (the same as find_references)."
 			out["nodes"] = []map[string]any{}
 			out["edges"] = []types.Edge{}
+			if err := addGoroutineCallers(reader, resolved, out, goroutineUsersKey, noTests); err != nil {
+				return nil, err
+			}
 			return textResult(resolved.result(out)), nil
 		}
 		if direct || noTests {
@@ -255,6 +258,12 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 				return nil, err
 			}
 			out["nodes"] = attachBlobs(reader, out["nodes"].([]types.Node), incl)
+			if err := addGoroutineCallers(reader, resolved, out, goroutineCallersKey, noTests); err != nil {
+				return nil, err
+			}
+			if err := addHandledBy(reader, resolved, out); err != nil {
+				return nil, err
+			}
 			return textResult(resolved.result(out)), nil
 		}
 		// Union the concrete seed with the interface methods it satisfies, so
@@ -265,11 +274,97 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 			return nil, err
 		}
 		traceWalk(traceFrom(ctx), d, nodes, edges)
-		return textResult(resolved.result(map[string]any{
+		out := map[string]any{
 			"nodes": attachBlobs(reader, nodes, incl),
 			"edges": edges,
-		})), nil
+		}
+		if err := addGoroutineCallers(reader, resolved, out, goroutineCallersKey, false); err != nil {
+			return nil, err
+		}
+		if err := addHandledBy(reader, resolved, out); err != nil {
+			return nil, err
+		}
+		return textResult(resolved.result(out)), nil
 	})
+}
+
+// Keys of the goroutines that run a function (find_callers) or use a value
+// (find_callers and find_references on a field).
+const (
+	goroutineCallersKey = "goroutine_callers"
+	goroutineUsersKey   = "goroutine_users"
+)
+
+// addGoroutineCallers adds to out, under key, the goroutines whose code
+// edges (types.IsGoroutineCode) end at the seed: for each, its name, file
+// and line (of the call or use), the edge type and the function that starts
+// it (spawned_by). Nothing is added when there are none. They are kept out
+// of the callers and users, whose counts stay function-level; noTests drops
+// goroutines in test code.
+func addGoroutineCallers(reader store.Reader, seed seedRef, out map[string]any, key string, noTests bool) error {
+	own, err := seed.nodes(reader)
+	if err != nil {
+		return err
+	}
+	ids := make([]string, 0, len(own))
+	for _, n := range own {
+		ids = append(ids, n.ID)
+	}
+	edges, err := store.GoroutineCode(reader, ids, true)
+	if err != nil || len(edges) == 0 {
+		return err
+	}
+	isTest, err := testFileRule(reader)
+	if err != nil {
+		return err
+	}
+	srcIDs := make([]string, 0, len(edges))
+	for _, e := range edges {
+		srcIDs = append(srcIDs, e.Src)
+	}
+	gors, err := reader.NodesByIDs(srcIDs)
+	if err != nil {
+		return err
+	}
+	byID := make(map[string]types.Node, len(gors))
+	for _, g := range gors {
+		byID[g.ID] = g
+	}
+	spawners, spawnEdges, err := reader.NeighborhoodByIDs(srcIDs, 1, true, string(types.EdgeSpawns))
+	if err != nil {
+		return err
+	}
+	spawnerOf := map[string]types.Node{}
+	for _, e := range spawnEdges {
+		for _, n := range spawners {
+			if n.ID == e.Src {
+				spawnerOf[e.Dst] = n
+			}
+		}
+	}
+	rows := []map[string]any{}
+	for _, e := range edges {
+		g, ok := byID[e.Src]
+		if !ok || noTests && isTest(g.FilePath) {
+			continue
+		}
+		row := map[string]any{"goroutine": store.PrintedName(reader, g), "file": g.FilePath, "line": e.Line, "edge": string(e.Type)}
+		if e.Type == types.EdgeReferences {
+			access := accessRead
+			if e.DispatchKind == types.DispatchGoroutineWrite {
+				access = accessWrite
+			}
+			row["access"] = access
+		}
+		if sp, ok := spawnerOf[g.ID]; ok {
+			row["spawned_by"] = store.PrintedName(reader, sp)
+		}
+		rows = append(rows, row)
+	}
+	if len(rows) > 0 {
+		out[key] = rows
+	}
+	return nil
 }
 
 // dropTestUsers removes from a valueUsers payload the users in test code
@@ -364,7 +459,7 @@ func callersFiltered(reader store.Reader, seed seedRef, depth int, direct, noTes
 func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("find_callees",
-		mcp.WithDescription("Functions called by the symbol (forward call graph). qname may be a full qualified_name or a bare short name (resolved by suffix; an ambiguous bare name returns candidate qnames instead of an empty result). Follows calls, interface calls and the implementations they can run (dispatches_to, not counted as a hop); for a Solidity function also the modifiers it applies, the events it emits and the errors it reverts with. Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
+		mcp.WithDescription("Functions called by the symbol (forward call graph). qname may be a full qualified_name or a bare short name (resolved by suffix; an ambiguous bare name returns candidate qnames instead of an empty result). Follows calls, interface calls and the implementations they can run (dispatches_to, not counted as a hop); for a Solidity function also the modifiers it applies, the events it emits and the errors it reverts with. What the function's sends on channels make run is listed under triggers: each receive a send can wake (receive, channel, send_line) with the code that receive then runs (handles: kind call, send, recv, go, read or write, the node and line, and for a call the function it calls). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
@@ -385,10 +480,14 @@ func RegisterFindCallees(s *server.MCPServer, reader store.Reader) {
 		nodes, edges, added := withDispatchTargets(reader, nodes, edges)
 		traceFrom(ctx).add("dispatch_targets", map[string]any{"added": added})
 		traceWalk(traceFrom(ctx), d, nodes, edges)
-		return textResult(resolved.result(map[string]any{
+		out := map[string]any{
 			"nodes": attachBlobs(reader, nodes, incl),
 			"edges": edges,
-		})), nil
+		}
+		if err := addTriggers(reader, resolved, out); err != nil {
+			return nil, err
+		}
+		return textResult(resolved.result(out)), nil
 	})
 }
 

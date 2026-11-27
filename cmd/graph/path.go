@@ -59,6 +59,8 @@ node below has it to the node above).`,
 			if err != nil {
 				return fmt.Errorf("load edges: %w", err)
 			}
+			// A Goroutine's code edges are read apart, as in the tools.
+			edges = types.WithoutGoroutineCode(edges)
 
 			fromID, err := resolveNodeQuery(store, nodes, args[0])
 			if err != nil {

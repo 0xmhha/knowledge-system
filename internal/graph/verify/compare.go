@@ -2,6 +2,7 @@ package verify
 
 import (
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/graph/concfacts"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -86,7 +87,19 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	if r.Statements, err = compareStatements(truth.Stmts, nodes, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
-	if r.UnderLock, err = compareUnderLock(truth.UnderLock, idx, g, opts.Samples); err != nil {
+	if r.UnderLock, err = compareUnderLock(truth.UnderLock, idx, g, false, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.UnderLockPropagated, err = compareUnderLock(truth.UnderLockPropagated, idx, g, true, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.Dispatch, err = compareDispatch(truth.Dispatch, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.Handles, r.Triggers, err = compareMessages(truth.Messages, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.GoroutineChans, err = compareGoroutineChans(truth.GoroutineChans, truth.GoroutineChansUndecided, truth.GoroutineLocalChans, idx, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
 	return r, nil
@@ -96,7 +109,10 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 // truth's pairs. A node is named like a truth declaration: its file, its
 // first line and its name (a Mutex node has its declaration's span and the
 // name of the variable or field, or of the embedded mutex type).
-func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, samples int) (UnderLockStats, error) {
+//
+// propagated selects the edges a build made with lock propagation marks
+// with the dispatch kind propagatedLockKind; the others are the direct ones.
+func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, propagated bool, samples int) (UnderLockStats, error) {
 	edges, err := g.QueryEdgesByType(string(types.EdgeAccessedUnderLock))
 	if err != nil {
 		return UnderLockStats{}, fmt.Errorf("verify: read accessed_under_lock: %w", err)
@@ -112,6 +128,9 @@ func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, sa
 	graph := map[[2]string]bool{}
 	var unsupported []string
 	for _, e := range edges {
+		if (e.DispatchKind == propagatedLockKind) != propagated {
+			continue
+		}
 		k := [2]string{key(e.Src), key(e.Dst)}
 		if graph[k] {
 			continue
@@ -137,6 +156,12 @@ func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, sa
 	st.UnsupportedSamples = firstN(unsupported, samples)
 	return st, nil
 }
+
+// propagatedLockKind is the dispatch kind the graph gives an
+// accessed_under_lock edge found in a callee (ckg build --lock-propagation),
+// as the concurrency contract names it. Verify takes the contract's
+// vocabulary, not its facts: the truth is its own.
+const propagatedLockKind = concfacts.PropagatedKind
 
 // nodeIndex looks graph nodes up by id and by (file, canonical id base).
 type nodeIndex struct {

@@ -67,3 +67,53 @@ func TestDispatchEdges(t *testing.T) {
 		}
 	}
 }
+
+// TestDispatchEdgesLocalAndAbstract: an interface declared in a function or
+// written inline in a type assertion dispatches like a package-level one,
+// and no dispatch ends at an interface method (a struct embedding Pricer
+// selects Pricer.Price, which has no body). Before, the 31 dispatches of
+// such interfaces in go-stablenet were missing, and one type_hierarchy edge
+// ended at an interface method.
+func TestDispatchEdgesLocalAndAbstract(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/dispatch_local")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	got := map[[2]string]bool{}
+	for _, e := range g.Edges {
+		if e.Type != types.EdgeDispatchesTo {
+			continue
+		}
+		src, dst := byID[e.Src], byID[e.Dst]
+		got[[2]string{src.QualifiedName, dst.QualifiedName}] = true
+		if dst.Type == types.NodeMethod && (dst.QualifiedName == "local.Pricer.Price" || dst.QualifiedName == "local.Backend.Price") {
+			t.Errorf("dispatch %s -> %s ends at an interface method (%s)", src.QualifiedName, dst.QualifiedName, e.DispatchKind)
+		}
+	}
+	var inline, declared string
+	for _, n := range g.Nodes {
+		if n.Type == types.NodeMethod && n.Name == "Bytes" && n.CanonicalID == "" {
+			if n.QualifiedName == "local.Count.sized.Bytes" {
+				declared = n.QualifiedName
+			} else {
+				inline = n.QualifiedName
+			}
+		}
+	}
+	if inline == "" || declared == "" {
+		t.Fatalf("no node of the local interface methods: inline %q, declared %q", inline, declared)
+	}
+	for _, w := range [][2]string{
+		{inline, "local.word.Bytes"}, {inline, "local.pair.Bytes"},
+		{declared, "local.word.Bytes"}, {declared, "local.pair.Bytes"},
+		{"local.Backend.Price", "local.fixed.Price"},
+	} {
+		if !got[w] {
+			t.Errorf("missing dispatches_to %s -> %s; have %v", w[0], w[1], got)
+		}
+	}
+}

@@ -56,6 +56,8 @@ calls, runs in seconds even on 220K-node graphs.`,
 			if err != nil {
 				return fmt.Errorf("load edges: %w", err)
 			}
+			// A Goroutine's code edges are read apart, as in the tools.
+			edges = types.WithoutGoroutineCode(edges)
 			// Topic tree powers the Communities + cohesion section.
 			// LoadHierarchy returns rows for every resolution; we read the
 			// middle one (Level=1, γ=1.0) by default — the smallest

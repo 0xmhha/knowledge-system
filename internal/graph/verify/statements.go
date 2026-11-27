@@ -37,8 +37,7 @@ import (
 // ranges over a channel are sites like calls.
 //
 // A truth fact whose statement has no node in the graph (none is made for
-// the call of a go statement itself, nor for a channel operation on a local
-// channel bound to its make site) is counted apart, as is a fact whose value
+// the call of a go statement itself) is counted apart, as is a fact whose value
 // or callee has no node (outside the scope).
 
 // StmtFact is one statement link: from a statement to a value, a callee or a

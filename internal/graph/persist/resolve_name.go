@@ -625,9 +625,41 @@ func resolveMutex(r StoreReader, declaring, language string) (NameResolution, er
 		}
 	}
 	if len(mutexes) == 0 {
-		return NameResolution{}, nil
+		// A field or variable that holds a channel used as a lock names
+		// that lock: the Channel node (sub kind lock) its alias comes from.
+		locks, err := lockChannelsOf(r, nodes)
+		if err != nil || len(locks) == 0 {
+			return NameResolution{}, err
+		}
+		mutexes = locks
 	}
 	return NameResolution{QName: declaring, Nodes: mutexes, ByID: true}, nil
+}
+
+// lockChannelsOf returns the channels used as locks (types.ChannelLockSubKind)
+// that the fields and variables among nodes hold: the make sites their
+// channel aliases (flows_to) come from.
+func lockChannelsOf(r StoreReader, nodes []types.Node) ([]types.Node, error) {
+	var ids []string
+	for _, n := range nodes {
+		if n.Type == types.NodeField || n.Type == types.NodeVariable || n.Type == types.NodeLocalVariable {
+			ids = append(ids, n.ID)
+		}
+	}
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	from, _, err := r.NeighborhoodByIDs(ids, 1, true, string(types.EdgeFlowsTo))
+	if err != nil {
+		return nil, fmt.Errorf("lock channels: %w", err)
+	}
+	var out []types.Node
+	for _, n := range from {
+		if n.Type == types.NodeChannel && n.SubKind == types.ChannelLockSubKind {
+			out = append(out, n)
+		}
+	}
+	return out, nil
 }
 
 // PrintedQName is the qualified name a tool prints for n: the qualified name,

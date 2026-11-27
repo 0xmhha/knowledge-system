@@ -18,10 +18,13 @@ import (
 type declIndex struct {
 	byCanonical map[string][]*types.Node
 	byQname     map[string][]*types.Node
+	// local are the methods without a canonical id (those of an interface
+	// declared in a function or written inline), by name.
+	local map[string][]*types.Node
 }
 
 func newDeclIndex(nodes []types.Node) declIndex {
-	ix := declIndex{byCanonical: map[string][]*types.Node{}, byQname: map[string][]*types.Node{}}
+	ix := declIndex{byCanonical: map[string][]*types.Node{}, byQname: map[string][]*types.Node{}, local: map[string][]*types.Node{}}
 	for i := range nodes {
 		n := &nodes[i]
 		if n.Type != types.NodeFunction && n.Type != types.NodeMethod {
@@ -29,6 +32,8 @@ func newDeclIndex(nodes []types.Node) declIndex {
 		}
 		if n.CanonicalID != "" {
 			ix.byCanonical[n.CanonicalID] = append(ix.byCanonical[n.CanonicalID], n)
+		} else if n.Type == types.NodeMethod {
+			ix.local[n.Name] = append(ix.local[n.Name], n)
 		}
 		ix.byQname[n.QualifiedName] = append(ix.byQname[n.QualifiedName], n)
 	}
@@ -49,6 +54,19 @@ func (ix declIndex) at(cid, qname string, pos token.Position) *types.Node {
 		cands = ix.byQname[qname]
 	}
 	return pickDecl(cands, pos, byName)
+}
+
+// localMethod returns the node of a method without a canonical id (one of
+// an interface declared in a function or written inline in a type
+// assertion) named name and declared at pos: the method node of that name
+// whose lines hold pos in pos's file.
+func (ix declIndex) localMethod(name string, pos token.Position) *types.Node {
+	for _, c := range ix.local[name] {
+		if sameFile(c.FilePath, pos.Filename) && c.StartLine <= pos.Line && pos.Line <= c.EndLine {
+			return c
+		}
+	}
+	return nil
 }
 
 func pickDecl(cands []*types.Node, pos token.Position, needFile bool) *types.Node {

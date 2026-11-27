@@ -40,21 +40,13 @@ func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 			return false
 		}
 		switch s := n.(type) {
-		case *ast.AssignStmt:
-			// Capture `ch := make(chan T, n)` before the generic CallExpr case fires.
-			// Maps LHS variable name → Channel node ID so sends_to/recvs_from edges
-			// can point at the actual Channel node rather than an anonymous CallSite.
-			// Note: channel parameters (e.g. `out chan<- int`) are not captured here;
-			// those fall back to CallSite as destination (best-effort only).
-			if len(s.Lhs) == 1 && len(s.Rhs) == 1 {
-				if call, cm, ok := v.chanMake(s.Rhs[0]); ok {
-					chanID := v.emitChannelFromMake(parentID, call, cm)
-					if key := v.chanVar(s.Lhs[0]); key != nil {
-						v.chanVarIDs[key] = chanID
-					}
-					assignedMakeChan[call.Pos()] = true
-				}
-			}
+		case *ast.AssignStmt, *ast.DeclStmt:
+			// Bind `ch := make(chan T, n)` (and var, grouped or not, and
+			// several names) before the generic CallExpr case fires, so
+			// sends_to/recvs_from edges point at the Channel node rather
+			// than an anonymous CallSite. Channel parameters are not bound;
+			// their operations get a CallSite.
+			v.bindLocalChans(parentID, s, assignedMakeChan)
 		case *ast.CallExpr:
 			id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", s.Pos(), s.End())
 			// Pending edge: CallSite -(calls|invokes)-> callee — resolved in Pass 2.
@@ -87,8 +79,8 @@ func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 				Src: parentID, Dst: goroutineID, Type: types.EdgeSpawns, Count: 1,
 				Confidence: types.ConfExtracted,
 			})
-			// Emit sends_to/recvs_from from goroutine body to known channels.
-			v.emitGoroutineChannelEdges(goroutineID, s.Call)
+			// The Goroutine's sends_to/recvs_from come from the channel
+			// linker (dispatch.go), which follows each channel to its origin.
 			// Named-function goroutines like
 			// `go x.method()` previously emitted no calls/invokes edge,
 			// so the cross-function lock propagator skipped the body of
@@ -101,7 +93,7 @@ func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 			// qname and the existing parent-attribution path already
 			// covers field touches inside it.
 			v.emitGoCall(parentID, parentQname, s)
-			return false // goroutine body handled by emitGoroutineChannelEdges; prevent double-walk
+			return false // the literal is walked by emitGoCall; prevent double-walk
 		default:
 			v.emitStatement(parentID, parentQname, n)
 		}
@@ -167,18 +159,20 @@ const (
 // the function parentID; ch is the channel operand and [from, to) the span of
 // the operation.
 //
-// A channel that is a local variable bound to a make site is linked to its
-// Channel node. Any other channel (a parameter, a field, a call result) gets a
-// site node of sub kind subKind and an edge to it. The edge carries the line
+// Every operation gets a site node of sub kind subKind, which the statement
+// around it encloses. A channel that is a local variable bound to a make site
+// is linked to its Channel node; for any other channel (a parameter, a field,
+// a call result) the edge goes to the site. The edge carries the line
 // of the operation, as a call edge does.
 //
 // The same holds inside the literal of a go statement: the operation is
-// written in the function, which gets the edge. emitGoroutineChannelEdges adds
-// the Goroutine's own inferred edge to the channel; with that edge alone, 76
-// operations of go-stablenet on a local channel had no edge from their
-// function and no line.
+// written in the function, which gets the edge. The channel linker
+// (dispatch.go) adds the Goroutine's own inferred edge to the channel.
 func (v *declVisitor) emitChannelOp(parentID, parentQname string, et types.EdgeType, subKind string, ch ast.Expr, from, to token.Pos) {
 	line, _ := v.pos(from)
+	// Every operation has its site, so the statement around it links to it
+	// (encloses); binding a channel must not take that link away.
+	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, subKind, from, to)
 	if key := v.chanVar(ch); key != nil {
 		if chanID, ok := v.chanVarIDs[key]; ok {
 			v.edges = append(v.edges, types.Edge{
@@ -188,7 +182,6 @@ func (v *declVisitor) emitChannelOp(parentID, parentQname string, et types.EdgeT
 			return
 		}
 	}
-	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, subKind, from, to)
 	v.edges = append(v.edges, types.Edge{
 		Src: parentID, Dst: id, Type: et, Line: line,
 		Count: 1, Confidence: types.ConfExtracted,
@@ -374,8 +367,11 @@ func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.
 	if lit == nil || lit.Body == nil {
 		return
 	}
+	made := map[token.Pos]bool{}
 	ast.Inspect(lit.Body, func(n ast.Node) bool {
 		switch s := n.(type) {
+		case *ast.AssignStmt, *ast.DeclStmt:
+			v.bindLocalChans(parentID, s, made)
 		case *ast.GoStmt:
 			gid := v.appendLogicBlockPos(parentID, parentQname, types.NodeGoroutine, "", s.Pos(), s.End())
 			v.edges = append(v.edges, types.Edge{Src: parentID, Dst: gid, Type: types.EdgeSpawns, Count: 1,
@@ -386,9 +382,9 @@ func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.
 			v.emitCallSite(parentID, parentQname, s)
 			// A channel made inside the literal has its node like any other
 			// (9 of the 10 make sites of go-stablenet without a Channel node
-			// were in a go statement's literal). It is not bound to its
-			// variable here: the operations on it get sites.
-			if _, cm, ok := v.chanMake(s); ok {
+			// were in a go statement's literal); one made into a variable
+			// is bound above (bindLocalChans).
+			if _, cm, ok := v.chanMake(s); ok && !made[s.Pos()] {
 				v.emitChannelFromMake(parentID, s, cm)
 			}
 		default:

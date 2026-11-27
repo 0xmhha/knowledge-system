@@ -139,3 +139,58 @@ func TestRunGo_OutsideScope(t *testing.T) {
 		}
 	}
 }
+
+// TestRunGo_PropagatedUnderLock: with lock propagation the graph's
+// propagated accessed_under_lock edges are exactly the pairs the truth's own
+// call walk finds: a field used in a function called while the mutex is
+// held, where it is still held at the use (Counter.viaCall and Counter.deep
+// under Ledger.mu, not Counter.afterCall).
+func TestRunGo_PropagatedUnderLock(t *testing.T) {
+	r := verifyFixture(t, gop.LoadOptions{LockPropagation: true})
+	p := r.UnderLockPropagated
+	if p.Edges == 0 || p.Unsupported != 0 || p.Matched != p.Truth {
+		t.Errorf("propagated: %d edges, %d unsupported, %d of %d true pairs; unsupported %v missing %v",
+			p.Edges, p.Unsupported, p.Matched, p.Truth, p.UnsupportedSamples, p.MissingSamples)
+	}
+	if r.UnderLock.Unsupported != 0 {
+		t.Errorf("direct edges unsupported with propagation on: %v", r.UnderLock.UnsupportedSamples)
+	}
+	// Counter.viaCall and Counter.deep; Counter.afterCall is used after the
+	// Unlock.
+	if p.Truth != 2 {
+		t.Errorf("propagated truth pairs = %d, want 2", p.Truth)
+	}
+}
+
+// TestRunGo_MessageLinks: the handles and triggers edges are exactly what
+// the syntax says on the messages fixture (a worker loop with range, a
+// select over two channels and a done signal, a send through a parameter,
+// an unbuffered channel, a field channel).
+func TestRunGo_MessageLinks(t *testing.T) {
+	r := verifyFixture(t, gop.LoadOptions{})
+	for name, st := range map[string]UnderLockStats{"handles": r.Handles, "triggers": r.Triggers} {
+		if st.Truth == 0 || st.Unsupported != 0 || st.Matched != st.Truth {
+			t.Errorf("%s: %d edges, %d unsupported, %d of %d true; unsupported %v missing %v",
+				name, st.Edges, st.Unsupported, st.Matched, st.Truth, st.UnsupportedSamples, st.MissingSamples)
+		}
+	}
+}
+
+// TestRunGo_ChannelLocks: the graph's channel locks and the fields under
+// them agree with the truth's own rules: the inverted lock (a select send
+// takes it) and a lock that reaches a method through a parameter and a
+// field; no field is under the lock it holds.
+func TestRunGo_ChannelLocks(t *testing.T) {
+	r := verifyFixture(t, gop.LoadOptions{})
+	if r.UnderLock.Unsupported != 0 {
+		t.Errorf("unsupported: %v", r.UnderLock.UnsupportedSamples)
+	}
+	want := []string{"chanlock/chanlock2.go:5:runs -> chanlock/chanlock2.go:10:channel", "chanlock/chanlock2.go:28:w -> chanlock/chanlock2.go:33:channel"}
+	for _, w := range want {
+		for _, m := range r.UnderLock.MissingSamples {
+			if m == w {
+				t.Errorf("missing %s", w)
+			}
+		}
+	}
+}

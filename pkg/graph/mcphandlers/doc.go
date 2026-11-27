@@ -17,7 +17,7 @@
 //	get_subgraph         bidirectional BFS rooted at qname
 //	search_text          FTS5 search with AND/OR mode + language pushdown
 //	search_code          regex over production declaration bodies, grouped by declaration, with resolve, expand and the tests that use each hit
-//	search_test_code     the same over test code (_test.go files and testdata)
+//	search_test_code     the same over test code (the files the build records as test code)
 //	impact_of_change     reverse-dependency closure (broader than callers)
 //	get_context_for_task smart 1-shot: BM25 -> 1-hop -> score-fuse -> pack
 //	evidence_for_intent  EvidencePack assembler over commit/hunk corpus

@@ -1,18 +1,16 @@
 // Package buildpipe orchestrates the full Pass 1..4 build (spec §4.7):
 // detect → parse → resolve → graph build/validate → cluster → score → persist.
-// Three routing paths: cold rebuild, short-circuit (all-cached), and incremental
-// (partial-hit — reuse cached files, re-parse dirty). See Run for routing logic.
+// Every build is cold: it parses every file and rebuilds every artifact
+// (see Run).
 package buildpipe
 
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"maps"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
@@ -31,27 +29,10 @@ import (
 // + changed_in/blame), cluster (pkg + topic), and score. Returns the cluster
 // outputs so the caller can persist them.
 //
-// Both runCold and the partial-cache rebuild path call this — the v2 bug
-// (temporal emitting to g but never persisting under incremental) is
-// structurally impossible because both paths feed the same g into the same
-// downstream persist step.
-//
-// solParser nil = skip xlang. Cold passes the parser when Sol files exist;
-// incremental passes nil when no TS/Sol file is dirty (the cached binds_to
-// edges are reloaded directly into g instead). DB-side drops for temporal
-// and binds_to are the caller's responsibility (cold wipes everything via
-// openColdStore; incremental issues targeted DeleteEdgesByType).
-//
-// goFuncFieldTouches (lock propagation): per Go Function/Method node ID → set of struct-
-// Field node IDs whose values are read/written in the body. Sourced from
-// the Go parser's FuncFieldTouches() accessor on the cold path; nil on
-// the incremental path (which short-circuits the propagation pass even
-// when opt.LockPropagation is true — incremental cache lacks per-function
-// field touches for cached files). lockPropagation=false makes the map
-// irrelevant.
+// solParser nil = skip xlang; the build passes the parser when Sol files
+// exist. The build wipes the store first (openColdStore).
 func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	log *slog.Logger, strict bool,
-	goFuncFieldTouches map[string]map[string]struct{}, lockPropagation bool,
 	temporalDepth int, filter *filterlist.FilterList,
 ) (*cluster.PkgTree, *cluster.TopicTree, map[string][]byte, error) {
 	if solParser != nil {
@@ -87,21 +68,6 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	if _, err := validateAndSanitize(g, log, "temporal", strict); err != nil {
 		return nil, nil, nil, err
 	}
-	// Cross-function lock propagation. Runs BEFORE
-	// cluster/score so the propagated edges contribute to PageRank /
-	// in-degree statistics consistently with the existing intra-function
-	// edges. Opt-in (Options.LockPropagation) — when off the call is a
-	// structural no-op that touches neither g.Edges nor the validation
-	// gate. validateAndSanitize is invoked after emit so any propagator
-	// bug producing dangling endpoints is caught at lenient/strict gates.
-	if lockPropagation {
-		n := propagateLockedFieldAccess(g, goFuncFieldTouches, log)
-		if n > 0 {
-			if _, err := validateAndSanitize(g, log, "lock_propagation", strict); err != nil {
-				return nil, nil, nil, err
-			}
-		}
-	}
 	// Scores first: topic labels name each community after its highest-
 	// PageRank member (cluster.LabelCommunity), so PageRank must be filled
 	// before the topic tree is built. Neither tree reads or changes scores
@@ -126,14 +92,11 @@ type Options struct {
 	Languages           []string // {"auto"} | subset of {"go","ts","sol"}
 	Logger              *slog.Logger
 	CKGVersion          string
-	// NoCache forces a full rebuild — bypasses the incremental cache and
-	// wipes graph.db at start. Use when the cache is suspect, or for clean
-	// benchmark runs.
+	// NoCache is accepted and changes nothing: every build is cold (Run).
 	NoCache bool
 	// DBDSN is an optional PostgreSQL DSN (e.g. "postgres://user:pass@host/db").
 	// When set, the build persists to PostgreSQL instead of a local SQLite file.
-	// OutDir is still used for manifest.json; --no-cache and incremental work the
-	// same way (NodesByFilePath reads from PG with ORDER BY start_line).
+	// OutDir is still used for manifest.json.
 	DBDSN string
 	// StrictValidate, when true, fails the build on the first dangling edge or
 	// schema violation (legacy v0.x behaviour). Default false: dangling edges
@@ -161,14 +124,11 @@ type Options struct {
 	// build scope, ckg build --scope). It sets the platform, cgo and tags of
 	// both Go discovery and type checking; nil keeps the host defaults.
 	GoBuild *detect.GoBuild
-	// LockPropagation enables cross-function lock propagation. When true, the cold build
-	// path walks the Go call graph from every lock-holding function up to
-	// lockPropagationMaxDepth=5 hops and emits accessed_under_lock(field,
-	// mutex) edges for fields touched in reachable callee bodies. Default
-	// false (opt-in per design §5.0 Q5) so existing builds are byte-identical.
-	// Incremental cache path skips propagation regardless of this flag —
-	// run with --no-cache when the flag is on to measure full effect.
-	// Spec: docs/graph/design/go-cross-function-lock-propagation.md.
+	// LockPropagation also records the fields used in a function called
+	// while a mutex is held, as long as the mutex is still held at the use
+	// (gop.LockOptions.Propagate): accessed_under_lock edges with the
+	// dispatch kind PropagatedLockKind, up to gop.PropagationDepth calls
+	// deep. Default false.
 	LockPropagation bool
 
 	// PolicyFile is the optional path to a governance/protocol policy
@@ -176,19 +136,14 @@ type Options struct {
 	// policy entries against the parsed graph and emits NodePolicy +
 	// EdgeGovernedBy rows so an LLM can answer "what policy governs
 	// this code?" without leaving the graph. Empty means "no policy
-	// enrichment" — existing builds stay byte-identical. Incremental cache
-	// path skips policy resolution for the same reason it skips lock
-	// propagation — the policy file's content is decoupled from the
-	// per-file parse output, so re-resolving is a cold-only step
-	// today; run with --no-cache when the policy file changes.
+	// enrichment" — existing builds stay byte-identical.
 	PolicyFile string
 
 	// SecurityPatternFile is the optional path to a security risk
 	// pattern YAML (pkg/security). Sibling to PolicyFile but for the
 	// risk-surface axis: reentrancy, access-control, Byzantine,
 	// overflow patterns flagged against specific code symbols. Empty
-	// means "no security enrichment". Same cold-only constraint as
-	// PolicyFile — re-run with --no-cache when the YAML changes.
+	// means "no security enrichment".
 	SecurityPatternFile string
 
 	// TemporalDepth caps the per-file commit count the temporal pass
@@ -247,10 +202,9 @@ func validateAndSanitize(g *graph.Graph, log *slog.Logger, stage string, strict 
 // and OutDir/manifest.json. Returns the persisted Manifest summary so the
 // caller can print stats without re-reading SQLite.
 //
-// Cache routing:
-//   - --no-cache OR no prior manifest OR schema/version mismatch → cold rebuild
-//   - all-cached AND no removals → short-circuit (timestamp refresh only)
-//   - mixed dirty/cached → incremental (parse only dirty, reuse cached node sets)
+// Every build is cold: it parses every file and recomputes every artifact,
+// whatever graph OutDir holds (Options.NoCache changes nothing). The
+// incremental build was removed because it did not reproduce the cold graph.
 func Run(opt Options) (persist.Manifest, error) {
 	if opt.ProjectID != "" || opt.SnapshotID != "" || opt.DatasetID != "" || opt.FileManifestDigest != "" || opt.CapturePolicyDigest != "" || opt.SourceMode != "" {
 		if opt.ProjectID == "" || opt.SnapshotID == "" || opt.DatasetID == "" || opt.FileManifestDigest == "" || opt.CapturePolicyDigest == "" ||
@@ -282,39 +236,8 @@ func Run(opt Options) (persist.Manifest, error) {
 	log.Info("detected files", "go", goCount, "ts", tsCount, "sol", solCount, "proto", protoCount)
 	log.Debug("discovery.end", "total", goCount+tsCount+solCount+protoCount)
 
-	// (2) cache routing — three paths (schema 1.5):
-	//
-	//   - runShortCircuit: 100% cache hit, no removals (manifest timestamp
-	//     refresh only). Load-bearing for CI re-runs on unchanged source.
-	//   - runIncremental: partial-hit — parse only dirty files, reload cached
-	//     nodes in declaration order (NodesByFilePath ORDER BY start_line —
-	//     keeps edge emission order stable), merge + rerun Pass 2.
-	//   - runCold: --no-cache, missing manifest, schema/version mismatch.
-	dbPath := filepath.Join(opt.OutDir, "graph.db")
-	old := readOldManifestFromDB(dbPath, opt.DBDSN)
-	// A graph built for another Go build configuration (platform, cgo, tags)
-	// holds other files and other type information, so its cache is not a
-	// base for this build.
-	sameGoBuild := old == nil || old.GoBuild == opt.GoBuild.Key()
-	if !opt.NoCache && old != nil && !sameGoBuild {
-		log.Info("Cache: Go build configuration changed; full rebuild", "old", old.GoBuild, "new", opt.GoBuild.Key())
-	}
-	if !opt.NoCache && sameGoBuild && ManifestUsable(old, opt.CKGVersion) {
-		decisions, derr := DiffManifest(opt.SrcRoot, discovery, old, opt.CKGVersion)
-		if derr != nil {
-			return persist.Manifest{}, fmt.Errorf("cache diff: %w", derr)
-		}
-		if decisions.IsAllCached() {
-			logCacheDecision(log, "short_circuit", "all files cached", decisions)
-			return runShortCircuit(opt, log, decisions, old, goCount, tsCount, solCount, protoCount)
-		}
-		logCacheDecision(log, "incremental", "files changed", decisions)
-		return runIncremental(opt, log, decisions, goCount, tsCount, solCount, protoCount, filter)
-	}
-	if opt.NoCache {
-		log.Info("Cache: bypassed (--no-cache); full rebuild")
-	}
-	logCacheDecision(log, "cold", coldReason(opt, old, sameGoBuild), CacheDecisions{})
+	// (2) every build is cold.
+	logBuildPath(log, opt)
 	return runCold(opt, log, discovery, filter)
 }
 
@@ -348,15 +271,9 @@ func runCold(opt Options, log *slog.Logger,
 	resolved := []*parse.ResolvedGraph{}
 	allPending := []persist.PendingRefRow{}
 	parseErrs := 0
-	// goFuncFieldTouches: lock-propagation side-channel from the Go parser (per
-	// Function/Method node ID → set of struct-Field node IDs touched in
-	// body). Consumed by emitDerivedPasses' propagateLockedFieldAccess
-	// when opt.LockPropagation is true. Stays nil when the Go pipeline
-	// doesn't run or the typed-load fallback strips field resolution.
-	var goFuncFieldTouches map[string]map[string]struct{}
 	if shouldRun("go", opt.Languages) && len(goFiles) > 0 {
 		log.Debug("pass1.start", "language", "go", "files", len(goFiles))
-		rg, pending, fieldTouches, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, opt.FileRoles, log)
+		rg, pending, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, opt.FileRoles, opt.LockPropagation, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("go pipeline: %w", err)
 		}
@@ -367,7 +284,6 @@ func runCold(opt Options, log *slog.Logger,
 		}
 		resolved = append(resolved, rg)
 		allPending = append(allPending, pending...)
-		goFuncFieldTouches = fieldTouches
 		log.Debug("pass1.end", "language", "go", "nodes", len(rg.Nodes), "errs", n)
 	}
 	// solParser is retained across the language passes so that the
@@ -431,14 +347,14 @@ func runCold(opt Options, log *slog.Logger,
 	// by temporal living only in cold; the helper makes that recurrence
 	// structurally impossible.
 	log.Debug("metrics.start")
-	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, goFuncFieldTouches, opt.LockPropagation, opt.TemporalDepth, filter)
+	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, opt.TemporalDepth, filter)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
 	log.Debug("metrics.end")
 
-	// (7) persist — cold rebuild wipes graph.db so we don't accumulate stale
-	// rows. Incremental path lives in incremental.go and reuses prior rows.
+	// (7) persist — the build wipes graph.db so we don't accumulate stale
+	// rows.
 	log.Debug("persist.start", "nodes", len(g.Nodes), "edges", len(g.Edges))
 	store, commitCold, err := openColdStore(opt.OutDir, opt.DBDSN)
 	if err != nil {
@@ -632,101 +548,10 @@ func removeSQLiteFiles(path string) {
 	_ = os.Remove(path + "-shm")
 }
 
-// openUpdateStore opens the store an incremental or short-circuit build
-// updates, and returns a commit func to call on success and a discard func
-// to call otherwise (both may be called; the second call does nothing).
-//
-// For SQLite the build updates a copy, graph.db.building, and commit renames
-// it over graph.db, as a cold build does. Readers open graph.db with
-// immutable=1, which assumes the file is never written while they hold it;
-// updating graph.db in place broke that for `ckg watch` or a second build
-// running next to `ckg mcp`, `ckg api` or CKS. The copy costs one file copy
-// (about a second for a 270 MB graph).
-//
-// When dbDsn is set the store is a PostgreSQL database updated in place;
-// commit and discard close it.
-func openUpdateStore(outDir, dbDsn string) (persist.Store, func() error, func(), error) {
-	if dbDsn != "" {
-		store, err := persist.OpenPostgres(dbDsn)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		var once sync.Once
-		closeOnce := func() error {
-			var err error
-			once.Do(func() { err = store.Close() })
-			return err
-		}
-		return store, closeOnce, func() { _ = closeOnce() }, nil
-	}
-	dbPath := filepath.Join(outDir, "graph.db")
-	tmpPath := dbPath + ".building"
-	removeSQLiteFiles(tmpPath) // clear artifacts from an aborted prior build
-	if err := copyFile(dbPath, tmpPath); err != nil {
-		return nil, nil, nil, fmt.Errorf("copy graph.db for update: %w", err)
-	}
-	// A WAL left by an older in-place build belongs to the copy too.
-	if st, err := os.Stat(dbPath + "-wal"); err == nil && st.Size() > 0 {
-		if err := copyFile(dbPath+"-wal", tmpPath+"-wal"); err != nil {
-			removeSQLiteFiles(tmpPath)
-			return nil, nil, nil, fmt.Errorf("copy graph.db-wal for update: %w", err)
-		}
-	}
-	store, err := persist.Open(tmpPath)
-	if err != nil {
-		removeSQLiteFiles(tmpPath)
-		return nil, nil, nil, err
-	}
-	done := false
-	commit := func() error {
-		if done {
-			return nil
-		}
-		done = true
-		if err := store.Close(); err != nil {
-			removeSQLiteFiles(tmpPath)
-			return fmt.Errorf("close updated store before rename: %w", err)
-		}
-		if err := os.Rename(tmpPath, dbPath); err != nil {
-			removeSQLiteFiles(tmpPath)
-			return fmt.Errorf("rename %s -> graph.db: %w", filepath.Base(tmpPath), err)
-		}
-		_ = os.Remove(dbPath + "-wal")
-		_ = os.Remove(dbPath + "-shm")
-		return nil
-	}
-	discard := func() {
-		if done {
-			return
-		}
-		done = true
-		_ = store.Close()
-		removeSQLiteFiles(tmpPath)
-	}
-	return store, commit, discard, nil
-}
-
-// copyFile copies src to dst, creating or truncating dst, and syncs it.
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = in.Close() }()
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
-	if err != nil {
-		return err
-	}
-	if _, err := io.Copy(out, in); err != nil {
-		_ = out.Close()
-		return err
-	}
-	if err := out.Sync(); err != nil {
-		_ = out.Close()
-		return err
-	}
-	return out.Close()
-}
+// TopicTreeForPersist re-exposes persist.TopicTreeInput under a buildpipe-
+// local alias, so persistColdArtifacts can take it as a typed parameter
+// without leaking the persist package detail to every caller.
+type TopicTreeForPersist = persist.TopicTreeInput
 
 // persistColdArtifacts performs the bulk-insert phase of a cold rebuild.
 // All inserts are unconditional — the DB was just wiped by openColdStore.

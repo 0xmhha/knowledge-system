@@ -127,6 +127,8 @@ func generateReport(graphDir, outPath string) error {
 	if err != nil {
 		return fmt.Errorf("edges: %w", err)
 	}
+	// A Goroutine's code edges are read apart, as in the tools.
+	edges = types.WithoutGoroutineCode(edges)
 	topics, err := store.LoadHierarchy("topic")
 	if err != nil {
 		topics = nil // graphs without a Leiden run still get a useful report

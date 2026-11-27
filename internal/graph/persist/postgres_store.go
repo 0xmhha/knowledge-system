@@ -1022,11 +1022,11 @@ func (s *pgStore) pgEdgesFrom(ids []string, edgeTypes []string) ([]types.Edge, e
 	var args []any
 	if len(edgeTypes) == 0 {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE src = ANY($1)`
+            FROM edges WHERE src = ANY($1) AND ` + types.GoroutineCodeSQL
 		args = []any{ids}
 	} else {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE src = ANY($1) AND type = ANY($2)`
+            FROM edges WHERE src = ANY($1) AND type = ANY($2) AND ` + types.GoroutineCodeSQL
 		args = []any{ids, edgeTypes}
 	}
 	rows, err := s.pool.Query(background, q, args...)
@@ -1046,11 +1046,11 @@ func (s *pgStore) pgEdgesPointingTo(ids []string, edgeTypes []string) ([]types.E
 	var args []any
 	if len(edgeTypes) == 0 {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE dst = ANY($1)`
+            FROM edges WHERE dst = ANY($1) AND ` + types.GoroutineCodeSQL
 		args = []any{ids}
 	} else {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE dst = ANY($1) AND type = ANY($2)`
+            FROM edges WHERE dst = ANY($1) AND type = ANY($2) AND ` + types.GoroutineCodeSQL
 		args = []any{ids, edgeTypes}
 	}
 	rows, err := s.pool.Query(background, q, args...)

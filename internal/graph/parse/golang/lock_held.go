@@ -103,10 +103,23 @@ type lockFlow struct {
 	mutexOf func(recv ast.Expr) *types.Node
 	// fieldOf returns the Field node of a struct field.
 	fieldOf func(f *gotypes.Var) *types.Node
+	// chanLocks are the channel lock operations by position (chanlock.go).
+	chanLocks ChanLocks
 	// uses are the (field, mutex) pairs found; undecided says the function
 	// holds code the rule cannot decide, and its uses are dropped.
 	uses      [][2]*types.Node
 	undecided bool
+	// calleeOf, when set, returns the declared function a call runs (a
+	// static callee with source); calls records each such call made while
+	// a mutex is held, with what is held there, for propagation.
+	calleeOf func(call *ast.CallExpr) (funcSource, bool)
+	calls    []heldCall
+}
+
+// heldCall is a call of a declared function made while held is held.
+type heldCall struct {
+	callee funcSource
+	held   heldMutexes
 }
 
 // funcWalk is the state of one function or literal being walked.
@@ -158,9 +171,15 @@ func (w *funcWalk) stmt(s ast.Stmt, held heldMutexes, label string) (heldMutexes
 	case *ast.LabeledStmt:
 		return w.stmt(x.Stmt, held, x.Label.Name)
 	case *ast.ExprStmt:
+		if u, ok := ast.Unparen(x.X).(*ast.UnaryExpr); ok && u.Op == token.ARROW {
+			return w.chanLock(u.OpPos, w.exprs(x.X, held)), true
+		}
 		if call, ok := ast.Unparen(x.X).(*ast.CallExpr); ok {
 			if next, ok := w.lockCall(call, held); ok {
 				return next, true
+			}
+			if _, ok := w.flow.chanLocks[call.Lparen]; ok {
+				return w.chanLock(call.Lparen, w.exprs(x.X, held)), true
 			}
 			if w.isPanic(call) {
 				w.exprs(call, held)
@@ -168,7 +187,18 @@ func (w *funcWalk) stmt(s ast.Stmt, held heldMutexes, label string) (heldMutexes
 			}
 		}
 		return w.exprs(x.X, held), true
-	case *ast.AssignStmt, *ast.IncDecStmt, *ast.SendStmt, *ast.DeclStmt:
+	case *ast.SendStmt:
+		return w.chanLock(x.Arrow, w.exprs(x, held)), true
+	case *ast.AssignStmt:
+		// v := <-ch and v, ok := <-ch take a lock's token.
+		after := w.exprs(x, held)
+		if len(x.Rhs) == 1 {
+			if u, ok := ast.Unparen(x.Rhs[0]).(*ast.UnaryExpr); ok && u.Op == token.ARROW {
+				after = w.chanLock(u.OpPos, after)
+			}
+		}
+		return after, true
+	case *ast.IncDecStmt, *ast.DeclStmt:
 		return w.exprs(x, held), true
 	case *ast.GoStmt:
 		w.callApart(x.Call, held)
@@ -426,6 +456,23 @@ func (w *funcWalk) lockCall(call *ast.CallExpr, held heldMutexes) (heldMutexes, 
 	return next, true
 }
 
+// chanLock applies the channel lock operation at pos, if there is one, to
+// held: a receive takes the lock's token (holds it), a send returns it and
+// close closes it (neither holds it after).
+func (w *funcWalk) chanLock(pos token.Pos, held heldMutexes) heldMutexes {
+	op, ok := w.flow.chanLocks[pos]
+	if !ok {
+		return held
+	}
+	next := held.clone()
+	if op.Kind == ChanLockAcquire {
+		next[op.Lock.ID] = op.Lock
+	} else {
+		delete(next, op.Lock.ID)
+	}
+	return next
+}
+
 // receiver records the uses of the receiver of a Lock or Unlock call of mu:
 // the path to the mutex (s.inner in s.inner.mu.Lock()) is used under held,
 // and the mutex field itself under the other mutexes held (the order in
@@ -488,6 +535,13 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 		case *ast.CallExpr:
 			lit, ok := ast.Unparen(x.Fun).(*ast.FuncLit)
 			if !ok {
+				// A call evaluated here runs here, with what is held
+				// (calls of go and defer statements do not come here).
+				if w.record && len(held) > 0 && w.flow.calleeOf != nil {
+					if callee, ok := w.flow.calleeOf(x); ok {
+						w.flow.calls = append(w.flow.calls, heldCall{callee: callee, held: held.clone()})
+					}
+				}
 				return true
 			}
 			for _, a := range x.Args {
@@ -511,6 +565,13 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 	return after
 }
 
+// declares reports whether field is the field that declares the mutex mu
+// (a Mutex node has its field's place and name): no field is under its own
+// mutex, as when a getter returns &s.mu while s.mu is held.
+func declares(field, mu *types.Node) bool {
+	return field.FilePath == mu.FilePath && field.StartLine == mu.StartLine && field.Name == mu.Name
+}
+
 // use records the field uses that n makes itself (fieldUsesAt: a selector,
 // the elements of a struct literal) as uses under every mutex of held.
 func (w *funcWalk) use(n ast.Node, held heldMutexes) {
@@ -524,7 +585,9 @@ func (w *funcWalk) use(n ast.Node, held heldMutexes) {
 		}
 		// In id order: the edges come out in the same order on every build.
 		for _, id := range slices.Sorted(maps.Keys(held)) {
-			w.flow.uses = append(w.flow.uses, [2]*types.Node{field, held[id]})
+			if mu := held[id]; !declares(field, mu) && !w.flow.chanLocks.holds(mu, field) {
+				w.flow.uses = append(w.flow.uses, [2]*types.Node{field, mu})
+			}
 		}
 	}
 }

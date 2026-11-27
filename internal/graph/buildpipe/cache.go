@@ -1,16 +1,12 @@
-// Package buildpipe — cache.go implements the file-level incremental
-// cache. Cache key composition, manifest diffing (hit/miss/removed
-// classification) and parser-version derivation live here.
-//
-// Scope: per-file SHA256 + cache key, skip parse on hit, full Pass 2
-// re-run, full PageRank/Leiden recompute when ANY file is dirty.
-// Reverse-reference invalidation and partial Pass 2 live in incremental.go.
+// Package buildpipe — cache.go holds the schema version and the per-file
+// keys the manifest records: SHA256, cache key, parser version. No build
+// reads them back (every build is cold); they say what a graph was built
+// from.
 package buildpipe
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -316,7 +312,22 @@ import (
 // sets while the mutex is held, as writes_field does (one notion of a field
 // use, fieldUsesAt), and the receiver path of a deferred Unlock, read where
 // the defer stands. accessed_under_lock edges change; force a cold rebuild.
-const SchemaVersion = "1.41"
+//
+// 1.42 (2026-11-26): no field is under the mutex it declares (a getter that
+// returns &s.mu while s.mu is held). --lock-propagation follows only calls
+// made where the caller's mutex is held and marks its edges with the
+// dispatch kind "propagated". Interface dispatches_to no longer end at an
+// interface method and reach the methods of interfaces declared in a
+// function or written inline; a Goroutine's sends_to/recvs_from come from
+// the channel linker. Every channel operation has its site, also on a bound
+// channel. A Goroutine is a caller: calls, reads_field and writes_field
+// from it (dispatch kind goroutine), which the walks and the tools keep apart
+// from the function-level edges. New edge types handles (a receive to the
+// code its message runs) and triggers (a sender to a receive it can wake),
+// and flows_to of kind received. accessed_under_lock, dispatches_to,
+// sends_to and recvs_from edges and CallSite nodes change. Every build is
+// cold.
+const SchemaVersion = "1.42"
 
 // fileClass classifies one source file against the previous manifest.
 type fileClass int
@@ -562,77 +573,4 @@ func DiffManifest(srcRoot string, discovered []DiscoveredFile, old *persist.Mani
 		return out.Decisions[i].Path < out.Decisions[j].Path
 	})
 	return out, nil
-}
-
-// ManifestUsable reports whether old can be used as the cache base for a
-// build under (ckgVersion, SchemaVersion). Returns false when the global
-// invariants drifted — caller must discard the cache and full-rebuild
-// (silent reuse with stale schema would corrupt the DB).
-//
-// nil manifest → false. Empty schema/ckg version → false (defensive).
-func ManifestUsable(old *persist.Manifest, ckgVersion string) bool {
-	if old == nil {
-		return false
-	}
-	if old.SchemaVersion != SchemaVersion {
-		return false
-	}
-	if bv := old.EffectiveBuilderVersion(); bv == "" || bv != ckgVersion {
-		return false
-	}
-	if len(old.Files) == 0 {
-		return false
-	}
-	return true
-}
-
-// IsAllCached returns true when every decision is classCached and there are
-// no removals. Used by the build pipeline to short-circuit Pass 2 / metrics
-// when nothing actually changed.
-func (cd CacheDecisions) IsAllCached() bool {
-	return cd.Misses == 0 && cd.Removed == 0
-}
-
-// DirtyPaths returns the srcRoot-relative paths of files needing reparse,
-// in the discovery order they were emitted (deterministic).
-func (cd CacheDecisions) DirtyPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classDirty {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// CachedPaths returns the srcRoot-relative paths whose cache hit, in sorted
-// order. Caller uses these to load nodes/edges from the DB.
-func (cd CacheDecisions) CachedPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classCached {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// RemovedPaths returns the srcRoot-relative paths that were in the old
-// manifest but are not in the current discovery. Caller deletes their data.
-func (cd CacheDecisions) RemovedPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classRemoved {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// FormatLogLine returns a single human-readable summary line. Stable phrasing
-// so operator runbooks can grep for it.
-func (cd CacheDecisions) FormatLogLine() string {
-	dirty := len(cd.DirtyPaths())
-	return fmt.Sprintf("Cache: %d hits, %d misses, %d removed; parsed %d files",
-		cd.Hits, cd.Misses, cd.Removed, dirty)
 }

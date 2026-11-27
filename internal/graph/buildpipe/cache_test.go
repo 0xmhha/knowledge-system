@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"sort"
 	"testing"
-	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -65,267 +64,32 @@ func runBuild(t *testing.T, src, out string, opts ...func(*buildpipe.Options)) p
 	return m
 }
 
-// TestIncremental_FullCacheHit builds twice in a row with no source changes.
-// The second build must report all-cached (Files block from first build is
-// reused; no parsing occurs). We assert this by checking that the BUILD
-// timestamp advances (proving we ran) but the per-file SHA256s are identical.
-func TestIncremental_FullCacheHit(t *testing.T) {
+// TestRebuildIsCold: every build is cold. A build over an existing graph
+// after an edit gives the graph a fresh build of the same tree gives, with
+// --no-cache or without (it changes nothing), and a removed file is gone.
+func TestRebuildIsCold(t *testing.T) {
 	src := makeMiniGoModule(t)
 	out := t.TempDir()
-
-	first := runBuild(t, src, out)
-	if len(first.Files) == 0 {
-		t.Fatal("expected Files block on first build")
-	}
-	firstStamp := first.BuildTimestamp
-
-	// Sleep 1 second to guarantee different RFC3339 second precision.
-	time.Sleep(1100 * time.Millisecond)
-
-	second := runBuild(t, src, out)
-	if second.BuildTimestamp == firstStamp {
-		t.Errorf("expected timestamp to advance on rebuild, got %q == %q",
-			second.BuildTimestamp, firstStamp)
-	}
-	// Same number of files, same SHAs.
-	if len(second.Files) != len(first.Files) {
-		t.Fatalf("Files count drift: first=%d second=%d",
-			len(first.Files), len(second.Files))
-	}
-	indexByPath := map[string]persist.FileEntry{}
-	for _, e := range first.Files {
-		indexByPath[e.Path] = e
-	}
-	for _, e := range second.Files {
-		want := indexByPath[e.Path]
-		if e.SHA256 != want.SHA256 {
-			t.Errorf("SHA drift on %q: %q vs %q", e.Path, e.SHA256, want.SHA256)
-		}
-		if e.CacheKey != want.CacheKey {
-			t.Errorf("CacheKey drift on %q", e.Path)
-		}
-	}
-}
-
-// TestIncremental_OneFileChanged modifies one file's content and asserts that
-// (a) the changed file's SHA changes; (b) the other files' SHA + node IDs
-// remain identical; (c) the changed file's node count is reflected.
-func TestIncremental_OneFileChanged(t *testing.T) {
-	src := makeMiniGoModule(t)
-	out := t.TempDir()
-	first := runBuild(t, src, out)
-	checkCachedCanonical := func() {
-		t.Helper()
-		store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer func() { _ = store.Close() }()
-		nodes, err := store.NodesByFilePath("b.go")
-		if err != nil {
-			t.Fatal(err)
-		}
-		for _, n := range nodes {
-			if n.Name == "Mul" {
-				if n.CanonicalID != "example.com/cachetest.Mul" {
-					t.Fatalf("cached file lost canonical symbol identity: %q", n.CanonicalID)
-				}
-				return
-			}
-		}
-		t.Fatal("cached Mul symbol missing")
-	}
-	checkCachedCanonical()
-
-	firstByPath := map[string]persist.FileEntry{}
-	for _, e := range first.Files {
-		firstByPath[e.Path] = e
-	}
-	if _, ok := firstByPath["a.go"]; !ok {
-		t.Fatalf("expected a.go in first manifest, got %v", manifestPaths(first))
-	}
-
-	// Append a comment to a.go (changes content + mtime).
+	runBuild(t, src, out)
 	mustWrite(t, filepath.Join(src, "a.go"), `package cachetest
 
-// Add returns a + b.
-func Add(a, b int) int { return a + b }
-
-// extra noop for cache test
-var _ = 0
+// Add returns a + b, and calls Mul to tie two files together.
+func Add(a, b int) int { return a + b + Mul(0, 0) }
 `)
-
-	second := runBuild(t, src, out)
-	checkCachedCanonical()
-	secondByPath := map[string]persist.FileEntry{}
-	for _, e := range second.Files {
-		secondByPath[e.Path] = e
-	}
-
-	// (a) a.go SHA must differ.
-	if firstByPath["a.go"].SHA256 == secondByPath["a.go"].SHA256 {
-		t.Errorf("expected a.go SHA to change, got identical %q", secondByPath["a.go"].SHA256)
-	}
-	// (b) b.go and c.go SHA + node IDs must be identical.
-	for _, p := range []string{"b.go", "c.go"} {
-		if firstByPath[p].SHA256 != secondByPath[p].SHA256 {
-			t.Errorf("%s SHA drift: %q vs %q", p,
-				firstByPath[p].SHA256, secondByPath[p].SHA256)
-		}
-		if !equalStringSlices(firstByPath[p].NodeIDs, secondByPath[p].NodeIDs) {
-			t.Errorf("%s NodeIDs drift:\n  first=%v\n  second=%v",
-				p, firstByPath[p].NodeIDs, secondByPath[p].NodeIDs)
-		}
-	}
-}
-
-// TestIncremental_FileRemoved deletes one file and asserts its FileEntry is
-// gone from the new manifest and its nodes are gone from the DB.
-func TestIncremental_FileRemoved(t *testing.T) {
-	src := makeMiniGoModule(t)
-	out := t.TempDir()
-	first := runBuild(t, src, out)
-
-	if firstHas := manifestHasPath(first, "c.go"); !firstHas {
-		t.Fatalf("expected c.go in first manifest, got %v", manifestPaths(first))
-	}
-
-	// Remove c.go from the source tree.
 	if err := os.Remove(filepath.Join(src, "c.go")); err != nil {
-		t.Fatalf("remove c.go: %v", err)
+		t.Fatal(err)
 	}
-
-	second := runBuild(t, src, out)
-	if manifestHasPath(second, "c.go") {
-		t.Errorf("c.go should be absent from second manifest, paths=%v",
-			manifestPaths(second))
+	over := runBuild(t, src, out)
+	fresh := runBuild(t, src, t.TempDir())
+	noCache := runBuild(t, src, t.TempDir(), func(o *buildpipe.Options) { o.NoCache = true })
+	if over.GraphDigest != fresh.GraphDigest || noCache.GraphDigest != fresh.GraphDigest {
+		t.Errorf("graph digests differ: over an old graph %s, fresh %s, --no-cache %s", over.GraphDigest, fresh.GraphDigest, noCache.GraphDigest)
 	}
-	// b.go survives.
-	if !manifestHasPath(second, "b.go") {
-		t.Errorf("b.go should still be present, paths=%v", manifestPaths(second))
+	if manifestHasPath(over, "c.go") {
+		t.Errorf("removed file still in the manifest: %v", manifestPaths(over))
 	}
-	// DB also lost c.go's nodes (look up via store).
-	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
-	if err != nil {
-		t.Fatalf("OpenReadOnly: %v", err)
-	}
-	defer func() { _ = store.Close() }()
-	nodes, err := store.NodesByFilePath("c.go")
-	if err != nil {
-		t.Fatalf("NodesByFilePath: %v", err)
-	}
-	if len(nodes) != 0 {
-		t.Errorf("expected c.go nodes to be deleted, got %d", len(nodes))
-	}
-}
-
-// TestIncremental_NoCacheFlag verifies --no-cache forces a full rebuild
-// even when prior manifest is fully usable. Verified by checking that
-// graph.db's mtime advances meaningfully (cold path os.Removes it) AND
-// the manifest still validates (Files block re-emitted).
-func TestIncremental_NoCacheFlag(t *testing.T) {
-	src := makeMiniGoModule(t)
-	out := t.TempDir()
-	_ = runBuild(t, src, out)
-	st1, err := os.Stat(filepath.Join(out, "graph.db"))
-	if err != nil {
-		t.Fatalf("stat first: %v", err)
-	}
-
-	time.Sleep(50 * time.Millisecond)
-
-	second := runBuild(t, src, out, func(o *buildpipe.Options) {
-		o.NoCache = true
-	})
-	st2, err := os.Stat(filepath.Join(out, "graph.db"))
-	if err != nil {
-		t.Fatalf("stat second: %v", err)
-	}
-	// Cold path os.Removes then recreates → inode advances or mtime changes
-	// significantly. Compare size/mtime bundle.
-	if st1.ModTime().Equal(st2.ModTime()) && st1.Size() == st2.Size() {
-		t.Errorf("expected graph.db to be rebuilt under --no-cache (same mtime+size suggests reuse)")
-	}
-	// Manifest still has Files block.
-	if len(second.Files) == 0 {
-		t.Errorf("expected --no-cache rebuild to still emit Files block")
-	}
-}
-
-// TestIncremental_SchemaBumpInvalidates simulates a stored manifest with
-// SchemaVersion="1.0", then runs a build. ManifestUsable returns false
-// (1.0 != current SchemaVersion), so the build falls into the cold path —
-// the entire DB is rebuilt and a fresh-version manifest is emitted.
-func TestIncremental_SchemaBumpInvalidates(t *testing.T) {
-	src := makeMiniGoModule(t)
-	out := t.TempDir()
-
-	first := runBuild(t, src, out)
-	if first.SchemaVersion != buildpipe.SchemaVersion {
-		t.Fatalf("first build SchemaVersion = %q, want %q",
-			first.SchemaVersion, buildpipe.SchemaVersion)
-	}
-
-	// Manually rewrite the manifest's schema_version to "1.0" (legacy).
-	store, err := persist.Open(filepath.Join(out, "graph.db"))
-	if err != nil {
-		t.Fatalf("Open: %v", err)
-	}
-	corrupted := first
-	corrupted.SchemaVersion = "1.0"
-	if err := store.SetManifest(corrupted); err != nil {
-		t.Fatalf("SetManifest(1.0): %v", err)
-	}
-	_ = store.Close()
-
-	second := runBuild(t, src, out)
-	if second.SchemaVersion != buildpipe.SchemaVersion {
-		t.Errorf("post-rebuild SchemaVersion = %q, want %q",
-			second.SchemaVersion, buildpipe.SchemaVersion)
-	}
-	// Files block is fresh (different timestamp guarantees fresh build).
-	if len(second.Files) != len(first.Files) {
-		t.Errorf("Files count drift: first=%d second=%d",
-			len(first.Files), len(second.Files))
-	}
-}
-
-// TestIncremental_MTimeOnlyChange uses os.Chtimes to bump a file's mtime
-// without changing content. The slow path (SHA256 verification) must
-// re-classify the file as cached even though mtime moved.
-func TestIncremental_MTimeOnlyChange(t *testing.T) {
-	src := makeMiniGoModule(t)
-	out := t.TempDir()
-	first := runBuild(t, src, out)
-	firstNodeIDs := map[string][]string{}
-	for _, e := range first.Files {
-		firstNodeIDs[e.Path] = e.NodeIDs
-	}
-
-	// Bump a.go's mtime to a far-future time without touching content.
-	future := time.Now().Add(2 * time.Hour)
-	if err := os.Chtimes(filepath.Join(src, "a.go"), future, future); err != nil {
-		t.Fatalf("Chtimes: %v", err)
-	}
-
-	second := runBuild(t, src, out)
-	// a.go is still cached (slow-path SHA confirmed content unchanged) → its
-	// NodeIDs in the manifest match what they were before.
-	for _, e := range second.Files {
-		if e.Path != "a.go" {
-			continue
-		}
-		if !equalStringSlices(e.NodeIDs, firstNodeIDs["a.go"]) {
-			t.Errorf("a.go NodeIDs drift on mtime-only change:\n  first=%v\n  second=%v",
-				firstNodeIDs["a.go"], e.NodeIDs)
-		}
-		// mtime advanced, so the manifest's MTime field for a.go must reflect that.
-		if e.MTime <= first.Files[0].MTime { // any first-file mtime as baseline
-			// Loose check: just confirm MTime is non-zero.
-			if e.MTime == 0 {
-				t.Errorf("expected non-zero MTime on a.go, got 0")
-			}
-		}
+	if !equalStringSlices(manifestPaths(over), manifestPaths(fresh)) {
+		t.Errorf("manifest files differ: %v vs %v", manifestPaths(over), manifestPaths(fresh))
 	}
 }
 
@@ -364,7 +128,7 @@ func manifestHasPath(m persist.Manifest, path string) bool {
 	return false
 }
 
-// TestPartialCache_PreservesCrossFileEdges_ViaColdFallback is the regression
+// TestRebuild_PreservesCrossFileEdges is the regression
 // guard for a partial-cache bug: previously, when a callee file was modified
 // (cached caller still pointing into it), the partial-cache routing in
 // runIncremental dropped the cross-file `calls` edge because cached files
@@ -382,7 +146,7 @@ func manifestHasPath(m persist.Manifest, path string) bool {
 //
 // Cold build → 1 cross-file `calls` edge (caller.Use → callee.Helper).
 // Modify callee.go → rebuild. Expect: still 1 cross-file `calls` edge.
-func TestPartialCache_PreservesCrossFileEdges_ViaColdFallback(t *testing.T) {
+func TestRebuild_PreservesCrossFileEdges(t *testing.T) {
 	dir := t.TempDir()
 	mustWrite(t, filepath.Join(dir, "go.mod"), `module example.com/edgepin
 
@@ -427,7 +191,7 @@ func Helper() {}
 	}
 }
 
-// TestIncremental_ImplementsEdgesNoDrift is the regression guard for the
+// TestRebuild_ImplementsEdgesNoDrift (formerly an incremental test) is the regression guard for the
 // incremental-path implements/extends bug: cold builds emit implements via
 // the post-Resolve EmitImplementsEdges pass, but runGoPipelineIncremental
 // previously did not, AND the runIncremental DROP step did not include the
@@ -444,7 +208,7 @@ func Helper() {}
 // here, but the same code path drives cross-pkg satisfaction). Touch
 // hello.go to dirty it → second build is incremental. Implements count
 // must equal cold count (no drift, no duplicates).
-func TestIncremental_ImplementsEdgesNoDrift(t *testing.T) {
+func TestRebuild_ImplementsEdgesNoDrift(t *testing.T) {
 	dir := t.TempDir()
 	mustWrite(t, filepath.Join(dir, "go.mod"), `module example.com/implpin
 

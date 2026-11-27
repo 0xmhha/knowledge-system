@@ -91,11 +91,15 @@ type Result struct {
 	// accessed (its accessed_under_lock edges): the locks that guard the
 	// field or variable that holds this mutex, not the ones this mutex is
 	// taken under. Seed one of them for its lockers.
-	GuardedBy []Site         `json:"guarded_by,omitempty"`
-	Depth     int            `json:"depth"`
-	Modules   []Module       `json:"modules"`
-	Edges     [][]any        `json:"edges"` // [src, dst, type, line] tuples, sorted
-	Totals    map[string]any `json:"totals"`
+	GuardedBy []Site   `json:"guarded_by,omitempty"`
+	Depth     int      `json:"depth"`
+	Modules   []Module `json:"modules"`
+	Edges     [][]any  `json:"edges"` // [src, dst, type, line] tuples, sorted
+	// Goroutines are the sends and receives of goroutines on the channels
+	// the walk reached (from the SSA channel linker): their own category,
+	// kept out of Modules and Edges, which are the function-level answer.
+	Goroutines []GoroutineOp  `json:"goroutines,omitempty"`
+	Totals     map[string]any `json:"totals"`
 }
 
 // Site is a node at a line: a function with the line of its lock call, or a
@@ -165,11 +169,11 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 		}
 	}
 
-	fwdN, fwdE, err := r.NeighborhoodByIDs(ids, d, false, ConcurrencyEdgeTypes...)
+	fwdN, fwdE, fwdG, err := walk(r, ids, d, false)
 	if err != nil {
 		return Result{}, err
 	}
-	revN, revE, err := r.NeighborhoodByIDs(ids, d, true, ConcurrencyEdgeTypes...)
+	revN, revE, revG, err := walk(r, ids, d, true)
 	if err != nil {
 		return Result{}, err
 	}
@@ -261,6 +265,7 @@ func Analyze(r store.Reader, symbol string, opt Options) (Result, error) {
 		return edges[i][3].(int) < edges[j][3].(int)
 	})
 
+	res.Goroutines = goroutineRows(r, append(fwdG, revG...))
 	res.Modules = modules
 	res.Edges = edges
 	res.Totals = map[string]any{"modules": len(modules), "edges": len(edges)}
@@ -279,7 +284,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 		return nil, nil, err
 	}
 	for _, n := range seeds {
-		if n.Type == types.NodeMutex {
+		if isLock(n) {
 			mutexes = append(mutexes, n)
 		}
 	}
@@ -296,7 +301,7 @@ func mutexAnswer(r store.Reader, seeds []types.Node, res *Result) ([]types.Node,
 	}
 	roots := append([]types.Node{}, mutexes...)
 	for _, n := range seeds {
-		if n.Type != types.NodeMutex && !hidden[n.ID] {
+		if !isLock(n) && !hidden[n.ID] {
 			roots = append(roots, n)
 		}
 	}
@@ -381,6 +386,21 @@ func declarationsOf(r store.Reader, mutexes []types.Node) ([]types.Node, error) 
 	var out []types.Node
 	seen := map[string]bool{}
 	for _, m := range mutexes {
+		if m.Type == types.NodeChannel {
+			// A channel used as a lock is declared by the fields and
+			// variables it is stored in (flows_to, kind chan).
+			held, _, err := r.NeighborhoodByIDs([]string{m.ID}, 1, false, string(types.EdgeFlowsTo))
+			if err != nil {
+				return nil, fmt.Errorf("names of %s: %w", m.QualifiedName, err)
+			}
+			for _, n := range held {
+				if n.ID != m.ID && declarationKinds[n.Type] && !seen[n.ID] {
+					seen[n.ID] = true
+					out = append(out, n)
+				}
+			}
+			continue
+		}
 		q := strings.TrimSuffix(m.QualifiedName, mutexSuffix)
 		nodes, err := r.FindSymbol(q, true, store.FindSymbolOptions{})
 		if err != nil {
@@ -424,6 +444,17 @@ func mutexNodes(r store.Reader, seeds []types.Node) ([]types.Node, error) {
 		if err != nil {
 			return nil, fmt.Errorf("mutex node of %s: %w", n.QualifiedName, err)
 		}
+		// A field or variable that holds a channel used as a lock names
+		// that lock (the make site the channel aliases lead from).
+		from, _, err := r.NeighborhoodByIDs([]string{n.ID}, 1, true, string(types.EdgeFlowsTo))
+		if err != nil {
+			return nil, fmt.Errorf("lock channel of %s: %w", n.QualifiedName, err)
+		}
+		for _, c := range from {
+			if isLockChannel(c) {
+				out = append(out, c)
+			}
+		}
 		for _, m := range nodes {
 			if m.Type == types.NodeMutex && (n.Type == types.NodeField || m.FilePath == n.FilePath && m.StartLine == n.StartLine) {
 				out = append(out, m)
@@ -431,4 +462,116 @@ func mutexNodes(r store.Reader, seeds []types.Node) ([]types.Node, error) {
 		}
 	}
 	return out, nil
+}
+
+// isLockChannel reports whether n is a channel used as a lock.
+func isLockChannel(n types.Node) bool {
+	return n.Type == types.NodeChannel && n.SubKind == types.ChannelLockSubKind
+}
+
+// isLock reports whether n is a lock: a Mutex node or a channel used as one.
+func isLock(n types.Node) bool { return n.Type == types.NodeMutex || isLockChannel(n) }
+
+// GoroutineOp is a goroutine's send or receive on a channel.
+type GoroutineOp struct {
+	Goroutine string `json:"goroutine"`
+	Edge      string `json:"edge"` // sends_to or recvs_from
+	Channel   string `json:"channel"`
+	File      string `json:"file_path"`
+	Line      int    `json:"line"`
+}
+
+// isGoroutineChannel reports whether e, from a node of type src, is a
+// goroutine's channel operation.
+func isGoroutineChannel(e types.Edge, src types.NodeType) bool {
+	return src == types.NodeGoroutine && (e.Type == types.EdgeSendsTo || e.Type == types.EdgeRecvsFrom)
+}
+
+// walk is the BFS of Analyze over ConcurrencyEdgeTypes, depth hops from ids
+// in one direction, without the goroutines' channel operations: those are
+// returned apart (gor), with the nodes they lead to not walked from.
+func walk(r store.Reader, ids []string, depth int, reverse bool) (nodes []types.Node, edges, gor []types.Edge, err error) {
+	seen := map[string]bool{}
+	for _, id := range ids {
+		seen[id] = true
+	}
+	frontier := ids
+	typeOf := map[string]types.NodeType{}
+	for d := 0; d < depth && len(frontier) > 0; d++ {
+		ns, es, err := r.NeighborhoodByIDs(frontier, 1, reverse, ConcurrencyEdgeTypes...)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		for _, n := range ns {
+			typeOf[n.ID] = n.Type
+		}
+		byID := make(map[string]types.Node, len(ns))
+		for _, n := range ns {
+			byID[n.ID] = n
+		}
+		var next []string
+		for _, e := range es {
+			if isGoroutineChannel(e, typeOf[e.Src]) {
+				gor = append(gor, e)
+				continue
+			}
+			edges = append(edges, e)
+			far := e.Dst
+			if reverse {
+				far = e.Src
+			}
+			if !seen[far] {
+				seen[far] = true
+				next = append(next, far)
+				if n, ok := byID[far]; ok {
+					nodes = append(nodes, n)
+				}
+			}
+		}
+		frontier = next
+	}
+	return nodes, edges, gor, nil
+}
+
+// goroutineRows names the goroutine operations gor, once each, in order of
+// goroutine, edge, channel and line.
+func goroutineRows(r store.Reader, gor []types.Edge) []GoroutineOp {
+	if len(gor) == 0 {
+		return nil
+	}
+	ids := make([]string, 0, 2*len(gor))
+	for _, e := range gor {
+		ids = append(ids, e.Src, e.Dst)
+	}
+	ns, err := r.NodesByIDs(ids)
+	if err != nil {
+		return nil
+	}
+	byID := make(map[string]types.Node, len(ns))
+	for _, n := range ns {
+		byID[n.ID] = n
+	}
+	seen := map[GoroutineOp]bool{}
+	var out []GoroutineOp
+	for _, e := range gor {
+		op := GoroutineOp{Goroutine: store.PrintedName(r, byID[e.Src]), Edge: string(e.Type),
+			Channel: store.PrintedName(r, byID[e.Dst]), File: e.FilePath, Line: e.Line}
+		if !seen[op] {
+			seen[op] = true
+			out = append(out, op)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		switch {
+		case a.Goroutine != b.Goroutine:
+			return a.Goroutine < b.Goroutine
+		case a.Edge != b.Edge:
+			return a.Edge < b.Edge
+		case a.Channel != b.Channel:
+			return a.Channel < b.Channel
+		}
+		return a.Line < b.Line
+	})
+	return out
 }

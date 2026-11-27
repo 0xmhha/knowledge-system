@@ -208,9 +208,8 @@ func (w *stmtWalker) site(x *ast.CallExpr) *types.Node {
 	return n
 }
 
-// opSite returns the site node of the channel operation spanning [from, to),
-// or nil: an operation on a local channel bound to its make site has an edge
-// to the Channel node and no site.
+// opSite returns the site node of the channel operation spanning [from, to)
+// (every operation has one; see emitChannelOp), or nil.
 func (w *stmtWalker) opSite(from, to token.Pos) *types.Node {
 	return w.stmts[stmtKey{w.file, w.fset.Position(from).Offset, w.fset.Position(to).Offset, types.NodeCallSite}]
 }

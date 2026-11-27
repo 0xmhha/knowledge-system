@@ -68,6 +68,7 @@ func RegisterFindReferences(s *server.MCPServer, reader store.Reader) {
 		mcp.WithDescription("Who reads or writes a value: the functions (and package-level initializers) that use a struct field, a package-level variable, a constant or a Solidity state variable (mappings included), "+
 			"each with the file, every line it uses the value on (lines; line is the first), the number of uses and access=read|write. Writers come first, production code before tests (test=true). "+
 			"Use it to follow a value to where it is set and where it is consumed; calls are in find_callers. "+
+			"Goroutines that use the field or variable in their go literal are listed apart under goroutine_users (with spawned_by, and access for a variable), not among the users. "+
 			"qname may be a canonical id, a qualified name (\"render.Options.Width\", \"log.DefaultLevel\") or a bare name. "+
 			"Recorded for Go and Solidity; other languages have no value edges."),
 		mcp.WithString("qname", mcp.Required()),
@@ -83,6 +84,9 @@ func RegisterFindReferences(s *server.MCPServer, reader store.Reader) {
 		}
 		out, err := valueUsers(reader, resolved, req.GetString("access", "all"), int(req.GetFloat("limit", defaultReferenceLimit)))
 		if err != nil {
+			return nil, err
+		}
+		if err := addGoroutineCallers(reader, resolved, out, goroutineUsersKey, false); err != nil {
 			return nil, err
 		}
 		return textResult(resolved.result(out)), nil
@@ -115,6 +119,10 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 	ids := make([]string, 0, len(values))
 	for id := range values {
 		ids = append(ids, id)
+	}
+	isTest, err := testFileRule(reader)
+	if err != nil {
+		return nil, err
 	}
 	nodes, edges, err := reader.NeighborhoodByIDs(ids, 1, true, valueEdgeTypes...)
 	if err != nil {
@@ -163,7 +171,7 @@ func valueUsers(reader store.Reader, seed seedRef, access string, limit int) (ma
 		if src.Signature != "" {
 			row["signature"] = src.Signature
 		}
-		if isTestFile(file) {
+		if isTest(file) {
 			row["test"] = true
 		}
 		rows[k] = row

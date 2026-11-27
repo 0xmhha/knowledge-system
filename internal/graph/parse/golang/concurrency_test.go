@@ -1,6 +1,7 @@
 package golang_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -380,4 +381,352 @@ func findNodeByID(nodes []types.Node, id string) *types.Node {
 		}
 	}
 	return nil
+}
+
+// TestChannelFlow_GoroutineFindsEveryOrigin: the goroutine literal of
+// ChannelOrigins uses five local channels; each gets its Goroutine edge, as
+// each gets its function edge (one rule, bindLocalChans). Before, a channel
+// declared with var, ranged over, made by a multi-name := or made inside
+// the literal had no Goroutine edge (57 operations of go-stablenet).
+func TestChannelFlow_GoroutineFindsEveryOrigin(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	type link struct {
+		et   types.EdgeType
+		line int
+	}
+	fromGoroutine, fromFunction := map[link]bool{}, map[link]bool{}
+	for _, e := range g.Edges {
+		if e.Type != types.EdgeSendsTo && e.Type != types.EdgeRecvsFrom {
+			continue
+		}
+		src, dst := byID[e.Src], byID[e.Dst]
+		if dst.Type != types.NodeChannel || !strings.HasSuffix(dst.FilePath, "channel_origins.go") {
+			continue
+		}
+		switch src.Type {
+		case types.NodeGoroutine:
+			fromGoroutine[link{e.Type, dst.StartLine}] = true
+		case types.NodeFunction:
+			fromFunction[link{e.Type, dst.StartLine}] = true
+		}
+	}
+	// Lines of the make calls: done 6, items 7, errs and outs 8, inner 16.
+	for _, w := range []link{
+		{types.EdgeRecvsFrom, 7}, {types.EdgeSendsTo, 6}, {types.EdgeSendsTo, 8}, {types.EdgeSendsTo, 16},
+	} {
+		if !fromGoroutine[w] {
+			t.Errorf("no Goroutine %s edge to the channel made on line %d; have %v", w.et, w.line, fromGoroutine)
+		}
+		if !fromFunction[w] {
+			t.Errorf("no function %s edge to the channel made on line %d; have %v", w.et, w.line, fromFunction)
+		}
+	}
+}
+
+// TestChannelFlow_GoroutineEdgesFromTheLinker: the Goroutine's channel edges
+// come from the channel linker, the one rule for a channel's origin, so a
+// go statement in a loop or a branch, a grouped var and a channel passed to
+// a call before the goroutine ranges over it all get one. The function's
+// own (extracted) operation on a grouped var points at the Channel too.
+func TestChannelFlow_GoroutineEdgesFromTheLinker(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	goroutineEdge, extracted := map[string]bool{}, map[string]bool{}
+	for _, e := range g.Edges {
+		if e.Type != types.EdgeSendsTo && e.Type != types.EdgeRecvsFrom {
+			continue
+		}
+		src, dst := byID[e.Src], byID[e.Dst]
+		if dst.Type != types.NodeChannel {
+			continue
+		}
+		fn := src.QualifiedName
+		if i := strings.Index(fn, "#"); i >= 0 {
+			fn = fn[:i]
+		}
+		if src.Type == types.NodeGoroutine {
+			goroutineEdge[fn] = true
+		}
+		if src.Type == types.NodeFunction && e.Confidence == types.ConfExtracted {
+			extracted[fn] = true
+		}
+	}
+	for _, fn := range []string{"Works", "InsideFor", "InsideIf", "GroupedVar", "CallArg"} {
+		if !goroutineEdge["mutex_fixture."+fn] {
+			t.Errorf("%s: no Goroutine -> Channel edge", fn)
+		}
+	}
+	if !extracted["mutex_fixture.GroupedVar"] {
+		t.Error("GroupedVar: the function's operation on the grouped var does not point at its Channel")
+	}
+}
+
+// TestGoroutineReachesItsCode: a Goroutine node leads to the code it runs
+// (dispatch kind goroutine): go f(x) to f, and a literal to the declared
+// functions it calls and the fields it uses.
+func TestGoroutineReachesItsCode(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		if e.DispatchKind != gop.GoroutineKind {
+			continue
+		}
+		src, dst := byID[e.Src], byID[e.Dst]
+		if src.Type != types.NodeGoroutine {
+			t.Errorf("goroutine edge from a %s: %s", src.Type, src.QualifiedName)
+		}
+		fn, _, _ := strings.Cut(src.QualifiedName, "#")
+		got[fn+" "+string(e.Type)+" "+dst.QualifiedName] = true
+	}
+	for _, w := range []string{
+		"mutex_fixture.StartsNamed calls mutex_fixture.worker",
+		"mutex_fixture.StartsLiteral calls mutex_fixture.worker",
+		"mutex_fixture.StartsLiteral writes_field mutex_fixture.Job.done",
+		"mutex_fixture.StartsLiteral reads_field mutex_fixture.Job.id",
+	} {
+		if !got[w] {
+			t.Errorf("missing %s; have %v", w, got)
+		}
+	}
+}
+
+// TestMessageLinks: a receive handles the code in its range (a range
+// body, a select case body, the rest of a plain receive's block), its value
+// flows to the uses it reaches (not for a signal channel), and each sender
+// on the same channel triggers it: through a parameter, on an unbuffered
+// channel, on a field channel; a send in a goroutine's literal is the
+// goroutine's, not the function's that starts it.
+func TestMessageLinks(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	// owner names a statement node by its function and the line it is on.
+	owner := func(n types.Node) string {
+		fn, _, _ := strings.Cut(strings.TrimPrefix(n.QualifiedName, "mutex_fixture."), "#")
+		if n.Type == types.NodeField || n.Type == types.NodeFunction || n.Type == types.NodeMethod {
+			return fn
+		}
+		return fmt.Sprintf("%s:%d", fn, n.StartLine)
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		switch {
+		case e.Type == types.EdgeHandles, e.Type == types.EdgeTriggers,
+			e.Type == types.EdgeFlowsTo && e.DispatchKind == types.DispatchReceived:
+		default:
+			continue
+		}
+		kind := e.DispatchKind
+		if e.Type == types.EdgeTriggers {
+			kind = ""
+		}
+		got[fmt.Sprintf("%s %s %s %s", owner(byID[e.Src]), e.Type, kind, owner(byID[e.Dst]))] = true
+	}
+	for _, w := range []string{
+		"WorkerLoop:18 handles call WorkerLoop:20", "WorkerLoop:18 handles write Store.total", "WorkerLoop:18 handles read Store.total",
+		"Serve:41 handles call Serve:42", "Serve:43 handles write Store.last", "Serve:43 handles call Serve:45",
+		"Serve:46 handles call Serve:47",
+		"Store.Drain:68 handles call Store.Drain:69", "Store.Drain:68 handles write Store.total",
+		"Serve:43 flows_to received Store.last", "Store.Drain:68 flows_to received Store.Drain:69",
+		"Produce triggers  WorkerLoop:18", "RunServe triggers  Serve:41", "RunServe triggers  Serve:43",
+		"RunServe triggers  Serve:46", "Store.Feed triggers  Store.Drain:68",
+		"ChannelOrigins:9 triggers  ChannelOrigins:19",
+	} {
+		if !got[w] {
+			t.Errorf("missing %q", w)
+		}
+	}
+	for _, bad := range []string{"Serve:46 flows_to received Serve:47", "ChannelOrigins triggers  ChannelOrigins:19"} {
+		if got[bad] {
+			t.Errorf("unexpected %q", bad)
+		}
+	}
+	if t.Failed() {
+		t.Logf("have %v", got)
+	}
+}
+
+// TestGoroutineRules: a goroutine on a declared function links to that
+// function only (the literal loop calls in place is loop's own code); a
+// goroutine on a literal links to its interface calls (invokes) and the
+// fields it names, not to an embedded field a promoted call passes
+// through; a send on a channel's make site and a receive through the field
+// it is stored in are joined by the alias; the edge of an operation names
+// the operation's file.
+func TestGoroutineRules(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		src, dst := byID[e.Src], byID[e.Dst]
+		s := strings.TrimPrefix(src.QualifiedName, "mutex_fixture.")
+		if src.Type == types.NodeGoroutine {
+			s = "goroutine of " + strings.SplitN(s, "#", 2)[0]
+		}
+		d := strings.TrimPrefix(dst.QualifiedName, "mutex_fixture.")
+		if i := strings.Index(d, "#CallSite@"); i >= 0 {
+			d = d[:i+len("#CallSite")]
+		}
+		got[fmt.Sprintf("%s %s %s", s, e.Type, d)] = true
+		if src.Type == types.NodeGoroutine && e.Line > 0 && dst.Type != types.NodeChannel && e.FilePath != "" {
+			if !strings.HasSuffix(e.FilePath, "goroutine_rules.go") && strings.Contains(src.QualifiedName, "Worker.Start") {
+				t.Errorf("edge %s -> %s at line %d names file %s", src.QualifiedName, dst.QualifiedName, e.Line, e.FilePath)
+			}
+		}
+	}
+	for _, w := range []string{
+		"goroutine of Worker.Start calls Worker.loop", "goroutine of Worker.Start invokes Doer.Do",
+		"goroutine of Worker.Start reads_field Worker.d", "NewWorker triggers Worker.loop#CallSite",
+		"Worker.reply triggers Worker.loop#CallSite", "goroutine of Worker.Start references hits",
+	} {
+		if !got[w] {
+			t.Errorf("missing %q", w)
+		}
+	}
+	for _, bad := range []string{"goroutine of Worker.Start reads_field Worker.Base", "goroutine of Worker.Start writes_field Worker.n"} {
+		if got[bad] {
+			t.Errorf("unexpected %q", bad)
+		}
+	}
+}
+
+// TestChannelLocks: a channel of empty structs with a buffer of one, filled
+// right where it is made, is a lock: its Channel node has sub kind lock,
+// receives acquire it, sends and close release it (close with kind close),
+// and fields used while its token is held are under it, on the select case
+// that takes it only; it gets no handles or triggers. A semaphore of
+// capacity two and a channel filled elsewhere stay channels.
+func TestChannelLocks(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	locks := map[int]bool{} // lines of the make sites marked lock
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+		if n.Type == types.NodeChannel && strings.HasSuffix(n.FilePath, "chanlock.go") && n.SubKind == gop.ChanLockSubKind {
+			locks[n.StartLine] = true
+		}
+	}
+	if len(locks) != 2 || !locks[11] || !locks[57] {
+		t.Errorf("lock channels on lines %v, want 11 (ClosableMutex) and 57 (Device)", locks)
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		src, dst := byID[e.Src], byID[e.Dst]
+		if dst.Type != types.NodeChannel || !strings.HasSuffix(dst.FilePath, "chanlock.go") {
+			if e.Type != types.EdgeAccessedUnderLock || !strings.HasSuffix(dst.FilePath, "chanlock.go") {
+				continue
+			}
+		}
+		name := strings.TrimPrefix(src.QualifiedName, "mutex_fixture.")
+		got[fmt.Sprintf("%s %s %d %s", name, e.Type, dst.StartLine, e.DispatchKind)] = true
+	}
+	for _, w := range []string{
+		"ClosableMutex.TryLock acquires_lock 11 ", "ClosableMutex.MustLock acquires_lock 11 ",
+		"ClosableMutex.Unlock releases_lock 11 ", "ClosableMutex.Close releases_lock 11 close",
+		"Device.Bump acquires_lock 57 ", "Device.Bump releases_lock 57 ",
+		"Device.count accessed_under_lock 57 ",
+	} {
+		if !got[w] {
+			t.Errorf("missing %q", w)
+		}
+	}
+	for k := range got {
+		if strings.HasPrefix(k, "Device.last accessed_under_lock") || strings.Contains(k, "Pool.Use acquires_lock") || strings.Contains(k, "Gate.Pass acquires_lock") {
+			t.Errorf("unexpected %q", k)
+		}
+	}
+	for _, e := range g.Edges {
+		src, dst := byID[e.Src], byID[e.Dst]
+		takesLock := src.Type == types.NodeCallSite && strings.HasSuffix(src.FilePath, "chanlock.go") && src.StartLine == 66
+		wakesLock := dst.Type == types.NodeCallSite && strings.HasSuffix(dst.FilePath, "chanlock.go") && dst.StartLine == 66
+		if e.Type == types.EdgeHandles && takesLock || e.Type == types.EdgeTriggers && wakesLock {
+			t.Errorf("message link on a lock: %s -> %s", src.QualifiedName, dst.QualifiedName)
+		}
+	}
+}
+
+// TestRound2: an inverted lock (a select send takes it, a receive returns
+// it) is a lock; a send in the receive's own statement is not in its range;
+// a closure stored in a variable and called later is not the goroutine's
+// code, a deferred interface call is, and go on an interface method links to
+// it; a received struct's promoted method call is where its value flows.
+func TestRound2(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/concurrency")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		src, dst := byID[e.Src], byID[e.Dst]
+		if !strings.HasSuffix(src.FilePath, "round2.go") && !strings.HasSuffix(dst.FilePath, "round2.go") {
+			continue
+		}
+		s := strings.TrimPrefix(src.QualifiedName, "mutex_fixture.")
+		if src.Type == types.NodeGoroutine || src.Type == types.NodeCallSite {
+			s = fmt.Sprintf("%s:%d", src.Type, src.StartLine)
+		}
+		d := strings.TrimPrefix(dst.QualifiedName, "mutex_fixture.")
+		if dst.Type == types.NodeCallSite || dst.Type == types.NodeChannel {
+			d = fmt.Sprintf("%s:%d", dst.Type, dst.StartLine)
+		}
+		got[fmt.Sprintf("%s %s %s", s, e.Type, d)] = true
+	}
+	for _, w := range []string{
+		"Resetter.Loop acquires_lock Channel:10", "Resetter.Loop releases_lock Channel:10",
+		"Resetter.runs accessed_under_lock Channel:10",
+		"Goroutine:46 invokes Sub.Unsubscribe", "Goroutine:50 invokes Doer.Do",
+		"CallSite:64 flows_to CallSite:65", "CallSite:33 handles Indexer.state",
+	} {
+		if !got[w] {
+			t.Errorf("missing %q", w)
+		}
+	}
+	for _, bad := range []string{"CallSite:33 handles CallSite:33", "Goroutine:46 calls record"} {
+		if got[bad] {
+			t.Errorf("unexpected %q", bad)
+		}
+	}
+	if t.Failed() {
+		for k := range got {
+			t.Log(k)
+		}
+	}
 }

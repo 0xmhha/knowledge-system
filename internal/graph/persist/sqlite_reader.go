@@ -532,8 +532,10 @@ func (s *sqliteStore) edgesByEndpoint(column string, ids []string, edgeTypes []s
 	var out []types.Edge
 	for start := 0; start < len(ids); start += queryEdgesChunk {
 		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		// A walk follows function-level relations: a Goroutine's code
+		// edges are read apart (GoroutineCode).
 		q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `)`
+		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `) AND ` + types.GoroutineCodeSQL
 		args := anys(chunk)
 		if len(edgeTypes) > 0 {
 			q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
@@ -824,4 +826,30 @@ func (s *sqliteStore) ReverseDepsForFiles(dirtyPaths []string) ([]string, error)
 		out = append(out, p)
 	}
 	return out, rows.Err()
+}
+
+// GoroutineCode implements GoroutineCodeReader: the code edges of
+// goroutines (types.IsGoroutineCode) that end at ids (reverse: who runs
+// them) or start at ids (forward: what the goroutines run), in id order.
+func (s *sqliteStore) GoroutineCode(ids []string, reverse bool) ([]types.Edge, error) {
+	column := "src"
+	if reverse {
+		column = "dst"
+	}
+	var out []types.Edge
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		rows, err := s.db.Query(`SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
+			FROM edges WHERE `+column+` IN (`+placeholders(len(chunk))+`) AND NOT `+types.GoroutineCodeSQL+` ORDER BY id`, anys(chunk)...)
+		if err != nil {
+			return nil, fmt.Errorf("goroutine code of %d ids: %w", len(ids), err)
+		}
+		es, err := scanEdges(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, es...)
+	}
+	return out, nil
 }

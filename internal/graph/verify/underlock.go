@@ -6,8 +6,12 @@ import (
 	"go/token"
 	gotypes "go/types"
 	"path/filepath"
+	"sort"
+	"strings"
 
 	"golang.org/x/tools/go/cfg"
+	"golang.org/x/tools/go/packages"
+	"golang.org/x/tools/go/types/typeutil"
 )
 
 // underlock.go is the truth side of accessed_under_lock: the struct fields
@@ -42,9 +46,11 @@ const (
 	truthRUnlock = "RUnlock"
 )
 
-// heldSet is the set of mutexes held at a point, by declaration; nil stands
+// heldSet is the set of mutexes held at a point, by the key of their
+// declaration (declKey: file, line and name, the same in a package and in its
+// test variant, whose type checks give one field two objects); nil stands
 // for "not reached yet", the top of the must-hold lattice.
-type heldSet map[gotypes.Object]bool
+type heldSet map[string]bool
 
 // meet returns the mutexes both a and b hold; nil is the identity.
 func meet(a, b heldSet) heldSet {
@@ -93,6 +99,46 @@ type lockTruth struct {
 	root  string
 	scope map[string]bool
 	out   map[[2]string]bool
+	// only, when set, keeps only the pairs of these mutexes: a callee walked
+	// for propagation records the uses under its caller's mutexes alone.
+	only heldSet
+	// chanLocks names the channels used as locks (chanlock.go).
+	chanLocks chanLockNames
+	// comms are the cases of selects: their lock effect is their path's.
+	comms map[ast.Node]bool
+	// funcs finds the declaration a static call runs; calls collects, when
+	// set, each call of a declared function made while a mutex is held.
+	funcs map[token.Position]truthFunc
+	calls *[]truthCall
+}
+
+// truthFunc is a declared function and the type information of its file.
+type truthFunc struct {
+	decl *ast.FuncDecl
+	info *gotypes.Info
+	fset *token.FileSet
+}
+
+// truthCall is a call of a declared function made while held is held.
+type truthCall struct {
+	callee truthFunc
+	held   heldSet
+}
+
+// callAt records call as a truth call when a mutex is held and its static
+// callee is a declared function.
+func (lt *lockTruth) callAt(call *ast.CallExpr, held heldSet) {
+	if lt.calls == nil || len(held) == 0 || lt.funcs == nil {
+		return
+	}
+	fn := typeutil.StaticCallee(lt.info, call)
+	if fn == nil {
+		return
+	}
+	p := lt.fset.Position(fn.Origin().Pos())
+	if f, ok := lt.funcs[token.Position{Filename: p.Filename, Offset: p.Offset}]; ok {
+		*lt.calls = append(*lt.calls, truthCall{callee: f, held: copyHeld(held)})
+	}
 }
 
 // function analyses one function body that starts with entry held (nil:
@@ -110,6 +156,40 @@ func (lt *lockTruth) function(body *ast.BlockStmt, entry heldSet) {
 	}
 	if entry == nil {
 		entry = heldSet{}
+	}
+	// The cfg evaluates every case of a select before it branches; a case
+	// that takes a channel lock takes it on its own path only, so its
+	// effect is applied where its body starts (caseEntry), not with the
+	// select's other cases.
+	ast.Inspect(body, func(n ast.Node) bool {
+		if cc, ok := n.(*ast.CommClause); ok && cc.Comm != nil {
+			if lt.comms == nil {
+				lt.comms = map[ast.Node]bool{}
+			}
+			lt.comms[cc.Comm] = true
+		}
+		return true
+	})
+	caseEntry := func(b *cfg.Block, h heldSet) heldSet {
+		cc, ok := b.Stmt.(*ast.CommClause)
+		if !ok || b.Kind != cfg.KindSelectCaseBody || cc.Comm == nil {
+			return h
+		}
+		next := copyHeld(h)
+		ast.Inspect(cc.Comm, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.UnaryExpr:
+				if m := lt.chanLock(x); m != "" {
+					lt.chanEffect(m, true)(next)
+				}
+			case *ast.SendStmt:
+				if m := lt.chanLockOf(x.Chan); m != "" {
+					lt.chanEffect(m, false)(next)
+				}
+			}
+			return true
+		})
+		return next
 	}
 	out := make([]heldSet, len(g.Blocks))
 	// start is what every path into b holds; nil while no path reached it.
@@ -133,6 +213,7 @@ func (lt *lockTruth) function(body *ast.BlockStmt, entry heldSet) {
 			if !b.Live || h == nil {
 				continue
 			}
+			h = caseEntry(b, h)
 			for _, n := range b.Nodes {
 				h = lt.node(n, h, false)
 			}
@@ -148,6 +229,7 @@ func (lt *lockTruth) function(body *ast.BlockStmt, entry heldSet) {
 		if !b.Live || h == nil {
 			continue
 		}
+		h = caseEntry(b, h)
 		for _, n := range b.Nodes {
 			h = lt.node(n, h, true)
 		}
@@ -188,6 +270,8 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 				delete(others, m)
 				lt.access(sel, others)
 				lt.exprs([]ast.Expr{sel.X}, held, record, true)
+			} else if record {
+				lt.exprs([]ast.Expr{recv}, held, record, true)
 			}
 			lt.exprs(x.Call.Args, held, record, true)
 			return held
@@ -202,6 +286,7 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 	}
 	receivers := map[ast.Expr]bool{}
 	var effects []func(heldSet)
+	inComm := lt.comms[n]
 	for _, p := range parts {
 		ast.Inspect(p, func(c ast.Node) bool {
 			switch x := c.(type) {
@@ -228,6 +313,16 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 					}
 					return false
 				}
+				if record {
+					lt.callAt(x, held)
+				}
+				if id, ok := ast.Unparen(x.Fun).(*ast.Ident); ok && id.Name == "close" && len(x.Args) == 1 {
+					if _, builtin := lt.info.ObjectOf(id).(*gotypes.Builtin); builtin {
+						if m := lt.chanLockOf(x.Args[0]); m != "" {
+							effects = append(effects, func(h heldSet) { delete(h, m) })
+						}
+					}
+				}
 				if m, method, ok := lt.lockCall(x); ok {
 					recv := ast.Unparen(x.Fun.(*ast.SelectorExpr).X)
 					receivers[recv] = true
@@ -243,6 +338,15 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 							delete(h, m)
 						}
 					})
+				}
+			case *ast.UnaryExpr:
+				// <-lock takes a channel lock's token (returns it, inverted).
+				if m := lt.chanLock(x); m != "" && !inComm {
+					effects = append(effects, lt.chanEffect(m, true))
+				}
+			case *ast.SendStmt:
+				if m := lt.chanLockOf(x.Chan); m != "" && !inComm {
+					effects = append(effects, lt.chanEffect(m, false))
 				}
 			case *ast.SelectorExpr:
 				if record && !receivers[x] {
@@ -268,8 +372,8 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 
 // unlockedIn returns the mutexes body unlocks anywhere outside the function
 // literals inside it.
-func (lt *lockTruth) unlockedIn(body *ast.BlockStmt) []gotypes.Object {
-	var out []gotypes.Object
+func (lt *lockTruth) unlockedIn(body *ast.BlockStmt) []string {
+	var out []string
 	ast.Inspect(body, func(c ast.Node) bool {
 		switch x := c.(type) {
 		case *ast.FuncLit:
@@ -299,6 +403,12 @@ func (lt *lockTruth) exprs(es []ast.Expr, held heldSet, record, literalsApart bo
 					lt.function(x.Body, held)
 				}
 				return false
+			case *ast.CallExpr:
+				if record {
+					if _, isLit := ast.Unparen(x.Fun).(*ast.FuncLit); !isLit {
+						lt.callAt(x, held)
+					}
+				}
 			case *ast.SelectorExpr:
 				if record {
 					lt.access(x, held)
@@ -354,31 +464,77 @@ func (lt *lockTruth) record(v *gotypes.Var, held heldSet) {
 	if field == "" {
 		return
 	}
-	for m := range held {
-		if mu := lt.declKey(m); mu != "" {
+	for mu := range held {
+		// No field is under its own mutex (a getter returning &s.mu).
+		// Nor is the field that holds a channel lock under that lock.
+		if mu != "" && mu != field && lt.chanLocks.lockOf(field) != mu && (lt.only == nil || lt.only[mu]) {
 			lt.out[[2]string{field, mu}] = true
 		}
 	}
 }
 
+// chanEffect is what a receive (recv) or a send on the channel lock m does
+// to what is held: a receive takes the token and a send returns it, the
+// other way round for an inverted lock (chanlock.go).
+func (lt *lockTruth) chanEffect(m string, recv bool) func(heldSet) {
+	if recv != lt.chanLocks.inverted[m] {
+		return func(h heldSet) { h[m] = true }
+	}
+	return func(h heldSet) { delete(h, m) }
+}
+
+// chanLock returns the lock a receive u takes, "" when u is not one.
+func (lt *lockTruth) chanLock(u *ast.UnaryExpr) string {
+	if u.Op != token.ARROW {
+		return ""
+	}
+	return lt.chanLockOf(u.X)
+}
+
+// chanLockOf returns the lock the channel expression e names: a variable
+// or field that names a channel lock (findChanLocks), "" otherwise.
+func (lt *lockTruth) chanLockOf(e ast.Expr) string {
+	if len(lt.chanLocks.names) == 0 {
+		return ""
+	}
+	var obj gotypes.Object
+	switch x := ast.Unparen(e).(type) {
+	case *ast.Ident:
+		obj = lt.info.ObjectOf(x)
+	case *ast.SelectorExpr:
+		if s := lt.info.Selections[x]; s != nil && s.Kind() == gotypes.FieldVal {
+			if v, ok := s.Obj().(*gotypes.Var); ok {
+				obj = v.Origin()
+			}
+		}
+	}
+	if obj == nil {
+		return ""
+	}
+	return lt.chanLocks.lockOf(lt.declKey(obj))
+}
+
 // lockCall reports whether call is mu.Lock(), RLock(), Unlock() or
 // RUnlock() of a sync mutex, and which mutex declaration mu is.
-func (lt *lockTruth) lockCall(call *ast.CallExpr) (gotypes.Object, string, bool) {
+func (lt *lockTruth) lockCall(call *ast.CallExpr) (string, string, bool) {
 	sel, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok || len(call.Args) != 0 {
-		return nil, "", false
+		return "", "", false
 	}
 	switch sel.Sel.Name {
 	case truthLock, truthRLock, truthUnlock, truthRUnlock:
 	default:
-		return nil, "", false
+		return "", "", false
 	}
 	fn, ok := lt.info.ObjectOf(sel.Sel).(*gotypes.Func)
 	if !ok || fn.Pkg() == nil || fn.Pkg().Path() != syncPackage {
-		return nil, "", false
+		return "", "", false
 	}
 	m := lt.mutexOf(sel)
-	return m, sel.Sel.Name, m != nil
+	if m == nil {
+		return "", "", false
+	}
+	return lt.declKey(m), sel.Sel.Name, true
 }
 
 // mutexOf returns the declaration of the mutex whose method sel selects:
@@ -445,4 +601,89 @@ func (lt *lockTruth) declKey(o gotypes.Object) string {
 		return ""
 	}
 	return fmt.Sprintf("%s:%d:%s", filepath.ToSlash(rel), p.Line, o.Name())
+}
+
+// propagationDepth bounds how many calls deep propagateTruth follows.
+const propagationDepth = 5
+
+// truthFuncs indexes the function declarations of pkgs by the position of
+// their name (file and offset: a package and its test variant read one
+// file), with the type information of their package.
+func truthFuncs(pkgs []*packages.Package) map[token.Position]truthFunc {
+	out := map[token.Position]truthFunc{}
+	for _, pkg := range pkgs {
+		if pkg.TypesInfo == nil || pkg.Fset == nil {
+			continue
+		}
+		for _, f := range pkg.Syntax {
+			for _, d := range f.Decls {
+				fd, ok := d.(*ast.FuncDecl)
+				if !ok || fd.Body == nil {
+					continue
+				}
+				p := pkg.Fset.Position(fd.Name.Pos())
+				k := token.Position{Filename: p.Filename, Offset: p.Offset}
+				if _, dup := out[k]; !dup {
+					out[k] = truthFunc{decl: fd, info: pkg.TypesInfo, fset: pkg.Fset}
+				}
+			}
+		}
+	}
+	return out
+}
+
+// propagateTruth walks the calls made while a mutex is held into the
+// declared functions they run: each callee is analysed with what is held
+// at the call as its entry state, its uses under those mutexes are
+// propagated pairs, and its own calls made while one of them is still held
+// are followed, up to propagationDepth calls deep. Pairs the direct
+// analysis already has are left out.
+func propagateTruth(t *Truth, calls []truthCall, funcs map[token.Position]truthFunc, root string, scope map[string]bool, chanLocks chanLockNames) {
+	type item struct {
+		call  truthCall
+		depth int
+	}
+	work := make([]item, 0, len(calls))
+	for _, c := range calls {
+		work = append(work, item{c, 1})
+	}
+	found := map[[2]string]bool{}
+	done := map[string]bool{}
+	for len(work) > 0 {
+		it := work[0]
+		work = work[1:]
+		keys := make([]string, 0, len(it.call.held))
+		for k := range it.call.held {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		key := fmt.Sprintf("%p|%s", it.call.callee.decl, strings.Join(keys, ","))
+		if done[key] {
+			continue
+		}
+		done[key] = true
+		var next []truthCall
+		lt := &lockTruth{info: it.call.callee.info, fset: it.call.callee.fset, root: root, scope: scope, chanLocks: chanLocks,
+			out: found, only: it.call.held, funcs: funcs, calls: &next}
+		lt.function(it.call.callee.decl.Body, it.call.held)
+		if it.depth >= propagationDepth {
+			continue
+		}
+		for _, n := range next {
+			kept := heldSet{}
+			for m := range n.held {
+				if it.call.held[m] {
+					kept[m] = true
+				}
+			}
+			if len(kept) > 0 {
+				work = append(work, item{truthCall{callee: n.callee, held: kept}, it.depth + 1})
+			}
+		}
+	}
+	for k := range found {
+		if !t.UnderLock[k] {
+			t.UnderLockPropagated[k] = true
+		}
+	}
 }

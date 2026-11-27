@@ -15,10 +15,12 @@ package persist
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // ErrInvalidMetric is returned by StoreReader.TopNodes when the metric
@@ -169,22 +171,57 @@ type StoreReader interface {
 
 // TestFileReader is implemented by stores that hold the build's record of
 // which files are test code (nodes.is_test, schema 1.24): the build scope's
-// file role when the build had a scope, the path rule otherwise. TestFiles
-// returns those files and whether the graph holds the record at all. It is
-// not part of StoreReader, so that readers without the record need not
-// implement it; callers fall back to the path rule (see TestFiles).
+// file role when the build had a scope, the path rule otherwise.
+// TestFileRoles returns every file that has nodes, true for test code, and
+// whether the graph holds the record at all. It is not part of StoreReader,
+// so that readers without the record need not implement it (see
+// TestFileRule).
 type TestFileReader interface {
-	TestFiles() (files []string, recorded bool, err error)
+	TestFileRoles() (roles map[string]bool, recorded bool, err error)
 }
 
-// TestFiles returns r's record of test files when r holds one (see
-// TestFileReader); recorded is false otherwise.
-func TestFiles(r StoreReader) (files []string, recorded bool, err error) {
+// GoroutineCodeReader is implemented by stores that read a Goroutine's code
+// edges (types.IsGoroutineCode) apart from the walks, which leave them out.
+// GoroutineCode returns those that end at ids (reverse) or start at ids.
+type GoroutineCodeReader interface {
+	GoroutineCode(ids []string, reverse bool) ([]types.Edge, error)
+}
+
+// GoroutineCode returns r's goroutine code edges at ids (see
+// GoroutineCodeReader), or none when r does not read them.
+func GoroutineCode(r any, ids []string, reverse bool) ([]types.Edge, error) {
+	gr, ok := r.(GoroutineCodeReader)
+	if !ok {
+		return nil, nil
+	}
+	return gr.GoroutineCode(ids, reverse)
+}
+
+// TestFileRule returns the one answer to "is this file test code" for code
+// that has a graph: for a file with nodes, the role the build recorded on
+// them (is_test); for a file without nodes (a path from the vector index the
+// graph does not hold) and for every file of a graph without the record (r
+// is not a TestFileReader, or was built before schema 1.24), the path rule a
+// build applies without a scope (testpath.IsTest). r is any graph reader;
+// the record is read once, when the rule is made.
+func TestFileRule(r any) (func(file string) bool, error) {
 	tr, ok := r.(TestFileReader)
 	if !ok {
-		return nil, false, nil
+		return testpath.IsTest, nil
 	}
-	return tr.TestFiles()
+	roles, recorded, err := tr.TestFileRoles()
+	if err != nil {
+		return nil, fmt.Errorf("test file rule: %w", err)
+	}
+	if !recorded {
+		return testpath.IsTest, nil
+	}
+	return func(file string) bool {
+		if test, ok := roles[file]; ok {
+			return test
+		}
+		return testpath.IsTest(file)
+	}, nil
 }
 
 // StoreWriter is the write surface used by buildpipe to materialise a graph

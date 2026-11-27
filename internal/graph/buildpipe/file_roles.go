@@ -32,9 +32,9 @@ const (
 // triedb/pathdb/testutils.go, consensus/wbft/testutil.go) were flagged as
 // tests and left out of every query that excludes tests.
 //
-// The path rule itself is unchanged: the query-time filters of the composer
-// and the vector index (testpath.IsTest on a result's path) have no scope to
-// ask and keep it.
+// Queries read the role back from the nodes (store.TestFileRule); only the
+// vector index, which holds no graph node, still judges a result by its path
+// (testpath.IsTest).
 type FileRoles map[string]FileRole
 
 // isTest reports whether file is test code, and whether the scope said so

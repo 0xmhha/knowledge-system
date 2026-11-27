@@ -73,6 +73,22 @@ type Truth struct {
 	// used in a function body at a point where the mutex is held
 	// (underlock.go). Both are keyed "file:line:name" of their declaration.
 	UnderLock map[[2]string]bool
+	// UnderLockPropagated are the pairs used in a function called while the
+	// mutex is held, where the mutex is still held at the use, up to
+	// propagationDepth calls deep (underlock.go), less the direct pairs.
+	UnderLockPropagated map[[2]string]bool
+	// Dispatch are the (interface method, concrete method) pairs of the
+	// interface dispatches; GoroutineChans the (go statement, make call and
+	// edge type) links of goroutine literals to local channels, and
+	// GoroutineChansUndecided those whose operand has several origins
+	// (dispatch.go).
+	Dispatch                                map[[2]string]bool
+	GoroutineChans, GoroutineChansUndecided map[[3]string]bool
+	// GoroutineLocalChans are the (go statement, make call) pairs the
+	// goroutine check decides: channels made in the go statement's function.
+	GoroutineLocalChans map[[2]string]bool
+	// Messages are the handles and triggers facts (messages.go).
+	Messages *messageFacts
 	// Load is what the go command reported while loading the truth's
 	// packages; Modules compares the outside modules with the scope's.
 	Load    detect.LoadProblems
@@ -112,13 +128,16 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	// The truth comes from the same go command as the graph. When it cannot
 	// load a package, both lose the same references and agree, so the
 	// problems are reported with the comparison.
-	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
+	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, UnderLockPropagated: map[[2]string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}
 	typeRefs := pairSet{}
 	outCalls := pairSet{}
 	outTypes := pairSet{}
+	funcs := truthFuncs(pkgs)
+	chanLocks := findChanLocks(pkgs, absRoot, scope)
+	var calls []truthCall
 	// Test variants load the same production file twice; walk each file once.
 	for _, pkg := range pkgs {
 		if pkg.TypesInfo == nil {
@@ -134,10 +153,16 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 			}
 			seenFile[rel] = true
 			w := fileWalker{t: t, info: pkg.TypesInfo, fset: pkg.Fset, rel: rel, root: absRoot, scope: scope,
-				static: static, iface: iface, typeRefs: typeRefs, outCalls: outCalls, outTypes: outTypes, stmt: t.Stmts}
+				static: static, iface: iface, typeRefs: typeRefs, outCalls: outCalls, outTypes: outTypes, stmt: t.Stmts,
+				funcs: funcs, calls: &calls, chanLocks: chanLocks}
 			w.walk(f)
 		}
 	}
+	propagateTruth(t, calls, funcs, absRoot, scope, chanLocks)
+	pf := collectProgramFacts(pkgs, absRoot, scope, chanLocks)
+	t.Dispatch = pf.dispatchTruth()
+	t.GoroutineChans, t.GoroutineChansUndecided, t.GoroutineLocalChans = pf.goChan, pf.undecidedChan, pf.localChan
+	t.Messages = pf.msg
 	t.StaticCalls = static.sorted()
 	t.InterfaceCalls = iface.sorted()
 	t.TypeRefs = typeRefs.sorted()
@@ -178,25 +203,28 @@ func (s pairSet) sorted() []Pair {
 }
 
 type fileWalker struct {
-	t        *Truth
-	info     *gotypes.Info
-	fset     *token.FileSet
-	rel      string
-	root     string
-	scope    map[string]bool
-	static   pairSet
-	iface    pairSet
-	typeRefs pairSet
-	outCalls pairSet
-	outTypes pairSet
-	stmt     map[StmtFact]bool
+	t         *Truth
+	info      *gotypes.Info
+	fset      *token.FileSet
+	rel       string
+	root      string
+	scope     map[string]bool
+	static    pairSet
+	iface     pairSet
+	typeRefs  pairSet
+	outCalls  pairSet
+	outTypes  pairSet
+	stmt      map[StmtFact]bool
+	funcs     map[token.Position]truthFunc
+	calls     *[]truthCall
+	chanLocks chanLockNames
 }
 
 func (w *fileWalker) walk(f *ast.File) {
 	// The file's bytes, for the blanks between a function and the comment
 	// after it; without them a function ends at its last token.
 	src, _ := os.ReadFile(filepath.Join(w.root, filepath.FromSlash(w.rel)))
-	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock}
+	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock, funcs: w.funcs, calls: w.calls, chanLocks: w.chanLocks}
 	for _, d := range f.Decls {
 		switch d := d.(type) {
 		case *ast.FuncDecl:

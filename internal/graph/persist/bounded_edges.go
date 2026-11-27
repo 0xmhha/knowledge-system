@@ -53,6 +53,8 @@ func edgePageSQL(q EdgePageInput, postgres bool) (string, []any, error) {
 		}
 		where += " AND type IN (" + strings.Join(marks, ",") + ")"
 	}
+	// An edge page walks function-level relations, as the walks do.
+	where += " AND " + types.GoroutineCodeSQL
 	sql := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'') FROM edges WHERE ` + where + ` ORDER BY type, src, dst, id LIMIT ` + parameter(q.Limit+1)
 	return sql, args, nil
 }

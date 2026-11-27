@@ -174,8 +174,8 @@ distribution can stamp its own namespace root at build time with
 
 `cks setup` runs the graph index, the vector index aligned to it, and
 the alignment gate in one command. Output lands in `<out>/graph/graph.db`
-and `<out>/vector/`. The graph build is incremental, so the same command
-serves first-time setup and refresh.
+and `<out>/vector/`. Every graph build is cold (it parses every file), so the
+same command serves first-time setup and refresh.
 
 | Flag | Effect |
 |---|---|

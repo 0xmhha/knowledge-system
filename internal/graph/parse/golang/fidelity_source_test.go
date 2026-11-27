@@ -835,7 +835,7 @@ func TestLockEdges_UndecidedCounted(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, st := gop.EmitLockEdges(pkgs, rg.Nodes)
+	_, st := gop.LockFacts(pkgs, rg.Nodes, gop.LockOptions{})
 	if st.UndecidedFunctions != 1 {
 		t.Errorf("undecided functions = %d, want 1 (Ledger.Jump)", st.UndecidedFunctions)
 	}

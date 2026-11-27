@@ -35,6 +35,24 @@ type Report struct {
 	// UnderLock compares the accessed_under_lock edges with the fields a
 	// function uses while it holds the mutex (underlock.go).
 	UnderLock UnderLockStats `json:"accessed_under_lock"`
+	// UnderLockPropagated compares the propagated accessed_under_lock edges
+	// (a field used in a function called while the mutex is held) with the
+	// truth's propagated pairs; all zero for a graph built without
+	// --lock-propagation, except Truth.
+	UnderLockPropagated UnderLockStats `json:"accessed_under_lock_propagated"`
+	// Dispatch compares the interface dispatches_to edges (interface method
+	// -> concrete method) with the implementations go/types allows for the
+	// invoked interface methods (dispatch.go).
+	Dispatch UnderLockStats `json:"dispatches_to_interface"`
+	// GoroutineChans compares the Goroutine -> Channel sends_to/recvs_from
+	// edges with the operations of goroutine literals on local channels.
+	GoroutineChans UnderLockStats `json:"goroutine_channels"`
+	// Handles compares the handles edges (a receive -> the code in its
+	// range) and Triggers the triggers edges (a sender -> a receive on the
+	// same channel, for the local channels the check decides) with the
+	// syntax (messages.go).
+	Handles  UnderLockStats `json:"handles"`
+	Triggers UnderLockStats `json:"triggers"`
 	// Load is what the go command reported while loading the truth. Graph
 	// and truth come from the same go command, so a package it cannot load
 	// is missing from both and the counts above cannot show it.
@@ -153,6 +171,16 @@ func (r Report) WriteText(w io.Writer) error {
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
 	p("accessed_under_lock: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
 		r.UnderLock.Matched, r.UnderLock.Truth, r.UnderLock.Unsupported, r.UnderLock.Edges)
+	p("accessed_under_lock propagated: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.UnderLockPropagated.Matched, r.UnderLockPropagated.Truth, r.UnderLockPropagated.Unsupported, r.UnderLockPropagated.Edges)
+	p("dispatches_to (interface): %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.Dispatch.Matched, r.Dispatch.Truth, r.Dispatch.Unsupported, r.Dispatch.Edges)
+	p("goroutine channel edges: %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.GoroutineChans.Matched, r.GoroutineChans.Truth, r.GoroutineChans.Unsupported, r.GoroutineChans.Edges)
+	p("handles: %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.Handles.Matched, r.Handles.Truth, r.Handles.Unsupported, r.Handles.Edges)
+	p("triggers (decided local channels): %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.Triggers.Matched, r.Triggers.Truth, r.Triggers.Unsupported, r.Triggers.Edges)
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
 	if r.Statements == nil {
 		p("statement links: none in this graph\n")

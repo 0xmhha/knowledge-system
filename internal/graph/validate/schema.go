@@ -255,6 +255,18 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 					FilePath: e.FilePath,
 				})
 			}
+		case types.EdgeHandles, types.EdgeTriggers:
+			// Schema 1.42: handles starts at a receive's CallSite and ends at
+			// the handled code; triggers starts at a sender and ends at a
+			// receive's CallSite.
+			if bad := messageLinkShape(e.Type, src.Type, dst.Type); bad != "" {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: string(e.Type) + "-bad-shape",
+					Message:  string(e.Type) + " " + bad,
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
 		case types.EdgeRevertsWith:
 			// Schema 1.38: a Solidity function, modifier or constructor
 			// (a Function with sub kind constructor) reverts with a
@@ -315,8 +327,33 @@ func isCaller(t types.NodeType) bool {
 	switch t {
 	case types.NodeVariable, types.NodeModifier, types.NodeField, types.NodeConstant:
 		return true
+	case types.NodeGoroutine:
+		// Schema 1.42: a goroutine calls the function it runs and the
+		// functions its literal calls (dispatch kind goroutine).
+		return true
 	}
 	return isCallable(t)
+}
+
+// messageLinkShape returns what is wrong with a handles or triggers edge
+// from a src node to a dst node, or "".
+func messageLinkShape(t types.EdgeType, src, dst types.NodeType) string {
+	if t == types.EdgeHandles {
+		switch {
+		case src != types.NodeCallSite:
+			return "src is not a CallSite (got " + string(src) + ")"
+		case dst != types.NodeCallSite && dst != types.NodeField && dst != types.NodeGoroutine:
+			return "dst is not a CallSite, Field or Goroutine (got " + string(dst) + ")"
+		}
+		return ""
+	}
+	switch {
+	case src != types.NodeFunction && src != types.NodeMethod && src != types.NodeGoroutine:
+		return "src is not a Function, Method or Goroutine (got " + string(src) + ")"
+	case dst != types.NodeCallSite:
+		return "dst is not a CallSite (got " + string(dst) + ")"
+	}
+	return ""
 }
 
 // isDispatchMarker reports whether e is the marker of a dynamic call: an

@@ -45,6 +45,10 @@ import (
 // the upstream interface is a breaking change here.
 type Reader = persist.StoreReader
 
+// TestFileReader is a reader that holds the build's record of test files.
+// See persist.TestFileReader.
+type TestFileReader = persist.TestFileReader
+
 // SearchHit pairs a node with its full-text search relevance score.
 // Returned by Reader.SearchFTS. See persist.SearchHit doc for the
 // Score vs RawScore semantics.
@@ -105,10 +109,18 @@ func InFunctionBody(n types.Node, enclosers []types.Node) bool {
 	return persist.InFunctionBody(n, enclosers)
 }
 
-// TestFiles returns the files the build recorded as test code
-// (nodes.is_test: the build scope's file role, the path rule without a
-// scope) and whether r holds that record. See persist.TestFiles.
-func TestFiles(r Reader) (files []string, recorded bool, err error) { return persist.TestFiles(r) }
+// GoroutineCode returns the edges from goroutines to the code they run
+// (types.IsGoroutineCode) that end at ids (reverse) or start at ids; the
+// walks leave them out. See persist.GoroutineCode.
+func GoroutineCode(r any, ids []string, reverse bool) ([]types.Edge, error) {
+	return persist.GoroutineCode(r, ids, reverse)
+}
+
+// TestFileRule returns the one rule for "is this file test code" for code
+// that has a graph: the role the build recorded on a file's nodes, the path
+// rule for a file without nodes or a graph without the record. See
+// persist.TestFileRule.
+func TestFileRule(r any) (func(file string) bool, error) { return persist.TestFileRule(r) }
 
 // MutexSuffix ends the seed name of a mutex: "<field or variable>#mutex".
 // See persist.MutexSuffix.

@@ -225,11 +225,17 @@ type codeIndex struct {
 	byFile map[string][]int // indexes into decls
 	idOnce sync.Once
 	byID   map[string]int // node id -> index into decls, see byNodeID
+	// isTest is the graph's test file rule (store.TestFileRule).
+	isTest func(file string) bool
 }
 
 // buildCodeIndex loads every searchable declaration and its source.
 func buildCodeIndex(reader store.Reader) (*codeIndex, error) {
-	idx := &codeIndex{byFile: map[string][]int{}}
+	isTest, err := testFileRule(reader)
+	if err != nil {
+		return nil, err
+	}
+	idx := &codeIndex{byFile: map[string][]int{}, isTest: isTest}
 	seenFile := map[string]bool{}
 	var longCalls []types.Node
 	for _, lang := range []string{"go", "sol", "ts", "js"} {
@@ -291,7 +297,7 @@ func (x *codeIndex) addFile(reader store.Reader, f string) ([]types.Node, error)
 			continue
 		}
 		x.byFile[f] = append(x.byFile[f], len(x.decls))
-		x.decls = append(x.decls, codeDecl{node: n, lines: strings.Split(string(src), "\n"), test: isTestFile(f)})
+		x.decls = append(x.decls, codeDecl{node: n, lines: strings.Split(string(src), "\n"), test: x.isTest(f)})
 	}
 	added := x.decls[first:]
 	// A nested declaration's source ends where the declaration ends, so the
@@ -811,7 +817,7 @@ func RegisterSearchCode(s *server.MCPServer, reader store.Reader) {
 			"answered per declaration: its qname, file, lines, the matched lines with line numbers, and the distinct texts it matched (lowercased). "+
 			"Order: a match in the name first, then more matches, then wider use in the repository (PageRank); declarations equal on these keep no meaningful order. ")
 	registerCodeSearch(s, reader, "search_test_code", codeSearchSide{tests: "only"},
-		"grep over the test code of the graph (_test.go files and testdata): a regular expression (RE2; alternatives with |) over the source of every test function, helper, type, constant and variable, "+
+		"grep over the test code of the graph (the files the build records as test code): a regular expression (RE2; alternatives with |) over the source of every test function, helper, type, constant and variable, "+
 			"answered per declaration: its qname, file, lines, the matched lines with line numbers, and the distinct texts it matched (lowercased). "+
 			"Order: a match in the name first, then more matches, then wider use in the repository (PageRank). ")
 }

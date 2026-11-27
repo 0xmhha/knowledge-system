@@ -1,3 +1,10 @@
+# Incremental Build Cache (removed)
+
+> The incremental build was removed: every `ckg build` is cold. See
+> `docs/graph/CKG-STRUCTURE.md` section 4 for why. `ckg watch` and
+> `ckg bench-index` refuse to run. The rest of this page describes the removed
+> build and is kept as history.
+
 # Incremental Build Cache
 
 > Operator-facing guide to the A3 file-level incremental cache. Covers the cold

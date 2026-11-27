@@ -508,9 +508,27 @@ const (
 	// line of `revert X(...)` or `require(cond, X(...))`. No existing kind
 	// fits: emits_event ends at an Event and calls at a callable.
 	EdgeRevertsWith EdgeType = "reverts_with"
+	// Schema 1.42 (message-driven code), from the Go frontend's SSA pass,
+	// confidence INFERRED:
+	//   handles   a receive operation's CallSite -> the code its message
+	//             makes run: the CallSite of each call and channel
+	//             operation, the Goroutine of each go statement, and each
+	//             Field used, in its range (a plain receive: the rest of
+	//             its block; range over a channel: the loop body; a select
+	//             case: the case body). dispatch_kind call, send, recv,
+	//             go, read or write; line of the handled code.
+	//   triggers  a sender (the Function, Method or Goroutine whose send
+	//             reaches the channel by its SSA origins) -> each receive
+	//             operation's CallSite on that channel it can wake.
+	//             dispatch_kind is the channel's origin (the qualified
+	//             name of its make site, field or variable); line and file
+	//             are the send's, the receive's line is its CallSite's.
+	// Sender to handled code is two hops: triggers, then handles.
+	EdgeHandles  EdgeType = "handles"
+	EdgeTriggers EdgeType = "triggers"
 )
 
-// AllEdgeTypes returns all 51 edge types in stable order.
+// AllEdgeTypes returns all 53 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -524,6 +542,8 @@ const (
 // The five statement-link types are appended at indices 44-48 (schema 1.32).
 // EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
 // EdgeRevertsWith is appended at index 50 (schema 1.38 — Solidity errors).
+// EdgeHandles and EdgeTriggers are appended at 51-52 (schema 1.42 —
+// message-driven code).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -546,6 +566,7 @@ func AllEdgeTypes() []EdgeType {
 		EdgeSiteCalls, EdgeCondReads, EdgeCondCalls, EdgeBodyWrites, EdgeEncloses,
 		EdgeFlowsTo,
 		EdgeRevertsWith,
+		EdgeHandles, EdgeTriggers,
 	}
 }
 

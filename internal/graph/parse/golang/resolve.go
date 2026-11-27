@@ -168,6 +168,9 @@ type LoadOptions struct {
 	// relative to the root), as a build scope leaves files of the module out
 	// of the build. Their packages are still loaded and type-checked.
 	Skip func(rel string) bool
+	// LockPropagation follows the calls made under a lock into their
+	// callees, as ckg build --lock-propagation does (LockOptions.Propagate).
+	LockPropagation bool
 }
 
 // LoadAndResolve is a convenience for tests: walks Go files under root,
@@ -254,14 +257,15 @@ func LoadAndResolveWith(root string, opts LoadOptions) (*parse.ResolvedGraph, er
 	rg.Edges = append(rg.Edges, promEdges...)
 	// One file shows each package, the same on every build (see packages.go).
 	CanonicalPackagePaths(rg.Nodes, isGoTestFile)
-	// Lock edges: acquires_lock / releases_lock / accessed_under_lock (see lock_edges.go).
-	lockEdges, _ := EmitLockEdges(p.Pkgs(), rg.Nodes)
-	rg.Edges = append(rg.Edges, lockEdges...)
 	// Value uses: reads_field / writes_field and references (see value_access.go).
 	rg.Edges = append(rg.Edges, EmitValueAccessEdges(p.Pkgs(), rg.Nodes)...)
 	// Runtime links: dispatches_to from SSA + VTA (see dispatch.go).
-	dispatch, _ := EmitDispatchEdges(p.Pkgs(), rg.Nodes)
-	rg.Edges = append(rg.Edges, dispatch...)
+	dispatch, facts, dst := EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, OrderDispatchEdges(append(dispatch, facts.Counted()...))...)
+	// Lock edges: acquires_lock / releases_lock / accessed_under_lock (see
+	// lock_edges.go), after the dispatch pass, which finds channel locks.
+	lockFacts, _ := LockFacts(p.Pkgs(), rg.Nodes, LockOptions{Propagate: opts.LockPropagation, ChanLocks: dst.ChanLockOps()})
+	rg.Edges = append(rg.Edges, lockFacts.Edges()...)
 	// Statement links: what happens inside a function (see statement_links.go).
 	stmtEdges, _ := EmitStatementEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, stmtEdges...)

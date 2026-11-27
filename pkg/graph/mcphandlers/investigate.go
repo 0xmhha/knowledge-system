@@ -162,27 +162,13 @@ func leafName(q string) string {
 	return q
 }
 
-func isTestFile(f string) bool {
-	return strings.HasSuffix(f, "_test.go") || strings.Contains(f, "/testdata/")
-}
-
-// testFileRule returns what investigate takes for test code: the files the
-// build recorded as test code (store.TestFiles: the build scope's file role,
-// or the build's path rule without a scope), or isTestFile for a graph that
-// holds no such record.
+// testFileRule is store.TestFileRule with an error that says where.
 func testFileRule(reader store.Reader) (func(string) bool, error) {
-	files, recorded, err := store.TestFiles(reader)
+	rule, err := store.TestFileRule(reader)
 	if err != nil {
 		return nil, fmt.Errorf("test files: %w", err)
 	}
-	if !recorded {
-		return isTestFile, nil
-	}
-	set := make(map[string]bool, len(files))
-	for _, f := range files {
-		set[f] = true
-	}
-	return func(f string) bool { return set[f] }, nil
+	return rule, nil
 }
 
 func buildInvIndex(reader store.Reader) (*invIndex, error) {
@@ -863,6 +849,17 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 	if len(same) > 0 {
 		fmt.Fprintf(&b, "  same channel as: %s\n", capNames(same, invCompactNames))
 	}
+	// A channel used as a lock (sub kind lock): its operations take and
+	// return the lock's token, and are printed so.
+	lock := n.Type == types.NodeChannel && n.SubKind == types.ChannelLockSubKind
+	for _, e := range x.adj[id] {
+		if o := x.nodes[e.other]; e.typ == types.EdgeFlowsTo && o.Type == types.NodeChannel && o.SubKind == types.ChannelLockSubKind {
+			lock = true
+		}
+	}
+	if lock {
+		b.WriteString("  lock: a channel used as a mutex (struct{}, buffer 1, filled where made); its sends and receives take and return the token (acquires_lock / releases_lock)\n")
+	}
 	// A channel (a make site, or a field or variable that holds one): who
 	// sends and who receives on it.
 	for _, op := range []types.EdgeType{types.EdgeSendsTo, types.EdgeRecvsFrom} {
@@ -879,6 +876,9 @@ func (x *invIndex) valueCard(id string, withTests, compact bool) string {
 		label := "senders"
 		if op == types.EdgeRecvsFrom {
 			label = "receivers"
+		}
+		if lock {
+			label += " (lock operations)"
 		}
 		fmt.Fprintf(&b, "  %s (%d lines)\n", label, len(rows))
 		if compact && len(rows) > invCompactReaders {

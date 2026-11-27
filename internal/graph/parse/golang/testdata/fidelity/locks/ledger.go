@@ -160,3 +160,28 @@ func (o *Outer) Hold() {
 	o.inner.mu.Lock()
 	defer o.inner.mu.Unlock()
 }
+
+// Counter is used by functions that Ledger.Locked calls.
+type Counter struct {
+	viaCall, afterCall, deep int
+}
+
+// Locked calls bump while it holds mu and settle after it released mu.
+func (l *Ledger) Locked(c *Counter) {
+	l.mu.Lock()
+	bump(c)
+	l.mu.Unlock()
+	settle(c)
+}
+
+// bump uses viaCall and calls deeper, both while its caller holds mu.
+func bump(c *Counter) {
+	c.viaCall++
+	deeper(c)
+}
+
+// deeper is two calls below the lock.
+func deeper(c *Counter) { c.deep++ }
+
+// settle runs after the lock was released.
+func settle(c *Counter) { c.afterCall++ }

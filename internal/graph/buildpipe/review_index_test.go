@@ -108,7 +108,8 @@ func TestReviewTestFilesFollowsScopeRoles(t *testing.T) {
 	}
 }
 
-// A cold build stores the review index.
+// A cold build stores the review index: the function-level calls of
+// production code (a Goroutine's calls are not callers back to entry points).
 func TestColdBuildWritesReviewIndex(t *testing.T) {
 	out, _ := SharedColdBuild(t, Options{SrcRoot: "../parse/golang/testdata/resolve", Languages: []string{"auto"}, CKGVersion: "test"})
 	db, err := sql.Open("sqlite", "file:"+filepath.Join(out, "graph.db")+"?mode=ro")
@@ -117,7 +118,7 @@ func TestColdBuildWritesReviewIndex(t *testing.T) {
 	}
 	defer func() { _ = db.Close() }()
 	var codeEdges, calls int
-	if err := db.QueryRow(`SELECT (SELECT count(*) FROM code_edges WHERE type = 'calls'), (SELECT count(*) FROM edges e JOIN nodes s ON s.id = e.src JOIN nodes d ON d.id = e.dst WHERE e.type = 'calls' AND s.is_test = 0 AND d.is_test = 0)`).Scan(&codeEdges, &calls); err != nil {
+	if err := db.QueryRow(`SELECT (SELECT count(*) FROM code_edges WHERE type = 'calls'), (SELECT count(*) FROM edges e JOIN nodes s ON s.id = e.src JOIN nodes d ON d.id = e.dst WHERE e.type = 'calls' AND s.is_test = 0 AND d.is_test = 0 AND COALESCE(e.dispatch_kind, '') <> 'goroutine')`).Scan(&codeEdges, &calls); err != nil {
 		t.Fatal(err)
 	}
 	if codeEdges == 0 || codeEdges != calls {

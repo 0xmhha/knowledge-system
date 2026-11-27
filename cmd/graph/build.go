@@ -149,13 +149,13 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&atCommit, "at-commit", "",
 		"build from a specific git commit using git worktree (leaves --src working tree untouched)")
 	cmd.Flags().BoolVar(&force, "force", false,
-		"build over an existing graph.db at the output directory; unchanged files still come from the cache (--no-cache rebuilds everything)")
+		"build over an existing graph.db at the output directory; the build is cold like every build and reuses nothing from it")
 	cmd.Flags().StringSliceVar(&langs, "lang", []string{"auto"}, "languages: auto|go,ts,sol")
 	cmd.Flags().BoolVar(&noCache, "no-cache", false,
-		"bypass A3 incremental cache; full rebuild from scratch")
+		"no effect on the build: every build is cold (parses every file); like --force it builds over an existing graph.db. Kept so existing scripts still parse")
 	cmd.Flags().BoolVar(&rebuildMetrics, "rebuild-metrics", false, "no effect; kept so existing scripts still parse")
 	_ = cmd.Flags().MarkDeprecated("rebuild-metrics",
-		"it has no effect: scores and communities are recomputed by every build that changes a file; use --no-cache to recompute an unchanged tree")
+		"it has no effect: every build recomputes scores and communities")
 	cmd.Flags().StringVar(&dbDsn, "db", "",
 		"PostgreSQL DSN (e.g. postgres://user:pass@host/dbname); if set, store graph in PG instead of local SQLite. DEPRECATED (ADR-0003): SQLite is the sole maintained backend")
 	cmd.Flags().BoolVar(&strictValidate, "strict-validate", false,
@@ -171,7 +171,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringSliceVar(&excludes, "exclude", nil,
 		"exclude glob(s) applied on top of a --files-from-main filter (repeatable or comma-separated); exclude trumps include")
 	cmd.Flags().BoolVar(&lockPropagation, "lock-propagation", false,
-		"enable Go cross-function lock propagation (DFS depth=5); requires --no-cache to take full effect")
+		"also record fields used in a function called while a mutex is held, where the mutex is still held at the use (up to 5 calls deep; accessed_under_lock edges with dispatch_kind \"propagated\")")
 	cmd.Flags().StringVar(&policyFile, "policy-file", "",
 		"path to governance/protocol policy YAML (pkg/policy); enriches the graph with NodePolicy + EdgeGovernedBy rows")
 	cmd.Flags().IntVar(&temporalDepth, "temporal-depth", 0,

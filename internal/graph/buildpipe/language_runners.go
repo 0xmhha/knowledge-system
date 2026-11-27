@@ -172,11 +172,8 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // in AST-only mode (concurrency edges become INFERRED). Logs the warning so
 // operators can investigate without breaking the build.
 //
-// funcFieldTouches (lock-propagation input) is nil when the typed-load fallback
-// kicks in — AST-only mode has no reliable way to map field references to
-// Field node IDs (parser.go comment). The propagator then no-ops, which
-// matches the existing INFERRED-confidence semantics of AST-only builds.
-func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, roles FileRoles, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
+// propagate turns on lock propagation into callees (gop.LockOptions).
+func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, roles FileRoles, propagate bool, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
 	p := gop.New(srcRoot)
 	loadStart := time.Now()
 	loadErrs := 0
@@ -205,8 +202,7 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		usesEdges, usesPending := gop.EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, usesEdges...)
 		// Types outside the build (time.Timer, big.Int) get External nodes
-		// (schema 1.36). The refs stay pending as well, so an incremental
-		// build that re-resolves the file binds them again.
+		// (schema 1.36). The refs stay pending as well (pending_refs).
 		// An interface that embeds one from outside the build (io.Reader)
 		// extends that interface's External node; the post-Resolve pass
 		// finds these again on every build, so they are not stored as
@@ -262,15 +258,6 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		// gop.CanonicalPackagePaths).
 		gop.CanonicalPackagePaths(rg.Nodes, roles.testFile)
 
-		// Lock edges: acquires_lock / releases_lock from the function to the
-		// Mutex node, wherever the mutex is declared, and accessed_under_lock.
-		// Before the contract pass and lock propagation, which read them.
-		lockEdges, lst := gop.EmitLockEdges(p.Pkgs(), rg.Nodes)
-		rg.Edges = append(rg.Edges, lockEdges...)
-		// undecided_functions lock a mutex in control flow the
-		// accessed_under_lock rule does not follow; their uses have no edge.
-		log.Info("lock edges emitted", "count", len(lockEdges), "undecided_functions", lst.UndecidedFunctions)
-
 		// Value uses: reads_field / writes_field (function -> struct field) and
 		// references (function or initializer -> package-level var/const).
 		vaEdges := gop.EmitValueAccessEdges(p.Pkgs(), rg.Nodes)
@@ -279,14 +266,33 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 
 		// Runtime links: interface methods and function values to the code
 		// they can run (SSA + VTA, design decision D3).
-		dEdges, dst := gop.EmitDispatchEdges(p.Pkgs(), rg.Nodes)
-		rg.Edges = append(rg.Edges, dEdges...)
+		// The concurrency facts of the same pass (channel operations,
+		// goroutine code, message links) are stored with them, one edge per
+		// distinct (ends, type, kind, line) with the uses counted.
+		dEdges, dFacts, dst := gop.EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, gop.OrderDispatchEdges(append(dEdges, dFacts.Counted()...))...)
 		log.Info("dispatch edges emitted", "interface_method", dst.InterfaceEdges, "func_value", dst.FuncValueEdges,
 			"packages", dst.Packages, "ssa_packages", dst.SSAPackages, "own_errors", dst.OwnErrors, "build_panics", dst.BuildPanics,
 			"channel_ops", dst.ChannelOps, "channel_linked", dst.ChannelLinked, "channel_aliases", dst.ChannelAliases,
-			"type_hierarchy", dst.TypeHierarchy,
+			"type_hierarchy", dst.TypeHierarchy, "goroutine_code", dst.GoroutineCode,
+			"receives", dst.Receives, "handles", dst.Handles, "received_flows", dst.ReceivedFlows,
+			"triggers", dst.Triggers, "sender_handled_pairs", dst.HandledPairs,
+			"channel_locks", dst.ChanLocks.Locks, "channel_semaphores", dst.ChanLocks.Semaphores, "channel_sized", dst.ChanLocks.Sized, "channel_counting", dst.ChanLocks.Counting, "channel_inverted_locks", dst.ChanLocks.Inverted, "channel_not_filled", dst.ChanLocks.NotFilled,
 			"dynamic_sites", dst.DynamicSites, "no_node", dst.NoNode, "ssa_functions", dst.Functions,
 			"ssa_seconds", dst.SSASeconds, "vta_seconds", dst.VTASeconds)
+
+		// Lock facts (concfacts) stored as acquires_lock / releases_lock from
+		// the function to the Mutex node, wherever the mutex is declared (or to
+		// the Channel node of a channel used as a lock, which the dispatch
+		// pass finds), and accessed_under_lock. Before the contract pass,
+		// which reads them.
+		lockFacts, lst := gop.LockFacts(p.Pkgs(), rg.Nodes, gop.LockOptions{Propagate: propagate, ChanLocks: dst.ChanLockOps()})
+		lockEdges := lockFacts.Edges()
+		rg.Edges = append(rg.Edges, lockEdges...)
+		// undecided_functions lock a mutex in control flow the
+		// accessed_under_lock rule does not follow; their uses have no edge.
+		log.Info("lock edges emitted", "count", len(lockEdges), "undecided_functions", lst.UndecidedFunctions,
+			"propagated", lst.PropagatedEdges, "undecided_callees", lst.UndecidedCallees)
 
 		// Statement links: conditions, guarded writes, nesting, call sites.
 		sEdges, sst := gop.EmitStatementEdges(p.Pkgs(), rg.Nodes)
@@ -297,14 +303,14 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 	if rg != nil {
 		rg.LoadErrors = loadErrs
 	}
-	return rg, pending, p.FuncFieldTouches(), errs, err
+	return rg, pending, errs, err
 }
 
 // stampFilePath populates Edge.FilePath for every per-file edge that lacks
 // one, drawing from the ParseResult.Path the parser already recorded.
-// Required by the incremental cache: EdgesByFilePath reloads cached
-// edges by file_path, and the parsers historically left it blank because
-// the V0 schema didn't surface the field. Stamping is idempotent — pre-set
+// The edges table and the manifest's per-file entries key edges by
+// file_path, and the parsers historically left it blank because the V0
+// schema didn't surface the field. Stamping is idempotent — pre-set
 // FilePaths (e.g. on edges with line numbers) are preserved.
 //
 // Stamping per-file edges is safe: an edge emitted while parsing file X

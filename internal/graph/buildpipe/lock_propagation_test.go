@@ -144,7 +144,9 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 //
 // Q4 ("Goroutine body INFERRED") rides the existing uniform cross-
 // fn INFERRED label — confidence stays consistent with the other
-// propagation paths.
+// TestLockPropagation_NamedGoroutine: a function started with go runs
+// without its starter's locks, so the field it uses is not under them. The
+// old propagator walked the go statement like a call and recorded it.
 func TestLockPropagation_NamedGoroutine(t *testing.T) {
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "GoroutineHolder.value")
@@ -152,12 +154,33 @@ func TestLockPropagation_NamedGoroutine(t *testing.T) {
 	if valueID == "" || muID == "" {
 		t.Fatalf("fixture nodes missing: value=%q mu=%q", valueID, muID)
 	}
-	found := findEdge(edges, valueID, muID, types.EdgeAccessedUnderLock)
-	if found == nil {
-		t.Fatalf("expected accessed_under_lock(GoroutineHolder.value -> GoroutineHolder.mu) via named-goroutine path")
+	if found := findEdge(edges, valueID, muID, types.EdgeAccessedUnderLock); found != nil {
+		t.Errorf("a goroutine's field is taken as under its starter's lock: %+v", *found)
 	}
-	if found.Confidence != types.ConfInferred {
-		t.Errorf("named-goroutine cross-fn emit confidence=%q, want INFERRED (design §5.0 Q4)", found.Confidence)
+}
+
+// TestLockPropagation_HeldAtTheCall: a callee's use is under L only when L
+// is held at the call (the must-hold rule of the direct pass) and the callee
+// has not released L before the use. Propagated edges say so in their
+// dispatch kind. The old propagator recorded every field of every callee of
+// a function that locks L anywhere: 667 of 1,761 edges of go-stablenet were
+// not supported by the source.
+func TestLockPropagation_HeldAtTheCall(t *testing.T) {
+	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
+	muID := findNodeIDBySuffix(nodes, "Ordered.mu#mutex")
+	for field, want := range map[string]bool{"Ordered.inner": true, "Ordered.before": false, "Ordered.after": false, "Ordered.late": false} {
+		id := findNodeIDBySuffix(nodes, field)
+		e := findEdge(edges, id, muID, types.EdgeAccessedUnderLock)
+		if (e != nil) != want {
+			t.Errorf("%s under mu: %v, want %v", field, e != nil, want)
+		}
+		if e != nil && e.DispatchKind != buildpipe.PropagatedLockKind {
+			t.Errorf("%s: dispatch kind %q, want %q", field, e.DispatchKind, buildpipe.PropagatedLockKind)
+		}
+	}
+	// A direct edge is not marked as propagated.
+	if e := findEdge(edges, findNodeIDBySuffix(nodes, "lockprop.Direct.n"), findNodeIDBySuffix(nodes, "Direct.mu#mutex"), types.EdgeAccessedUnderLock); e == nil || e.DispatchKind != "" {
+		t.Errorf("direct edge %+v, want one without a dispatch kind", e)
 	}
 }
 

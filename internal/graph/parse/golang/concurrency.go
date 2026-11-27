@@ -438,46 +438,6 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr, c
 	return nodeID
 }
 
-// emitGoroutineChannelEdges walks the goroutine body call expression and
-// emits sends_to/recvs_from edges from the Goroutine node to Channel nodes
-// for any channel sends/recvs whose channel variable is in chanVarIDs.
-// Only handles inline `go func() { ... }()` literals; named-function goroutines
-// require cross-file resolution and are silently skipped.
-func (v *declVisitor) emitGoroutineChannelEdges(goroutineID string, call *ast.CallExpr) {
-	if call == nil {
-		return
-	}
-	fn, ok := call.Fun.(*ast.FuncLit)
-	if !ok {
-		return // named-function goroutines: cross-file resolution needed
-	}
-	link := func(et types.EdgeType, ch ast.Expr) {
-		key := v.chanVar(ch)
-		if key == nil {
-			return
-		}
-		if chanID, ok := v.chanVarIDs[key]; ok {
-			v.edges = append(v.edges, types.Edge{
-				Src: goroutineID, Dst: chanID, Type: et, Count: 1,
-				Confidence: types.ConfInferred,
-			})
-		}
-	}
-	ast.Inspect(fn.Body, func(n ast.Node) bool {
-		switch s := n.(type) {
-		case *ast.GoStmt:
-			return false // nested goroutines not recursively tracked here
-		case *ast.SendStmt:
-			link(types.EdgeSendsTo, s.Chan)
-		case *ast.UnaryExpr:
-			if s.Op == token.ARROW {
-				link(types.EdgeRecvsFrom, s.X)
-			}
-		}
-		return true
-	})
-}
-
 // Directions of a Channel node (its sub kind).
 const (
 	chanDirBidi = "bidi"
@@ -549,4 +509,52 @@ func formatChannelSignature(cm chanMake) string {
 		elem = "?"
 	}
 	return prefix + " " + elem + bufPart
+}
+
+// bindLocalChans binds each variable that n (an assignment, or a var
+// declaration, grouped or not) sets to a make(chan ...) to the Channel node
+// of that make, emitted here, in chanVarIDs, so the function's operations on
+// it point at the Channel (emitChannelOp). made records the make calls
+// handled, so the walk does not emit their node again. Several names are
+// bound one by one (a, b := make(chan int), make(chan error)); a name set
+// from one call that returns several values has no make origin here. The
+// Goroutine's edges do not use this: the channel linker follows a channel
+// to its origin through parameters, closures and stores (dispatch.go).
+func (v *declVisitor) bindLocalChans(parentID string, n ast.Node, made map[token.Pos]bool) {
+	bind := func(lhs, rhs []ast.Expr) {
+		if len(lhs) != len(rhs) {
+			return
+		}
+		for i, r := range rhs {
+			call, cm, ok := v.chanMake(r)
+			if !ok {
+				continue
+			}
+			chanID := v.emitChannelFromMake(parentID, call, cm)
+			made[call.Pos()] = true
+			if key := v.chanVar(lhs[i]); key != nil {
+				v.chanVarIDs[key] = chanID
+			}
+		}
+	}
+	switch s := n.(type) {
+	case *ast.AssignStmt:
+		bind(s.Lhs, s.Rhs)
+	case *ast.DeclStmt:
+		gd, ok := s.Decl.(*ast.GenDecl)
+		if !ok || gd.Tok != token.VAR {
+			return
+		}
+		for _, spec := range gd.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+			names := make([]ast.Expr, len(vs.Names))
+			for i, name := range vs.Names {
+				names[i] = name
+			}
+			bind(names, vs.Values)
+		}
+	}
 }
