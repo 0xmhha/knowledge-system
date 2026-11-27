@@ -184,6 +184,12 @@ type Node struct {
 	RecentPRs []PRRef `json:"recent_prs,omitempty"`
 	// Commit is the git metadata of a Commit node; nil for every other node.
 	Commit *CommitMeta `json:"commit,omitempty"`
+	// SyncUnknown, on a CallSite, are the operations on a sync primitive
+	// made there whose primitive the graph does not name: the site has no
+	// operates_on edge for that operation, and this says so and why (Go
+	// frontend, sync_flow.go). Nil for every other node and for a site
+	// whose every operation is named.
+	SyncUnknown []SyncUnknown `json:"sync_unknown,omitempty"`
 }
 
 // CommitMeta is what a Commit node records of its commit. Times are unix

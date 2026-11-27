@@ -65,9 +65,9 @@ func textResult(payload any) *mcp.CallToolResult {
 	return shapeResult(payload, "", false)
 }
 
-// proseResult wraps a prose answer (investigate, investigate_open). Under
-// ContentStructured and ContentBoth its structuredContent is
-// {"text": <the prose>}.
+// proseResult wraps a prose answer (investigate, investigate_open,
+// execution_flow). Under ContentStructured and ContentBoth its
+// structuredContent is {"text": <the prose>}.
 func proseResult(text string) *mcp.CallToolResult {
 	return shapeResult(nil, text, true)
 }

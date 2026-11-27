@@ -36,10 +36,20 @@ func RegisterAll(s *server.MCPServer, reader store.Reader) {
 	RegisterValueDependencies(s, reader)
 	RegisterRuleCandidates(s, reader)
 	RegisterChangeHistory(s, reader)
+	RegisterExecutionFlow(s, reader)
 	// One Cache per Run amortises BM25 corpus indexing across every
 	// evidence_for_intent call. Manifest-keyed invalidation handles
 	// the case where a concurrent `ckg build` rebuilds the graph.
 	RegisterEvidenceForIntent(s, reader, evidence.NewCache())
-	// No answer repeats a caller argument longer than maxEchoBytes.
+	// The wrappers apply to every tool registered above, all 18. They nest
+	// so that a call meets, in order: the argument check (arguments.go),
+	// then the handler, whose answer the echo cut (echo.go) bounds after
+	// the handler shaped it by content mode (content.go). The check runs
+	// first so a call with a missing or unknown argument gets that error
+	// before any work; the echo cut wraps the handler directly so the
+	// handler's errors, which the check turns into error results, are cut
+	// too. boundEchoes must therefore wrap the handlers before
+	// requireDeclaredArguments wraps the result.
 	boundEchoes(s)
+	requireDeclaredArguments(s)
 }

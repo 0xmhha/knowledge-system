@@ -87,6 +87,25 @@ type Manifest struct {
 	// for unchanged files. omitempty so pre-1.2 manifests reload as nil and
 	// trigger a full rebuild on the next ckg build invocation.
 	Files []FileEntry `json:"files,omitempty"`
+	// OptionalInputs are the optional input files the build was given
+	// (ckg build --policy-file, --security-pattern-file), one record each;
+	// none when the build had none. A reader tells "this project has no
+	// policies" from "built without a policy file" by it.
+	OptionalInputs []OptionalInput `json:"optional_inputs,omitempty"`
+}
+
+// OptionalInput is one optional input file of a build.
+type OptionalInput struct {
+	Kind string `json:"kind"` // "policy_file" | "security_pattern_file"
+	// Path is the path as given on the command line.
+	Path string `json:"path"`
+	// SHA256 is the hex digest of its content; empty when it could not be
+	// read (the build then has no rows from it).
+	SHA256 string `json:"sha256"`
+	// RowPath is the path the graph's rows from this file carry: relative
+	// to the source root when the file is inside it, else its base name
+	// and the start of SHA256.
+	RowPath string `json:"row_path"`
 }
 
 // FileEntry records the cache fingerprint and produced node/edge IDs for one
@@ -190,6 +209,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		// existing kv table is fine for now — a later change may move this to
 		// per-file rows for partial query performance.
 		{"files", m.Files},
+		{"optional_inputs", m.OptionalInputs},
 	}
 	for _, r := range jsonRows {
 		buf, err := json.Marshal(r.v)
@@ -277,6 +297,7 @@ func readManifest(ctx context.Context, q manifestQueryer) (Manifest, error) {
 		// pre-1.2 manifests have no "files" key; the empty branch leaves
 		// m.Files as nil, which buildpipe interprets as "no cache available".
 		{"files", &m.Files},
+		{"optional_inputs", &m.OptionalInputs},
 	} {
 		if v, ok := kv[j.k]; ok && v != "" {
 			if err := json.Unmarshal([]byte(v), j.dst); err != nil {

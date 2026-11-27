@@ -48,22 +48,7 @@ func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 			// their operations get a CallSite.
 			v.bindLocalChans(parentID, s, assignedMakeChan)
 		case *ast.CallExpr:
-			id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", s.Pos(), s.End())
-			// Pending edge: CallSite -(calls|invokes)-> callee — resolved in Pass 2.
-			// Classify dispatch kind so non-static dispatches
-			// surface as `invokes` with a populated dispatch_kind metadata
-			// column instead of being conflated with static `calls`.
-			v.pending = append(v.pending, v.parsePendingFromCall(id, s))
-			// For dispatch kinds whose target is unresolvable
-			// (closure literal, func value, method value) — Resolve would
-			// drop the PendingRef because TargetQName has no matching
-			// Function/Method node — we emit a direct self-loop on the
-			// parent function so the edge isn't lost. Self-loop semantics
-			// mirror timeout_path / cancellation_path: marker edges that
-			// say "this function performs <kind> dispatch" without naming
-			// a runtime target. interface_method dispatch resolves cleanly
-			// to a Method node so we leave it in the PendingRef path.
-			v.maybeEmitInvokesSelfLoop(parentID, s)
+			v.emitCallSite(parentID, parentQname, s)
 			// Lock and unlock edges are made after Resolve (lock_edges.go):
 			// the mutex may be declared in another file.
 			//
@@ -102,8 +87,10 @@ func (v *declVisitor) emitBodyPos(parentQname, parentID string, body ast.Node) {
 }
 
 // emitStatement emits the node of n when n is a control statement (if, for,
-// range, switch, return) or a channel operation (send, receive, range over a
-// channel); other nodes are left to the caller. Both body walks call it: the
+// range, switch, select, return; schema 1.45: break, continue, goto,
+// fallthrough, a case clause, a defer statement, a function literal) or a
+// channel operation (send, receive, range over a channel); other nodes are
+// left to the caller. Both body walks call it: the
 // one for a function body and the one for the literal of a go statement.
 func (v *declVisitor) emitStatement(parentID, parentQname string, n ast.Node) {
 	switch s := n.(type) {
@@ -124,8 +111,29 @@ func (v *declVisitor) emitStatement(parentID, parentQname string, n ast.Node) {
 		v.appendLogicBlockPos(parentID, parentQname, types.NodeSwitchStmt, "", s.Pos(), s.End())
 	case *ast.TypeSwitchStmt:
 		v.appendLogicBlockPos(parentID, parentQname, types.NodeSwitchStmt, "type", s.Pos(), s.End())
+	case *ast.SelectStmt:
+		// A select chooses among its cases like a switch: a SwitchStmt node
+		// whose sub kind says whether it can block (select) or has a
+		// default clause that runs when no case is ready (select_default).
+		sub := types.SubKindSelect
+		for _, cl := range s.Body.List {
+			if cc, ok := cl.(*ast.CommClause); ok && cc.Comm == nil {
+				sub = types.SubKindSelectDefault
+			}
+		}
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeSwitchStmt, sub, s.Pos(), s.End())
 	case *ast.ReturnStmt:
 		v.appendLogicBlockPos(parentID, parentQname, types.NodeReturnStmt, "", s.Pos(), s.End())
+	case *ast.BranchStmt:
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeBranchStmt, s.Tok.String(), s.Pos(), s.End())
+	case *ast.CaseClause:
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeCaseClause, clauseKind(s.List == nil), s.Pos(), s.End())
+	case *ast.CommClause:
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeCaseClause, clauseKind(s.Comm == nil), s.Pos(), s.End())
+	case *ast.DeferStmt:
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeDeferStmt, "", s.Pos(), s.End())
+	case *ast.FuncLit:
+		v.appendLogicBlockPos(parentID, parentQname, types.NodeFuncLit, "", s.Pos(), s.End())
 	case *ast.SendStmt:
 		v.emitChannelOp(parentID, parentQname, types.EdgeSendsTo, subKindSend, s.Chan, s.Pos(), s.End())
 	case *ast.UnaryExpr:
@@ -133,6 +141,15 @@ func (v *declVisitor) emitStatement(parentID, parentQname string, n ast.Node) {
 			v.emitChannelOp(parentID, parentQname, types.EdgeRecvsFrom, subKindRecv, s.X, s.Pos(), s.End())
 		}
 	}
+}
+
+// clauseKind is the sub kind of a CaseClause node: default for the default
+// clause of a switch or select, case otherwise.
+func clauseKind(isDefault bool) string {
+	if isDefault {
+		return types.SubKindDefault
+	}
+	return types.SubKindCase
 }
 
 // isChannel reports whether e is of channel type. Without type information
@@ -186,6 +203,31 @@ func (v *declVisitor) emitChannelOp(parentID, parentQname string, et types.EdgeT
 		Src: parentID, Dst: id, Type: et, Line: line,
 		Count: 1, Confidence: types.ConfExtracted,
 	})
+}
+
+// closedChan returns the channel operand of close(ch) when call is one.
+func (v *declVisitor) closedChan(call *ast.CallExpr) (ast.Expr, bool) {
+	id, ok := ast.Unparen(call.Fun).(*ast.Ident)
+	if !ok || id.Name != "close" || len(call.Args) != 1 || !v.isBuiltinCall(id) {
+		return nil, false
+	}
+	return call.Args[0], true
+}
+
+// emitClose records close(ch) by the function parentID, as emitChannelOp
+// records a send: closes to the Channel node of a local variable bound to a
+// make site, else to the close's own site siteID. The channel linker
+// (dispatch.go) adds the edge to the channel's origin.
+func (v *declVisitor) emitClose(parentID, siteID string, ch ast.Expr, at token.Pos) {
+	line, _ := v.pos(at)
+	dst := siteID
+	if key := v.chanVar(ch); key != nil {
+		if chanID, ok := v.chanVarIDs[key]; ok {
+			dst = chanID
+		}
+	}
+	v.edges = append(v.edges, types.Edge{Src: parentID, Dst: dst, Type: types.EdgeCloses, Line: line,
+		Count: 1, Confidence: types.ConfExtracted})
 }
 
 // chanVar returns the key of the variable that the channel operand e names
@@ -367,6 +409,7 @@ func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.
 	if lit == nil || lit.Body == nil {
 		return
 	}
+	v.emitStatement(parentID, parentQname, lit)
 	made := map[token.Pos]bool{}
 	ast.Inspect(lit.Body, func(n ast.Node) bool {
 		switch s := n.(type) {
@@ -396,10 +439,25 @@ func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.
 
 // emitCallSite records one call of the enclosing function: a CallSite node,
 // the pending calls or invokes ref, and the dispatch self-loop.
+//
+// Pending edge: CallSite -(calls|invokes)-> callee, resolved in Pass 2, with
+// the dispatch kind classified so non-static dispatches surface as invokes.
+// For a callee that cannot be resolved (a closure literal, a function value,
+// a method value) the function gets a self-loop that says it makes such a
+// call, as timeout_path and cancellation_path mark a function. A close(ch)
+// has a site of sub kind close and a closes edge (emitClose).
 func (v *declVisitor) emitCallSite(parentID, parentQname string, c *ast.CallExpr) {
-	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", c.Pos(), c.End())
+	ch, closes := v.closedChan(c)
+	sub := ""
+	if closes {
+		sub = types.SubKindClose
+	}
+	id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, sub, c.Pos(), c.End())
 	v.pending = append(v.pending, v.parsePendingFromCall(id, c))
 	v.maybeEmitInvokesSelfLoop(parentID, c)
+	if closes {
+		v.emitClose(parentID, id, ch, c.Pos())
+	}
 }
 
 // emitGoCall records what a go statement runs: the literal's body, or the

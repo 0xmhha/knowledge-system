@@ -29,7 +29,20 @@ import (
 //	             body writes outside every statement nested in it
 //	             (dispatch_kind then, else, body, case, go)
 //	encloses     a statement -> each statement node directly inside it
-//	             (dispatch_kind cond, then, else, body, case, go)
+//	             (dispatch_kind cond, then, else, body, case, go); a
+//	             switch or select -> each of its CaseClause nodes (clause)
+//	jumps_to     (schema 1.45) a BranchStmt or ReturnStmt -> where it
+//	             goes (dispatch_kind break, continue, goto, fallthrough,
+//	             return): the loop or switch a break leaves, the loop a
+//	             continue goes on with (the innermost one, or the one its
+//	             label names), the statement a goto's label stands on, the
+//	             clause a fallthrough goes into, the function or function
+//	             literal a return returns from
+//
+// A function literal is a FuncLit node the statement around it encloses;
+// what is written in it stays enclosed by that statement too (the regions
+// cross literals), but its breaks and returns stay inside it. A defer
+// statement is a DeferStmt node; the calls it makes are enclosed as before.
 //
 // Line is the line of the use. A statement without a node is transparent:
 // what lies inside it belongs to the statement around it.
@@ -86,7 +99,8 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 					byCanonical[n.CanonicalID] = n
 				}
 			}
-		case types.NodeIfStmt, types.NodeLoopStmt, types.NodeSwitchStmt, types.NodeReturnStmt, types.NodeGoroutine:
+		case types.NodeIfStmt, types.NodeLoopStmt, types.NodeSwitchStmt, types.NodeReturnStmt, types.NodeGoroutine,
+			types.NodeBranchStmt, types.NodeCaseClause, types.NodeDeferStmt, types.NodeFuncLit:
 			stmts[stmtKey{n.FilePath, n.StartByte, 0, n.Type}] = n
 		case types.NodeCallSite:
 			// A call and a channel operation never share a span: a send
@@ -113,6 +127,7 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 		}
 		w := &stmtWalker{c: c, st: &st, info: oc.info(), fset: oc.pkg.Fset, file: oc.owner.FilePath, owner: oc.owner,
 			stmts: stmts, byCanonical: byCanonical, fields: fields, methods: methods, lhs: assignedExprs(oc.root, oc.info(), true)}
+		w.scope = jumpScope{ret: oc.owner, labels: w.labelsOf(oc.root)}
 		w.region(oc.root, ctl{})
 	})
 	return c.edges, st
@@ -121,7 +136,7 @@ func EmitStatementEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.E
 // ctl is the statement a region of code lies in, and which part of it.
 type ctl struct {
 	node *types.Node
-	kind string // cond, then, else, body, case, go
+	kind string // cond, then, else, body, case, go (a select case's send or receive is its cond)
 	// lit is set inside a function literal written in the statement: the
 	// statement still encloses what the literal holds, but the literal's
 	// writes are not the statement's.
@@ -187,6 +202,114 @@ type stmtWalker struct {
 	fields      fieldIndex
 	methods     posIndex
 	lhs         map[ast.Expr]bool // what the assignments and increments in the body write (assignedExprs)
+	// scope is where the jumps of the code being walked go (jumps_to).
+	scope jumpScope
+}
+
+// jumpScope is what the jumps of one function or function literal can
+// reach: the loops and switches around the walk (innermost last), the node
+// a return returns from, the statements the labels stand on, and the label
+// written on the statement about to be walked.
+type jumpScope struct {
+	targets []branchTarget
+	ret     *types.Node
+	labels  map[string]*types.Node
+	label   string
+	// next is the clause a fallthrough of the clause being walked goes into.
+	next *types.Node
+}
+
+// branchTarget is a loop or switch (select) a break or continue can name.
+type branchTarget struct {
+	node  *types.Node
+	loop  bool
+	label string
+}
+
+// enter pushes the statement s onto the targets, with the label written on
+// it, and returns the function that pops it.
+func (w *stmtWalker) enter(s *types.Node, loop bool) func() {
+	w.scope.targets = append(w.scope.targets, branchTarget{node: s, loop: loop, label: w.scope.label})
+	w.scope.label = ""
+	return func() { w.scope.targets = w.scope.targets[:len(w.scope.targets)-1] }
+}
+
+// labelsOf returns the statement node each label of body (not of the
+// literals in it) stands on, for goto.
+func (w *stmtWalker) labelsOf(body ast.Node) map[string]*types.Node {
+	out := map[string]*types.Node{}
+	if body == nil {
+		return out
+	}
+	ast.Inspect(body, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.LabeledStmt:
+			if t := labeledNodeType(x.Stmt); t != "" {
+				out[x.Label.Name] = w.stmts[stmtKey{w.file, w.fset.Position(x.Stmt.Pos()).Offset, 0, t}]
+			}
+		}
+		return true
+	})
+	return out
+}
+
+// labeledNodeType is the node type of a statement a label can stand on, ""
+// for one without a node.
+func labeledNodeType(s ast.Stmt) types.NodeType {
+	switch s.(type) {
+	case *ast.ForStmt, *ast.RangeStmt:
+		return types.NodeLoopStmt
+	case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt:
+		return types.NodeSwitchStmt
+	case *ast.IfStmt:
+		return types.NodeIfStmt
+	case *ast.ReturnStmt:
+		return types.NodeReturnStmt
+	case *ast.DeferStmt:
+		return types.NodeDeferStmt
+	case *ast.BranchStmt:
+		return types.NodeBranchStmt
+	}
+	return ""
+}
+
+// jump records where the break, continue, goto or fallthrough x goes.
+func (w *stmtWalker) jump(x *ast.BranchStmt, b *types.Node) {
+	label := ""
+	if x.Label != nil {
+		label = x.Label.Name
+	}
+	var to *types.Node
+	switch x.Tok {
+	case token.BREAK, token.CONTINUE:
+		for i := len(w.scope.targets) - 1; i >= 0; i-- {
+			t := w.scope.targets[i]
+			if label != "" && t.label != label || x.Tok == token.CONTINUE && !t.loop {
+				continue
+			}
+			to = t.node
+			break
+		}
+	case token.GOTO:
+		to = w.scope.labels[label]
+	case token.FALLTHROUGH:
+		to = w.scope.next
+	}
+	w.c.emit(b, to, types.EdgeJumpsTo, x.Tok.String(), w.line(x.Pos()))
+}
+
+// literal walks the body of the function literal x, whose node the region
+// c encloses, in a jump scope of its own: its breaks and returns stay in
+// it.
+func (w *stmtWalker) literal(x *ast.FuncLit, c ctl, body ctl) {
+	lit := w.node(types.NodeFuncLit, x.Pos())
+	w.enclose(c, lit, x.Pos())
+	outer := w.scope
+	w.scope = jumpScope{ret: lit, labels: w.labelsOf(x.Body)}
+	w.region(x.Body, body)
+	w.scope = outer
 }
 
 func (w *stmtWalker) line(p token.Pos) int { return w.fset.Position(p).Line }
@@ -240,51 +363,80 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 		case nil:
 			return false
 		case *ast.FuncLit:
-			w.region(x.Body, c.inLiteral())
+			w.literal(x, c, c.inLiteral())
+			return false
+		case *ast.LabeledStmt:
+			w.scope.label = x.Label.Name
+			w.region(x.Stmt, c)
+			w.scope.label = ""
 			return false
 		case *ast.IfStmt:
+			w.scope.label = ""
 			w.ifStmt(x, c)
 			return false
 		case *ast.ForStmt:
 			s := w.node(types.NodeLoopStmt, x.Pos())
 			w.enclose(c, s, x.Pos())
+			leave := w.enter(s, true)
 			cc := inner(s, c, "cond")
 			w.region(x.Init, cc)
 			w.region(x.Cond, cc)
 			w.region(x.Post, cc)
 			w.region(x.Body, inner(s, c, "body"))
+			leave()
 			return false
 		case *ast.RangeStmt:
 			s := w.node(types.NodeLoopStmt, x.Pos())
 			w.enclose(c, s, x.Pos())
+			leave := w.enter(s, true)
 			cc := inner(s, c, "cond")
 			// A range over a channel receives; its site is part of the
 			// loop header, as a call in the range expression is.
 			w.enclose(cc, w.opSite(x.Range, x.X.End()), x.Range)
 			w.region(x.X, cc)
 			w.region(x.Body, inner(s, c, "body"))
+			leave()
 			return false
 		case *ast.SwitchStmt:
 			s := w.node(types.NodeSwitchStmt, x.Pos())
 			w.enclose(c, s, x.Pos())
+			leave := w.enter(s, false)
 			cc := inner(s, c, "cond")
 			w.region(x.Init, cc)
 			w.region(x.Tag, cc)
 			w.caseClauses(x.Body, s, c)
+			leave()
 			return false
 		case *ast.TypeSwitchStmt:
 			s := w.node(types.NodeSwitchStmt, x.Pos())
 			w.enclose(c, s, x.Pos())
+			leave := w.enter(s, false)
 			cc := inner(s, c, "cond")
 			w.region(x.Init, cc)
 			w.region(x.Assign, cc)
 			w.caseClauses(x.Body, s, c)
+			leave()
+			return false
+		case *ast.SelectStmt:
+			s := w.node(types.NodeSwitchStmt, x.Pos())
+			w.enclose(c, s, x.Pos())
+			leave := w.enter(s, false)
+			w.caseClauses(x.Body, s, c)
+			leave()
 			return false
 		case *ast.GoStmt:
 			w.goStmt(x, c)
 			return false
+		case *ast.BranchStmt:
+			b := w.node(types.NodeBranchStmt, x.Pos())
+			w.enclose(c, b, x.Pos())
+			w.jump(x, b)
+		case *ast.DeferStmt:
+			w.enclose(c, w.node(types.NodeDeferStmt, x.Pos()), x.Pos())
 		case *ast.ReturnStmt:
-			w.enclose(c, w.node(types.NodeReturnStmt, x.Pos()), x.Pos())
+			r := w.node(types.NodeReturnStmt, x.Pos())
+			w.enclose(c, r, x.Pos())
+			w.c.emit(r, w.scope.ret, types.EdgeJumpsTo, types.JumpReturn, w.line(x.Pos()))
 		case *ast.SendStmt:
 			// Send and receive sites lie in the statement around them
 			// like call sites (841 of go-stablenet had no encloses edge).
@@ -346,19 +498,44 @@ func (w *stmtWalker) caseClauses(body *ast.BlockStmt, s *types.Node, c ctl) {
 	if body == nil {
 		return
 	}
-	for _, cl := range body.List {
-		cc, ok := cl.(*ast.CaseClause)
-		if !ok {
-			continue
+	outerNext := w.scope.next
+	defer func() { w.scope.next = outerNext }()
+	for i, cl := range body.List {
+		if clause := w.node(types.NodeCaseClause, cl.Pos()); s != nil {
+			w.c.emit(s, clause, types.EdgeEncloses, clauseEncloses, w.line(cl.Pos()))
 		}
-		for _, e := range cc.List {
+		w.scope.next = nil
+		if i+1 < len(body.List) {
+			w.scope.next = w.node(types.NodeCaseClause, body.List[i+1].Pos())
+		}
+		// A select case's send or receive is what the select chooses on,
+		// as a switch case's expressions are: both are the header.
+		var conds []ast.Node
+		var stmts []ast.Stmt
+		switch cc := cl.(type) {
+		case *ast.CaseClause:
+			for _, e := range cc.List {
+				conds = append(conds, e)
+			}
+			stmts = cc.Body
+		case *ast.CommClause:
+			if cc.Comm != nil {
+				conds = append(conds, cc.Comm)
+			}
+			stmts = cc.Body
+		}
+		for _, e := range conds {
 			w.region(e, inner(s, c, "cond"))
 		}
-		for _, b := range cc.Body {
+		for _, b := range stmts {
 			w.region(b, inner(s, c, "case"))
 		}
 	}
 }
+
+// clauseEncloses is the kind of the encloses edge from a switch or select to
+// one of its CaseClause nodes.
+const clauseEncloses = "clause"
 
 func (w *stmtWalker) goStmt(x *ast.GoStmt, c ctl) {
 	g := w.node(types.NodeGoroutine, x.Pos())
@@ -372,7 +549,7 @@ func (w *stmtWalker) goStmt(x *ast.GoStmt, c ctl) {
 	// started at the statement around the go statement).
 	own := inner(g, c, "go")
 	if lit, ok := x.Call.Fun.(*ast.FuncLit); ok {
-		w.region(lit.Body, own)
+		w.literal(lit, own, own)
 	} else {
 		callee, kind := w.resolve(x.Call)
 		if callee == nil {
@@ -453,8 +630,9 @@ const LiteralArgKind = "arg"
 
 // literalArgs records, for each function literal passed as an argument of
 // call (r.Each(func(...) { ... })), a literal_passed_to edge from the site
-// of every call written in that literal (and not in a literal nested in it)
-// to the function call passes it to, callee, with the line of call. The
+// of every call written in that literal (and not in a literal nested in it),
+// and from the Goroutine of every go statement written there, to the
+// function call passes it to, callee, with the line of call. The
 // literal runs when callee calls it; a callee the call does not name (a
 // function value) gives none.
 func (w *stmtWalker) literalArgs(call *ast.CallExpr, callee *types.Node) {
@@ -466,21 +644,36 @@ func (w *stmtWalker) literalArgs(call *ast.CallExpr, callee *types.Node) {
 		if !ok {
 			continue
 		}
+		goCalls := map[*ast.CallExpr]bool{}
 		ast.Inspect(lit.Body, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.FuncLit:
 				return false
+			case *ast.GoStmt:
+				// The callee runs the go statement: the goroutine starts
+				// there. Its call is the goroutine, not a site; the calls
+				// in its function expression and arguments are evaluated
+				// there too.
+				w.c.emit(w.node(types.NodeGoroutine, x.Pos()), callee, types.EdgeLiteralPassedTo, LiteralArgKind, w.line(call.Pos()))
+				goCalls[x.Call] = true
 			case *ast.CallExpr:
-				// A conversion or a builtin is not a call of code.
-				if tv, ok := w.info.Types[x.Fun]; ok && (tv.IsType() || tv.IsBuiltin()) {
-					return true
-				}
-				if s := w.site(x); s != nil {
-					w.c.emit(s, callee, types.EdgeLiteralPassedTo, LiteralArgKind, w.line(call.Pos()))
+				if !goCalls[x] {
+					w.literalCall(x, call, callee)
 				}
 			}
 			return true
 		})
+	}
+}
+
+// literalCall records x, a call written in a literal passed to call, as run
+// by callee. A conversion or a builtin is not a call of code.
+func (w *stmtWalker) literalCall(x, call *ast.CallExpr, callee *types.Node) {
+	if tv, ok := w.info.Types[x.Fun]; ok && (tv.IsType() || tv.IsBuiltin()) {
+		return
+	}
+	if s := w.site(x); s != nil {
+		w.c.emit(s, callee, types.EdgeLiteralPassedTo, LiteralArgKind, w.line(call.Pos()))
 	}
 }
 

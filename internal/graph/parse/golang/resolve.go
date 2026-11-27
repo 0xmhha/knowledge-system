@@ -266,6 +266,9 @@ func LoadAndResolveWith(root string, opts LoadOptions) (*parse.ResolvedGraph, er
 	// lock_edges.go), after the dispatch pass, which finds channel locks.
 	lockFacts, _ := LockFacts(p.Pkgs(), rg.Nodes, LockOptions{Propagate: opts.LockPropagation, ChanLocks: dst.ChanLockOps()})
 	rg.Edges = append(rg.Edges, lockFacts.Edges()...)
+	// Operations on sync primitives (see syncops.go).
+	syncFacts, _ := SyncFacts(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, syncFacts.Edges()...)
 	// Statement links: what happens inside a function (see statement_links.go).
 	stmtEdges, _ := EmitStatementEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, stmtEdges...)

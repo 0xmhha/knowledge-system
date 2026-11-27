@@ -46,6 +46,11 @@ type Report struct {
 	// make site and the field it is stored in), or one is not linked.
 	ChannelPairsDisjoint int `json:"channel_pairs_disjoint"`
 	ChannelPairsUnlinked int `json:"channel_pairs_unlinked"`
+	// ChannelOpsRuntime: receives on a channel the runtime makes and sends
+	// on (a timer's or ticker's C, a context's Done), which the graph marks
+	// with operates_on kind timer_recv or done_recv. No send in the build
+	// reaches them, so they are outside ChannelOps.
+	ChannelOpsRuntime int `json:"channel_ops_runtime"`
 }
 
 // PairStats counts observed items and how many the graph holds.
@@ -72,6 +77,9 @@ type record struct {
 	Ch     string `json:"ch"`
 	Op     int    `json:"op"`
 	Fn     string `json:"fn"`
+	// Defer are the lines of the caller's defer statements when Line is
+	// where the caller ends: the call may be a deferred one.
+	Defer []int `json:"defer"`
 }
 
 // closure and instantiation suffixes of runtime function names:
@@ -181,11 +189,38 @@ func Compare(dir string, g GraphReader, samples int) (Report, error) {
 		if !ok1 || !ok2 {
 			continue
 		}
+		// A deferred call is recorded where its caller ends: it is matched
+		// on the first defer statement whose call can be this one (a static
+		// call of the callee, an interface method of its name, a call
+		// through a function value). Two defers through function values
+		// are not told apart.
+		line := rc.Line
+		leaf := leafOf(callee.QualifiedName)
+		has := func(l int) bool {
+			k := lineKey{caller.ID, l}
+			if static[staticKey{caller.ID, callee.ID, l}] || fvAt[k] {
+				return true
+			}
+			for _, m := range ifaceAt[k] {
+				if leafOf(byID[m].QualifiedName) == leaf {
+					return true
+				}
+			}
+			return false
+		}
+		if !has(line) {
+			for _, d := range rc.Defer {
+				if has(d) {
+					line = d
+					break
+				}
+			}
+		}
+		rc.Line = line
 		k := lineKey{caller.ID, rc.Line}
 		if static[staticKey{caller.ID, callee.ID, rc.Line}] {
 			continue // a static call on a line that also makes a dynamic one
 		}
-		leaf := leafOf(callee.QualifiedName)
 		viaIface := false
 		for _, m := range ifaceAt[k] {
 			if leafOf(byID[m].QualifiedName) != leaf {
@@ -247,6 +282,7 @@ func Compare(dir string, g GraphReader, samples int) (Report, error) {
 			chanTo[k][e.Dst] = true
 		}
 	}
+	runtimeAt := runtimeReceives(edges, byID)
 	type side struct {
 		fn   string
 		line int
@@ -262,6 +298,13 @@ func Compare(dir string, g GraphReader, samples int) (Report, error) {
 			continue
 		}
 		k := opKey{fn.ID, rc.Line, rc.Op}
+		if rc.Op == recvOp && runtimeAt[siteLine{fn.ID, rc.Line}] {
+			if !seenOp[k] {
+				seenOp[k] = true
+				r.ChannelOpsRuntime++
+			}
+			continue
+		}
 		if !seenOp[k] {
 			seenOp[k] = true
 			r.ChannelOps.Observed++
@@ -332,6 +375,37 @@ func Compare(dir string, g GraphReader, samples int) (Report, error) {
 		}
 	}
 	return r, nil
+}
+
+// recvOp is the op of a receive record.
+const recvOp = 2
+
+// siteLine is a line of a function.
+type siteLine struct {
+	fn   string
+	line int
+}
+
+// runtimeReceives returns the lines of the receives on a channel the
+// runtime sends on: the sites of operates_on edges of kind timer_recv or
+// done_recv, by the function that contains them.
+func runtimeReceives(edges func(types.EdgeType) []types.Edge, byID map[string]types.Node) map[siteLine]bool {
+	sites := map[string]bool{}
+	for _, e := range edges(types.EdgeOperatesOn) {
+		if op := types.SyncOp(e.DispatchKind); op == types.SyncTimerRecv || op == types.SyncDoneRecv {
+			sites[e.Src] = true
+		}
+	}
+	out := map[siteLine]bool{}
+	if len(sites) == 0 {
+		return out
+	}
+	for _, e := range edges(types.EdgeContains) {
+		if sites[e.Dst] {
+			out[siteLine{e.Src, byID[e.Dst].StartLine}] = true
+		}
+	}
+	return out
 }
 
 func readRecords(dir string) ([]record, error) {

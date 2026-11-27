@@ -23,7 +23,8 @@ import (
 // The truth here is computed another way, so that the two can disagree: one
 // flat walk keeps the stack of syntax nodes above each node, and the
 // innermost control statement and its part (cond, then, else, body, case,
-// go) are read off that stack. Canonical ids are formatted by this package
+// go) are read off that stack. A select is a switch whose cases are sends
+// and receives: each case's statement is its cond. Canonical ids are formatted by this package
 // (canonicalID), not the parser's. A struct field is named by where it is
 // declared (fieldRef), not by "<importpath>.<Type>.<Field>": that string
 // names the package-level field when a function declares a struct of the
@@ -94,11 +95,12 @@ func (s StmtRelStats) Recall() float64 {
 }
 
 var stmtRels = []types.EdgeType{types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
-	types.EdgeLiteralPassedTo}
+	types.EdgeLiteralPassedTo, types.EdgeJumpsTo}
 
 var stmtNodeTypes = map[types.NodeType]bool{
 	types.NodeIfStmt: true, types.NodeLoopStmt: true, types.NodeSwitchStmt: true,
 	types.NodeReturnStmt: true, types.NodeCallSite: true, types.NodeGoroutine: true,
+	types.NodeBranchStmt: true, types.NodeCaseClause: true, types.NodeDeferStmt: true, types.NodeFuncLit: true,
 }
 
 // stmtKind is the graph node type a statement of the syntax tree becomes.
@@ -108,7 +110,8 @@ func stmtKind(n ast.Node) types.NodeType {
 		return types.NodeIfStmt
 	case *ast.ForStmt, *ast.RangeStmt:
 		return types.NodeLoopStmt
-	case *ast.SwitchStmt, *ast.TypeSwitchStmt:
+	case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt:
+		// A select chooses among cases as a switch does (schema 1.44).
 		return types.NodeSwitchStmt
 	case *ast.ReturnStmt:
 		return types.NodeReturnStmt
@@ -120,13 +123,106 @@ func stmtKind(n ast.Node) types.NodeType {
 		}
 	case *ast.GoStmt:
 		return types.NodeGoroutine
+	case *ast.BranchStmt:
+		return types.NodeBranchStmt
+	case *ast.CaseClause, *ast.CommClause:
+		return types.NodeCaseClause
+	case *ast.DeferStmt:
+		return types.NodeDeferStmt
+	case *ast.FuncLit:
+		return types.NodeFuncLit
 	}
 	return ""
 }
 
+// jumpTarget returns the statement the break, continue, goto or
+// fallthrough x goes to, read off the stack of its ancestors (innermost
+// last): for break and continue the innermost loop (a break: or switch, type
+// switch, select) its label names, if any, not crossing a function literal;
+// for goto the statement its label stands on in the function around it;
+// for fallthrough the clause after x's clause. nil when there is none.
+func jumpTarget(stack []ast.Node, x *ast.BranchStmt, root ast.Node) ast.Node {
+	label := ""
+	if x.Label != nil {
+		label = x.Label.Name
+	}
+	switch x.Tok {
+	case token.BREAK, token.CONTINUE:
+		for i := len(stack) - 1; i >= 0; i-- {
+			var loop bool
+			switch stack[i].(type) {
+			case *ast.FuncLit:
+				return nil
+			case *ast.ForStmt, *ast.RangeStmt:
+				loop = true
+			case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt:
+			default:
+				continue
+			}
+			named := ""
+			if i > 0 {
+				if l, ok := stack[i-1].(*ast.LabeledStmt); ok && ast.Node(l.Stmt) == stack[i] {
+					named = l.Label.Name
+				}
+			}
+			if label != "" && named != label || x.Tok == token.CONTINUE && !loop {
+				continue
+			}
+			return stack[i]
+		}
+	case token.GOTO:
+		for i := len(stack) - 1; i >= 0; i-- {
+			if lit, ok := stack[i].(*ast.FuncLit); ok {
+				root = lit.Body
+				break
+			}
+		}
+		var to ast.Node
+		ast.Inspect(root, func(n ast.Node) bool {
+			if _, lit := n.(*ast.FuncLit); lit && n != root {
+				return false
+			}
+			if l, ok := n.(*ast.LabeledStmt); ok && l.Label.Name == label {
+				to = l.Stmt
+			}
+			return to == nil
+		})
+		return to
+	case token.FALLTHROUGH:
+		if len(stack) < 2 {
+			return nil
+		}
+		block, ok := stack[len(stack)-2].(*ast.BlockStmt)
+		if !ok {
+			return nil
+		}
+		for i, s := range block.List {
+			if ast.Node(s) == stack[len(stack)-1] && i+1 < len(block.List) {
+				return block.List[i+1]
+			}
+		}
+	}
+	return nil
+}
+
+// innermostLiteral returns the innermost function literal on the stack.
+func innermostLiteral(stack []ast.Node) *ast.FuncLit {
+	for i := len(stack) - 1; i >= 0; i-- {
+		if lit, ok := stack[i].(*ast.FuncLit); ok {
+			return lit
+		}
+	}
+	return nil
+}
+
 // statements adds the statement facts of one function body.
 func (w *fileWalker) statements(d *ast.FuncDecl) {
+	w.returnsTo = canonicalID(w.info.Defs[d.Name])
+	if w.returnsTo == "" {
+		w.returnsTo = methodRefAt(w.rel, w.fset.Position(d.Pos()).Line, d.Name.Name)
+	}
 	w.statementsIn(d.Body)
+	w.returnsTo = ""
 }
 
 // statementsIn adds the statement facts of one piece of code: a function
@@ -136,6 +232,7 @@ func (w *fileWalker) statementsIn(body ast.Node) {
 		return
 	}
 	writes := writtenExprs(body)
+	litVars := literalVars(w.info, body)
 	key := func(n ast.Node) string {
 		return fmt.Sprintf("%s@L%d", stmtKind(n), w.fset.Position(n.Pos()).Line)
 	}
@@ -148,10 +245,31 @@ func (w *fileWalker) statementsIn(body ast.Node) {
 			stack = stack[:len(stack)-1]
 			return false
 		}
+		if k := w.extentOf(n); k != "" && w.t != nil {
+			w.t.Extents[k] = true
+		}
 		ctl, part, inLit := enclosingControl(stack, n)
 		if stmtKind(n) != "" && !isGoCall(stack, n) {
 			if ctl != nil && part != "" {
 				add(types.EdgeEncloses, ctl, key(n), part, n.Pos())
+			}
+		}
+		switch x := n.(type) {
+		case *ast.CaseClause, *ast.CommClause:
+			// A clause lies in its switch or select (stack: the statement,
+			// then its body).
+			if len(stack) >= 2 {
+				add(types.EdgeEncloses, stack[len(stack)-2], key(n), "clause", n.Pos())
+			}
+		case *ast.BranchStmt:
+			if to := jumpTarget(stack, x, body); to != nil && stmtKind(to) != "" {
+				add(types.EdgeJumpsTo, n, key(to), x.Tok.String(), n.Pos())
+			}
+		case *ast.ReturnStmt:
+			if lit := innermostLiteral(stack); lit != nil {
+				add(types.EdgeJumpsTo, n, key(lit), types.JumpReturn, n.Pos())
+			} else if w.returnsTo != "" {
+				add(types.EdgeJumpsTo, n, w.returnsTo, types.JumpReturn, n.Pos())
 			}
 		}
 		// A range over a channel receives: its site, at the range keyword,
@@ -177,7 +295,20 @@ func (w *fileWalker) statementsIn(body ast.Node) {
 				}
 				// A function literal passed as an argument: each call in it
 				// (not in a literal nested in it) runs when dst calls it.
-				for _, a := range x.Args {
+				for i, a := range x.Args {
+					// What the callee does with a literal it is passed, here
+					// or through a local variable set once to it.
+					passed, _ := stripConversions(w.info, a).(*ast.FuncLit)
+					if id, isID := ast.Unparen(a).(*ast.Ident); isID {
+						passed = litVars[w.info.Uses[id]]
+					}
+					if passed != nil {
+						if kind := w.literalUse(x, i); kind != "" {
+							w.stmt[StmtFact{Rel: string(types.EdgeLiteralPassedTo), File: w.rel,
+								Src: litSpan(w.fset.Position(passed.Pos()).Offset, w.fset.Position(passed.End()).Offset),
+								Dst: dst, Kind: kind, Line: w.fset.Position(x.Pos()).Line}] = true
+						}
+					}
 					lit, ok := ast.Unparen(a).(*ast.FuncLit)
 					if !ok {
 						continue
@@ -188,7 +319,13 @@ func (w *fileWalker) statementsIn(body ast.Node) {
 						case *ast.FuncLit:
 							return false
 						case *ast.GoStmt:
+							// The function the literal is passed to runs
+							// the go statement: its goroutine is the fact's
+							// source.
 							goCalls[y.Call] = true
+							w.stmt[StmtFact{Rel: string(types.EdgeLiteralPassedTo), File: w.rel,
+								Src: callSpan(w.fset.Position(y.Pos()).Offset, w.fset.Position(y.End()).Offset),
+								Dst: dst, Kind: "arg", Line: w.fset.Position(x.Pos()).Line}] = true
 						case *ast.CallExpr:
 							if goCalls[y] {
 								return true
@@ -287,6 +424,10 @@ func headerAround(stack []ast.Node, n ast.Node) ast.Node {
 			}
 		case *ast.TypeSwitchStmt:
 			if child == ast.Node(a.Init) || child == ast.Node(a.Assign) || child == ast.Node(a.Body) && casePart(at(i+2), at(i+3)) == "cond" {
+				return a
+			}
+		case *ast.SelectStmt:
+			if child == ast.Node(a.Body) && casePart(at(i+2), at(i+3)) == "cond" {
 				return a
 			}
 		}
@@ -424,22 +565,35 @@ func enclosingControl(stack []ast.Node, n ast.Node) (ctl ast.Node, part string, 
 			if child == ast.Node(a.Body) {
 				return a, casePart(at(i+2), at(i+3)), inLit
 			}
+		case *ast.SelectStmt:
+			if child == ast.Node(a.Body) {
+				return a, casePart(at(i+2), at(i+3)), inLit
+			}
 		}
 	}
 	return nil, "", inLit
 }
 
 // casePart says whether x, a child of case clause cl, is a case expression
-// or a statement of the clause's body.
+// (of a select: the case's send or receive statement) or a statement of the
+// clause's body.
 func casePart(cl, x ast.Node) string {
-	cc, ok := cl.(*ast.CaseClause)
-	if !ok || x == nil {
+	if x == nil {
 		return ""
 	}
-	for _, e := range cc.List {
-		if ast.Node(e) == x {
+	switch cc := cl.(type) {
+	case *ast.CaseClause:
+		for _, e := range cc.List {
+			if ast.Node(e) == x {
+				return "cond"
+			}
+		}
+	case *ast.CommClause:
+		if cc.Comm != nil && ast.Node(cc.Comm) == x {
 			return "cond"
 		}
+	default:
+		return ""
 	}
 	return "case"
 }
@@ -515,8 +669,11 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		byID[n.ID] = n
 		if stmtNodeTypes[n.Type] {
 			stmtNodes[n.FilePath+"|"+fmt.Sprintf("%s@L%d", n.Type, n.StartLine)] = true
-			if n.Type == types.NodeCallSite {
+			if n.Type == types.NodeCallSite || n.Type == types.NodeGoroutine {
 				stmtNodes[n.FilePath+"|"+callSpan(n.StartByte, n.EndByte)] = true
+			}
+			if n.Type == types.NodeFuncLit {
+				stmtNodes[n.FilePath+"|"+litSpan(n.StartByte, n.EndByte)] = true
 			}
 		}
 		switch {
@@ -549,11 +706,14 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		edges += len(es)
 		for _, e := range es {
 			s, d := byID[e.Src], byID[e.Dst]
-			src := ref(s)
-			if rel == types.EdgeLiteralPassedTo {
+			src, kind := ref(s), e.DispatchKind
+			switch {
+			case rel == types.EdgeLiteralPassedTo && s.Type == types.NodeFuncLit:
+				src, kind = litSpan(s.StartByte, s.EndByte), e.DispatchKind+litKindMark+string(e.Confidence)
+			case rel == types.EdgeLiteralPassedTo:
 				src = callSpan(s.StartByte, s.EndByte)
 			}
-			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: src, Dst: ref(d), Kind: e.DispatchKind, Line: e.Line}] = true
+			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: src, Dst: ref(d), Kind: kind, Line: e.Line}] = true
 		}
 	}
 	if edges == 0 {
@@ -621,6 +781,11 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		out[f.Rel] = s
 	}
 	return out, nil
+}
+
+// litSpan names a function literal by its byte span.
+func litSpan(start, end int) string {
+	return fmt.Sprintf("%s@%d-%d", types.NodeFuncLit, start, end)
 }
 
 // callSpan names a call site by its byte span: the facts of

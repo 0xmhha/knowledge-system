@@ -404,15 +404,22 @@ func resolveSeeds(store persist.StoreReader, seedQname, seedFile string) ([]type
 		if err != nil {
 			return nil, nil, persist.NameResolution{}, err
 		}
-		// Drop nodes without a qname (StartLine-anonymous fragments etc.):
-		// they are not symbols a change is asked about.
+		// The declarations of the file (persist.Declarations, the one rule
+		// for what an agent asks about by name): not its statement nodes,
+		// goroutines or the names local to its functions, which are not
+		// what a change is asked about and are reached from the
+		// declarations that hold them.
 		filtered := nodes[:0]
 		for _, n := range nodes {
 			if n.QualifiedName != "" {
 				filtered = append(filtered, n)
 			}
 		}
-		return filtered, nil, persist.NameResolution{}, nil
+		decls, err := persist.Declarations(store, filtered)
+		if err != nil {
+			return nil, nil, persist.NameResolution{}, err
+		}
+		return decls, nil, persist.NameResolution{}, nil
 	}
 	return nil, nil, persist.NameResolution{}, nil
 }

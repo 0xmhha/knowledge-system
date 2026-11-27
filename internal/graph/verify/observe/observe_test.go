@@ -28,7 +28,7 @@ func TestInstrumentRunCompare(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if st.Files != 2 || st.ChannelOps != 4 || st.SkippedOps != 0 {
+	if st.Files != 2 || st.ChannelOps != 5 || st.SkippedOps != 0 {
 		t.Fatalf("instrument stats %+v", st)
 	}
 	obs := t.TempDir()
@@ -50,10 +50,15 @@ func TestInstrumentRunCompare(t *testing.T) {
 	for name, got := range map[string]observe.PairStats{
 		"interface": r.Interface, "func value": r.FuncValue, "channel ops": r.ChannelOps, "channel pairs": r.ChannelPairs,
 	} {
-		want := map[string]int{"interface": 2, "func value": 2, "channel ops": 4, "channel pairs": 2}[name]
+		// The deferred calls of Deferred count at their defer statements;
+		// its receive on a timer's channel is the runtime's, not the build's.
+		want := map[string]int{"interface": 3, "func value": 3, "channel ops": 4, "channel pairs": 2}[name]
 		if got.Observed != want || got.InGraph != want {
 			t.Errorf("%s: %+v, want %d observed and in the graph", name, got, want)
 		}
+	}
+	if r.ChannelOpsRuntime != 1 {
+		t.Errorf("receives on a channel the runtime sends on: %d, want 1 (Deferred's timer)", r.ChannelOpsRuntime)
 	}
 	if r.InterfaceByTypeOnly != 0 {
 		t.Errorf("both implementations reach use by value flow; %d linked only by type", r.InterfaceByTypeOnly)

@@ -35,13 +35,33 @@ func callToolRaw(t *testing.T, store persist.StoreReader, name string, args map[
 	return raw
 }
 
+// callToolText returns the text of a tool's answer, errors included.
+func callToolText(t *testing.T, store persist.StoreReader, name string, args map[string]any) []byte {
+	t.Helper()
+	s := server.NewMCPServer("test", "0")
+	RegisterAll(s, store)
+	req := mcp.CallToolRequest{}
+	req.Params.Name = name
+	req.Params.Arguments = args
+	res, err := s.GetTool(name).Handler(context.Background(), req)
+	if err != nil {
+		t.Fatalf("%s: %v", name, err)
+	}
+	raw, _ := json.Marshal(res.Content)
+	return raw
+}
+
 // TestSearchCode_NoCut: search_code returns every matched declaration and
-// every matched line of each; the caller cannot cut the result with limit.
+// every matched line of each; the caller cannot cut the result with limit,
+// which is not an argument of the tool (a call with it is an error).
 func TestSearchCode_NoCut(t *testing.T) {
 	// The budgets below are sized for one copy of the answer.
 	withContentMode(t, ContentStructured)
 	store := newFixtureStore(t)
-	out := callTool(t, store, "search_code", map[string]any{"pattern": `.`, "limit": 2})
+	if raw := string(callToolText(t, store, "search_code", map[string]any{"pattern": `.`, "limit": 2})); !strings.Contains(raw, `unknown argument \"limit\"`) {
+		t.Errorf("limit is not an argument of search_code: %s", raw)
+	}
+	out := callTool(t, store, "search_code", map[string]any{"pattern": `.`})
 	if out["truncated"] != nil {
 		t.Errorf("result must not be cut: truncated=%v", out["truncated"])
 	}
@@ -168,13 +188,42 @@ func asSlice(v any) []any {
 	return s
 }
 
-// TestInstructionsExplainSearchCodeResult: the server guide, which the client
-// puts next to the system prompt, explains every key a search_code result can
-// carry and tells the model that a result with a page key is incomplete until
+// searchCodeTexts returns search_code's description and its parameters'
+// descriptions, as a server registered now declares them.
+func searchCodeTexts(t *testing.T, store persist.StoreReader) string {
+	t.Helper()
+	s := server.NewMCPServer("test", "0")
+	RegisterAll(s, store)
+	b, err := json.Marshal(s.GetTool("search_code").Tool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var tool struct {
+		Description string `json:"description"`
+		Schema      struct {
+			Properties map[string]struct {
+				Description string `json:"description"`
+			} `json:"properties"`
+		} `json:"inputSchema"`
+	}
+	if err := json.Unmarshal(b, &tool); err != nil {
+		t.Fatal(err)
+	}
+	text := tool.Description
+	for _, p := range tool.Schema.Properties {
+		text += "\n" + p.Description
+	}
+	return text
+}
+
+// TestInstructionsExplainSearchCodeResult: search_code's description and
+// parameter descriptions, which the client delivers whole (the server guide
+// is cut at maxGuideChars), explain every key a search_code result can carry
+// and tell the model that a result with a page key is incomplete until
 // every part is read. A sentence inside the result alone was not followed in
 // agent runs.
 func TestInstructionsExplainSearchCodeResult(t *testing.T) {
-	text := Instructions()
+	text := searchCodeTexts(t, newFixtureStore(t))
 	for _, key := range []string{"pattern", "total_declarations", "total_files", "total_matches", "note", "without_filters", "error",
 		"hits", "qname", "type", "file", "start_line", "end_line", "signature", "canonical_id", "test", "name_match",
 		"matched", "matches", "lines", "line", "text", "uses", "callers", "callees", "references",
@@ -443,8 +492,8 @@ func TestSearchCodeNameAsBoth(t *testing.T) {
 			t.Errorf("name match %v after a body match", h["qname"])
 		}
 	}
-	if !strings.Contains(Instructions(), "in=name also returns body matches") {
-		t.Error("guide does not say in=name returns body matches")
+	if !strings.Contains(searchCodeTexts(t, store), "in=name also returns body matches") {
+		t.Error("search_code does not say in=name returns body matches")
 	}
 }
 
@@ -457,10 +506,10 @@ func TestSearchCodeReasons(t *testing.T) {
 	store := newFixtureStore(t)
 	defer SetSearchCodeOptions(false, false)
 	SetSearchCodeOptions(false, false)
-	plain := callTool(t, store, "search_code", map[string]any{"pattern": `AfterFunc`, "reasons": []any{"fire"}})
-	if plain["related"] != nil {
-		t.Fatal("reasons used while the option is off")
+	if raw := string(callToolText(t, store, "search_code", map[string]any{"pattern": `AfterFunc`, "reasons": []any{"fire"}})); !strings.Contains(raw, `unknown argument \"reasons\"`) {
+		t.Fatalf("reasons accepted while the option is off: %s", raw)
 	}
+	plain := callTool(t, store, "search_code", map[string]any{"pattern": `AfterFunc`})
 	SetSearchCodeOptions(false, true)
 	out := callTool(t, store, "search_code", map[string]any{"pattern": `AfterFunc`, "reasons": []any{"fire", "x"}})
 	if strings.Join(hitNames(out), ",") != strings.Join(hitNames(plain), ",") {
@@ -492,9 +541,10 @@ func TestSearchCodeReasons(t *testing.T) {
 	if _, ok := s.GetTool("search_code").Tool.InputSchema.Properties["reasons"]; !ok {
 		t.Error("reasons argument missing with the option on")
 	}
+	texts := searchCodeTexts(t, store)
 	for _, key := range []string{"related", "reason_matched", "via"} {
-		if !strings.Contains(Instructions(), "`"+key+"`") {
-			t.Errorf("guide does not explain %q", key)
+		if !strings.Contains(texts, "`"+key+"`") {
+			t.Errorf("search_code does not explain %q", key)
 		}
 	}
 }

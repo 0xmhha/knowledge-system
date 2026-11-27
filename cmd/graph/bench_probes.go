@@ -73,6 +73,7 @@ var mcpProbeArgs = map[string]probeArgs{
 	}},
 	"investigate":        {functionKinds, false, anyAnswer, func(n types.Node) map[string]any { return map[string]any{"words": n.Name} }},
 	"investigate_open":   {functionKinds, false, anyAnswer, func(n types.Node) map[string]any { return map[string]any{"open": "card:" + n.QualifiedName} }},
+	"execution_flow":     {functionKinds, false, anyAnswer, qnameArgs("qname")},
 	"find_callers":       {functionKinds, false, "edges", qnameDepthArgs("qname", 1)},
 	"find_callees":       {functionKinds, false, "edges", qnameDepthArgs("qname", 1)},
 	"get_subgraph":       {functionKinds, false, "edges", qnameDepthArgs("seed_qname", 2)},

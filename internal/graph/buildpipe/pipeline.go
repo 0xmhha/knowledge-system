@@ -394,10 +394,25 @@ func runCold(opt Options, log *slog.Logger,
 	// see graph_digest.go).
 	var enrichNodes []types.Node
 	var enrichEdges []types.Edge
+	var inputs []persist.OptionalInput
+	rowPath := func(kind, given string) string {
+		if given == "" {
+			return ""
+		}
+		in, err := describeInput(kind, given, opt.SrcRoot)
+		if err != nil {
+			log.Warn("optional input not readable", "kind", kind, "err", err)
+		}
+		inputs = append(inputs, in)
+		return in.RowPath
+	}
+	policyRows := rowPath(inputPolicyFile, opt.PolicyFile)
+	securityRows := rowPath(inputSecurityPatternFile, opt.SecurityPatternFile)
 	if policyNodes, policyEdges, perr := loadPolicy(opt.PolicyFile, g.Nodes, log); perr != nil {
 		log.Warn("policy enrichment failed; policy nodes/edges left empty",
 			"file", opt.PolicyFile, "err", perr)
 	} else if len(policyNodes) > 0 {
+		relocateRows(policyNodes, policyEdges, policyRows)
 		if err := store.InsertNodes(policyNodes); err != nil {
 			return persist.Manifest{}, fmt.Errorf("persist policy nodes: %w", err)
 		}
@@ -422,6 +437,7 @@ func runCold(opt Options, log *slog.Logger,
 		log.Warn("security enrichment failed; security nodes/edges left empty",
 			"file", opt.SecurityPatternFile, "err", serr)
 	} else if len(secNodes) > 0 {
+		relocateRows(secNodes, secEdges, securityRows)
 		if err := store.InsertNodes(secNodes); err != nil {
 			return persist.Manifest{}, fmt.Errorf("persist security nodes: %w", err)
 		}
@@ -450,6 +466,7 @@ func runCold(opt Options, log *slog.Logger,
 	// the store so the manifest pins the enrichment (empty when none was applied).
 	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
 	countEnrichment(m.Stats, len(enrichNodes), len(enrichEdges))
+	m.OptionalInputs = inputs
 	// Files: every discovered file becomes an entry. This is the cache
 	// fingerprint that subsequent builds will diff against. We computed
 	// SHAs / cache_keys lazily here — once per cold build, so the cost

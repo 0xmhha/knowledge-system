@@ -1,6 +1,7 @@
 package golang_test
 
 import (
+	"fmt"
 	"testing"
 
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
@@ -115,5 +116,40 @@ func TestDispatchEdgesLocalAndAbstract(t *testing.T) {
 		if !got[w] {
 			t.Errorf("missing dispatches_to %s -> %s; have %v", w[0], w[1], got)
 		}
+	}
+}
+
+// TestValueCallsHaveTargets: every call through a function value has an
+// edge to what it runs: a calls edge when SSA knows the one callee (a local
+// set once, deferred or not; a method value), a dispatches_to otherwise (a
+// field, a parameter). A literal the caller calls is the caller's own code.
+func TestValueCallsHaveTargets(t *testing.T) {
+	g, err := gop.LoadAndResolve("testdata/valuecalls")
+	if err != nil {
+		t.Fatalf("LoadAndResolve: %v", err)
+	}
+	byID := map[string]types.Node{}
+	for _, n := range g.Nodes {
+		byID[n.ID] = n
+	}
+	got := map[string]bool{}
+	for _, e := range g.Edges {
+		if e.Type != types.EdgeCalls && e.Type != types.EdgeDispatchesTo || e.Src == e.Dst {
+			continue
+		}
+		got[fmt.Sprintf("%s %s %s:%d", byID[e.Src].QualifiedName, e.Type, byID[e.Dst].QualifiedName, e.Line)] = true
+	}
+	for _, w := range []string{
+		"values.Local calls values.inc:16", "values.Local calls values.inc:17",
+		"values.Method calls values.box.get:23",
+		"values.Field dispatches_to values.dec:31",
+		"values.apply dispatches_to values.inc:34",
+	} {
+		if !got[w] {
+			t.Errorf("missing %q", w)
+		}
+	}
+	if t.Failed() {
+		t.Log(got)
 	}
 }

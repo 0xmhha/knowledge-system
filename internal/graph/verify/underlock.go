@@ -30,10 +30,10 @@ import (
 // is a function of its own: it starts with nothing held, unless it is called
 // where it is written (`func() { ... }()`), and then it starts with what is
 // held at the call. A mutex is named by its declaration: the variable or the
-// field, also an embedded one (s.Lock() with struct{ sync.Mutex }); a mutex
-// reached through a call (s.guard().Lock()) names no declaration and is not
-// followed. The receiver of a Lock or Unlock call is a use of the mutex
-// field under the other mutexes held, not under the mutex itself.
+// field, also an embedded one (s.Lock() with struct{ sync.Mutex }), or the
+// one a getter returns (s.guard().Lock(), returnedMutex). The receiver of a
+// Lock or Unlock call is a use of the mutex field under the other mutexes
+// held, not under the mutex itself.
 
 // syncPackage is the import path of the package that declares the mutexes.
 const syncPackage = "sync"
@@ -99,6 +99,9 @@ type lockTruth struct {
 	root  string
 	scope map[string]bool
 	out   map[[2]string]bool
+	// sites, when set, collects the (site, mutex) pairs of the calls, sends
+	// and receives made while a mutex is held (runs_under_lock).
+	sites map[[2]string]bool
 	// only, when set, keeps only the pairs of these mutexes: a callee walked
 	// for propagation records the uses under its caller's mutexes alone.
 	only heldSet
@@ -224,6 +227,7 @@ func (lt *lockTruth) function(body *ast.BlockStmt, entry heldSet) {
 		}
 	}
 	// One recording pass with the final states.
+	var exit heldSet
 	for _, b := range g.Blocks {
 		h := start(b)
 		if !b.Live || h == nil {
@@ -233,7 +237,117 @@ func (lt *lockTruth) function(body *ast.BlockStmt, entry heldSet) {
 		for _, n := range b.Nodes {
 			h = lt.node(n, h, true)
 		}
+		if lt.returns(b) {
+			exit = meet(exit, h)
+		}
 	}
+	if exit != nil {
+		lt.deferred(body, exit)
+	}
+}
+
+// returns reports whether the function returns at the end of block b: b
+// has no successor and does not end in a panic.
+func (lt *lockTruth) returns(b *cfg.Block) bool {
+	if len(b.Succs) != 0 {
+		return false
+	}
+	if n := len(b.Nodes); n > 0 {
+		if es, ok := b.Nodes[n-1].(*ast.ExprStmt); ok {
+			if c, ok := ast.Unparen(es.X).(*ast.CallExpr); ok && !lt.mayReturn(c) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// deferred records the calls of the defer statements of body (not of the
+// literals in it) as run with what is held when it returns, exit, less what
+// a defer written after them releases: defers run last written first. A
+// deferred literal's call is a site like any call, and its body runs then,
+// starting with what is held at that moment; what it releases anywhere in
+// its body (an Unlock, a channel lock's token given back, a close of a
+// channel lock) is not held by the defers that run after it. The extractor
+// walks the literal's body for what it leaves held instead; the two agree
+// unless a literal releases and takes back a mutex it was entered with.
+func (lt *lockTruth) deferred(body *ast.BlockStmt, exit heldSet) {
+	var defers []*ast.CallExpr
+	ast.Inspect(body, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.DeferStmt:
+			defers = append(defers, x.Call)
+		}
+		return true
+	})
+	held := copyHeld(exit)
+	for i := len(defers) - 1; i >= 0; i-- {
+		c := defers[i]
+		lt.callSite(c, held)
+		if lit, ok := ast.Unparen(c.Fun).(*ast.FuncLit); ok {
+			lt.function(lit.Body, copyHeld(held))
+			for _, m := range lt.releasedIn(lit.Body) {
+				delete(held, m)
+			}
+			continue
+		}
+		if m, method, ok := lt.lockCall(c); ok && (method == truthUnlock || method == truthRUnlock) {
+			delete(held, m)
+		}
+		if ch, ok := closeArg(lt.info, c); ok {
+			if m := lt.chanLockOf(ch); m != "" {
+				delete(held, m)
+			}
+		}
+	}
+}
+
+// releasedIn returns the locks body releases anywhere outside the literals
+// inside it: the mutexes it unlocks, and the channel locks whose token it
+// gives back or that it closes.
+func (lt *lockTruth) releasedIn(body *ast.BlockStmt) []string {
+	out := lt.unlockedIn(body)
+	ast.Inspect(body, func(c ast.Node) bool {
+		switch x := c.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.SendStmt:
+			if m := lt.chanLockOf(x.Chan); m != "" && !lt.chanLocks.inverted[m] {
+				out = append(out, m)
+			}
+		case *ast.UnaryExpr:
+			if m := lt.chanLock(x); m != "" && lt.chanLocks.inverted[m] {
+				out = append(out, m)
+			}
+		case *ast.CallExpr:
+			if ch, ok := closeArg(lt.info, x); ok {
+				if m := lt.chanLockOf(ch); m != "" {
+					out = append(out, m)
+				}
+			}
+		}
+		return true
+	})
+	return out
+}
+
+// callSite records call as a site under held when it calls code: a
+// conversion or a builtin (but close, a channel operation) has no callee.
+// A close under a lock is a site under it, as any call. Sites are keyed by
+// the call's span, so new(T).M(), two calls from one byte, stay two: the
+// call of new is not a site, the call of M is.
+func (lt *lockTruth) callSite(call *ast.CallExpr, held heldSet) {
+	if tv, ok := lt.info.Types[call.Fun]; ok {
+		if tv.IsType() {
+			return
+		}
+		if id, isID := ast.Unparen(call.Fun).(*ast.Ident); tv.IsBuiltin() && (!isID || id.Name != "close") {
+			return
+		}
+	}
+	lt.site(call.Pos(), call.End(), held)
 }
 
 // mayReturn is false for a call of the builtin panic.
@@ -301,6 +415,7 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 					// is held here. Literals are analysed in the recording
 					// pass only, with the final state of their call.
 					if record {
+						lt.site(x.Pos(), x.End(), held)
 						lt.function(lit.Body, held)
 					}
 					// What the literal unlocks, here or deferred, is not
@@ -315,6 +430,7 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 				}
 				if record {
 					lt.callAt(x, held)
+					lt.callSite(x, held)
 				}
 				if id, ok := ast.Unparen(x.Fun).(*ast.Ident); ok && id.Name == "close" && len(x.Args) == 1 {
 					if _, builtin := lt.info.ObjectOf(id).(*gotypes.Builtin); builtin {
@@ -340,11 +456,17 @@ func (lt *lockTruth) node(n ast.Node, held heldSet, record bool) heldSet {
 					})
 				}
 			case *ast.UnaryExpr:
+				if x.Op == token.ARROW && record {
+					lt.site(x.Pos(), x.End(), held)
+				}
 				// <-lock takes a channel lock's token (returns it, inverted).
 				if m := lt.chanLock(x); m != "" && !inComm {
 					effects = append(effects, lt.chanEffect(m, true))
 				}
 			case *ast.SendStmt:
+				if record {
+					lt.site(x.Pos(), x.End(), held)
+				}
 				if m := lt.chanLockOf(x.Chan); m != "" && !inComm {
 					effects = append(effects, lt.chanEffect(m, false))
 				}
@@ -405,9 +527,12 @@ func (lt *lockTruth) exprs(es []ast.Expr, held heldSet, record, literalsApart bo
 				return false
 			case *ast.CallExpr:
 				if record {
-					if _, isLit := ast.Unparen(x.Fun).(*ast.FuncLit); !isLit {
-						lt.callAt(x, held)
-					}
+					lt.callAt(x, held)
+					lt.callSite(x, held)
+				}
+			case *ast.UnaryExpr:
+				if x.Op == token.ARROW && record {
+					lt.site(x.Pos(), x.End(), held)
 				}
 			case *ast.SelectorExpr:
 				if record {
@@ -420,6 +545,25 @@ func (lt *lockTruth) exprs(es []ast.Expr, held heldSet, record, literalsApart bo
 			}
 			return true
 		})
+	}
+}
+
+// site records the call, send or receive spanning [from, to) as made
+// while every mutex of held is held (of lt.only, when set).
+func (lt *lockTruth) site(from, to token.Pos, held heldSet) {
+	if lt.sites == nil || len(held) == 0 {
+		return
+	}
+	p := lt.fset.Position(from)
+	rel, ok := relPath(lt.root, p.Filename)
+	if !ok || !lt.scope[rel] {
+		return
+	}
+	k := fmt.Sprintf("%s@%d-%d", rel, p.Offset, lt.fset.Position(to).Offset)
+	for mu := range held {
+		if mu != "" && (lt.only == nil || lt.only[mu]) {
+			lt.sites[[2]string{k, mu}] = true
+		}
 	}
 }
 
@@ -573,8 +717,59 @@ func (lt *lockTruth) mutexOf(sel *ast.SelectorExpr) gotypes.Object {
 		return lt.info.ObjectOf(y)
 	case *ast.SelectorExpr:
 		return lt.info.ObjectOf(y.Sel)
+	case *ast.CallExpr:
+		return lt.returnedMutex(y)
 	}
 	return nil
+}
+
+// returnedMutex returns the mutex a getter returns (s.guard().Lock() with
+// func (s *S) guard() *sync.Mutex { return &s.mu }): the declared function
+// call runs, when each of its return statements returns the same variable
+// or field, or its address. Getters are followed one call deep.
+func (lt *lockTruth) returnedMutex(call *ast.CallExpr) gotypes.Object {
+	fn := typeutil.StaticCallee(lt.info, call)
+	if fn == nil || lt.funcs == nil {
+		return nil
+	}
+	p := lt.fset.Position(fn.Origin().Pos())
+	f, ok := lt.funcs[token.Position{Filename: p.Filename, Offset: p.Offset}]
+	if !ok {
+		return nil
+	}
+	var got gotypes.Object
+	same := true
+	ast.Inspect(f.decl.Body, func(n ast.Node) bool {
+		if _, lit := n.(*ast.FuncLit); lit {
+			return false
+		}
+		r, ok := n.(*ast.ReturnStmt)
+		if !ok {
+			return true
+		}
+		var obj gotypes.Object
+		if len(r.Results) == 1 {
+			e := ast.Unparen(r.Results[0])
+			if u, ok := e.(*ast.UnaryExpr); ok && u.Op == token.AND {
+				e = ast.Unparen(u.X)
+			}
+			switch y := e.(type) {
+			case *ast.Ident:
+				obj = f.info.ObjectOf(y)
+			case *ast.SelectorExpr:
+				obj = f.info.ObjectOf(y.Sel)
+			}
+		}
+		if obj == nil || got != nil && got != obj {
+			same = false
+		}
+		got = obj
+		return true
+	})
+	if !same {
+		return nil
+	}
+	return got
 }
 
 func derefStruct(t gotypes.Type) (*gotypes.Struct, bool) {
@@ -648,6 +843,7 @@ func propagateTruth(t *Truth, calls []truthCall, funcs map[token.Position]truthF
 		work = append(work, item{c, 1})
 	}
 	found := map[[2]string]bool{}
+	foundSites := map[[2]string]bool{}
 	done := map[string]bool{}
 	for len(work) > 0 {
 		it := work[0]
@@ -664,7 +860,7 @@ func propagateTruth(t *Truth, calls []truthCall, funcs map[token.Position]truthF
 		done[key] = true
 		var next []truthCall
 		lt := &lockTruth{info: it.call.callee.info, fset: it.call.callee.fset, root: root, scope: scope, chanLocks: chanLocks,
-			out: found, only: it.call.held, funcs: funcs, calls: &next}
+			out: found, sites: foundSites, only: it.call.held, funcs: funcs, calls: &next}
 		lt.function(it.call.callee.decl.Body, it.call.held)
 		if it.depth >= propagationDepth {
 			continue
@@ -684,6 +880,11 @@ func propagateTruth(t *Truth, calls []truthCall, funcs map[token.Position]truthF
 	for k := range found {
 		if !t.UnderLock[k] {
 			t.UnderLockPropagated[k] = true
+		}
+	}
+	for k := range foundSites {
+		if !t.SiteLocks[k] {
+			t.SiteLocksPropagated[k] = true
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package a
 
+import "time"
+
 // Tipper has two implementations whose values reach use.
 type Tipper interface{ Tip() int }
 
@@ -50,4 +52,21 @@ func Hub() int {
 	h, c := newHub()
 	c <- 5
 	return <-h.in
+}
+
+// Shutter is called only by a deferred call.
+type Shutter interface{ Shut() }
+
+func (g *gov) Shut() { g.v = 0 }
+
+// Deferred makes an interface call and a function-value call in defer
+// statements, which run at its end, and waits on a timer, whose channel
+// the runtime sends on.
+func Deferred(f func(int) int) int {
+	var s Shutter = &gov{v: 1}
+	defer s.Shut()
+	defer f(1)
+	t := time.NewTimer(time.Millisecond)
+	<-t.C
+	return 0
 }

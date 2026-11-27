@@ -94,6 +94,9 @@ const (
 
 // KindOf returns the common kind of a stored node type.
 func KindOf(t types.NodeType) Kind {
+	if t.IsStatement() {
+		return KindStatement
+	}
 	switch t {
 	case types.NodePackage:
 		return KindModule
@@ -115,8 +118,6 @@ func KindOf(t types.NodeType) Kind {
 		return KindMessage
 	case types.NodeEndpoint:
 		return KindService
-	case types.NodeIfStmt, types.NodeLoopStmt, types.NodeCallSite, types.NodeReturnStmt, types.NodeSwitchStmt:
-		return KindStatement
 	case types.NodeGoroutine, types.NodeChannel, types.NodeMutex:
 		return KindConcurrency
 	case types.NodeExternal:
@@ -157,6 +158,9 @@ type Decl struct {
 	Confidence    Confidence
 	// External names the package of an External declaration; nil otherwise.
 	External *types.ExternalPackage
+	// SyncUnknown are the operations on a sync primitive at a call site
+	// whose primitive is not named (types.Node.SyncUnknown); nil otherwise.
+	SyncUnknown []types.SyncUnknown
 }
 
 // Ref is one reference from a declaration to another.

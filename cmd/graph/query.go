@@ -141,7 +141,9 @@ func tokeniseQuestion(q string) []string {
 // seedNodeFilter is stricter than godNodeFilter — query seeds must be
 // real symbol-level nodes (Function/Method/Type/Struct/Interface/...),
 // not statement nodes that just happen to mention the keyword (CallSite
-// inside `NewBlockChain` body would otherwise dominate the seed list).
+// inside `NewBlockChain` body would otherwise dominate the seed list);
+// godNodeFilter leaves statement nodes out (types.NodeType.IsStatement),
+// and this leaves out the names local to a function as well.
 //
 // Returns true to EXCLUDE the node from seed selection.
 func seedNodeFilter(t types.NodeType, filePath string) bool {
@@ -149,9 +151,7 @@ func seedNodeFilter(t types.NodeType, filePath string) bool {
 		return true
 	}
 	switch t {
-	case types.NodeCallSite, types.NodeIfStmt, types.NodeLoopStmt,
-		types.NodeReturnStmt, types.NodeSwitchStmt,
-		types.NodeParameter, types.NodeLocalVariable:
+	case types.NodeParameter, types.NodeLocalVariable:
 		return true
 	}
 	return false

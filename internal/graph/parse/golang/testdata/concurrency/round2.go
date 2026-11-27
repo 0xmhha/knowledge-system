@@ -98,15 +98,18 @@ func multi() {}
 func Two(a, b chan int) {
 	<-a
 	<-b
-	multi(); multi()
+	multi()
+	multi()
 }
 
 // RunTwo sends to both from one goroutine and from itself, on one line.
 func RunTwo(r Reg) {
 	a, b := make(chan int, 2), make(chan int, 2)
 	go func() { a <- 1; b <- 1; multi(); multi() }()
-	a <- 2; b <- 2
+	a <- 2
+	b <- 2
 	Two(a, b)
 	r.Each(func(int) { multi(); multi() })
-	go func() { multi() }(); go func() { multi() }()
+	go func() { multi() }()
+	go func() { multi() }()
 }

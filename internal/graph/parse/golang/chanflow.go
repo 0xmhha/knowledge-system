@@ -15,7 +15,7 @@ import (
 //
 //	handles   receive CallSite -> the code in the receive's range
 //	flows_to  receive CallSite -> the uses its value reaches (kind received)
-//	triggers  sender -> each receive CallSite on the same channel
+//	triggers  sender (or closer) -> each receive CallSite on the same channel
 //
 // The facts come from SSA: the instructions of a function (calls, field
 // accesses, channel operations, go statements) and the channel origins of
@@ -47,6 +47,9 @@ type chanEvent struct {
 	typ     types.EdgeType
 	pos     token.Pos
 	origins []chanOrigin
+	// site is the CallSite of an operation done through reflection
+	// (reflect_chans.go), whose receive has no receive site of its own.
+	site *types.Node
 }
 
 // siteIndex finds the statement nodes of a position: CallSite nodes by
@@ -103,14 +106,19 @@ func (ix *siteIndex) file(p token.Position) string {
 }
 
 // site returns the smallest CallSite of sub kind subKind whose span holds
-// p (that starts at p when exact).
+// p (that starts at p when exact). The site of close(ch) is a call's: sub
+// kind "" finds it too.
 func (ix *siteIndex) site(p token.Position, subKind string, exact bool) *types.Node {
 	var best *types.Node
 	for _, n := range ix.sites[ix.file(p)] {
 		if n.StartByte > p.Offset {
 			break
 		}
-		if n.SubKind != subKind || p.Offset >= n.EndByte || exact && n.StartByte != p.Offset {
+		kind := n.SubKind
+		if kind == types.SubKindClose {
+			kind = ""
+		}
+		if kind != subKind || p.Offset >= n.EndByte || exact && n.StartByte != p.Offset {
 			continue
 		}
 		if best == nil || n.EndByte-n.StartByte < best.EndByte-best.StartByte {
@@ -118,6 +126,18 @@ func (ix *siteIndex) site(p token.Position, subKind string, exact bool) *types.N
 		}
 	}
 	return best
+}
+
+// span returns the CallSite that spans exactly [from, to), or nil.
+func (ix *siteIndex) span(from, to token.Position) *types.Node {
+	sites := ix.sites[ix.file(from)]
+	i := sort.Search(len(sites), func(i int) bool { return sites[i].StartByte >= from.Offset })
+	for ; i < len(sites) && sites[i].StartByte == from.Offset; i++ {
+		if sites[i].EndByte == to.Offset {
+			return sites[i]
+		}
+	}
+	return nil
 }
 
 // rangeSite returns the receive site of the range over a channel whose
@@ -594,75 +614,265 @@ func embeddedField(t gotypes.Type, i int) bool {
 	return st != nil && i < st.NumFields() && st.Field(i).Embedded()
 }
 
-// triggers returns, for each channel origin, an edge from every sender on
-// it (senders)
-// to every receive site on it, and the number of sender x handled-code
-// pairs these edges and the receives' handles edges stand for.
+// triggers returns an edge from every sender to every receive site it can
+// wake, and the number of sender x handled-code pairs these edges and the
+// receives' handles edges stand for.
+//
+// A send and a receive pair when their operands can be one channel. What
+// an operand can be is its own possible make sites (makeSitesOf): a make
+// site is that channel; a field, variable or parameter is every make site
+// whose value is stored into it, directly or through other holders, not
+// every member of an alias class two unrelated values were merged into; a
+// channel received from a channel of channels is every one sent on it. The
+// edge names each make site both operands can be, one edge each; when that
+// is more than one, or the channel was carried by another channel, the kind
+// carries triggersAliasMark. An operand no make site in the build reaches
+// (a channel made outside it) is named by its alias class's representative
+// holder, and can be any make site of that class.
 func (c *chanLinker) triggers(ix *siteIndex, handled map[*types.Node]int) ([]chanOp, int) {
 	type send struct {
 		sender *types.Node
 		line   int
 		file   string
 	}
-	channel := c.channelIdentity()
-	senders := map[*types.Node][]send{}
-	receivers := map[*types.Node][]*types.Node{}
-	sendSeen := map[*types.Node]map[send]bool{}
-	recvSeen := map[*types.Node]map[*types.Node]bool{}
-	var channels []*types.Node
-	known := map[*types.Node]bool{}
+	tokensOf := c.channelTokens()
+	type tokens map[string]bool
+	sendTok := map[send]tokens{}
+	var sends []send
+	recvTok := map[*types.Node]tokens{}
+	var recvs []*types.Node
+	sendCarried := map[send]map[string]bool{}
+	recvCarried := map[*types.Node]map[string]bool{}
 	for _, ev := range c.events {
 		if _, isLock := c.locks[ev.pos]; isLock {
 			continue // a lock's token wakes no handled code (chanlock.go)
 		}
 		p := c.prog.Fset.Position(ev.pos)
-		for _, o := range ev.origins {
-			ch := channel(o.node)
-			if !known[ch] {
-				known[ch] = true
-				channels = append(channels, ch)
-				sendSeen[ch], recvSeen[ch] = map[send]bool{}, map[*types.Node]bool{}
-			}
-			switch ev.typ {
-			case types.EdgeSendsTo:
-				for _, s := range c.senders(ev.fn) {
-					// One send names one channel once, whichever of its
-					// names (origins) it reaches.
-					if snd := (send{sender: s, line: p.Line, file: ix.file(p)}); s != nil && !sendSeen[ch][snd] {
-						sendSeen[ch][snd] = true
-						senders[ch] = append(senders[ch], snd)
+		switch ev.typ {
+		case types.EdgeSendsTo, types.EdgeCloses:
+			// A close wakes every receive on the channel, as a send can.
+			for _, s := range c.senders(ev.fn) {
+				if s == nil {
+					continue
+				}
+				snd := send{sender: s, line: p.Line, file: ix.file(p)}
+				if sendTok[snd] == nil {
+					sendTok[snd], sendCarried[snd] = tokens{}, map[string]bool{}
+					sends = append(sends, snd)
+				}
+				for _, o := range ev.origins {
+					for _, t := range tokensOf(o.node) {
+						sendTok[snd][t] = true
+						if o.carried {
+							sendCarried[snd][t] = true
+						}
 					}
 				}
-			case types.EdgeRecvsFrom:
-				if site := ix.recvSite(p); site != nil && !recvSeen[ch][site] {
-					recvSeen[ch][site] = true
-					receivers[ch] = append(receivers[ch], site)
+			}
+		case types.EdgeRecvsFrom:
+			site := ix.recvSite(p)
+			if ev.site != nil {
+				site = ev.site
+			}
+			if site == nil {
+				continue
+			}
+			if recvTok[site] == nil {
+				recvTok[site], recvCarried[site] = tokens{}, map[string]bool{}
+				recvs = append(recvs, site)
+			}
+			for _, o := range ev.origins {
+				for _, t := range tokensOf(o.node) {
+					recvTok[site][t] = true
+					if o.carried {
+						recvCarried[site][t] = true
+					}
 				}
 			}
 		}
 	}
+	byToken := map[string][]*types.Node{}
+	for _, r := range recvs {
+		for t := range recvTok[r] {
+			byToken[t] = append(byToken[t], r)
+		}
+	}
 	var out []chanOp
-	pairs := 0
-	for _, ch := range channels {
-		distinct := map[*types.Node]bool{}
-		for _, s := range senders[ch] {
-			distinct[s.sender] = true
-			for _, r := range receivers[ch] {
-				out = append(out, chanOp{src: s.sender, dst: r, typ: types.EdgeTriggers, kind: ch.QualifiedName, line: s.line, file: s.file})
+	senders := map[*types.Node]map[*types.Node]bool{}
+	for _, s := range sends {
+		paired := map[*types.Node]bool{}
+		var pairRecvs []*types.Node
+		for _, t := range sortedKeys(sendTok[s]) {
+			for _, r := range byToken[t] {
+				if !paired[r] {
+					paired[r] = true
+					pairRecvs = append(pairRecvs, r)
+				}
 			}
 		}
-		for _, r := range receivers[ch] {
-			pairs += len(distinct) * handled[r]
+		for _, r := range pairRecvs {
+			var common []string
+			mark := false
+			for _, t := range sortedKeys(sendTok[s]) {
+				if recvTok[r][t] {
+					common = append(common, t)
+					mark = mark || sendCarried[s][t] || recvCarried[r][t]
+				}
+			}
+			if len(common) > 1 {
+				mark = true
+			}
+			for _, t := range common {
+				kind := c.aliasNodes[t].QualifiedName
+				if mark {
+					kind += triggersAliasMark
+				}
+				out = append(out, chanOp{src: s.sender, dst: r, typ: types.EdgeTriggers, kind: kind, line: s.line, file: s.file})
+			}
+			if senders[r] == nil {
+				senders[r] = map[*types.Node]bool{}
+			}
+			senders[r][s.sender] = true
 		}
+	}
+	pairs := 0
+	for _, r := range recvs {
+		pairs += len(senders[r]) * handled[r]
 	}
 	return out, pairs
 }
 
+// sortedKeys returns the keys of m in order.
+func sortedKeys(m map[string]bool) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// channelTokens returns, for a channel origin, the channels it can be, by
+// node id: a make site is itself; a holder is every make site stored into
+// it through the channel aliases (origin -> holder, followed from holder to
+// holder); a holder no make site reaches is its class's representative
+// (channelIdentity) and every make site of that class. Every node a token
+// names is in c.aliasNodes.
+func (c *chanLinker) channelTokens() func(*types.Node) []string {
+	into := map[string][]string{} // holder -> origins stored into it
+	pairs := make([][2]string, 0, len(c.aliases))
+	for k := range c.aliases {
+		pairs = append(pairs, k)
+	}
+	sort.Slice(pairs, func(i, j int) bool {
+		return pairs[i][0] < pairs[j][0] || pairs[i][0] == pairs[j][0] && pairs[i][1] < pairs[j][1]
+	})
+	for _, k := range pairs {
+		into[k[1]] = append(into[k[1]], k[0])
+	}
+	class, makes := c.channelClasses()
+	memo := map[string][]string{}
+	return func(n *types.Node) []string {
+		if c.aliasNodes[n.ID] == nil {
+			c.aliasNodes[n.ID] = n
+		}
+		if n.Type == types.NodeChannel {
+			return []string{n.ID}
+		}
+		if out, ok := memo[n.ID]; ok {
+			return out
+		}
+		seen := map[string]bool{n.ID: true}
+		work := []string{n.ID}
+		found := map[string]bool{}
+		for len(work) > 0 {
+			id := work[0]
+			work = work[1:]
+			for _, o := range into[id] {
+				if seen[o] {
+					continue
+				}
+				seen[o] = true
+				if on := c.aliasNodes[o]; on != nil && on.Type == types.NodeChannel {
+					found[o] = true
+					continue
+				}
+				work = append(work, o)
+			}
+		}
+		if len(found) == 0 {
+			rep := class(n)
+			found[rep] = true
+			for _, m := range makes[rep] {
+				found[m.ID] = true
+			}
+		}
+		out := sortedKeys(found)
+		memo[n.ID] = out
+		return out
+	}
+}
+
+// triggersAliasMark ends the kind of a triggers edge whose channel is one
+// of several the analysis leaves (the send's and the receive's operands
+// can each be several make sites).
+const triggersAliasMark = "~aliasing"
+
+// sortByPlace orders nodes by file and byte offset, which a renaming
+// cannot change.
+func sortByPlace(ns []*types.Node) {
+	sort.Slice(ns, func(i, j int) bool {
+		if ns[i].FilePath != ns[j].FilePath {
+			return ns[i].FilePath < ns[j].FilePath
+		}
+		if ns[i].StartByte != ns[j].StartByte {
+			return ns[i].StartByte < ns[j].StartByte
+		}
+		return ns[i].ID < ns[j].ID
+	})
+}
+
+// channelClasses returns the alias class of a channel origin (by its
+// representative's id, see channelIdentity) and the make sites (Channel
+// nodes) of each class, in position order.
+func (c *chanLinker) channelClasses() (func(*types.Node) string, map[string][]*types.Node) {
+	channel := c.channelIdentity()
+	makes := map[string][]*types.Node{}
+	seen := map[string]bool{}
+	add := func(n *types.Node) {
+		if n == nil || n.Type != types.NodeChannel || seen[n.ID] {
+			return
+		}
+		seen[n.ID] = true
+		k := channel(n).ID
+		makes[k] = append(makes[k], n)
+	}
+	ids := make([]string, 0, len(c.aliasNodes))
+	for id := range c.aliasNodes {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		add(c.aliasNodes[id])
+	}
+	for _, ev := range c.events {
+		for _, o := range ev.origins {
+			add(o.node)
+		}
+	}
+	for _, ms := range makes {
+		sortByPlace(ms)
+	}
+	return func(n *types.Node) string { return channel(n).ID }, makes
+}
+
 // channelIdentity returns the identity of the channel an origin names: the
 // origins the channel aliases join (a make site stored in a field, the field
-// copied to a package-level variable) are one channel. Its node is the make
-// site when the group has one, else the name that sorts first, so senders
-// and receivers that name one channel differently are joined.
+// copied to a package-level variable) are one channel. Its node is a make
+// site when the group has one, the first by place (file, byte offset), else
+// the first holder by place: a renaming of nodes cannot change it. It joins
+// senders and receivers that name one channel differently; which channel a
+// triggers edge names is decided by channelNames, not by this choice.
 func (c *chanLinker) channelIdentity() func(*types.Node) *types.Node {
 	parent := map[string]string{}
 	var find func(string) string
@@ -679,8 +889,11 @@ func (c *chanLinker) channelIdentity() func(*types.Node) *types.Node {
 		if (a.Type == types.NodeChannel) != (b.Type == types.NodeChannel) {
 			return a.Type == types.NodeChannel
 		}
-		if a.QualifiedName != b.QualifiedName {
-			return a.QualifiedName < b.QualifiedName
+		if a.FilePath != b.FilePath {
+			return a.FilePath < b.FilePath
+		}
+		if a.StartByte != b.StartByte {
+			return a.StartByte < b.StartByte
 		}
 		return a.ID < b.ID
 	}

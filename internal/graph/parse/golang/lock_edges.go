@@ -259,7 +259,8 @@ func LockFacts(pkgs []*packages.Package, nodes []types.Node, opt LockOptions) (c
 	fields := newFieldIndex(fsetOf(pkgs), nodes)
 	var edges concfacts.Facts
 	under := map[edgeDedupKey]bool{} // (field, mutex) pairs already recorded
-	var pending []heldCall           // calls made under a lock, for propagation
+	held := siteLocks{fset: fsetOf(pkgs), sites: newSiteIndex(nodes), seen: map[edgeDedupKey]bool{}}
+	var pending []heldCall // calls made under a lock, for propagation
 	calleeOf := func(info *gotypes.Info) func(*ast.CallExpr) (funcSource, bool) {
 		if !opt.Propagate {
 			return nil
@@ -277,14 +278,14 @@ func LockFacts(pkgs []*packages.Package, nodes []types.Node, opt LockOptions) (c
 		if !c.part.runs() {
 			return
 		}
-		var held []*types.Node // mutexes the code locks, in source order
+		var locked []*types.Node // mutexes the code locks, in source order
 		seen := map[string]bool{}
 		ast.Inspect(c.root, func(n ast.Node) bool {
 			if pos, ok := chanOpPos(n); ok {
 				if op, isLock := opt.ChanLocks[pos]; isLock {
 					if op.Kind == ChanLockAcquire && !seen[op.Lock.ID] {
 						seen[op.Lock.ID] = true
-						held = append(held, op.Lock)
+						locked = append(locked, op.Lock)
 					}
 					edges = append(edges, concfacts.LockOp{Function: c.owner.ID, Mutex: op.Lock.ID, Acquire: op.Kind == ChanLockAcquire,
 						Close: op.Kind == ChanLockClose, Line: c.line(pos), File: c.owner.FilePath,
@@ -309,13 +310,13 @@ func LockFacts(pkgs []*packages.Package, nodes []types.Node, opt LockOptions) (c
 				et = types.EdgeReleasesLock
 			} else if !seen[mu.ID] {
 				seen[mu.ID] = true
-				held = append(held, mu)
+				locked = append(locked, mu)
 			}
 			edges = append(edges, concfacts.LockOp{Function: c.owner.ID, Mutex: mu.ID, Acquire: et == types.EdgeAcquiresLock,
 				Line: c.line(call.Pos()), File: c.owner.FilePath, Certainty: concfacts.Proof})
 			return true
 		})
-		if len(held) == 0 || c.part != partBody {
+		if len(locked) == 0 || c.part != partBody {
 			return
 		}
 		body, ok := c.root.(*ast.BlockStmt)
@@ -335,6 +336,7 @@ func LockFacts(pkgs []*packages.Package, nodes []types.Node, opt LockOptions) (c
 			return
 		}
 		pending = append(pending, flow.calls...)
+		edges = append(edges, held.facts(flow.sites, nil)...)
 		for _, use := range flow.uses {
 			field, mu := use[0], use[1]
 			k := edgeDedupKey{src: field.ID, dst: mu.ID}
@@ -347,9 +349,46 @@ func LockFacts(pkgs []*packages.Package, nodes []types.Node, opt LockOptions) (c
 		}
 	})
 	if opt.Propagate {
-		edges = append(edges, propagateLocks(pending, mutexes, fields, under, calleeOf, opt.ChanLocks, &st)...)
+		edges = append(edges, propagateLocks(pending, mutexes, fields, under, &held, calleeOf, opt.ChanLocks, &st)...)
 	}
 	return edges, st
+}
+
+// siteLocks turns the sites a lock flow records into SiteLock facts, once
+// per (site, mutex): a site whose own function holds the mutex is not also
+// recorded as held there by a caller.
+type siteLocks struct {
+	fset  *token.FileSet
+	sites *siteIndex
+	seen  map[edgeDedupKey]bool
+}
+
+// facts returns the SiteLock facts of sites; with from set, only of the
+// mutexes in from (a callee walked with its callers' mutexes), marked
+// propagated. Every one is approximated: mutexes are told apart by
+// declaration, and the must-hold rule reads the paths of a branch together.
+func (sl *siteLocks) facts(sites []heldSite, from heldMutexes) concfacts.Facts {
+	var out concfacts.Facts
+	for _, s := range sites {
+		p := sl.fset.Position(s.from)
+		site := sl.sites.span(p, sl.fset.Position(s.to))
+		if site == nil {
+			continue
+		}
+		for _, id := range slices.Sorted(maps.Keys(s.held)) {
+			if _, fromCaller := from[id]; from != nil && !fromCaller {
+				continue
+			}
+			k := edgeDedupKey{src: site.ID, dst: id}
+			if sl.seen[k] {
+				continue
+			}
+			sl.seen[k] = true
+			out = append(out, concfacts.SiteLock{Site: site.ID, Mutex: id, Propagated: from != nil, Line: p.Line,
+				File: site.FilePath, Certainty: concfacts.Approx(concfacts.ReasonBranches)})
+		}
+	}
+	return out
 }
 
 // chanOpPos returns the position a channel lock operation is keyed by when
@@ -373,7 +412,7 @@ func chanOpPos(n ast.Node) (token.Pos, bool) {
 // LockFacts) and returns the UnderLock facts of the pairs that
 // under does not hold yet, marking them PropagatedLockKind. A callee is
 // walked once per set of mutexes held at its calls.
-func propagateLocks(calls []heldCall, mutexes mutexIndex, fields fieldIndex, under map[edgeDedupKey]bool,
+func propagateLocks(calls []heldCall, mutexes mutexIndex, fields fieldIndex, under map[edgeDedupKey]bool, sites *siteLocks,
 	calleeOf func(*gotypes.Info) func(*ast.CallExpr) (funcSource, bool), chanLocks ChanLocks, st *LockStats) concfacts.Facts {
 	type item struct {
 		call  heldCall
@@ -407,6 +446,7 @@ func propagateLocks(calls []heldCall, mutexes mutexIndex, fields fieldIndex, und
 			st.UndecidedCallees++
 			continue
 		}
+		edges = append(edges, sites.facts(flow.sites, held)...)
 		for _, use := range flow.uses {
 			field, mu := use[0], use[1]
 			k := edgeDedupKey{src: field.ID, dst: mu.ID}

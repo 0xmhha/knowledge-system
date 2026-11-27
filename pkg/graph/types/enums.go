@@ -130,6 +130,32 @@ const (
 	// like an event and holds no value like a constant. reverts_with edges
 	// end at it. Signature is the declaration header.
 	NodeError NodeType = "Error"
+
+	// Schema 1.45 (control transfer and code extents), statement nodes of
+	// the Go frontend, each with a contains edge from its function and an
+	// encloses edge from the statement around it:
+	//   BranchStmt  a break, continue, goto or fallthrough (sub kind the
+	//               keyword); jumps_to names where it goes.
+	//   CaseClause  one clause of a switch, type switch or select, spanning
+	//               from its case (or default) keyword to the end of its
+	//               last statement (sub kind case or default); its switch
+	//               encloses it with kind clause.
+	//   DeferStmt   a defer statement, spanning the whole statement.
+	//   FuncLit     a function literal, spanning func to its closing brace.
+	NodeBranchStmt NodeType = "BranchStmt"
+	NodeCaseClause NodeType = "CaseClause"
+	NodeDeferStmt  NodeType = "DeferStmt"
+	NodeFuncLit    NodeType = "FuncLit"
+)
+
+// Sub kinds of the schema 1.45 statement nodes.
+const (
+	SubKindBreak       = "break"
+	SubKindContinue    = "continue"
+	SubKindGoto        = "goto"
+	SubKindFallthrough = "fallthrough"
+	SubKindCase        = "case"
+	SubKindDefault     = "default"
 )
 
 // Sub kinds of a Go TypeAlias node. The node type covers every named type
@@ -188,6 +214,7 @@ func AllNodeTypes() []NodeType {
 		NodeSecurityPattern,
 		NodeExternal,
 		NodeError,
+		NodeBranchStmt, NodeCaseClause, NodeDeferStmt, NodeFuncLit,
 	}
 }
 
@@ -196,8 +223,7 @@ func AllNodeTypes() []NodeType {
 // agent's keyword search would normally want to surface. Returns
 // false for:
 //
-//   - Statement nodes (IfStmt, LoopStmt, CallSite, ReturnStmt,
-//     SwitchStmt, AwaitPoint) — control-flow markers whose qname
+//   - Statement nodes (IsStatement) — control-flow markers whose qname
 //     carries the enclosing function's prefix, which makes them
 //     false-positive FTS hits on a keyword that names the enclosing
 //     symbol.
@@ -220,10 +246,11 @@ func AllNodeTypes() []NodeType {
 // included) pass an explicit NodeKinds slice — typically
 // types.AllNodeTypes().
 func (t NodeType) IsSymbol() bool {
+	if t.IsStatement() {
+		return false
+	}
 	switch t {
-	case NodeIfStmt, NodeLoopStmt, NodeCallSite, NodeReturnStmt, NodeSwitchStmt,
-		NodeAwaitPoint,
-		NodeCommit, NodeHunk,
+	case NodeCommit, NodeHunk,
 		NodeImport, NodeExport,
 		NodeExternal,
 		NodeLocalVariable:
@@ -231,6 +258,22 @@ func (t NodeType) IsSymbol() bool {
 	default:
 		return true
 	}
+}
+
+// IsStatement reports whether t is a statement-level node: a piece of a
+// function body (IfStmt, LoopStmt, CallSite, ReturnStmt, SwitchStmt,
+// BranchStmt, CaseClause, DeferStmt, FuncLit, AwaitPoint) whose qname
+// carries the enclosing function's prefix. It is the one rule the tools
+// and the graph passes use to tell such a node from a declaration an agent
+// asks about (IsSymbol); a new statement kind is added here only.
+func (t NodeType) IsStatement() bool {
+	switch t {
+	case NodeIfStmt, NodeLoopStmt, NodeCallSite, NodeReturnStmt, NodeSwitchStmt,
+		NodeBranchStmt, NodeCaseClause, NodeDeferStmt, NodeFuncLit,
+		NodeAwaitPoint:
+		return true
+	}
+	return false
 }
 
 // SymbolNodeTypes returns the symbol-level subset of AllNodeTypes —
@@ -524,21 +567,102 @@ const (
 	//             dispatch_kind is the channel's origin (the qualified
 	//             name of its make site, field or variable); line and file
 	//             are the send's, the receive's line is its CallSite's.
+	//             The send and the receive pair when their operands can be
+	//             one channel by their own possible make sites; one edge per
+	//             such make site, and the kind ends in "~aliasing" when
+	//             there are several or the channel was received from a
+	//             channel of channels (schema 1.45).
+	//             A channel is identified by where it is made or held, not
+	//             by object: two values of a struct type whose field holds
+	//             a channel are one channel to the graph, so an edge through
+	//             a field joins every instance's sends and receives on it.
 	// Sender to handled code is two hops: triggers, then handles.
 	EdgeHandles  EdgeType = "handles"
 	EdgeTriggers EdgeType = "triggers"
 	// Schema 1.42 (literals passed to calls), a statement link of the Go
 	// frontend: literal_passed_to from the CallSite of a call written in a
-	// function literal (not in a literal nested in it) to the function or
-	// method the literal is passed to as an argument, with the line of that
-	// call; dispatch_kind arg; confidence EXTRACTED. The literal's code runs
-	// when that function calls it. A literal assigned, returned, called in
+	// function literal (not in a literal nested in it), or the Goroutine of
+	// a go statement written there (schema 1.44), to the function or method
+	// the literal is passed to as an argument, with the line of that call;
+	// dispatch_kind arg; confidence EXTRACTED. The literal's code runs when
+	// that function calls it. A literal assigned, returned, called in
 	// place, started with go or deferred gives no edge, nor does one passed
 	// to a function value.
 	EdgeLiteralPassedTo EdgeType = "literal_passed_to"
+	// Schema 1.44 (execution order), from the Go frontend:
+	//   closes           a closer (a Function, Method or Goroutine) -> the
+	//                    origin of the channel it closes (a make site, a
+	//                    field, a package-level variable), as sends_to;
+	//                    dispatch_kind make, field or global; confidence
+	//                    INFERRED. A close wakes every receive on the
+	//                    channel: the closer has a triggers edge to each,
+	//                    on the line of the close.
+	//   runs_under_lock  a CallSite (a call, a send, a receive) -> each
+	//                    Mutex held there by the must-hold rule; dispatch
+	//                    kind propagated when the mutex is held by a caller
+	//                    (ckg build --lock-propagation), none when the
+	//                    site's own function holds it; confidence INFERRED.
+	//   operates_on      a CallSite -> the declaration of the sync primitive
+	//                    it operates on (a Field, a Variable, a
+	//                    LocalVariable; for a timer channel no declaration
+	//                    holds, <-time.After(d), the CallSite of the call
+	//                    that makes the timer); dispatch_kind the operation
+	//                    (SyncOp); confidence EXTRACTED, INFERRED when the
+	//                    primitive is a parameter followed to its origins.
+	//   runs_func        a CallSite of sync.Once.Do, time.AfterFunc or
+	//                    sync.WaitGroup.Go -> the declared function or
+	//                    method passed to it, which runs later (once_do,
+	//                    after_func, wg_go); confidence EXTRACTED. A literal
+	//                    passed there is told by literal_passed_to.
+	EdgeCloses        EdgeType = "closes"
+	EdgeRunsUnderLock EdgeType = "runs_under_lock"
+	EdgeOperatesOn    EdgeType = "operates_on"
+	EdgeRunsFunc      EdgeType = "runs_func"
+	// Schema 1.45 (control transfer), a statement link of the Go frontend:
+	// jumps_to from a statement that leaves the normal order to where it
+	// goes, dispatch_kind the kind of jump; confidence EXTRACTED:
+	//   break        BranchStmt -> the LoopStmt or SwitchStmt it leaves
+	//   continue     BranchStmt -> the LoopStmt it goes on with
+	//   goto         BranchStmt -> the statement node its label stands on
+	//   fallthrough  BranchStmt -> the CaseClause it goes on into
+	//   return       ReturnStmt -> the Function, Method or FuncLit it
+	//                returns from
+	EdgeJumpsTo EdgeType = "jumps_to"
 )
 
-// AllEdgeTypes returns all 54 edge types in stable order.
+// What a callee does with a function literal it is passed: the dispatch
+// kind of a literal_passed_to edge from a FuncLit node (schema 1.45), the
+// kinds of its uses joined by LiteralUseSep in this order (call+go). A use
+// inside a function literal of the callee's own takes the kind of how that
+// literal runs: started by go, go; deferred, defer; called, call; stored or
+// returned, store; sent, send; passed on, pass. The edge is EXTRACTED when
+// one use of the kind list runs on every path through the callee, INFERRED
+// when each depends on a branch (a select case is a branch).
+const (
+	LiteralUseCall  = "call"  // the callee calls it before it returns
+	LiteralUseGo    = "go"    // the callee starts it in a goroutine
+	LiteralUseDefer = "defer" // the callee defers it: it runs as the callee returns
+	LiteralUseStore = "store" // the callee stores it (a field, a variable, a map) or returns it
+	LiteralUseSend  = "send"  // the callee sends it on a channel: another goroutine may run it
+	LiteralUsePass  = "pass"  // the callee passes it on as an argument
+	LiteralUseSep   = "+"
+)
+
+// LiteralUses returns the literal use kinds in the order they are joined.
+func LiteralUses() []string {
+	return []string{LiteralUseCall, LiteralUseGo, LiteralUseDefer, LiteralUseStore, LiteralUseSend, LiteralUsePass}
+}
+
+// Dispatch kinds of a jumps_to edge.
+const (
+	JumpBreak       = "break"
+	JumpContinue    = "continue"
+	JumpGoto        = "goto"
+	JumpFallthrough = "fallthrough"
+	JumpReturn      = "return"
+)
+
+// AllEdgeTypes returns all 59 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -553,7 +677,9 @@ const (
 // EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
 // EdgeRevertsWith is appended at index 50 (schema 1.38 — Solidity errors).
 // EdgeHandles and EdgeTriggers are appended at 51-52 (schema 1.42 —
-// message-driven code), EdgeLiteralPassedTo at 53 (schema 1.42).
+// message-driven code), EdgeLiteralPassedTo at 53 (schema 1.42), and
+// EdgeCloses, EdgeRunsUnderLock, EdgeOperatesOn and EdgeRunsFunc at 54-57
+// (schema 1.44 — execution order), EdgeJumpsTo at 58 (schema 1.45).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -578,6 +704,8 @@ func AllEdgeTypes() []EdgeType {
 		EdgeRevertsWith,
 		EdgeHandles, EdgeTriggers,
 		EdgeLiteralPassedTo,
+		EdgeCloses, EdgeRunsUnderLock, EdgeOperatesOn, EdgeRunsFunc,
+		EdgeJumpsTo,
 	}
 }
 

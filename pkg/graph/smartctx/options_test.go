@@ -3,6 +3,8 @@ package smartctx
 import (
 	"testing"
 	"time"
+
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // TestOptionsDefaults locks the published default values so a casual
@@ -114,5 +116,16 @@ func TestOptionsOverrides(t *testing.T) {
 	}
 	if got.PRCutoff.IsZero() {
 		t.Errorf("PRCutoff override lost: %v", got.PRCutoff)
+	}
+}
+
+// TestContextEdgesLeaveSiteFacts: the expand stage does not walk the
+// execution-order facts that start at a statement site.
+func TestContextEdgesLeaveSiteFacts(t *testing.T) {
+	in := []types.Edge{{Type: types.EdgeCalls}, {Type: types.EdgeRunsUnderLock}, {Type: types.EdgeOperatesOn},
+		{Type: types.EdgeRunsFunc}, {Type: types.EdgeJumpsTo}, {Type: types.EdgeCloses}}
+	got := contextEdges(in)
+	if len(got) != 2 || got[0].Type != types.EdgeCalls || got[1].Type != types.EdgeCloses {
+		t.Errorf("contextEdges = %v, want calls and closes", got)
 	}
 }

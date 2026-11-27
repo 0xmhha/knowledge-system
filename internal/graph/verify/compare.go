@@ -81,6 +81,9 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	r.OutsideCalls = compareOutside(truth.OutsideCalls, calls, declNode, external, opts.Samples)
 	r.OutsideTypeRefs = compareOutside(truth.OutsideTypeRefs, typeEdges, declNode, external, opts.Samples)
 	r.DynamicCallSites = truth.DynamicCallSites
+	if r.DynamicTargets, err = compareDynamicSites(truth, declNode, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
 	r.CallsOutsideFuncs = truth.CallsOutsideFuncs
 	r.Unexpected = unexpected(truth, calls, typeEdges, declNode, opts.Samples)
 	r.LocalDeclNodes = localDeclNodes(nodes, declNode, opts.Samples)
@@ -99,6 +102,22 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	if r.Handles, r.Triggers, err = compareMessages(truth.Messages, idx, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
+	if r.Closes, r.SyncOps, r.RunsFunc, err = compareExecOrder(truth.Exec, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	r.SyncUnknown = compareSyncUnknown(truth.Exec, idx, opts.Samples)
+	r.Extents = compareExtents(truth.Extents, idx, opts.Samples)
+	flows, err := g.QueryEdgesByType(string(types.EdgeFlowsTo))
+	if err != nil {
+		return Report{}, fmt.Errorf("verify: read flows_to: %w", err)
+	}
+	r.SyncAliases = compareSyncAliases(truth.Exec, idx, flows, opts.Samples)
+	if r.SiteLocks, err = compareSiteLocks(truth.SiteLocks, idx, g, false, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.SiteLocksPropagated, err = compareSiteLocks(truth.SiteLocksPropagated, idx, g, true, opts.Samples); err != nil {
+		return Report{}, err
+	}
 	if r.GoroutineChans, err = compareGoroutineChans(truth.GoroutineChans, truth.GoroutineChansUndecided, truth.GoroutineLocalChans, idx, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
@@ -113,14 +132,29 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 // propagated selects the edges a build made with lock propagation marks
 // with the dispatch kind propagatedLockKind; the others are the direct ones.
 func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, propagated bool, samples int) (UnderLockStats, error) {
-	edges, err := g.QueryEdgesByType(string(types.EdgeAccessedUnderLock))
+	return compareHeld(types.EdgeAccessedUnderLock, truth, idx, g, propagated, samples)
+}
+
+// compareSiteLocks compares the runs_under_lock edges of g with the
+// truth's (site, mutex) pairs: a CallSite is named by its file and span.
+func compareSiteLocks(truth map[[2]string]bool, idx nodeIndex, g GraphReader, propagated bool, samples int) (UnderLockStats, error) {
+	return compareHeld(types.EdgeRunsUnderLock, truth, idx, g, propagated, samples)
+}
+
+// compareHeld compares the edges of type et (a use or a site -> the mutex
+// held there) with the truth's pairs, direct or propagated.
+func compareHeld(et types.EdgeType, truth map[[2]string]bool, idx nodeIndex, g GraphReader, propagated bool, samples int) (UnderLockStats, error) {
+	edges, err := g.QueryEdgesByType(string(et))
 	if err != nil {
-		return UnderLockStats{}, fmt.Errorf("verify: read accessed_under_lock: %w", err)
+		return UnderLockStats{}, fmt.Errorf("verify: read %s: %w", et, err)
 	}
 	key := func(id string) string {
 		n, ok := idx.byID[id]
 		if !ok {
 			return ""
+		}
+		if n.Type == types.NodeCallSite {
+			return placeKey(n)
 		}
 		return fmt.Sprintf("%s:%d:%s", n.FilePath, n.StartLine, n.Name)
 	}
