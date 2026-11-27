@@ -33,7 +33,7 @@ import (
 // instantiations whose target type isn't in the node graph are silently
 // dropped; the resolution drift they'd produce is far smaller than uses_type
 // (most struct literals point to types declared in the same package) so the
-// pending_refs path isn't worth the complexity for this edge.
+// pending-ref path isn't worth the complexity for this edge.
 
 // EmitInstantiatesEdges scans every loaded package's function bodies and
 // package-level initialisers for composite literals and new() calls, emitting

@@ -526,9 +526,18 @@ const (
 	// Sender to handled code is two hops: triggers, then handles.
 	EdgeHandles  EdgeType = "handles"
 	EdgeTriggers EdgeType = "triggers"
+	// Schema 1.42 (literals passed to calls), a statement link of the Go
+	// frontend: literal_passed_to from the CallSite of a call written in a
+	// function literal (not in a literal nested in it) to the function or
+	// method the literal is passed to as an argument, with the line of that
+	// call; dispatch_kind arg; confidence EXTRACTED. The literal's code runs
+	// when that function calls it. A literal assigned, returned, called in
+	// place, started with go or deferred gives no edge, nor does one passed
+	// to a function value.
+	EdgeLiteralPassedTo EdgeType = "literal_passed_to"
 )
 
-// AllEdgeTypes returns all 53 edge types in stable order.
+// AllEdgeTypes returns all 54 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -543,7 +552,7 @@ const (
 // EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
 // EdgeRevertsWith is appended at index 50 (schema 1.38 — Solidity errors).
 // EdgeHandles and EdgeTriggers are appended at 51-52 (schema 1.42 —
-// message-driven code).
+// message-driven code), EdgeLiteralPassedTo at 53 (schema 1.42).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -567,6 +576,7 @@ func AllEdgeTypes() []EdgeType {
 		EdgeFlowsTo,
 		EdgeRevertsWith,
 		EdgeHandles, EdgeTriggers,
+		EdgeLiteralPassedTo,
 	}
 }
 

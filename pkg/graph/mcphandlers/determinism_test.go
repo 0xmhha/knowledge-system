@@ -170,6 +170,30 @@ func TestToolsAreDeterministic(t *testing.T) {
 			}
 		}
 	}
+	// The message and goroutine keys, on subjects with several entries on
+	// one line (the concurrency fixture's Two, RunTwo and multi).
+	msg := []persist.Store{messagesFixture(t), messagesFixture(t)}
+	for _, seq := range messageDeterminismCalls {
+		first := runSequence(t, msg[0], seq)
+		for i := 0; i < 8; i++ {
+			if again := runSequence(t, msg[i%2], seq); !bytes.Equal(first, again) {
+				t.Errorf("%s %v: run %d differs:\n%s\n%s", seq[0].tool, seq[0].args, i, first, again)
+				break
+			}
+		}
+	}
+}
+
+// messageDeterminismCalls cover handled_by, goroutine_callers,
+// closure_calls, triggers and goroutine_users.
+var messageDeterminismCalls = [][]struct {
+	tool string
+	args map[string]any
+}{
+	{{"find_callers", map[string]any{"qname": "mutex_fixture.multi", "depth": 1}}},
+	{{"find_callees", map[string]any{"qname": "mutex_fixture.RunTwo", "depth": 1}}},
+	{{"find_references", map[string]any{"qname": "mutex_fixture.hits"}}},
+	{{"concurrency_impact", map[string]any{"seed_qname": "mutex_fixture.RunTwo"}}},
 }
 
 // TestExpandTotalIsFindCallersAtDepthOne: the callers an expansion counts are

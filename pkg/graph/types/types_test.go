@@ -14,7 +14,7 @@ func TestAllNodeTypes_Count(t *testing.T) {
 }
 
 func TestAllEdgeTypes_Count(t *testing.T) {
-	if got, want := len(types.AllEdgeTypes()), 53; got != want {
+	if got, want := len(types.AllEdgeTypes()), 54; got != want {
 		t.Fatalf("AllEdgeTypes count = %d, want %d", got, want)
 	}
 }
@@ -134,6 +134,7 @@ func TestAllEdgeTypes_Stable(t *testing.T) {
 		types.EdgeFlowsTo,
 		types.EdgeRevertsWith,
 		types.EdgeHandles, types.EdgeTriggers,
+		types.EdgeLiteralPassedTo,
 	}
 	if !reflect.DeepEqual(types.AllEdgeTypes(), want) {
 		t.Fatalf("AllEdgeTypes order changed:\n got=%v\nwant=%v", types.AllEdgeTypes(), want)

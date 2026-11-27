@@ -116,6 +116,12 @@ func GoroutineCode(r any, ids []string, reverse bool) ([]types.Edge, error) {
 	return persist.GoroutineCode(r, ids, reverse)
 }
 
+// LockChannelsOf returns the channels used as locks that the fields and
+// variables among nodes hold. See persist.LockChannelsOf.
+func LockChannelsOf(r Reader, nodes []types.Node) ([]types.Node, error) {
+	return persist.LockChannelsOf(r, nodes)
+}
+
 // TestFileRule returns the one rule for "is this file test code" for code
 // that has a graph: the role the build recorded on a file's nodes, the path
 // rule for a file without nodes or a graph without the record. See

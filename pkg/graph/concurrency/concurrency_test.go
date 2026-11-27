@@ -32,6 +32,16 @@ func (f *fakeReader) FindSymbol(name string, _ bool, _ store.FindSymbolOptions) 
 }
 
 // AllNodes returns every fixture node (the printed-name index reads them).
+func (f *fakeReader) NodesByFilePath(path string) ([]types.Node, error) {
+	var out []types.Node
+	for _, n := range f.nodes {
+		if n.FilePath == path {
+			out = append(out, n)
+		}
+	}
+	return out, nil
+}
+
 func (f *fakeReader) AllNodes() ([]types.Node, error) {
 	out := make([]types.Node, 0, len(f.nodes))
 	for _, n := range f.nodes {

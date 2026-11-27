@@ -157,3 +157,52 @@ func TestLockFieldCard(t *testing.T) {
 		}
 	}
 }
+
+// TestClosureCallsAndLocalLock: a call inside a literal passed to another
+// call names that call's function (closure_calls), whose own handled_by
+// gives the receive that runs it; a local variable holding a channel lock
+// seeds concurrency_impact in both forms.
+func TestClosureCallsAndLocalLock(t *testing.T) {
+	s := messagesFixture(t)
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.snap", "depth": 1})
+	rows := asSlice(callers[closureCallsKey])
+	if len(rows) != 1 || rows[0].(map[string]any)["in_literal_passed_to"] != "mutex_fixture.Reg.Each" {
+		t.Errorf("closure_calls = %v", callers[closureCallsKey])
+	}
+	each := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.Reg.Each", "depth": 1})
+	if len(asSlice(each[handledByKey])) == 0 {
+		t.Errorf("handled_by of Reg.Each = %v", each[handledByKey])
+	}
+	for _, q := range []string{"mutex_fixture.Resetter.Loop.busy", "mutex_fixture.Resetter.Loop.busy#mutex"} {
+		out := callTool(t, s, "concurrency_impact", map[string]any{"seed_qname": q})
+		if m, _ := out["mutex"].(string); !strings.HasPrefix(m, "chan@") || len(asSlice(out["locked_by"])) == 0 {
+			t.Errorf("%s: mutex %v locked_by %v", q, out["mutex"], out["locked_by"])
+		}
+	}
+}
+
+// TestSeveralEntriesOnOneLine: the determinism subjects do have several
+// entries on one line under each key.
+func TestSeveralEntriesOnOneLine(t *testing.T) {
+	s := messagesFixture(t)
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.multi", "depth": 1})
+	for _, k := range []string{handledByKey, goroutineCallersKey, closureCallsKey} {
+		lines := map[any]int{}
+		for _, r := range asSlice(callers[k]) {
+			lines[r.(map[string]any)["line"]]++
+		}
+		max := 0
+		for _, n := range lines {
+			if n > max {
+				max = n
+			}
+		}
+		if max < 2 {
+			t.Errorf("%s has no two entries on one line: %v", k, callers[k])
+		}
+	}
+	callees := callTool(t, s, "find_callees", map[string]any{"qname": "mutex_fixture.RunTwo", "depth": 1})
+	if len(asSlice(callees[triggersKey])) < 2 {
+		t.Errorf("triggers of RunTwo: %v", callees[triggersKey])
+	}
+}

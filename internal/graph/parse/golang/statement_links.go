@@ -299,6 +299,7 @@ func (w *stmtWalker) region(root ast.Node, c ctl) {
 				w.enclose(c, s, x.Pos())
 				w.c.emit(s, callee, types.EdgeSiteCalls, kind, w.line(x.Pos()))
 			}
+			w.literalArgs(x, callee)
 			if callee == nil {
 				w.st.Unresolved++
 			} else if h := c.header(); h != nil {
@@ -378,6 +379,7 @@ func (w *stmtWalker) goStmt(x *ast.GoStmt, c ctl) {
 			w.st.Unresolved++
 		}
 		w.c.emit(g, callee, types.EdgeSiteCalls, kind, w.line(x.Pos()))
+		w.literalArgs(x.Call, callee) // go f(func() {...}): passed to f
 		w.region(x.Call.Fun, own)
 	}
 	for _, a := range x.Call.Args {
@@ -443,6 +445,43 @@ func (w *stmtWalker) resolve(call *ast.CallExpr) (*types.Node, string) {
 		w.c.emit(w.owner, callee, types.EdgeInvokes, kind, w.line(call.Pos()))
 	}
 	return callee, kind
+}
+
+// LiteralArgKind is the dispatch kind of a literal_passed_to edge: the
+// literal is an argument of the call.
+const LiteralArgKind = "arg"
+
+// literalArgs records, for each function literal passed as an argument of
+// call (r.Each(func(...) { ... })), a literal_passed_to edge from the site
+// of every call written in that literal (and not in a literal nested in it)
+// to the function call passes it to, callee, with the line of call. The
+// literal runs when callee calls it; a callee the call does not name (a
+// function value) gives none.
+func (w *stmtWalker) literalArgs(call *ast.CallExpr, callee *types.Node) {
+	if callee == nil {
+		return
+	}
+	for _, a := range call.Args {
+		lit, ok := ast.Unparen(a).(*ast.FuncLit)
+		if !ok {
+			continue
+		}
+		ast.Inspect(lit.Body, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.FuncLit:
+				return false
+			case *ast.CallExpr:
+				// A conversion or a builtin is not a call of code.
+				if tv, ok := w.info.Types[x.Fun]; ok && (tv.IsType() || tv.IsBuiltin()) {
+					return true
+				}
+				if s := w.site(x); s != nil {
+					w.c.emit(s, callee, types.EdgeLiteralPassedTo, LiteralArgKind, w.line(call.Pos()))
+				}
+			}
+			return true
+		})
+	}
 }
 
 // callee resolves the declaration a call names: a function, a method, or

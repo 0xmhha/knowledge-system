@@ -269,11 +269,10 @@ func runCold(opt Options, log *slog.Logger,
 
 	// (2)+(3) parse + link, per language
 	resolved := []*parse.ResolvedGraph{}
-	allPending := []persist.PendingRefRow{}
 	parseErrs := 0
 	if shouldRun("go", opt.Languages) && len(goFiles) > 0 {
 		log.Debug("pass1.start", "language", "go", "files", len(goFiles))
-		rg, pending, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, opt.FileRoles, opt.LockPropagation, log)
+		rg, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, opt.FileRoles, opt.LockPropagation, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("go pipeline: %w", err)
 		}
@@ -283,7 +282,6 @@ func runCold(opt Options, log *slog.Logger,
 			return persist.Manifest{}, err
 		}
 		resolved = append(resolved, rg)
-		allPending = append(allPending, pending...)
 		log.Debug("pass1.end", "language", "go", "nodes", len(rg.Nodes), "errs", n)
 	}
 	// solParser is retained across the language passes so that the
@@ -292,25 +290,23 @@ func runCold(opt Options, log *slog.Logger,
 	var solParser *solp.Parser
 	if shouldRun("ts", opt.Languages) && len(files.TS) > 0 {
 		log.Debug("pass1.start", "language", "ts", "files", len(files.TS))
-		rg, pending, n, err := runTSPipeline(opt.SrcRoot, files.TS, log)
+		rg, n, err := runTSPipeline(opt.SrcRoot, files.TS, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("ts pipeline: %w", err)
 		}
 		parseErrs += n
 		resolved = append(resolved, rg)
-		allPending = append(allPending, pending...)
 		log.Debug("pass1.end", "language", "ts", "nodes", len(rg.Nodes), "errs", n)
 	}
 	if shouldRun("sol", opt.Languages) && len(files.Sol) > 0 {
 		log.Debug("pass1.start", "language", "sol", "files", len(files.Sol))
-		rg, pending, n, p, err := runSolPipeline(opt.SrcRoot, files.Sol, log)
+		rg, n, p, err := runSolPipeline(opt.SrcRoot, files.Sol, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("sol pipeline: %w", err)
 		}
 		parseErrs += n
 		solParser = p
 		resolved = append(resolved, rg)
-		allPending = append(allPending, pending...)
 		log.Debug("pass1.end", "language", "sol", "nodes", len(rg.Nodes), "errs", n)
 	}
 	// Schema 1.9: .proto schema parser. Hand-rolled lexer + recursive-
@@ -319,18 +315,17 @@ func runCold(opt Options, log *slog.Logger,
 	// detection lives in the Go/TS parsers.
 	if shouldRun("proto", opt.Languages) && len(files.Proto) > 0 {
 		log.Debug("pass1.start", "language", "proto", "files", len(files.Proto))
-		rg, pending, n, err := runProtoPipeline(opt.SrcRoot, files.Proto, log)
+		rg, n, err := runProtoPipeline(opt.SrcRoot, files.Proto, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("proto pipeline: %w", err)
 		}
 		parseErrs += n
 		resolved = append(resolved, rg)
-		allPending = append(allPending, pending...)
 		log.Debug("pass1.end", "language", "proto", "nodes", len(rg.Nodes), "errs", n)
 	}
 
 	// (4) graph build + validate
-	log.Debug("pass2.resolve.start", "pending_refs", len(allPending))
+	log.Debug("pass2.resolve.start")
 	warnDuplicateNodeIDs(log, resolved)
 	g, err := graph.Build(resolved)
 	if err != nil {
@@ -368,15 +363,6 @@ func runCold(opt Options, log *slog.Logger,
 	}()
 	if err := persistColdArtifacts(store, opt.SrcRoot, g, pkgTree, topicTree, hunkBlobs); err != nil {
 		return persist.Manifest{}, err
-	}
-	// Schema 1.5: persist Pass 1 pending refs so the next partial
-	// build can replay Pass 2 over a merged dirty + cached input set without
-	// re-parsing cached files. INSERT after persistColdArtifacts so node FKs
-	// are satisfied. The cold path builds into a fresh temp DB via openColdStore,
-	// so the table starts empty — IGNORE on the PK in InsertPendingRefs handles
-	// the rare emit-twice case.
-	if err := store.InsertPendingRefs(allPending); err != nil {
-		return persist.Manifest{}, fmt.Errorf("persist pending_refs: %w", err)
 	}
 	// PR breadcrumb (schema 1.12): scan git log for PR-tagged
 	// commits and persist the node ↔ PR mapping. Runs after the node

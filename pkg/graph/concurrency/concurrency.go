@@ -445,16 +445,12 @@ func mutexNodes(r store.Reader, seeds []types.Node) ([]types.Node, error) {
 			return nil, fmt.Errorf("mutex node of %s: %w", n.QualifiedName, err)
 		}
 		// A field or variable that holds a channel used as a lock names
-		// that lock (the make site the channel aliases lead from).
-		from, _, err := r.NeighborhoodByIDs([]string{n.ID}, 1, true, string(types.EdgeFlowsTo))
+		// that lock (store.LockChannelsOf, the one rule the resolver uses).
+		locks, err := store.LockChannelsOf(r, []types.Node{n})
 		if err != nil {
-			return nil, fmt.Errorf("lock channel of %s: %w", n.QualifiedName, err)
+			return nil, err
 		}
-		for _, c := range from {
-			if isLockChannel(c) {
-				out = append(out, c)
-			}
-		}
+		out = append(out, locks...)
 		for _, m := range nodes {
 			if m.Type == types.NodeMutex && (n.Type == types.NodeField || m.FilePath == n.FilePath && m.StartLine == n.StartLine) {
 				out = append(out, m)

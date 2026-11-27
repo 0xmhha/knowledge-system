@@ -207,7 +207,7 @@ func rankNamed(reader store.Reader, nodes []types.Node, all bool) (kept []types.
 func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("find_callers",
-		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to, also for interfaces declared in a function or written inline in a type assertion, interface{ Bytes() []byte }); goroutines that run the function (go f(x), or a go literal that calls it) are listed apart under goroutine_callers, each with the function that starts it (spawned_by), and never counted among the callers; calls that run because a message arrives on a channel are listed under handled_by: the receive whose range holds the call, and the senders that can wake it (sender, line of the send, channel, and goroutines: the goroutines that run the sender), or no_sender_in_build when no send in the build reaches the channel (time.Tick, a library channel); for a Solidity modifier, event or error, the functions that apply, emit or revert with it; for a field, package-level variable, constant or Solidity state variable it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
+		mcp.WithDescription("Functions that call the symbol (reverse call graph). qname may be a full qualified_name (\"render.NewTemplate\") or a bare short name (\"NewTemplate\") — a bare name is resolved by suffix, and an ambiguous bare name returns its candidate qnames instead of an empty result. Follows calls, interface calls and the implementations they can run (dispatches_to, also for interfaces declared in a function or written inline in a type assertion, interface{ Bytes() []byte }); goroutines that run the function (go f(x), or a go literal that calls it) are listed apart under goroutine_callers, each with the function that starts it (spawned_by), and never counted among the callers; calls that run because a message arrives on a channel are listed under handled_by: the receive whose range holds the call, and the senders that can wake it (sender, line of the send, channel, and goroutines: the goroutines that run the sender), or no_sender_in_build when no send in the build reaches the channel (time.Tick, a library channel); the code of a function literal belongs to the literal, and its calls are listed under the function the literal is written in: a call inside a literal passed as an argument (r.Each(func(...) { m.Snapshot() })) is also listed under closure_calls with in_literal_passed_to, the function that runs the literal; find_callers on that function gives its own callers and handled_by; for a Solidity modifier, event or error, the functions that apply, emit or revert with it; for a field, package-level variable, constant or Solidity state variable it returns the code that reads or writes it (as find_references). Default depth=2 — see docs/graph/TRAVERSAL-DEPTH.md for the latency/recall justification."),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithNumber("depth", mcp.DefaultNumber(2)),
 		mcp.WithBoolean("include_blobs", mcp.DefaultBool(false)),
@@ -264,6 +264,9 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 			if err := addHandledBy(reader, resolved, out); err != nil {
 				return nil, err
 			}
+			if err := addClosureCalls(reader, resolved, out); err != nil {
+				return nil, err
+			}
 			return textResult(resolved.result(out)), nil
 		}
 		// Union the concrete seed with the interface methods it satisfies, so
@@ -282,6 +285,9 @@ func RegisterFindCallers(s *server.MCPServer, reader store.Reader) {
 			return nil, err
 		}
 		if err := addHandledBy(reader, resolved, out); err != nil {
+			return nil, err
+		}
+		if err := addClosureCalls(reader, resolved, out); err != nil {
 			return nil, err
 		}
 		return textResult(resolved.result(out)), nil
@@ -362,6 +368,7 @@ func addGoroutineCallers(reader store.Reader, seed seedRef, out map[string]any, 
 		rows = append(rows, row)
 	}
 	if len(rows) > 0 {
+		sortRows(rows)
 		out[key] = rows
 	}
 	return nil

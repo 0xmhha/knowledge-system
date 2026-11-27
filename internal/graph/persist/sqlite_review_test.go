@@ -98,7 +98,7 @@ func TestRebuildReviewIndex(t *testing.T) {
 		t.Fatalf("node_commits = %s %s %v", node, commit, err)
 	}
 	// A node deletion cascades out of both derived tables.
-	if err := st.DeleteNodesByFilePath("p/a.go"); err != nil {
+	if _, err := st.db.Exec(`DELETE FROM nodes WHERE file_path = ?`, "p/a.go"); err != nil {
 		t.Fatal(err)
 	}
 	var left int

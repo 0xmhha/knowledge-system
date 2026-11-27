@@ -14,8 +14,10 @@ import (
 )
 
 // statements.go checks the statement links of schema 1.32 (site_calls,
-// cond_reads, cond_calls, body_writes, encloses) against facts computed here
-// from go/types and the syntax tree.
+// cond_reads, cond_calls, body_writes, encloses) and literal_passed_to
+// (schema 1.42: a call in a function literal passed as an argument -> the
+// function it is passed to) against facts computed here from go/types and
+// the syntax tree.
 //
 // The build walks a body region by region (parse/golang/statement_links.go).
 // The truth here is computed another way, so that the two can disagree: one
@@ -91,7 +93,8 @@ func (s StmtRelStats) Recall() float64 {
 	return float64(s.Matched) / float64(d)
 }
 
-var stmtRels = []types.EdgeType{types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses}
+var stmtRels = []types.EdgeType{types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
+	types.EdgeLiteralPassedTo}
 
 var stmtNodeTypes = map[types.NodeType]bool{
 	types.NodeIfStmt: true, types.NodeLoopStmt: true, types.NodeSwitchStmt: true,
@@ -171,6 +174,36 @@ func (w *fileWalker) statementsIn(body ast.Node) {
 				}
 				if hdr != nil {
 					add(types.EdgeCondCalls, hdr, dst, "", x.Pos())
+				}
+				// A function literal passed as an argument: each call in it
+				// (not in a literal nested in it) runs when dst calls it.
+				for _, a := range x.Args {
+					lit, ok := ast.Unparen(a).(*ast.FuncLit)
+					if !ok {
+						continue
+					}
+					goCalls := map[*ast.CallExpr]bool{} // a go statement's call is a goroutine
+					ast.Inspect(lit.Body, func(m ast.Node) bool {
+						switch y := m.(type) {
+						case *ast.FuncLit:
+							return false
+						case *ast.GoStmt:
+							goCalls[y.Call] = true
+						case *ast.CallExpr:
+							if goCalls[y] {
+								return true
+							}
+							if tv, ok := w.info.Types[y.Fun]; !ok || !tv.IsType() && !tv.IsBuiltin() {
+								// Named by its span, not its line: each call
+								// in the literal is one fact, as each is one
+								// edge.
+								w.stmt[StmtFact{Rel: string(types.EdgeLiteralPassedTo), File: w.rel,
+									Src: callSpan(w.fset.Position(y.Pos()).Offset, w.fset.Position(y.End()).Offset),
+									Dst: dst, Kind: "arg", Line: w.fset.Position(x.Pos()).Line}] = true
+							}
+						}
+						return true
+					})
 				}
 			}
 		case *ast.GoStmt:
@@ -482,6 +515,9 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		byID[n.ID] = n
 		if stmtNodeTypes[n.Type] {
 			stmtNodes[n.FilePath+"|"+fmt.Sprintf("%s@L%d", n.Type, n.StartLine)] = true
+			if n.Type == types.NodeCallSite {
+				stmtNodes[n.FilePath+"|"+callSpan(n.StartByte, n.EndByte)] = true
+			}
 		}
 		switch {
 		case n.Type == types.NodeField:
@@ -513,7 +549,11 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		edges += len(es)
 		for _, e := range es {
 			s, d := byID[e.Src], byID[e.Dst]
-			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: ref(s), Dst: ref(d), Kind: e.DispatchKind, Line: e.Line}] = true
+			src := ref(s)
+			if rel == types.EdgeLiteralPassedTo {
+				src = callSpan(s.StartByte, s.EndByte)
+			}
+			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: src, Dst: ref(d), Kind: e.DispatchKind, Line: e.Line}] = true
 		}
 	}
 	if edges == 0 {
@@ -581,4 +621,10 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		out[f.Rel] = s
 	}
 	return out, nil
+}
+
+// callSpan names a call site by its byte span: the facts of
+// literal_passed_to are one per call, so two calls on one line are two.
+func callSpan(start, end int) string {
+	return fmt.Sprintf("%s@%d-%d", types.NodeCallSite, start, end)
 }

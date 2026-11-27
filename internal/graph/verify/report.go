@@ -185,6 +185,12 @@ func (r Report) WriteText(w io.Writer) error {
 	if r.Statements == nil {
 		p("statement links: none in this graph\n")
 	}
+	if r.Statements != nil {
+		// What one fact is: a statement (its kind and line), a target, the
+		// part and the line; literal_passed_to counts each call site by its
+		// span, so one fact is one edge.
+		p("statement links count facts (statement kind and line, target, part, line; literal_passed_to: call site span, receiver, line)\n")
+	}
 	for _, rel := range stmtRels {
 		s, ok := r.Statements[string(rel)]
 		if !ok {

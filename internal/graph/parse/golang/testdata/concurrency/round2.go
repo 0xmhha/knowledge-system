@@ -74,3 +74,39 @@ func Pinger() {
 	<-ch
 	pong()
 }
+
+// Reg runs a function for each entry.
+type Reg struct{}
+
+// Each calls f.
+func (Reg) Each(f func(int)) { f(1) }
+
+func snap(int) {}
+
+// LogAll calls snap in a literal passed to Each, on every tick.
+func LogAll(r Reg, tick chan struct{}) {
+	for range tick {
+		r.Each(func(i int) {
+			snap(i)
+		})
+	}
+}
+
+func multi() {}
+
+// Two receives twice, then calls multi: both receives handle that line.
+func Two(a, b chan int) {
+	<-a
+	<-b
+	multi(); multi()
+}
+
+// RunTwo sends to both from one goroutine and from itself, on one line.
+func RunTwo(r Reg) {
+	a, b := make(chan int, 2), make(chan int, 2)
+	go func() { a <- 1; b <- 1; multi(); multi() }()
+	a <- 2; b <- 2
+	Two(a, b)
+	r.Each(func(int) { multi(); multi() })
+	go func() { multi() }(); go func() { multi() }()
+}

@@ -255,6 +255,17 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 					FilePath: e.FilePath,
 				})
 			}
+		case types.EdgeLiteralPassedTo:
+			// Schema 1.42: a call site in a function literal -> the function
+			// the literal is passed to.
+			if src.Type != types.NodeCallSite || !isCallable(dst.Type) {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "literal-passed-to-bad-shape",
+					Message:  "literal_passed_to must go from a CallSite to a callable (got " + string(src.Type) + " -> " + string(dst.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
 		case types.EdgeHandles, types.EdgeTriggers:
 			// Schema 1.42: handles starts at a receive's CallSite and ends at
 			// the handled code; triggers starts at a sender and ends at a

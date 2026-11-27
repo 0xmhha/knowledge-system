@@ -1,6 +1,7 @@
 package mcphandlers
 
 import (
+	"encoding/json"
 	"sort"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
@@ -88,6 +89,11 @@ func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string
 		}
 	}
 	out := map[string][]map[string]any{}
+	defer func() {
+		for _, rows := range out {
+			sortRows(rows) // by line, then sender name
+		}
+	}()
 	for _, k := range order {
 		g := groups[k]
 		if len(g.fn) == 0 {
@@ -254,19 +260,50 @@ func addTriggers(reader store.Reader, seed seedRef, out map[string]any) error {
 	return nil
 }
 
-// putRows sets out[key] to rows in file and line order, at most
+// sortRows puts rows in a total order: by file, then line, then the whole
+// row (its JSON text: the receive, call, caller or sender names next), so
+// rows that share a line come back in the same order on every call.
+func sortRows(rows []map[string]any) {
+	keyOf := func(r map[string]any) string {
+		b, _ := json.Marshal(r)
+		return string(b)
+	}
+	keys := make([]string, len(rows))
+	for i, r := range rows {
+		keys[i] = keyOf(r)
+	}
+	idx := make([]int, len(rows))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.SliceStable(idx, func(a, b int) bool {
+		ra, rb := rows[idx[a]], rows[idx[b]]
+		fa, _ := ra["file"].(string)
+		fb, _ := rb["file"].(string)
+		if fa != fb {
+			return fa < fb
+		}
+		la, _ := ra["line"].(int)
+		lb, _ := rb["line"].(int)
+		if la != lb {
+			return la < lb
+		}
+		return keys[idx[a]] < keys[idx[b]]
+	})
+	sorted := make([]map[string]any, len(rows))
+	for i, j := range idx {
+		sorted[i] = rows[j]
+	}
+	copy(rows, sorted)
+}
+
+// putRows sets out[key] to rows in file and line order (sortRows), at most
 // messageLimit, with key_total when there are more. Nothing is set for none.
 func putRows(out map[string]any, key string, rows []map[string]any) {
 	if len(rows) == 0 {
 		return
 	}
-	sort.SliceStable(rows, func(i, j int) bool {
-		fi, fj := rows[i]["file"].(string), rows[j]["file"].(string)
-		if fi != fj {
-			return fi < fj
-		}
-		return rows[i]["line"].(int) < rows[j]["line"].(int)
-	})
+	sortRows(rows)
 	if len(rows) > messageLimit {
 		out[key+"_total"] = len(rows)
 		rows = rows[:messageLimit]
@@ -281,4 +318,61 @@ func idsOf(nodes []types.Node) []string {
 		ids = append(ids, n.ID)
 	}
 	return ids
+}
+
+// closureCallsKey lists the calls of the seed written inside a function
+// literal passed as an argument (find_callers).
+const closureCallsKey = "closure_calls"
+
+// addClosureCalls adds to out, under closureCallsKey, the calls of the seed
+// that sit in a function literal passed as an argument of another call
+// (r.Each(func(...) { m.Snapshot() })), read from the graph's
+// literal_passed_to edges: the caller (the function the literal is written
+// in, the container of the call's site), the line of the call, and the
+// function the literal is passed to with the line of that call. The literal
+// runs when that function calls it, so what runs the seed there is found
+// with find_callers on that function (and its handled_by).
+func addClosureCalls(reader store.Reader, seed seedRef, out map[string]any) error {
+	own, err := seed.nodes(reader)
+	if err != nil {
+		return err
+	}
+	calls, sites, err := edgesAt(reader, idsOf(own), true, types.EdgeSiteCalls)
+	if err != nil || len(calls) == 0 {
+		return err
+	}
+	siteIDs := make([]string, 0, len(calls))
+	for _, e := range calls {
+		siteIDs = append(siteIDs, e.Src)
+	}
+	passed, receivers, err := edgesAt(reader, siteIDs, false, types.EdgeLiteralPassedTo)
+	if err != nil || len(passed) == 0 {
+		return err
+	}
+	contains, owners, err := edgesAt(reader, siteIDs, true, types.EdgeContains)
+	if err != nil {
+		return err
+	}
+	ownerOf := map[string]types.Node{}
+	for _, e := range contains {
+		if o, ok := owners[e.Src]; ok && (o.Type == types.NodeFunction || o.Type == types.NodeMethod || o.Type == types.NodeVariable) {
+			ownerOf[e.Dst] = o
+		}
+	}
+	var rows []map[string]any
+	for _, e := range passed {
+		x, ok := sites[e.Src]
+		recv, ok2 := receivers[e.Dst]
+		if !ok || !ok2 {
+			continue
+		}
+		row := map[string]any{"file": x.FilePath, "line": x.StartLine,
+			"in_literal_passed_to": store.PrintedName(reader, recv), "passed_at": e.Line}
+		if o, ok := ownerOf[x.ID]; ok {
+			row["caller"] = store.PrintedName(reader, o)
+		}
+		rows = append(rows, row)
+	}
+	putRows(out, closureCallsKey, rows)
+	return nil
 }

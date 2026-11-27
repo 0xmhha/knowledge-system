@@ -627,7 +627,7 @@ func resolveMutex(r StoreReader, declaring, language string) (NameResolution, er
 	if len(mutexes) == 0 {
 		// A field or variable that holds a channel used as a lock names
 		// that lock: the Channel node (sub kind lock) its alias comes from.
-		locks, err := lockChannelsOf(r, nodes)
+		locks, err := LockChannelsOf(r, nodes)
 		if err != nil || len(locks) == 0 {
 			return NameResolution{}, err
 		}
@@ -636,14 +636,21 @@ func resolveMutex(r StoreReader, declaring, language string) (NameResolution, er
 	return NameResolution{QName: declaring, Nodes: mutexes, ByID: true}, nil
 }
 
-// lockChannelsOf returns the channels used as locks (types.ChannelLockSubKind)
+// LockChannelsOf returns the channels used as locks (types.ChannelLockSubKind)
 // that the fields and variables among nodes hold: the make sites their
-// channel aliases (flows_to) come from.
-func lockChannelsOf(r StoreReader, nodes []types.Node) ([]types.Node, error) {
+// channel aliases (flows_to) come from, and, for a variable (a local one:
+// resetBusy), the lock channel made on the line that declares it in its
+// file (a local's channel has no alias of its own).
+func LockChannelsOf(r StoreReader, nodes []types.Node) ([]types.Node, error) {
 	var ids []string
+	var vars []types.Node
 	for _, n := range nodes {
-		if n.Type == types.NodeField || n.Type == types.NodeVariable || n.Type == types.NodeLocalVariable {
+		switch n.Type {
+		case types.NodeField:
 			ids = append(ids, n.ID)
+		case types.NodeVariable, types.NodeLocalVariable:
+			ids = append(ids, n.ID)
+			vars = append(vars, n)
 		}
 	}
 	if len(ids) == 0 {
@@ -653,10 +660,25 @@ func lockChannelsOf(r StoreReader, nodes []types.Node) ([]types.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("lock channels: %w", err)
 	}
+	isLock := func(n types.Node) bool { return n.Type == types.NodeChannel && n.SubKind == types.ChannelLockSubKind }
 	var out []types.Node
+	seen := map[string]bool{}
 	for _, n := range from {
-		if n.Type == types.NodeChannel && n.SubKind == types.ChannelLockSubKind {
+		if isLock(n) && !seen[n.ID] {
+			seen[n.ID] = true
 			out = append(out, n)
+		}
+	}
+	for _, v := range vars {
+		inFile, err := r.NodesByFilePath(v.FilePath)
+		if err != nil {
+			return nil, fmt.Errorf("lock channels of %s: %w", v.QualifiedName, err)
+		}
+		for _, n := range inFile {
+			if isLock(n) && n.StartLine == v.StartLine && !seen[n.ID] {
+				seen[n.ID] = true
+				out = append(out, n)
+			}
 		}
 	}
 	return out, nil

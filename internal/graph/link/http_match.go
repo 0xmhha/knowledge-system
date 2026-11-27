@@ -137,13 +137,8 @@ func MatchHTTPClients(nodes []types.Node, edges []types.Edge) ([]types.Node, []t
 		if matchID == "" {
 			// Both miss — keep placeholder.
 			retained[e.Dst] = true
-			// Reset ID so the incremental persist step inserts a fresh row.
-			// Background: incremental.go's reloadCachedEdges loads cached
-			// http_calls edges with non-zero ID; the persist step's INSERT
-			// skips ID!=0 to avoid duplicating. Combined with the DB-side
-			// DeleteEdgesByType("http_calls") in incremental.go step 3, the
-			// reset lets us re-INSERT every http_calls edge on each pass —
-			// keeping DB in sync with in-memory rewire/retain decisions.
+			// Reset ID so the persist step inserts a fresh row (it skips
+			// edges that already carry an id).
 			e.ID = 0
 			newEdges = append(newEdges, e)
 			result.AmbiguousRetained++

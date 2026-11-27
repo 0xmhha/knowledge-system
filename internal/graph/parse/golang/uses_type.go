@@ -31,9 +31,8 @@ import (
 //
 // Why a post-Resolve pass (mirroring EmitImplementsEdges):
 //   - Cross-package references need the union of every package's nodes.
-//   - Running here lets us emit a `pending_refs` row for unresolved
-//     cross-package references so the partial-cache rebuild replays the same
-//     input set the cold path saw.
+//   - Running here lets us return unresolved cross-package references as
+//     pending refs, which become External nodes.
 //
 // Skip rules:
 //   - Builtin types (int, string, error) and type parameters are not nodes.

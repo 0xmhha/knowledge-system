@@ -7,13 +7,8 @@ package buildpipe
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"os"
-	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"sort"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // SchemaVersion is the cache-key contributor for the extraction schema. Bumped
@@ -327,42 +322,14 @@ import (
 // and flows_to of kind received. accessed_under_lock, dispatches_to,
 // sends_to and recvs_from edges and CallSite nodes change. Every build is
 // cold.
-const SchemaVersion = "1.42"
-
-// fileClass classifies one source file against the previous manifest.
-type fileClass int
-
-const (
-	classDirty   fileClass = iota // miss: must reparse
-	classCached                   // hit: reuse from DB
-	classRemoved                  // present in old manifest, gone now
-)
-
-// FileDecision is the cache decision for one file in the current discovery.
-// For classRemoved the Path comes from the OLD manifest (file is gone) and
-// Language/SHA256/CacheKey/MTime are zero.
-type FileDecision struct {
-	Path     string
-	Language string
-	Class    fileClass
-	// Populated for classDirty/classCached:
-	SHA256        string
-	CacheKey      string
-	MTime         int64
-	ParserVersion string
-	// Populated for classCached only — the matching entry from the OLD
-	// manifest, so the caller can pull NodeIDs out for reload.
-	Cached *persist.FileEntry
-}
-
-// CacheDecisions is the sorted, fully-classified result of one diff pass.
-// Sorted by Path for deterministic logging.
-type CacheDecisions struct {
-	Decisions []FileDecision
-	Hits      int
-	Misses    int
-	Removed   int
-}
+//
+// 1.43 (2026-11-27): literal_passed_to, a statement link from the call site
+// of each call written in a function literal passed as an argument to the
+// function it is passed to. New edges; force a cold rebuild (every build is).
+// The pending_refs table is no longer written (only the removed incremental
+// build read it); an older graph.db keeps it until the next build replaces
+// the file.
+const SchemaVersion = "1.43"
 
 // ComputeCacheKey returns the SHA256 of:
 //
@@ -459,118 +426,4 @@ func treeSitterModuleVersion() string {
 type DiscoveredFile struct {
 	Path     string
 	Language string
-}
-
-// DiffManifest classifies every discovered file against the OLD manifest and
-// emits a CacheDecisions in deterministic Path order. Files in old but not in
-// the discovery are emitted as classRemoved.
-//
-// Fast/slow path (spec § 4 build flow): mtime-equal entries skip the SHA256
-// recomputation and reuse the old hash; mtime-mismatched entries fall through
-// to a full hash. Either way, the cache decision is byte-equal whether mtime
-// changed or not — mtime is purely a perf hint.
-func DiffManifest(srcRoot string, discovered []DiscoveredFile, old *persist.Manifest, ckgVersion string) (CacheDecisions, error) {
-	oldByPath := map[string]persist.FileEntry{}
-	if old != nil {
-		for _, e := range old.Files {
-			oldByPath[e.Path] = e
-		}
-	}
-	seen := map[string]bool{}
-	out := CacheDecisions{}
-	for _, df := range discovered {
-		seen[df.Path] = true
-		full := filepath.Join(srcRoot, filepath.FromSlash(df.Path))
-		st, statErr := os.Stat(full)
-		var mtime int64
-		if statErr == nil {
-			mtime = st.ModTime().UnixNano()
-		}
-		parserVer := parserVersionFor(df.Language)
-		oldE, hadOld := oldByPath[df.Path]
-
-		// Fast path: mtime + parser_version unchanged AND old cache_key was
-		// computed against the same ckg_version + schema_version. We can't
-		// re-derive cache_key without rehashing content, so we recompute the
-		// "expected key from the stored SHA" via a deterministic prefix check:
-		// the old cache_key is valid iff the version triple matches. Since
-		// SchemaVersion is a build-time constant in this binary, the only
-		// version that can drift between builds is ckg_version. Compare it
-		// implicitly: if the OLD entry's CacheKey was computed under the
-		// CURRENT ckg+parser+schema combo, it's still valid; otherwise the
-		// caller (full-rebuild guard in pipeline.Run) already invalidated it.
-		// Here we trust mtime+parser as the fast-path discriminator.
-		if hadOld && statErr == nil && oldE.MTime == mtime && oldE.ParserVersion == parserVer {
-			e := oldE // copy
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path:          df.Path,
-				Language:      df.Language,
-				Class:         classCached,
-				SHA256:        oldE.SHA256,
-				CacheKey:      oldE.CacheKey,
-				MTime:         mtime,
-				ParserVersion: parserVer,
-				Cached:        &e,
-			})
-			out.Hits++
-			continue
-		}
-
-		// Slow path: read file, hash content, derive full cache key. This
-		// runs when mtime drifted (e.g. git checkout) OR the parser version
-		// changed for this language. Hashing confirms whether the bytes
-		// actually changed.
-		content, err := os.ReadFile(full)
-		if err != nil {
-			// Treat as dirty — the parser will surface the read failure.
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path: df.Path, Language: df.Language, Class: classDirty,
-				MTime: mtime, ParserVersion: parserVer,
-			})
-			out.Misses++
-			continue
-		}
-		sha := SHA256Hex(content)
-		key := ComputeCacheKey(content, ckgVersion, parserVer)
-		if hadOld && oldE.CacheKey == key {
-			// Content identical (and full key matches) — cache hit despite mtime drift.
-			e := oldE
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path:          df.Path,
-				Language:      df.Language,
-				Class:         classCached,
-				SHA256:        sha,
-				CacheKey:      key,
-				MTime:         mtime,
-				ParserVersion: parserVer,
-				Cached:        &e,
-			})
-			out.Hits++
-			continue
-		}
-		out.Decisions = append(out.Decisions, FileDecision{
-			Path:          df.Path,
-			Language:      df.Language,
-			Class:         classDirty,
-			SHA256:        sha,
-			CacheKey:      key,
-			MTime:         mtime,
-			ParserVersion: parserVer,
-		})
-		out.Misses++
-	}
-	// Removed files: present in old manifest, absent from discovery.
-	for path, e := range oldByPath {
-		if seen[path] {
-			continue
-		}
-		out.Decisions = append(out.Decisions, FileDecision{
-			Path: path, Language: e.Language, Class: classRemoved,
-		})
-		out.Removed++
-	}
-	sort.Slice(out.Decisions, func(i, j int) bool {
-		return out.Decisions[i].Path < out.Decisions[j].Path
-	})
-	return out, nil
 }

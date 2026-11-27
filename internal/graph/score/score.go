@@ -57,7 +57,7 @@ func Compute(g *graph.Graph) {
 var statementLink = map[types.EdgeType]bool{
 	types.EdgeSiteCalls: true, types.EdgeCondReads: true, types.EdgeCondCalls: true,
 	types.EdgeBodyWrites: true, types.EdgeEncloses: true,
-	types.EdgeHandles: true, types.EdgeTriggers: true,
+	types.EdgeHandles: true, types.EdgeTriggers: true, types.EdgeLiteralPassedTo: true,
 }
 
 // Type-hierarchy dispatch candidates (dispatches_to, kind type_hierarchy)

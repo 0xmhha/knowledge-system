@@ -22,7 +22,6 @@ import (
 	protop "github.com/0xmhha/knowledge-system/internal/graph/parse/proto"
 	solp "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
 	tsp "github.com/0xmhha/knowledge-system/internal/graph/parse/typescript"
-	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -129,33 +128,6 @@ func parseConcurrent(
 	return results, errs
 }
 
-// collectPendingRefs flattens per-file ParseResults into PendingRefRow records
-// (schema 1.5) with file_path stamped from each ParseResult.Path.
-// Called by every language pipeline AFTER stampFilePath but BEFORE Resolve so
-// the row data carries the rel-path Resolve will consume into edges.
-func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
-	var out []persist.PendingRefRow
-	for _, r := range results {
-		rel := filepath.ToSlash(r.Path)
-		if rel == "" {
-			continue
-		}
-		for _, pr := range r.Pending {
-			out = append(out, persist.PendingRefRow{
-				FilePath:          rel,
-				SrcID:             pr.SrcID,
-				TargetQName:       pr.TargetQName,
-				TargetCanonicalID: pr.TargetCanonicalID,
-				EdgeType:          string(pr.EdgeType),
-				Line:              pr.Line,
-				HintFile:          pr.HintFile,
-				DispatchKind:      pr.DispatchKind,
-			})
-		}
-	}
-	return out
-}
-
 // runGoPipeline drives Pass 1 (per-file ParseFile) + Pass 2 (Resolve) for Go.
 // Returns the resolved graph, the per-Function/Method body field-touch map
 // used by cross-function lock propagation, count of files that failed
@@ -173,7 +145,7 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // operators can investigate without breaking the build.
 //
 // propagate turns on lock propagation into callees (gop.LockOptions).
-func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, roles FileRoles, propagate bool, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
+func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, roles FileRoles, propagate bool, log *slog.Logger) (*parse.ResolvedGraph, int, error) {
 	p := gop.New(srcRoot)
 	loadStart := time.Now()
 	loadErrs := 0
@@ -184,7 +156,6 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		p.SetPackages(pkgs)
 	}
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "go")
-	pending := collectPendingRefs(results)
 	rg, err := p.Resolve(results)
 	// Emit implements / extends edges from go/types satisfaction. Runs
 	// post-Resolve because (a) it needs the union of Struct/Interface IDs
@@ -197,12 +168,11 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		log.Debug("implements emitted", "count", len(implEdges), "outside_build", len(implPending))
 		// uses_type post-pass. Same wiring rationale as
 		// implements above. Cross-package types without a node (stdlib,
-		// vendored deps) become PendingRefs — appended to the pending
-		// slice so the cold path persists them via InsertPendingRefs (q4=A).
+		// vendored deps) become PendingRefs, which give External nodes below.
 		usesEdges, usesPending := gop.EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, usesEdges...)
 		// Types outside the build (time.Timer, big.Int) get External nodes
-		// (schema 1.36). The refs stay pending as well (pending_refs).
+		// (schema 1.36).
 		// An interface that embeds one from outside the build (io.Reader)
 		// extends that interface's External node; the post-Resolve pass
 		// finds these again on every build, so they are not stored as
@@ -211,37 +181,7 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		rg.Nodes = append(rg.Nodes, extNodes...)
 		rg.Edges = append(rg.Edges, extEdges...)
 		log.Debug("uses_type emitted", "edges", len(usesEdges), "pending", len(usesPending))
-		// Anchor the pending refs to the file the SRC node was defined in,
-		// so the partial-rebuild path's PendingRefsByFilePath query reaches
-		// them. Build the SRC-ID → file_path lookup once.
-		if len(usesPending) > 0 {
-			srcFile := make(map[string]string, len(rg.Nodes))
-			for _, n := range rg.Nodes {
-				switch n.Type {
-				case types.NodeFunction, types.NodeMethod, types.NodeStruct:
-					if _, exists := srcFile[n.ID]; !exists {
-						srcFile[n.ID] = n.FilePath
-					}
-				}
-			}
-			for _, pr := range usesPending {
-				rel := srcFile[pr.SrcID]
-				if rel == "" {
-					continue // SRC outside this build — skip
-				}
-				pending = append(pending, persist.PendingRefRow{
-					FilePath:          rel,
-					SrcID:             pr.SrcID,
-					TargetQName:       pr.TargetQName,
-					TargetCanonicalID: pr.TargetCanonicalID,
-					EdgeType:          string(pr.EdgeType),
-					Line:              pr.Line,
-					HintFile:          pr.HintFile,
-				})
-			}
-		}
-		// instantiates post-pass. No pending_refs path —
-		// composite-literal targets without a node in the graph are silently
+		// instantiates post-pass: composite-literal targets without a node in the graph are silently
 		// dropped (the noise floor would be higher than the value).
 		instEdges := gop.EmitInstantiatesEdges(p.Pkgs(), rg.Nodes)
 		rg.Edges = append(rg.Edges, instEdges...)
@@ -303,7 +243,7 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 	if rg != nil {
 		rg.LoadErrors = loadErrs
 	}
-	return rg, pending, errs, err
+	return rg, errs, err
 }
 
 // stampFilePath populates Edge.FilePath for every per-file edge that lacks
@@ -356,33 +296,30 @@ func lineQualifyDuplicateCanonicalIDs(nodes []types.Node) {
 // runTSPipeline drives Pass 1 + Pass 2 for TypeScript / JavaScript.
 // Returns the resolved graph, count of files that failed to read or parse,
 // and any fatal Resolve error. Mirrors runGoPipeline.
-func runTSPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
+func runTSPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, int, error) {
 	p := tsp.New(srcRoot)
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "ts")
-	pending := collectPendingRefs(results)
 	rg, err := p.Resolve(results)
-	return rg, pending, errs, err
+	return rg, errs, err
 }
 
 // runSolPipeline drives Pass 1 + Pass 2 for Solidity. Returns the parser
 // instance so callers can read the accumulated ABI for cross-language linking.
-func runSolPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, *solp.Parser, error) {
+func runSolPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, int, *solp.Parser, error) {
 	p := solp.New(srcRoot)
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "sol")
-	pending := collectPendingRefs(results)
 	rg, err := p.Resolve(results)
-	return rg, pending, errs, p, err
+	return rg, errs, p, err
 }
 
 // runProtoPipeline drives Pass 1 + Pass 2 for `.proto` files (schema 1.9).
 // Mirrors runTSPipeline — proto has no cross-language ABI to surface back to
 // the caller, so the signature stays minimal.
-func runProtoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
+func runProtoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, int, error) {
 	p := protop.New(srcRoot)
 	results, errs := parseConcurrent(srcRoot, files, log, p.ParseFile, "proto")
-	pending := collectPendingRefs(results)
 	rg, err := p.Resolve(results)
-	return rg, pending, errs, err
+	return rg, errs, err
 }
 
 // convertABI bridges solidity.ABISig (parser output) and link.ABISig (linker
