@@ -77,6 +77,10 @@ type Manifest struct {
 	// consumers watch it to detect "the enrichment moved" without a vector
 	// realignment. Additive + omitempty (no SchemaVersion bump).
 	EnrichDigest string `json:"enrich_digest,omitempty"`
+	// History says how much git history the build recorded and what bounded
+	// it, so a history answer can say what it could not see. nil when the
+	// source had no git history. Additive + omitempty.
+	History *HistoryRecord `json:"history,omitempty"`
 	// Files is the per-file incremental-cache record (schema 1.2).
 	// Each entry tracks the SHA256 + cache key of one source file plus the
 	// node/edge IDs it produced, enabling subsequent builds to skip parsing
@@ -180,6 +184,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"parse_errors_count", m.ParseErrorsCount},
 		{"unresolved_refs_count", m.UnresolvedRefsCount},
 		{"go_load_errors_count", m.GoLoadErrorsCount},
+		{"history", m.History},
 		// "files" is the incremental-cache fingerprint blob. It can be large
 		// on big repos (~120 bytes per file), but JSON-blob storage in the
 		// existing kv table is fine for now — a later change may move this to
@@ -268,6 +273,7 @@ func readManifest(ctx context.Context, q manifestQueryer) (Manifest, error) {
 		{"ckgignore", &m.CKGIgnore},
 		{"parse_errors_count", &m.ParseErrorsCount},
 		{"unresolved_refs_count", &m.UnresolvedRefsCount},
+		{"history", &m.History},
 		// pre-1.2 manifests have no "files" key; the empty branch leaves
 		// m.Files as nil, which buildpipe interprets as "no cache available".
 		{"files", &m.Files},

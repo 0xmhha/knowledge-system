@@ -1,6 +1,7 @@
 package temporal_test
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,112 +11,77 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
 )
 
-// TestLoadHistory_BasicThreeFiles initialises a tiny repo with three files
-// across three commits, then verifies that LoadHistory populates Files +
-// Commits with the expected (file → SHA list) shape.
-//
-// Sequence:
-//
-//	commit1: add a.txt
-//	commit2: add b.txt
-//	commit3: modify a.txt
-//
-// Expected Files:
-//
-//	a.txt → [commit3, commit1]   (most-recent-first)
-//	b.txt → [commit2]
-func TestLoadHistory_BasicThreeFiles(t *testing.T) {
-	repo := initRepo(t)
-	c1 := commitFile(t, repo, "a.txt", "alpha\n", "first")
-	c2 := commitFile(t, repo, "b.txt", "bravo\n", "second")
-	c3 := commitFile(t, repo, "a.txt", "alpha\nmore\n", "third (modify a)")
-
-	hist, err := temporal.LoadHistory(repo, 10)
-	if err != nil {
-		t.Fatalf("LoadHistory: %v", err)
-	}
-	if got, want := len(hist.Files), 2; got != want {
-		t.Errorf("Files count = %d, want %d (%v)", got, want, fileNames(hist.Files))
-	}
-	if got, want := len(hist.Commits), 3; got != want {
-		t.Errorf("Commits count = %d, want %d", got, want)
-	}
-	wantA := []string{c3, c1}
-	if !sliceEq(hist.Files["a.txt"], wantA) {
-		t.Errorf("Files[a.txt] = %v, want %v", hist.Files["a.txt"], wantA)
-	}
-	wantB := []string{c2}
-	if !sliceEq(hist.Files["b.txt"], wantB) {
-		t.Errorf("Files[b.txt] = %v, want %v", hist.Files["b.txt"], wantB)
-	}
-	// Commit metadata sanity: subject + non-zero timestamp recorded.
-	if hist.Commits[c1].Subject == "" || hist.Commits[c1].Timestamp == 0 {
-		t.Errorf("Commit[c1] missing subject/timestamp: %+v", hist.Commits[c1])
-	}
-}
-
-// TestLoadHistory_MostRecentFirst pins down the ordering invariant: the
-// first SHA in Files[<path>] is the most recent commit touching that path.
-func TestLoadHistory_MostRecentFirst(t *testing.T) {
-	repo := initRepo(t)
-	first := commitFile(t, repo, "x.txt", "a\n", "first")
-	second := commitFile(t, repo, "x.txt", "ab\n", "second")
-	third := commitFile(t, repo, "x.txt", "abc\n", "third")
-
-	hist, err := temporal.LoadHistory(repo, 10)
-	if err != nil {
-		t.Fatalf("LoadHistory: %v", err)
-	}
-	got := hist.Files["x.txt"]
-	want := []string{third, second, first}
-	if !sliceEq(got, want) {
-		t.Errorf("Files[x.txt] order = %v, want %v", got, want)
-	}
-}
-
-// TestLoadHistory_PerFileCap ensures maxPerFile bounds the per-file list.
-func TestLoadHistory_PerFileCap(t *testing.T) {
-	repo := initRepo(t)
-	for i := 0; i < 5; i++ {
-		commitFile(t, repo, "y.txt", strings.Repeat("y\n", i+1), "edit y")
-	}
-	hist, err := temporal.LoadHistory(repo, 3)
-	if err != nil {
-		t.Fatalf("LoadHistory: %v", err)
-	}
-	got := hist.Files["y.txt"]
-	if len(got) != 3 {
-		t.Errorf("expected exactly 3 commits for y.txt under cap, got %d (%v)", len(got), got)
-	}
-}
-
-// TestLoadHistory_NotAGitCheckout: when repoRoot has no .git, LoadHistory
-// returns an empty FileHistory with nil error so the build pipeline can
-// degrade gracefully (no temporal edges, no fatal).
-func TestLoadHistory_NotAGitCheckout(t *testing.T) {
+// TestTrackLines_NotAGitCheckout degrades to an empty history.
+func TestTrackLines_NotAGitCheckout(t *testing.T) {
 	dir := t.TempDir()
-	hist, err := temporal.LoadHistory(dir, 10)
+	h, err := temporal.TrackLines(context.Background(), dir, []string{"*.go"},
+		[]temporal.Item{{ID: "f", Path: "a.go"}}, nil)
 	if err != nil {
-		t.Fatalf("LoadHistory: unexpected err on non-git dir: %v", err)
+		t.Fatalf("TrackLines on a non-git dir: %v", err)
 	}
-	if len(hist.Files) != 0 || len(hist.Commits) != 0 {
-		t.Errorf("expected empty history for non-git dir, got Files=%d Commits=%d",
-			len(hist.Files), len(hist.Commits))
+	if len(h.Commits) != 0 || len(h.Touches) != 0 {
+		t.Errorf("expected an empty history, got %d commits, %d touched items", len(h.Commits), len(h.Touches))
 	}
 }
 
-// TestLoadHistory_PathWithSpaces verifies the TAB-based path parser
-// preserves spaces (a naive whitespace split would corrupt the path).
-func TestLoadHistory_PathWithSpaces(t *testing.T) {
+// TestTrackLines_PathWithSpaces follows a file whose name has a space.
+func TestTrackLines_PathWithSpaces(t *testing.T) {
 	repo := initRepo(t)
-	c1 := commitFile(t, repo, "a file.txt", "hello\n", "spaces")
-	hist, err := temporal.LoadHistory(repo, 10)
+	c1 := commitFile(t, repo, "a file.go", "hello\n", "spaces")
+	h, err := temporal.TrackLines(context.Background(), repo, []string{"*.go"},
+		[]temporal.Item{{ID: "f", Path: "a file.go"}}, nil)
 	if err != nil {
-		t.Fatalf("LoadHistory: %v", err)
+		t.Fatalf("TrackLines: %v", err)
 	}
-	got := hist.Files["a file.txt"]
-	if !sliceEq(got, []string{c1}) {
-		t.Errorf("Files[\"a file.txt\"] = %v, want [%s]", got, c1)
+	if got := h.Touches["f"]; len(got) != 1 || got[0].SHA != c1 {
+		t.Errorf("history of \"a file.go\" = %+v, want [%s]", got, c1)
+	}
+}
+
+// TestTrackLines_SubjectKeptWhole keeps a long subject whole: a cut subject
+// ends in the middle of a word or a pull request reference.
+func TestTrackLines_SubjectKeptWhole(t *testing.T) {
+	repo := initRepo(t)
+	subject := "fix: " + strings.Repeat("a long subject ", 20) + "(ethereum#29563) (#133)"
+	sha := commitFile(t, repo, "a.go", "package a\n", subject)
+	h, err := temporal.TrackLines(context.Background(), repo, []string{"*.go"},
+		[]temporal.Item{{ID: "f", Path: "a.go"}}, nil)
+	if err != nil {
+		t.Fatalf("TrackLines: %v", err)
+	}
+	if got := h.Commits[sha].Subject; got != subject {
+		t.Errorf("subject = %q (%d bytes), want the whole subject (%d bytes)", got, len(got), len(subject))
+	}
+	if got := temporal.PRNumber(h.Commits[sha].Subject); got != 133 {
+		t.Errorf("PRNumber = %d, want 133 (the subject's own number, not the cited one)", got)
+	}
+}
+
+// TestPRNumber reads both subject forms GitHub writes.
+func TestPRNumber(t *testing.T) {
+	for _, tc := range []struct {
+		subject string
+		want    int
+	}{
+		{"core: fix x (#123)", 123},
+		{"Merge pull request #456 from someone/branch", 456},
+		{"fix: port upstream change (ethereum#29563) (#133)", 133},
+		{"params: release Geth v 1.13.15", 0},
+		{"refer to #12 in passing", 0},
+		{"core: port a fix (#31991) (#53)", 53},
+	} {
+		if got := temporal.PRNumber(tc.subject); got != tc.want {
+			t.Errorf("PRNumber(%q) = %d, want %d", tc.subject, got, tc.want)
+		}
+	}
+	if n := temporal.PRNumbers("core: port a fix (#31991) (#53)"); n.Own != 53 || len(n.Ported) != 1 || n.Ported[0] != 31991 || n.Reverts != nil {
+		t.Errorf("PRNumbers = %+v; want 53 and the ported 31991", n)
+	}
+	if n := temporal.PRNumbers(`Revert "core: bad change (#120)" (#121)`); n.Own != 121 || len(n.Reverts) != 1 || n.Reverts[0] != 120 || n.Ported != nil {
+		t.Errorf("PRNumbers of a revert = %+v; want 121 reverting 120", n)
+	}
+	if n := temporal.PRNumbers(`Revert "core: bad change (#120)"`); n.Own != 0 || len(n.Reverts) != 1 {
+		t.Errorf("PRNumbers of an unmerged revert = %+v; want no own number, reverting 120", n)
 	}
 }
 
@@ -156,24 +122,4 @@ func run(t *testing.T, dir, name string, args ...string) {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("%s %v: %v\n%s", name, args, err, out)
 	}
-}
-
-func sliceEq(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func fileNames(m map[string][]string) []string {
-	out := make([]string, 0, len(m))
-	for k := range m {
-		out = append(out, k)
-	}
-	return out
 }

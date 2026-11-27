@@ -51,10 +51,11 @@ func TestH3H4_EvidencePackOnRealGitFixture(t *testing.T) {
 		"[INGEST-9] add password to login")
 
 	g := buildSyntheticGraph(relPath)
-	blobs, err := emitTemporalEdges(g, repo, discardLog(), 10, nil)
+	res, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil)
 	if err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
+	blobs := res.hunkBlobs
 
 	// Sanity: three commits emitted, three hunks, three has_hunk edges,
 	// at least one modifies edge per hunk targeting `Login`.

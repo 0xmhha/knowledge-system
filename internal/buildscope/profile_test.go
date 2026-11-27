@@ -266,3 +266,18 @@ func TestStablenetProfileLoads(t *testing.T) {
 		t.Errorf("stablenet profile should list its exceptions as inclusions: %+v", prof)
 	}
 }
+
+// TestLoadProfile_History reads the history section and refuses an upstream
+// without its repository or fork point.
+func TestLoadProfile_History(t *testing.T) {
+	prof, _, err := LoadProfile(writeProfile(t, "build_roots: [./cmd/app]\nhistory:\n  repo: own/repo\n  upstream:\n    repo: up/repo\n    base: v1.0.0\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if h := prof.History; h == nil || h.Repo != "own/repo" || h.Upstream == nil || h.Upstream.Repo != "up/repo" || h.Upstream.Base != "v1.0.0" {
+		t.Errorf("history = %+v", prof.History)
+	}
+	if _, _, err := LoadProfile(writeProfile(t, "build_roots: [./cmd/app]\nhistory:\n  upstream:\n    repo: up/repo\n")); err == nil {
+		t.Error("an upstream without base was accepted")
+	}
+}

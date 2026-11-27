@@ -25,7 +25,9 @@ package evidence
 import (
 	"fmt"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
+	"maps"
 	"path"
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -90,9 +92,11 @@ func (c *Cache) BuildPack(store persist.StoreReader, opt Options) (*Pack, error)
 	corpus := c.corpus
 	scorer := c.scorer
 	c.mu.RUnlock()
-	if corpus == nil || len(corpus.hunks) == 0 {
+	if corpus == nil || len(corpus.commitBySHA) == 0 {
 		return pack, nil
 	}
+	man, _ := c.getManifest(store) // read by ensureIndex just before
+	pack.Searched = searchedCorpus(corpus, man.History)
 
 	// IssueID filter: restrict the candidate set to
 	// hunks whose parent commit cites the requested ticket. When
@@ -166,7 +170,7 @@ func hunksForIssueID(corpus *hunkCorpus, issueID string) []bm25.ScoredDoc {
 func filterByIssueID(scored []bm25.ScoredDoc, corpus *hunkCorpus, issueID string) []bm25.ScoredDoc {
 	out := make([]bm25.ScoredDoc, 0, len(scored))
 	for _, s := range scored {
-		sha := corpus.hunkSHA[s.ID]
+		sha := docSHA(corpus, s.ID)
 		if corpus.issuesBySHA[sha][issueID] {
 			out = append(out, s)
 		}
@@ -260,12 +264,15 @@ func (c *Cache) ensureIndex(store persist.StoreReader) error {
 	// A Goroutine's code edges repeat its function's calls.
 	corpus := indexCorpus(nodes, types.WithoutGoroutineCode(edges))
 
-	docs := make([]bm25.Document, 0, len(corpus.hunks))
+	docs := make([]bm25.Document, 0, len(corpus.hunks)+2*len(corpus.commitBySHA))
 	for _, h := range corpus.hunks {
 		docs = append(docs, bm25.Document{
 			ID:     h.ID,
 			Tokens: hunkDocTokens(store, h, corpus),
 		})
+	}
+	for _, sha := range slices.Sorted(maps.Keys(corpus.commitBySHA)) {
+		docs = append(docs, commitDocs(corpus.commitBySHA[sha], corpus, sha)...)
 	}
 	scorer := bm25.NewOkapi()
 	scorer.Index(docs)

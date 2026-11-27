@@ -329,7 +329,21 @@ import (
 // The pending_refs table is no longer written (only the removed incremental
 // build read it); an older graph.db keeps it until the next build replaces
 // the file.
-const SchemaVersion = "1.43"
+//
+// 1.44 (2026-11-27): history facts follow lines. changed_in and blame are
+// recorded for File nodes and declarations only: a declaration's changed_in
+// edges are the commits that changed its own lines (git log -L, renames
+// followed, every commit unless --temporal-depth caps it; Line = its first
+// line in that commit), blame edges the commits that last changed its lines
+// today (git blame, Count = lines). modifies links a hunk to a declaration
+// only when a changed line (not context) lies in the declaration at the
+// hunk's commit. Commit nodes carry attrs.commit (author, author and commit
+// times, the whole subject, body, pull request number and its repository)
+// and their Signature keeps the whole subject. node_prs comes from the same
+// line history, Repo set per number space. The manifest gains "history" and
+// stats enrichment_nodes/enrichment_edges, and its node and edge counts
+// include the enrichment rows. Force a cold rebuild (every build is).
+const SchemaVersion = "1.44"
 
 // ComputeCacheKey returns the SHA256 of:
 //

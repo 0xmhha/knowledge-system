@@ -9,9 +9,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/0xmhha/knowledge-system/internal/buildscope"
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
+	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
 )
 
 func newBuildCmd() *cobra.Command {
@@ -65,6 +67,9 @@ func newBuildCmd() *cobra.Command {
 			// fileRoles carries each scoped file's role to the build, so
 			// is_test follows the scope and not the file's name alone.
 			var fileRoles buildpipe.FileRoles
+			// spaces says which repository a pull request number belongs
+			// to, from the scope's history section.
+			var spaces temporal.NumberSpaces
 			if scopePath != "" {
 				if filesFrom != "" || len(filesFromMain) > 0 {
 					return fmt.Errorf("--scope cannot be combined with --files-from or --files-from-main")
@@ -74,6 +79,7 @@ func newBuildCmd() *cobra.Command {
 					return err
 				}
 				generatedFilter, goBuild = fl, b
+				spaces = numberSpaces(s.History)
 				fileRoles = make(buildpipe.FileRoles, len(s.Files))
 				for _, f := range s.Files {
 					fileRoles[f.Path] = buildpipe.FileRole(f.Role)
@@ -114,6 +120,7 @@ func newBuildCmd() *cobra.Command {
 				PolicyFile:          policyFile,
 				SecurityPatternFile: securityPatternFile,
 				TemporalDepth:       temporalDepth,
+				NumberSpaces:        spaces,
 			})
 			if err != nil {
 				return err
@@ -175,7 +182,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&policyFile, "policy-file", "",
 		"path to governance/protocol policy YAML (pkg/policy); enriches the graph with NodePolicy + EdgeGovernedBy rows")
 	cmd.Flags().IntVar(&temporalDepth, "temporal-depth", 0,
-		"max commits per file the temporal pass walks for changed_in/Hunk/blame edges (0 = default 10; higher deepens commit history at ~linear graph-size cost; does not affect node_prs symbol history)")
+		"keep at most this many changed_in edges per file or declaration, newest first (0 = every commit that changed its lines); blame, hunks and node_prs are not capped by it")
 	cmd.Flags().StringVar(&securityPatternFile, "security-pattern-file", "",
 		"path to security risk pattern YAML (pkg/security); enriches the graph with NodeSecurityPattern + EdgeHasSecurityPattern rows")
 	cmd.Flags().BoolVar(&failOnParseErrors, "fail-on-parse-errors", false,
@@ -262,4 +269,17 @@ func srcCommitHash(srcRoot string) (string, error) {
 		return "", fmt.Errorf("git log in %s: %w", absRoot, err)
 	}
 	return strings.TrimSpace(string(out)), nil
+}
+
+// numberSpaces turns a scope's history section into the build's pull request
+// number spaces; nil gives the zero value (every number is the origin's).
+func numberSpaces(h *buildscope.History) temporal.NumberSpaces {
+	if h == nil {
+		return temporal.NumberSpaces{}
+	}
+	ns := temporal.NumberSpaces{Repo: h.Repo}
+	if h.Upstream != nil {
+		ns.UpstreamRepo, ns.UpstreamBase = h.Upstream.Repo, h.Upstream.Base
+	}
+	return ns
 }
