@@ -18,10 +18,8 @@ const testDemotionFactor = 0.25
 // the same demotion to test-file neighbors when Stage 2 demoted tests.
 const TestDemotionFactor = testDemotionFactor
 
-// isTestPath reports whether file is a test or test-only support file. It
-// delegates to pkg/testpath.IsTest, the single source of truth shared with
-// the exclude_tests query filter, so graph and vector citations are
-// classified consistently without re-indexing.
+// isTestPath is the path rule (testpath.IsTest), for an aggregator made
+// without the graph's rule (ckgclient.TestFileRule), as in tests.
 func isTestPath(file string) bool {
 	return testpath.IsTest(file)
 }
