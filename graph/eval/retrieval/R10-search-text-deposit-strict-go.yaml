@@ -1,10 +1,16 @@
 id: R10-search-text-deposit-strict-go
 description: |
   Single-keyword precision target: "Deposit" with language=go must
-  return all Go symbol nodes whose name/qname or search_tokens
-  contain the token "deposit". Since schema 1.13 the search_tokens
-  column carries camelCase-split tokens, so HandleDeposit and
-  SafeDeposit now match via the "deposit" sub-token.
+  return every Go declaration whose name/qname or search_tokens contain
+  the token "deposit". Since schema 1.13 the search_tokens column carries
+  camelCase-split tokens, so HandleDeposit and SafeDeposit match via the
+  "deposit" sub-token.
+
+  The probe runs the search_text tool's default path (no node_kinds), as
+  an MCP client calls it: the tool's default filter leaves out whatever is
+  declared inside a function body, so `var req` in HandleDeposit (stored
+  as a Variable node, api.Handler.HandleDeposit.req, while `:=` locals are
+  LocalVariable nodes) is not an expected result.
 probe:
   tool: search_text
   args:

@@ -17,6 +17,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -79,29 +80,17 @@ func depthSweepProbes(seedQname string) []mcpProbe {
 	}
 }
 
-// defaultMCPProbes covers the eight registered tools with realistic
-// query shapes. The seed qname is plucked from the graph at runtime
-// so tests don't need fixture-specific knowledge.
-func defaultMCPProbes(seedQname string) []mcpProbe {
-	probes := []mcpProbe{
-		{Name: "find_symbol", Args: map[string]any{"name": "Login"}},
-		{Name: "search_text", Args: map[string]any{"query": "consensus", "top_k": 10.0}},
-		{Name: "get_context_for_task", Args: map[string]any{
-			"task_description": "consensus metrics", "budget_tokens": 4000.0, "max_bodies": 3.0,
-		}},
-		{Name: "evidence_for_intent", Args: map[string]any{
-			"intent": "consensus metrics", "k": 5.0, "budget_tokens": 4000.0,
-		}},
+// notProbed is a registered tool a bench run did not call, and why.
+type notProbed struct {
+	Tool   string `json:"tool"`
+	Reason string `json:"reason"`
+}
+
+// reportNotProbed prints the tools a run did not call.
+func reportNotProbed(w io.Writer, skipped []notProbed) {
+	for _, s := range skipped {
+		_, _ = fmt.Fprintf(w, "  %-26s NOT PROBED (%s)\n", s.Tool, s.Reason)
 	}
-	if seedQname != "" {
-		probes = append(probes,
-			mcpProbe{Name: "find_callers", Args: map[string]any{"qname": seedQname, "depth": 1.0}},
-			mcpProbe{Name: "find_callees", Args: map[string]any{"qname": seedQname, "depth": 1.0}},
-			mcpProbe{Name: "get_subgraph", Args: map[string]any{"seed_qname": seedQname, "depth": 2.0}},
-			mcpProbe{Name: "impact_of_change", Args: map[string]any{"seed_qname": seedQname, "depth": 2.0}},
-		)
-	}
-	return probes
 }
 
 func newBenchMCPCmd() *cobra.Command {
@@ -115,16 +104,22 @@ func newBenchMCPCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bench-mcp",
 		Short: "Measure in-process MCP tool p50/p95/p99 latency against a graph.db",
-		Long: `Build a fresh MCP server in-process, then drive every registered
-tool's handler with a parallel load profile. Reports the same JSON
+		Long: `Build a fresh MCP server in-process, then drive every tool it
+registers with a parallel load profile. Reports the same JSON
 shape as bench-server so the two numbers can be compared
 side-by-side: bench-server captures HTTP latency, bench-mcp captures
 the underlying graph layer without stdio + JSON-RPC framing.
 
-Tools that need a seed qname (find_callers / find_callees /
-get_subgraph / impact_of_change) skip when the graph has no
-Function-typed root. Tools that don't (find_symbol / search_text /
-get_context_for_task / evidence_for_intent) always run.`,
+The tools come from the server's registry. Each probe's seed is picked
+from the graph by one rule per tool: the highest-ranked node of the kinds
+the tool asks about (Functions for the traversal and search tools, Fields
+and Variables for find_references, Mutexes, Fields and Functions for
+concurrency_impact) whose answer is real, that is whose answer key is
+not empty; at most 20 candidates are tried. The output (probe_seed) gives
+each probe's rule, seed and arguments. A tool for which the graph gives
+no real answer (change_history on a graph built without history) is
+listed under empty_by_graph with the reason and is not timed; a tool
+without probe arguments is listed under not_probed.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if iterations <= 0 || iterations > 10000 {
 				return fmt.Errorf("--iterations must be in [1, 10000], got %d", iterations)
@@ -139,20 +134,25 @@ get_context_for_task / evidence_for_intent) always run.`,
 			}
 			defer func() { _ = store.Close() }()
 
-			seed, err := pickFunctionSeed(store)
+			seed, _ := pickFunctionSeed(store)
+			_, handlers := mcp.NewBenchHandlers(store)
+			candidates, err := store.TopNodes("pagerank", seedCandidates)
 			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "ckg bench-mcp: no Function seed; skipping callers/callees/subgraph/impact probes\n")
+				return fmt.Errorf("rank seed candidates: %w", err)
 			}
 			var probes []mcpProbe
+			var skipped []notProbed
+			var made *probeSeed
 			if depthSweep {
-				probes = depthSweepProbes(seed)
+				probes = depthSweepProbes(seed.QualifiedName)
 				if len(probes) == 0 {
 					return fmt.Errorf("--depth-sweep requested but no Function seed found in graph")
 				}
 			} else {
-				probes = defaultMCPProbes(seed)
+				probes, skipped, made = mcpProbesFor(mcp.SortedToolNames(handlers), candidates, handlerCall(handlers))
 			}
-			_, handlers := mcp.NewBenchHandlers(store)
+			reportProbeSeed(os.Stderr, made)
+			reportNotProbed(os.Stderr, skipped)
 
 			_, _ = fmt.Fprintf(os.Stderr, "bench-mcp: graph=%s iters=%d concurrency=%d probes=%d\n",
 				graph, iterations, concurrency, len(probes))
@@ -166,8 +166,8 @@ get_context_for_task / evidence_for_intent) always run.`,
 				}
 				r := runMCPBench(h, p, iterations, concurrency)
 				results = append(results, r)
-				_, _ = fmt.Fprintf(os.Stderr, "  %-26s p50=%6.2f p95=%6.2f p99=%6.2f mean=%6.2f errors=%d\n",
-					r.Endpoint, r.P50Ms, r.P95Ms, r.P99Ms, r.MeanMs, r.ErrorCount)
+				_, _ = fmt.Fprintf(os.Stderr, "  %-26s p50=%6.2f p95=%6.2f p99=%6.2f mean=%6.2f errors=%d result_bytes=%d\n",
+					r.Endpoint, r.P50Ms, r.P95Ms, r.P99Ms, r.MeanMs, r.ErrorCount, r.ResultBytes)
 			}
 
 			man, _ := store.GetManifest()
@@ -179,6 +179,8 @@ get_context_for_task / evidence_for_intent) always run.`,
 				Iterations:     iterations,
 				Concurrency:    concurrency,
 				Results:        results,
+				NotProbed:      skipped,
+				ProbeSeed:      made,
 			}
 			payload, err := json.MarshalIndent(out, "", "  ")
 			if err != nil {
@@ -223,6 +225,7 @@ func runMCPBench(handler mcpserver.ToolHandlerFunc, probe mcpProbe, iterations, 
 		dur time.Duration
 		err error
 	}
+	resultBytes := 0
 	{
 		// Warmup: prime any per-tool caches so the bench measures the
 		// steady-state path the way bench-server does (which benefits
@@ -230,7 +233,11 @@ func runMCPBench(handler mcpserver.ToolHandlerFunc, probe mcpProbe, iterations, 
 		warmReq := mcpgo.CallToolRequest{}
 		warmReq.Params.Name = probe.Name
 		warmReq.Params.Arguments = probe.Args
-		_, _ = handler(context.Background(), warmReq)
+		if res, err := handler(context.Background(), warmReq); err == nil && res != nil {
+			if b, err := json.Marshal(res); err == nil {
+				resultBytes = len(b)
+			}
+		}
 	}
 	samples := make(chan sample, iterations*concurrency)
 	var wg sync.WaitGroup
@@ -268,6 +275,7 @@ func runMCPBench(handler mcpserver.ToolHandlerFunc, probe mcpProbe, iterations, 
 		N:           len(durs),
 		Concurrency: concurrency,
 		ErrorCount:  errCount,
+		ResultBytes: resultBytes,
 	}
 	if len(durs) == 0 {
 		return r

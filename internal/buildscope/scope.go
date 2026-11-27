@@ -58,6 +58,9 @@ type Scope struct {
 	// Problems are load errors the build tool reported; a scope with problems
 	// may be incomplete, so extraction fails on them unless told otherwise.
 	Problems []string `json:"problems,omitempty"`
+	// GoStderr is what the go command wrote to standard error while the
+	// scope was extracted; it goes into error messages, not the file.
+	GoStderr []string `json:"-"`
 	// CheckedBinaries are built binaries whose recorded build settings were
 	// compared with Target and EntryPoints and matched.
 	CheckedBinaries []CheckedBinary `json:"checked_binaries,omitempty"`

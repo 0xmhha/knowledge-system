@@ -5,8 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	mcp "github.com/mark3labs/mcp-go/mcp"
-
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -169,13 +167,6 @@ func forwardCallees(reader store.Reader, seed seedRef, depth int) ([]types.Node,
 		return nil, nil, err
 	}
 	return walkCalls(reader, ids, depth, false /*reverse*/)
-}
-
-// textResult wraps a payload in the mcp-go structured-result envelope.
-// All handlers route their JSON payload through here so the response
-// shape stays uniform across the tool set.
-func textResult(payload any) *mcp.CallToolResult {
-	return mcp.NewToolResultStructured(payload, "")
 }
 
 // callEdgeTypes are the edge types find_callers / find_callees follow.

@@ -40,4 +40,6 @@ func RegisterAll(s *server.MCPServer, reader store.Reader) {
 	// evidence_for_intent call. Manifest-keyed invalidation handles
 	// the case where a concurrent `ckg build` rebuilds the graph.
 	RegisterEvidenceForIntent(s, reader, evidence.NewCache())
+	// No answer repeats a caller argument longer than maxEchoBytes.
+	boundEchoes(s)
 }

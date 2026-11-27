@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	mcp "github.com/mark3labs/mcp-go/mcp"
 	server "github.com/mark3labs/mcp-go/server"
@@ -21,6 +22,16 @@ const mcpServerVersion = "0.1.0"
 // tool names follow the shared namespace rule (see pkg/mcp): bare names by
 // default, <root>.context.<name> when a namespace root is injected via
 // --namespace, KNOWLEDGE_MCP_NAMESPACE, or -ldflags.
+// contentFlagHelp is the help of ckg mcp --content.
+const contentFlagHelp = "which blocks a tool result carries: both (a text block and structuredContent, the same answer twice), " +
+	"text (the text block only) or structured (structuredContent only, with an empty content list). " +
+	"The default is both because the MCP specification says a tool that returns structured content SHOULD also return " +
+	"functionally equivalent unstructured content, and a client that reads only text content sees nothing otherwise; " +
+	"the cost is a response about twice as large. The text of a JSON answer is its JSON; investigate and investigate_open " +
+	"answer in prose, which is the text, and their structuredContent is {\"text\": <the prose>}. " +
+	"--page-bytes bounds all blocks together; the investigate budget argument bounds the characters of the prose, " +
+	"which under both is sent in each block"
+
 func newMCPCmd() *cobra.Command {
 	var graph, name, namespace, trace string
 	var pageBytes int
@@ -29,6 +40,7 @@ func newMCPCmd() *cobra.Command {
 	var noInstructions bool
 	var toolTextFile string
 	var nameAsBoth, reasonTail bool
+	var content string
 	cmd := &cobra.Command{
 		Use:   "mcp",
 		Short: "Run the MCP stdio server",
@@ -46,8 +58,20 @@ func newMCPCmd() *cobra.Command {
 			}
 			defer func() { _ = store.Close() }()
 
+			mode, err := mcphandlers.ParseContentMode(content)
+			if err != nil {
+				return fmt.Errorf("--content: %w", err)
+			}
+			mcphandlers.SetContentMode(mode)
 			mcphandlers.SetNamespaceRoot(kmcp.Root(namespace, ""))
-			mcphandlers.SetSearchCodePageBytes(pageBytes)
+			// The default applies only when the flag is absent; a given
+			// size below the minimum (0 and negatives too) is refused.
+			if cmd.Flags().Changed("page-bytes") {
+				if err := mcphandlers.ValidateSearchCodePageBytes(pageBytes); err != nil {
+					return err
+				}
+				mcphandlers.SetSearchCodePageBytes(pageBytes)
+			}
 			if resultDir == "" {
 				resultDir = os.Getenv("CKG_SEARCH_CODE_DIR")
 			}
@@ -101,9 +125,11 @@ func newMCPCmd() *cobra.Command {
 	cmd.Flags().StringVar(&name, "name", "knowledge-graph", "MCP server name reported in the handshake")
 	cmd.Flags().StringVar(&namespace, "namespace", "", "tool-namespace root override (default: env/build-time, else bare names)")
 	cmd.Flags().StringVar(&trace, "trace", "", "append one JSON line per tool call with what it matched, kept and cut (default: $CKG_MCP_TRACE; off when empty)")
-	cmd.Flags().IntVar(&pageBytes, "page-bytes", 0, "largest search_code response in bytes; a larger result is sent in parts (default 40000, sized for Claude Code's 25,000-token tool output limit)")
+	cmd.Flags().StringVar(&content, "content", string(mcphandlers.DefaultContentMode), contentFlagHelp)
+	cmd.Flags().IntVar(&pageBytes, "page-bytes", 0, "largest search_code response in bytes: the content list (each text block with its type key) and the structuredContent value, as encoded on the wire, both under --content both (the JSON-RPC envelope around them is not counted); a larger result is sent in parts (default 40000, sized for Claude Code's 25,000-token tool output limit; at least "+
+		strconv.Itoa(mcphandlers.MinSearchCodePageBytes)+", the smallest answer, or the server refuses to start)")
 	cmd.Flags().StringVar(&resultDir, "result-dir", "", "folder where a search_code result larger than one response is saved as a JSON file; the response then holds only its path (default: $CKG_SEARCH_CODE_DIR; empty sends an index instead). The agent must be allowed to read it")
-	cmd.Flags().IntVar(&maxResultChars, "max-result-chars", 0, "declare to the client (Claude Code _meta anthropic/maxResultSizeChars) the largest search_code result it should give the model inline; 0 declares none")
+	cmd.Flags().IntVar(&maxResultChars, "max-result-chars", 0, "declare to the client (Claude Code _meta anthropic/maxResultSizeChars) the largest search_code result it should give the model inline; 0 declares none. The value is sent as given: the server does not cut answers to it, and how a client counts a response that carries both blocks is the client's")
 	cmd.Flags().BoolVar(&noInstructions, "no-instructions", false, "do not send the server guide (instructions) in the MCP handshake; for measuring what the guide changes")
 	cmd.Flags().BoolVar(&nameAsBoth, "name-as-both", false, "answer search_code in=name with in=both: name matches first, then body matches")
 	cmd.Flags().BoolVar(&reasonTail, "reason-tail", false, "give search_code a reasons argument; graph neighbours of the hits that hold a reason word are listed after the hits under related")

@@ -11,41 +11,37 @@
 package mcp
 
 import (
+	"maps"
+	"slices"
+
 	server "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
 )
 
-// BenchToolNames is the canonical ordering of the eight tools, used
-// by cmd/ckg/bench-mcp so probe output stays stable across runs.
-var BenchToolNames = []string{
-	"find_symbol",
-	"find_callers",
-	"find_callees",
-	"get_subgraph",
-	"search_text",
-	"get_context_for_task",
-	"impact_of_change",
-	"evidence_for_intent",
-}
-
-// NewBenchHandlers builds a fresh MCPServer with all eight tools
-// registered through the safe wrapper, then returns the handler map
-// keyed by tool name. The MCPServer is returned alongside so the
-// caller can cleanly tear down (the current mcp-go API doesn't need
-// explicit close, but holding the reference avoids GC pressure on
-// long-running benches).
+// NewBenchHandlers builds a fresh MCPServer with every tool registered
+// through mcphandlers.RegisterAll, then returns the handler map keyed by
+// the client-visible tool name. The list of tools is the registry's, so a
+// tool added to RegisterAll is benched without a change here. The
+// MCPServer is returned alongside so the caller holds the reference for
+// the run.
 func NewBenchHandlers(store persist.StoreReader) (*server.MCPServer, map[string]server.ToolHandlerFunc) {
 	s := server.NewMCPServer("ckg-bench", "0.0.0")
 	mcphandlers.RegisterAll(s, store)
-	handlers := make(map[string]server.ToolHandlerFunc, len(BenchToolNames))
-	for _, name := range BenchToolNames {
-		t := s.GetTool(mcphandlers.ToolName(name))
+	tools := s.ListTools()
+	handlers := make(map[string]server.ToolHandlerFunc, len(tools))
+	for name, t := range tools {
 		if t == nil || t.Handler == nil {
 			continue
 		}
 		handlers[name] = t.Handler
 	}
 	return s, handlers
+}
+
+// SortedToolNames returns the tool names of handlers in sorted order, the
+// order bench output uses so runs compare row by row.
+func SortedToolNames(handlers map[string]server.ToolHandlerFunc) []string {
+	return slices.Sorted(maps.Keys(handlers))
 }

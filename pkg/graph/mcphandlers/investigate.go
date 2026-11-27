@@ -1573,7 +1573,7 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 		}
 		terms := splitTerms(req.GetString("words", ""))
 		if len(terms) == 0 {
-			return mcp.NewToolResultText("no words: give identifiers of three or more characters, separated by |"), nil
+			return proseResult("no words: give identifiers of three or more characters, separated by |"), nil
 		}
 		sess := sessionFor(s)
 		sess.mu.Lock()
@@ -1606,7 +1606,7 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 		text := head + body
 		text += footer(inv, cut, budget-len(text))
 		traceFrom(ctx).add("investigate", invTrace(x, inv, in, cut, len(text)))
-		return mcp.NewToolResultText(text), nil
+		return proseResult(text), nil
 	})
 
 	open := nsTool("investigate_open",
@@ -1633,12 +1633,12 @@ func RegisterInvestigate(s *server.MCPServer, reader store.Reader) {
 		}
 		inv := sess.invs[id]
 		if inv == nil {
-			return mcp.NewToolResultText(fmt.Sprintf("unknown investigation %q; run investigate first", id)), nil
+			return proseResult(fmt.Sprintf("unknown investigation %q; run investigate first", id)), nil
 		}
 		budget := clampBudget(int(req.GetFloat("budget", invDefaultBudget)))
 		text := x.open(inv, sess, req.GetString("open", ""), int(req.GetFloat("from", 0)), budget)
 		traceFrom(ctx).add("investigate_open", map[string]any{"id": id, "open": req.GetString("open", ""), "chars": len(text)})
-		return mcp.NewToolResultText(text), nil
+		return proseResult(text), nil
 	})
 }
 

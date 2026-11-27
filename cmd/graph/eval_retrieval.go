@@ -16,6 +16,15 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
+// retrievalExampleFixture is a fixture shipped with the repository, given
+// in the help as the example; it runs against a graph of
+// graph/testdata/synthetic.
+const retrievalExampleFixture = "graph/eval/retrieval/R03-find-callers-service-new.yaml"
+
+// defaultRetrievalFixtures is the default --fixtures directory. It is
+// relative to the working directory and exists when ckg runs in graph/.
+const defaultRetrievalFixtures = "eval/retrieval"
+
 func newEvalRetrievalCmd() *cobra.Command {
 	var (
 		graph    string
@@ -34,6 +43,31 @@ The probe-tool layer mirrors the MCP tools (find_callers, find_callees,
 find_symbol, search_text) so fixture YAML stays close to how a real
 consumer would call them.
 
+A fixture is one YAML file (*.yaml or *.yml) with these fields:
+
+  id                     unique name of the probe (required)
+  description            free text
+  probe.tool             find_callers, find_callees, find_symbol or
+                         search_text (required)
+  probe.args             the tool's arguments: qname and depth (callers,
+                         callees), name, exact, language, kinds
+                         (find_symbol), query, top_k, language, mode,
+                         node_kinds (search_text)
+  expected.symbols       qualified names the probe must return (required,
+                         not empty)
+  scoring.recall_min     pass threshold for recall (default 0)
+  scoring.precision_min  pass threshold for precision (default 0)
+
+An example shipped with the repository is
+` + retrievalExampleFixture + `; its directory holds
+the fixtures for a graph of graph/testdata/synthetic. From graph/:
+
+  ckg build --src=testdata/synthetic --out=eval/.synthetic-data --lang=go,ts,sol
+  ckg eval-retrieval --graph=eval/.synthetic-data --fixtures=eval/retrieval
+
+The default --fixtures (` + defaultRetrievalFixtures + `) is relative to the
+working directory, so it exists only when ckg runs in graph/.
+
 Output JSON shape:
   {
     "graph": "...",
@@ -47,8 +81,12 @@ Output JSON shape:
 Exit codes:
   0  every fixture met its threshold
   1  one or more fixtures failed
-  2  internal error (graph open, fixture parse, etc.)`,
+  2  the run could not be made (graph open, missing fixtures
+     directory, fixture parse, etc.); a command-line flag error exits 1`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := requireFixturesDir(fixtures); err != nil {
+				return err
+			}
 			db := filepath.Join(graph, "graph.db")
 			store, err := persist.OpenReadOnly(db)
 			if err != nil {
@@ -91,12 +129,40 @@ Exit codes:
 		},
 	}
 	cmd.Flags().StringVar(&graph, "graph", "", "graph directory containing graph.db (required)")
-	cmd.Flags().StringVar(&fixtures, "fixtures", "eval/retrieval",
-		"directory containing retrieval *.yaml fixtures")
+	cmd.Flags().StringVar(&fixtures, "fixtures", defaultRetrievalFixtures,
+		"directory containing retrieval *.yaml fixtures (relative to the working directory)")
 	cmd.Flags().StringVar(&output, "output", "-",
 		"path for JSON output ('-' for stdout)")
 	_ = cmd.MarkFlagRequired("graph")
+	run := cmd.RunE
+	cmd.RunE = func(c *cobra.Command, args []string) error {
+		if err := run(c, args); err != nil {
+			return exitCodeError{Code: evalRetrievalInternalExit, Err: err}
+		}
+		return nil
+	}
 	return cmd
+}
+
+// evalRetrievalInternalExit is the exit code of a run that could not be
+// made (the help's code 2).
+const evalRetrievalInternalExit = 2
+
+// requireFixturesDir fails with the directory's name, and for a relative
+// path the directory it was looked for in, when dir is not a directory.
+func requireFixturesDir(dir string) error {
+	st, err := os.Stat(dir)
+	if err == nil && st.IsDir() {
+		return nil
+	}
+	where := dir
+	if abs, absErr := filepath.Abs(dir); absErr == nil && abs != dir {
+		where = fmt.Sprintf("%s (looked for at %s)", dir, abs)
+	}
+	if err == nil {
+		return fmt.Errorf("--fixtures %s is not a directory", where)
+	}
+	return fmt.Errorf("--fixtures %s: %w; give the directory of the fixture YAML files (see --help)", where, err)
 }
 
 // retrievalReport is the JSON shape consumed by make eval +

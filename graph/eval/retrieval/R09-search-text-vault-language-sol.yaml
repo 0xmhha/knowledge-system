@@ -12,10 +12,15 @@ probe:
     language: "sol"
     top_k: 20
 expected:
+  # A qualified name two declarations share (the TypeScript class and the
+  # Solidity contract are both "Vault") is printed and scored in the site
+  # form <qname>@<file>:<line>, the name that opens exactly one node.
   symbols:
-    - Vault                              # contract
-    - Vault.deposit                      # method (qname carries "vault" via contract prefix)
+    - Vault@sol-contract/contracts/Vault.sol:3          # contract
+    - Vault.deposit@sol-contract/contracts/Vault.sol:9  # method (qname carries "vault" via contract prefix)
     - Vault.nonZero                      # modifier
+    - Vault.Deposited                    # event (qname carries "vault" via contract prefix)
+    - Vault.balances                     # mapping state variable (same)
     - file:sol-contract/contracts/Vault.sol
 scoring:
   recall_min: 1.0

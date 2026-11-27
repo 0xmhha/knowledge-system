@@ -6,9 +6,11 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -40,7 +42,13 @@ const (
 	searchCodeExpandCap   = 10
 )
 
-// searchCodePageBytes bounds one search_code response. search_code returns
+// indexHeaderReserve is the room an index response leaves for its header
+// in each copy of the answer.
+const indexHeaderReserve = 1200
+
+// searchCodePageBytes bounds the content of one search_code response: the
+// bytes of every block it carries (contentBytes), so under ContentBoth the
+// two copies together stay within it. search_code returns
 // every matched declaration and every matched line; a result larger than
 // this is sent in parts (page). Claude Code replaces an MCP tool result over
 // 25,000 tokens (MAX_MCP_OUTPUT_TOKENS) with an error and a file path the
@@ -87,6 +95,27 @@ var searchCodeReasons bool
 // SetSearchCodeOptions turns the two options on or off.
 func SetSearchCodeOptions(nameAsBoth, reasons bool) {
 	searchCodeNameAsBoth, searchCodeReasons = nameAsBoth, reasons
+}
+
+// MinSearchCodePageBytes is the smallest search_code page size a server
+// accepts: the smallest index (totals, the pattern, read_me and how to
+// narrow, no rows and no list entries) fits it in every content mode for
+// a pattern of up to maxFloorPatternBytes bytes (2,223 bytes measured
+// under both with a 200-byte pattern). A result whose smallest index is
+// larger (a longer pattern) is answered with tooLargeAnswer.
+const MinSearchCodePageBytes = 3000
+
+// maxFloorPatternBytes is the pattern length MinSearchCodePageBytes holds for.
+const maxFloorPatternBytes = 200
+
+// ValidateSearchCodePageBytes refuses a page size below
+// MinSearchCodePageBytes, zero and negative sizes included; a caller that
+// was given no size keeps the default and does not call it.
+func ValidateSearchCodePageBytes(n int) error {
+	if n < MinSearchCodePageBytes {
+		return fmt.Errorf("--page-bytes %d is below the smallest search_code answer the server can send; the minimum is %d", n, MinSearchCodePageBytes)
+	}
+	return nil
 }
 
 // SetSearchCodePageBytes changes the part size for clients whose output limit
@@ -876,8 +905,11 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 			context: int(req.GetFloat("context", 0)), only: req.GetStringSlice("ids", nil), trace: traceFrom(ctx),
 		})
 		if err != nil {
-			return textResult(map[string]any{"pattern": req.GetString("pattern", ""), "error": err.Error(), "hits": []any{}}), nil
+			// Echoes are cut before the answer is built, so the size the
+			// answer is measured at is the size it is sent at.
+			return textResult(cutAnswerEchoes(ctx, map[string]any{"pattern": req.GetString("pattern", ""), "error": err.Error(), "hits": []any{}})), nil
 		}
+		out = cutAnswerEchoes(ctx, out)
 		if len(req.GetStringSlice("ids", nil)) == 0 {
 			if res, ok := fileSearchCode(out, traceFrom(ctx), name); ok {
 				return textResult(res), nil
@@ -1595,18 +1627,7 @@ func pageSearchCode(out map[string]any, page int, t *callTrace, tool string) any
 			rest[k] = v
 		}
 	}
-	base, _ := json.Marshal(rest)
-	var parts [][2]int // [from, to) indexes into rows
-	from, size := 0, len(base)
-	for i, r := range rows {
-		b, _ := json.Marshal(r)
-		if i > from && size+len(b)+1 > searchCodePageBytes {
-			parts = append(parts, [2]int{from, i})
-			from, size = i, len(base)
-		}
-		size += len(b) + 1
-	}
-	parts = append(parts, [2]int{from, len(rows)})
+	parts := splitSearchCode(out, rows, rest, tool)
 	t.add("search_code.page", map[string]any{"parts": len(parts), "requested": page, "budget_bytes": searchCodePageBytes})
 	if page < 1 {
 		page = 1
@@ -1618,23 +1639,92 @@ func pageSearchCode(out map[string]any, page int, t *callTrace, tool string) any
 	if len(parts) == 1 {
 		return out
 	}
+	return json.RawMessage(renderPart(rows, rest, parts, page, tool))
+}
+
+// pageFits is the one test of whether a response fits one search_code
+// response: its content blocks as encoded on the wire (wireBytes) within
+// searchCodePageBytes.
+// The whole result, every part of a split one and every index are held to
+// it.
+func pageFits(raw []byte) bool { return wireBytes(raw) <= searchCodePageBytes }
+
+// splitSearchCode returns the parts ([from, to) indexes into rows) a result
+// is sent in: one when it fits whole, otherwise as many as it takes for
+// every rendered part, page header included, to fit (pageFits). A part of a
+// single hit is sent even when that hit alone is too large.
+func splitSearchCode(out map[string]any, rows []map[string]any, rest map[string]any, tool string) [][2]int {
+	if full, _ := json.Marshal(out); pageFits(full) || len(rows) <= 1 {
+		return [][2]int{{0, len(rows)}}
+	}
+	sizes := make([]int, len(rows))
+	for i, r := range rows {
+		b, _ := json.Marshal(r)
+		sizes[i] = rowBytes(b)
+	}
+	base, _ := json.Marshal(rest)
+	// The header's size grows with its numbers; no number exceeds the row
+	// count, so a header written with that count bounds every real one.
+	reserve := contentBytes(partHeaderRaw(len(rows), len(rows), len(rows), len(rows), len(rows), tool))
+	budget := searchCodePageBytes - reserve
+	var parts [][2]int
+	from, size := 0, contentBytes(base)
+	for i := range rows {
+		if i > from && size+sizes[i] > budget {
+			parts = append(parts, [2]int{from, i})
+			from, size = i, contentBytes(base)
+		}
+		size += sizes[i]
+	}
+	parts = append(parts, [2]int{from, len(rows)})
+	// Check every rendered part with the one test; split any that does not
+	// fit (the estimate leaves out key order and separators).
+	for {
+		split := false
+		for i := 0; i < len(parts); i++ {
+			p := parts[i]
+			if p[1]-p[0] > 1 && !pageFits(renderPart(rows, rest, parts, i+1, tool)) {
+				mid := (p[0] + p[1]) / 2
+				parts = append(parts[:i], append([][2]int{{p[0], mid}, {mid, p[1]}}, parts[i+1:]...)...)
+				split = true
+				break
+			}
+		}
+		if !split {
+			return parts
+		}
+	}
+}
+
+// renderPart renders part page (1-based) of parts: the page header first,
+// then the result's other keys with the part's hits.
+func renderPart(rows []map[string]any, rest map[string]any, parts [][2]int, page int, tool string) []byte {
 	p := parts[page-1]
-	rest["hits"] = rows[p[0]:p[1]]
-	header := map[string]any{"number": page, "of": len(parts),
-		"declarations": fmt.Sprintf("%d-%d of %d", p[0]+1, p[1], len(rows))}
-	if page < len(parts) {
+	body := make(map[string]any, len(rest)+1)
+	for k, v := range rest {
+		body[k] = v
+	}
+	body["hits"] = rows[p[0]:p[1]]
+	rb, _ := json.Marshal(body)
+	raw := partHeaderRaw(page, len(parts), p[0]+1, p[1], len(rows), tool)
+	raw = append(raw, ',')
+	return append(raw, rb[1:]...)
+}
+
+// partHeaderRaw renders `{"page":<header>` for part page of n holding
+// declarations from..to of total.
+func partHeaderRaw(page, n, from, to, total int, tool string) []byte {
+	header := map[string]any{"number": page, "of": n,
+		"declarations": fmt.Sprintf("%d-%d of %d", from, to, total)}
+	if page < n {
 		header["next"] = page + 1
 		header["get_next"] = fmt.Sprintf("This is part %d of %d of one result, and the result is not complete until all %d parts are read. "+
-			"Call %s again with the same arguments and page=%d for part %d.", page, len(parts), len(parts), ToolName(tool), page+1, page+1)
+			"Call %s again with the same arguments and page=%d for part %d.", page, n, n, ToolName(tool), page+1, page+1)
 	} else {
-		header["get_next"] = fmt.Sprintf("This is the last part (%d of %d). Parts 1 to %d together hold all %d declarations.", page, len(parts), len(parts), len(rows))
+		header["get_next"] = fmt.Sprintf("This is the last part (%d of %d). Parts 1 to %d together hold all %d declarations.", page, n, n, total)
 	}
 	hb, _ := json.Marshal(header)
-	rb, _ := json.Marshal(rest)
-	raw := append([]byte(`{"page":`), hb...)
-	raw = append(raw, ',')
-	raw = append(raw, rb[1:]...)
-	return json.RawMessage(raw)
+	return append([]byte(`{"page":`), hb...)
 }
 
 // indexSearchCode answers a result larger than one response with an index
@@ -1651,7 +1741,7 @@ func pageSearchCode(out map[string]any, page int, t *callTrace, tool string) any
 // a number. It returns ok=false when the full result fits.
 func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) {
 	full, _ := json.Marshal(out)
-	if len(full) <= searchCodePageBytes {
+	if pageFits(full) {
 		return nil, false
 	}
 	rows, _ := out["hits"].([]map[string]any)
@@ -1682,7 +1772,7 @@ func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) 
 		out := make([]int, len(rs))
 		for i, r := range rs {
 			b, _ := json.Marshal(r)
-			out[i] = len(b) + 1
+			out[i] = rowBytes(b)
 		}
 		return out
 	}
@@ -1693,8 +1783,8 @@ func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) 
 	// leaves room for the header; the rendered response is then checked
 	// against the budget and rows give up lines, then names, until it fits.
 	base, _ := json.Marshal(rest)
-	budget := searchCodePageBytes - 1200
-	total, m := len(base), 0
+	budget := searchCodePageBytes - indexHeaderReserve*contentCopies()
+	total, m := contentBytes(base), 0
 	for m < len(rows) && total+sn[m] <= budget {
 		total += sn[m]
 		m++
@@ -1704,30 +1794,128 @@ func indexSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) 
 		total += sw[k] - sn[k]
 		k++
 	}
-	raw, hdr := renderIndex(rows, withLines, nameOnly, rest, k, m, tool)
-	for len(raw) > searchCodePageBytes && m > 0 {
+	// Every list besides the rows (the per-file counts of the rows not
+	// listed, packages, related, ids_not_matched) is cut by one bound,
+	// keep, entries of each (boundList). The lists may first take at most
+	// half the response, so that rows keep room; then rows give up lines,
+	// then names; then keep shrinks until the response fits (pageFits).
+	largestKeep := func(limit int) int {
+		lo, hi := 0, len(rows)+maxListLen(rest)
+		for lo < hi {
+			mid := (lo + hi + 1) / 2
+			if r, _ := renderIndex(rows, withLines, nameOnly, rest, 0, 0, mid, tool); wireBytes(r) <= limit {
+				lo = mid
+			} else {
+				hi = mid - 1
+			}
+		}
+		return lo
+	}
+	keep := largestKeep(searchCodePageBytes / listShareDivisor)
+	raw, hdr := renderIndex(rows, withLines, nameOnly, rest, k, m, keep, tool)
+	for !pageFits(raw) && m > 0 {
 		if k > 0 {
 			k--
 		} else {
 			m--
 		}
-		raw, hdr = renderIndex(rows, withLines, nameOnly, rest, k, m, tool)
+		raw, hdr = renderIndex(rows, withLines, nameOnly, rest, k, m, keep, tool)
+	}
+	if m == 0 {
+		keep = largestKeep(searchCodePageBytes)
+		raw, hdr = renderIndex(rows, withLines, nameOnly, rest, 0, 0, keep, tool)
+	}
+	if !pageFits(raw) {
+		t.add("search_code.index", map[string]any{"declarations": len(rows), "too_large": wireBytes(raw), "budget_bytes": searchCodePageBytes})
+		return tooLargeAnswer(len(rows), wireBytes(raw)), true
 	}
 	t.add("search_code.index", map[string]any{"declarations": len(rows), "with_lines": hdr["with_lines"], "names_only": m - k,
 		"not_listed": len(rows) - m, "budget_bytes": searchCodePageBytes, "full_bytes": len(full), "bytes": len(raw)})
 	return json.RawMessage(raw), true
 }
 
+// tooLargeAnswer is the answer when even the smallest index does not fit
+// the page size (a pattern longer than maxFloorPatternBytes): the counts
+// and how to narrow, without the pattern.
+func tooLargeAnswer(declarations, smallest int) map[string]any {
+	return map[string]any{"hits": []any{}, "total_declarations": declarations,
+		"error": fmt.Sprintf("this result of %d declarations is too large for one response even as an index without rows (%d bytes, page size %d); "+
+			"narrow it with path or a shorter, more specific pattern", declarations, smallest, searchCodePageBytes)}
+}
+
+// listShareDivisor sets how much of a response the lists besides the rows
+// may take before rows are cut: 1/listShareDivisor of it.
+const listShareDivisor = 2
+
+// boundedListKeys are the lists of a search_code result besides hits that
+// an index cuts to keep entries (boundList).
+var boundedListKeys = []string{"packages", "related", "ids_not_matched"}
+
+// leftOutSuffix names the count of the entries a cut list left out.
+const leftOutSuffix = "_left_out"
+
+// listLen returns the length of a list value of a result, -1 for a value
+// that is not a list.
+func listLen(v any) int {
+	switch l := v.(type) {
+	case []map[string]any:
+		return len(l)
+	case []string:
+		return len(l)
+	case []any:
+		return len(l)
+	}
+	return -1
+}
+
+// maxListLen is the longest bounded list of rest.
+func maxListLen(rest map[string]any) int {
+	n := 0
+	for _, k := range boundedListKeys {
+		n = max(n, listLen(rest[k]))
+	}
+	return n
+}
+
+// boundList cuts the list under key in rest to its first keep entries, in
+// the order the result lists them, and records how many it left out under
+// key+leftOutSuffix. It is the one rule every list of an index is cut by.
+func boundList(rest map[string]any, key string, keep int) {
+	n := listLen(rest[key])
+	if n <= keep {
+		return
+	}
+	switch l := rest[key].(type) {
+	case []map[string]any:
+		rest[key] = l[:keep]
+	case []string:
+		rest[key] = l[:keep]
+	case []any:
+		rest[key] = l[:keep]
+	}
+	rest[key+leftOutSuffix] = n - keep
+}
+
 // renderIndex renders an index response: rows 0..k-1 with their lines,
-// k..m-1 by name, the rest counted per file. with_lines in the header is k,
+// k..m-1 by name, the rest counted per file for at most keep files (those
+// with the most rows first), and every other list cut to keep entries
+// (boundList); what is left out is counted. with_lines in the header is k,
 // the rows given in full, so that with_lines and names_only add up to the
 // rows listed. A row matched in its name only is one of them and has no
 // lines to carry: counting only rows with lines left such rows in neither
 // number (137 rows against with_lines 131 in one go-stablenet response).
-func renderIndex(rows, withLines, nameOnly []map[string]any, base map[string]any, k, m int, tool string) ([]byte, map[string]any) {
-	rest := make(map[string]any, len(base)+2)
+func renderIndex(rows, withLines, nameOnly []map[string]any, base map[string]any, k, m, keep int, tool string) ([]byte, map[string]any) {
+	rest := make(map[string]any, len(base)+6)
 	for key, v := range base {
 		rest[key] = v
+	}
+	var cut []string
+	for _, key := range boundedListKeys {
+		total := listLen(rest[key])
+		boundList(rest, key, keep)
+		if total > keep {
+			cut = append(cut, fmt.Sprintf("%s lists %d of %d (%s%s counts the rest)", key, keep, total, key, leftOutSuffix))
+		}
 	}
 	index := make([]map[string]any, 0, m)
 	index = append(index, withLines[:k]...)
@@ -1737,31 +1925,82 @@ func renderIndex(rows, withLines, nameOnly []map[string]any, base map[string]any
 	if m > k {
 		header["names_only"] = m - k
 	}
-	text := fmt.Sprintf("This result is too large for one response, so it is an index: all %d matched declarations in rank order, "+
-		"each with its matched line numbers and the calls and uses on them, without the code. "+
-		"To see the code of the declarations you choose, call %s with the same pattern and ids=[their qname, ...].", len(rows), ToolName(tool))
-	if m > k {
-		text = fmt.Sprintf("This result is too large for one response, so it is an index of the %d matched declarations in rank order: "+
-			"the first %d with their matched line numbers and the calls and uses on them, the next %d by name, file and lines only, without the code. "+
-			"To see the code of the declarations you choose, call %s with the same pattern and ids=[their qname, ...].", len(rows), k, m-k, ToolName(tool))
-	}
+	shown, all := 0, 0
 	if m < len(rows) {
 		perFile := map[string]int{}
 		for _, r := range rows[m:] {
 			f, _ := r["file"].(string)
 			perFile[f]++
 		}
-		rest["not_listed"] = perFile
+		files := slices.Collect(maps.Keys(perFile))
+		sort.Slice(files, func(i, j int) bool {
+			if perFile[files[i]] != perFile[files[j]] {
+				return perFile[files[i]] > perFile[files[j]]
+			}
+			return files[i] < files[j]
+		})
+		all, shown = len(files), min(len(files), keep)
+		if shown > 0 {
+			listed := make(map[string]int, shown)
+			for _, f := range files[:shown] {
+				listed[f] = perFile[f]
+			}
+			rest["not_listed"] = listed
+		}
 		header["not_listed"] = len(rows) - m
-		text += fmt.Sprintf(" %d more declarations do not fit even as names; not_listed counts them per file. Narrow the pattern or add path to see them.", len(rows)-m)
+		if shown < all {
+			left := 0
+			for _, f := range files[shown:] {
+				left += perFile[f]
+			}
+			rest["not_listed_files_left_out"] = map[string]int{"files": all - shown, "declarations": left}
+		}
 	}
-	header["read_me"] = text
+	header["read_me"] = indexReadMe(len(rows), k, m, shown, all, cut, tool)
 	hb, _ := json.Marshal(header)
 	rb, _ := json.Marshal(rest)
 	raw := append([]byte(`{"index":`), hb...)
 	raw = append(raw, ',')
 	raw = append(raw, rb[1:]...)
 	return raw, header
+}
+
+// indexReadMe describes what an index response holds: total matched
+// declarations, k listed with lines, m listed in all, the rows not listed
+// counted for shown of all files, and the lists cut.
+func indexReadMe(total, k, m, shown, all int, cut []string, tool string) string {
+	text := fmt.Sprintf("This result is too large for one response, so it is an index of the %d matched declarations in rank order", total)
+	switch {
+	case m == 0:
+		text += ": not even their names fit, so none is listed."
+	case k == m && m == total:
+		text += ": all of them, each with its matched line numbers and the calls and uses on them, without the code."
+	case k == m:
+		text += fmt.Sprintf(": the first %d, each with its matched line numbers and the calls and uses on them, without the code.", m)
+	default:
+		text += fmt.Sprintf(": the first %d with their matched line numbers and the calls and uses on them, the next %d by name, file and lines only, without the code.", k, m-k)
+	}
+	if m > 0 {
+		text += fmt.Sprintf(" To see the code of the declarations you choose, call %s with the same pattern and ids=[their qname, ...].", ToolName(tool))
+	}
+	if m < total {
+		switch shown {
+		case all:
+			text += fmt.Sprintf(" %d declarations are not listed; not_listed counts them per file.", total-m)
+		case 0:
+			text += fmt.Sprintf(" %d declarations are not listed; not_listed_files_left_out counts them and their %d files.", total-m, all)
+		default:
+			text += fmt.Sprintf(" %d declarations are not listed; not_listed counts them per file for the %d files with the most of them, "+
+				"and not_listed_files_left_out counts the other %d files.", total-m, shown, all-shown)
+		}
+	}
+	if len(cut) > 0 {
+		text += " " + strings.Join(cut, "; ") + "."
+	}
+	if m < total || len(cut) > 0 {
+		text += " Narrow the search to see more: add path (a folder or file) or make the pattern more specific."
+	}
+	return text
 }
 
 // indexRow is one hit as an index row, kept short so more rows fit: qname,
@@ -1817,7 +2056,7 @@ func fileSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) {
 		return nil, false
 	}
 	full, _ := json.Marshal(out)
-	if len(full) <= searchCodePageBytes {
+	if pageFits(full) {
 		return nil, false
 	}
 	body, err := json.MarshalIndent(out, "", " ")

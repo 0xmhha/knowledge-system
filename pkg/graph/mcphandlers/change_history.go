@@ -610,13 +610,13 @@ func classifyHistoryInput(reader store.Reader, q string) historyInput {
 	if m := lineSuffixInput.FindStringSubmatch(t); m != nil {
 		n, err := strconv.Atoi(m[2])
 		if err != nil || n < 1 {
-			return historyInput{kind: inputBadLine, note: fmt.Sprintf("taken for %s at line %q: line numbers are whole numbers starting at 1 (file:line or file@line)", m[1], m[2])}
+			return historyInput{kind: inputBadLine, note: fmt.Sprintf("taken for %s at line %q: line numbers are whole numbers starting at 1 (file:line or file@line)", boundedEcho(m[1]), boundedEcho(m[2]))}
 		}
 		t, line = m[1], n
 	}
 	p, outside := cleanHistoryPath(reader, t)
 	if outside != "" {
-		return historyInput{kind: inputOutsideSrc, note: fmt.Sprintf("taken for the path %s, which is outside the source root %s: give a path under it, or relative to it", t, outside)}
+		return historyInput{kind: inputOutsideSrc, note: fmt.Sprintf("taken for the path %s, which is outside the source root %s: give a path under it, or relative to it", boundedEcho(t), outside)}
 	}
 	name := fileNodeName(reader, p)
 	if line > 0 {
@@ -624,7 +624,7 @@ func classifyHistoryInput(reader store.Reader, q string) historyInput {
 			return historyInput{qname: persist.PrintedName(reader, decl)}
 		}
 		if name != "" {
-			return historyInput{kind: inputFileLine, note: fmt.Sprintf("taken for line %d of %s, where no declaration with recorded history lies: change_history {\"qname\": %q} returns the file's history", line, p, name)}
+			return historyInput{kind: inputFileLine, note: fmt.Sprintf("taken for line %d of %s, where no declaration with recorded history lies: change_history {\"qname\": %q} returns the file's history", line, boundedEcho(p), name)}
 		}
 	}
 	if name != "" {
@@ -633,7 +633,7 @@ func classifyHistoryInput(reader store.Reader, q string) historyInput {
 	all := allFilePaths(reader)
 	for _, f := range all {
 		if strings.EqualFold(f, p) {
-			return historyInput{kind: inputWrongCase, note: fmt.Sprintf("taken for the file %s, which differs only in case from %s: paths are case-sensitive; call change_history {\"qname\": %q}", p, f, f)}
+			return historyInput{kind: inputWrongCase, note: fmt.Sprintf("taken for the file %s, which differs only in case from %s: paths are case-sensitive; call change_history {\"qname\": %q}", boundedEcho(p), f, f)}
 		}
 	}
 	var under []string
@@ -643,12 +643,12 @@ func classifyHistoryInput(reader store.Reader, q string) historyInput {
 		}
 	}
 	if len(under) > 0 {
-		return historyInput{kind: inputDirectory, note: fmt.Sprintf("taken for the directory %s: history is recorded per file, so call change_history on one of its %d files, for example {\"qname\": %q}", p, len(under), under[0])}
+		return historyInput{kind: inputDirectory, note: fmt.Sprintf("taken for the directory %s: history is recorded per file, so call change_history on one of its %d files, for example {\"qname\": %q}", boundedEcho(p), len(under), under[0])}
 	}
 	if !sourceExts[path.Ext(p)] {
-		return historyInput{kind: inputNotSource, note: fmt.Sprintf("taken for the file %s, which is not a source file of the graph: history is recorded for Go, Solidity, TypeScript and proto files and their declarations", p)}
+		return historyInput{kind: inputNotSource, note: fmt.Sprintf("taken for the file %s, which is not a source file of the graph: history is recorded for Go, Solidity, TypeScript and proto files and their declarations", boundedEcho(p))}
 	}
-	return historyInput{kind: inputNoFile, note: fmt.Sprintf("taken for the file %s, which is not in the graph at its source commit: a file that was deleted or renamed, or lies outside the build's scope, has no node", p)}
+	return historyInput{kind: inputNoFile, note: fmt.Sprintf("taken for the file %s, which is not in the graph at its source commit: a file that was deleted or renamed, or lies outside the build's scope, has no node", boundedEcho(p))}
 }
 
 // cleanHistoryPath turns any spelling of one file's path into the graph's,
