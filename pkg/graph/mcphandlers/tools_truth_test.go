@@ -683,7 +683,7 @@ func TestIndexHeaderCounts(t *testing.T) {
 		{2, 3, 2, 1},
 		{0, 2, 0, 2},
 	} {
-		_, hdr := renderIndex(rows, with, names, map[string]any{}, tc.k, tc.m, "search_code")
+		_, hdr := renderIndex(rows, with, names, map[string]any{}, tc.k, tc.m, len(rows), "search_code")
 		gotNames, _ := hdr["names_only"].(int)
 		if hdr["with_lines"] != tc.wantWith || gotNames != tc.wantNames {
 			t.Errorf("k=%d m=%d: with_lines %v names_only %v, want %d and %d", tc.k, tc.m, hdr["with_lines"], hdr["names_only"], tc.wantWith, tc.wantNames)

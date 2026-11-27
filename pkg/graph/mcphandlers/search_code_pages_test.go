@@ -38,6 +38,8 @@ func callToolRaw(t *testing.T, store persist.StoreReader, name string, args map[
 // TestSearchCode_NoCut: search_code returns every matched declaration and
 // every matched line of each; the caller cannot cut the result with limit.
 func TestSearchCode_NoCut(t *testing.T) {
+	// The budgets below are sized for one copy of the answer.
+	withContentMode(t, ContentStructured)
 	store := newFixtureStore(t)
 	out := callTool(t, store, "search_code", map[string]any{"pattern": `.`, "limit": 2})
 	if out["truncated"] != nil {
@@ -66,6 +68,8 @@ func TestSearchCode_NoCut(t *testing.T) {
 // (or counted in not_listed), rows carry matched line numbers and uses but
 // no code, and ids returns the chosen declarations in full.
 func TestSearchCode_Index(t *testing.T) {
+	// The budgets below are sized for one copy of the answer.
+	withContentMode(t, ContentStructured)
 	store := newFixtureStore(t)
 	full := callTool(t, store, "search_code", map[string]any{"pattern": `.`})
 	want := hitNames(full)
@@ -262,6 +266,8 @@ func TestSearchCode_ExternalUses(t *testing.T) {
 // where it is: no hit, so a part cannot be taken for the whole. The file
 // holds the full result, line by line.
 func TestSearchCode_File(t *testing.T) {
+	// The budgets below are sized for one copy of the answer.
+	withContentMode(t, ContentStructured)
 	store := newFixtureStore(t)
 	full := callTool(t, store, "search_code", map[string]any{"pattern": `.`})
 	fullRaw := callToolRaw(t, store, "search_code", map[string]any{"pattern": `.`})

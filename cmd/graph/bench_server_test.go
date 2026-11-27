@@ -1,8 +1,31 @@
 package main
 
 import (
+	"errors"
+	"net"
+	"net/http"
+	"strings"
 	"testing"
 )
+
+// TestStartBenchServer_BindErrorIsReturned: a port that cannot be bound is
+// an error, not a panic, and the help says the command binds a loopback
+// port. The command panicked (httptest) while its help said "no port
+// allocation".
+func TestStartBenchServer_BindErrorIsReturned(t *testing.T) {
+	bindErr := errors.New("bind: refused")
+	_, stop, err := startBenchServer(http.NotFoundHandler(), func(string) (net.Listener, error) { return nil, bindErr })
+	if !errors.Is(err, bindErr) {
+		t.Fatalf("err = %v, want the bind error", err)
+	}
+	if stop != nil {
+		t.Error("stop returned with an error")
+	}
+	long := newBenchServerCmd().Long
+	if strings.Contains(long, "no port") || !strings.Contains(long, benchServerAddr) {
+		t.Errorf("help does not say the command binds %s: %q", benchServerAddr, long)
+	}
+}
 
 // TestPercentile_NearestRank locks in the percentile semantics used
 // by bench-server: nearest-rank, sort-in-place, edge-clamp on rank ≥

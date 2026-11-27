@@ -21,7 +21,10 @@ func newVerifyCmd() *cobra.Command {
 		Long: "Loads the source under --src with go/packages and go/types and compares the declarations, static\n" +
 			"calls, interface calls and type references it resolves with the nodes and edges of the graph in\n" +
 			"--graph. Only Go files recorded in the graph are checked. The report is a measurement; the command\n" +
-			"exits 0 unless it cannot run.",
+			"exits 0 unless it cannot run.\n\n" +
+			"With --observed, the calls and channel operations a test run recorded (ckg observe) are compared\n" +
+			"with the runtime links of the graph; ckg observe --help says what a recorded call line is.\n\n" +
+			observeRuntimeChannelNote,
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			store, err := persist.OpenReadOnly(filepath.Join(graph, "graph.db"))

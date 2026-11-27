@@ -24,9 +24,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
-	"github.com/0xmhha/knowledge-system/internal/graph/persist"
-	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
+
+// quickstartTopGod is how many god nodes the quickstart report lists.
+const quickstartTopGod = 25
 
 func newQuickstartCmd() *cobra.Command {
 	var src, out string
@@ -37,14 +38,16 @@ func newQuickstartCmd() *cobra.Command {
 		Use:   "quickstart",
 		Short: "One-command build + serve + report (the ergonomic entrypoint)",
 		Long: `Build a graph from --src into --out, generate a GRAPH_REPORT.md
-summary, and start the HTTP viewer on --port. The full first-time
-flow in one command.
+summary, and serve the graph REST API on 127.0.0.1:--port. The full
+first-time flow in one command. The serving line is printed once the
+port is bound; a port that cannot be bound is an error. The dashboard
+pages come from the separate cks binary (cks viewer --api-url URL).
 
 Equivalent to running:
 
   ckg build  --src <SRC> --out <OUT>
   ckg report --graph <OUT> --out <OUT>/GRAPH_REPORT.md
-  ckg viewer --graph <OUT> --port <PORT>
+  ckg api    --graph <OUT> --port <PORT>
 
 Pass --no-serve to skip the HTTP server (useful for CI/scripts that
 just want graph.db + GRAPH_REPORT.md). Pass --no-report to skip the
@@ -81,7 +84,7 @@ markdown summary when you only need the SQLite output.`,
 
 			if !noReport {
 				reportPath := filepath.Join(absOut, "GRAPH_REPORT.md")
-				if err := generateReport(absOut, reportPath); err != nil {
+				if _, err := generateReport(absOut, reportPath, quickstartTopGod); err != nil {
 					return fmt.Errorf("report: %w", err)
 				}
 				_, _ = fmt.Fprintf(os.Stderr, "ckg quickstart: wrote %s\n", reportPath)
@@ -92,7 +95,7 @@ markdown summary when you only need the SQLite output.`,
 				return nil
 			}
 
-			_, _ = fmt.Fprintf(os.Stderr, "ckg quickstart: starting API at http://localhost:%d/api/ (dashboard: cks viewer --api-url http://localhost:%d)\n", port, port)
+			// runAPI prints the serving line once the port is bound.
 			return runAPI(apiOpts{
 				GraphDir: absOut, Port: port, Log: log,
 			})
@@ -104,36 +107,4 @@ markdown summary when you only need the SQLite output.`,
 	cmd.Flags().BoolVar(&noServe, "no-serve", false, "skip the HTTP API server (build + report only)")
 	cmd.Flags().BoolVar(&noReport, "no-report", false, "skip GRAPH_REPORT.md generation")
 	return cmd
-}
-
-// generateReport mirrors `ckg report` inline. We don't shell out to a
-// separate ckg invocation because that would double the binary's
-// startup cost and clutter the user's terminal with two banners.
-func generateReport(graphDir, outPath string) error {
-	store, err := persist.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
-	if err != nil {
-		return fmt.Errorf("open graph: %w", err)
-	}
-	defer func() { _ = store.Close() }()
-	manifest, err := store.GetManifest()
-	if err != nil {
-		return fmt.Errorf("manifest: %w", err)
-	}
-	nodes, err := store.AllNodes()
-	if err != nil {
-		return fmt.Errorf("nodes: %w", err)
-	}
-	edges, err := store.AllEdges()
-	if err != nil {
-		return fmt.Errorf("edges: %w", err)
-	}
-	// A Goroutine's code edges are read apart, as in the tools.
-	edges = types.WithoutGoroutineCode(edges)
-	topics, err := store.LoadHierarchy("topic")
-	if err != nil {
-		topics = nil // graphs without a Leiden run still get a useful report
-	}
-	report := buildReport(manifest, nodes, edges, topics, 25,
-		func(n types.Node) string { return persist.PrintedName(store, n) })
-	return os.WriteFile(outPath, []byte(report), 0o644)
 }

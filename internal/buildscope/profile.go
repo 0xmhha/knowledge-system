@@ -223,7 +223,7 @@ func ExtractProject(ctx context.Context, cfg ProjectConfig) (*Scope, error) {
 	}
 	if len(s.Problems) > 0 && !cfg.AllowProblems {
 		sort.Strings(s.Problems)
-		return nil, fmt.Errorf("buildscope: the go command reported %d load errors, so the scope may be incomplete (first: %s)", len(s.Problems), s.Problems[0])
+		return nil, loadErrorsError(s.Problems, s.GoStderr)
 	}
 	for _, b := range cfg.Binaries {
 		cb, err := CheckBinary(ctx, cfg.GoBinary, b, s)

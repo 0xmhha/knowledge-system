@@ -12,6 +12,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 func newBuildCmd() *cobra.Command {
@@ -122,16 +123,17 @@ func newBuildCmd() *cobra.Command {
 			// build, so a plain success line would misreport a partial graph
 			// as complete. --fail-on-parse-errors turns that into a hard
 			// failure for CI / reproducible builds.
+			nodes, edges := builtCounts(m, effectiveOut, dbDsn)
 			if m.ParseErrorsCount > 0 {
 				_, _ = fmt.Fprintf(os.Stderr, "ckg: built %d nodes / %d edges into %s (%d files failed to parse and were skipped)\n",
-					m.Stats["nodes"], m.Stats["edges"], effectiveOut, m.ParseErrorsCount)
+					nodes, edges, effectiveOut, m.ParseErrorsCount)
 				if failOnParseErrors {
 					return fmt.Errorf("ckg: %d files failed to parse (--fail-on-parse-errors)", m.ParseErrorsCount)
 				}
 				return nil
 			}
 			_, _ = fmt.Fprintf(os.Stderr, "ckg: built %d nodes / %d edges into %s\n",
-				m.Stats["nodes"], m.Stats["edges"], effectiveOut)
+				nodes, edges, effectiveOut)
 			return nil
 		},
 	}
@@ -228,6 +230,27 @@ func checkoutWorktree(repoSrc, commit string) (string, func(), error) {
 		_ = os.RemoveAll(wtDir)
 	}
 	return wtDir, cleanup, nil
+}
+
+// builtCounts returns the node and edge counts a build reports: the rows
+// of the graph.db it wrote, which hold rows the build writes after its
+// manifest counts them (Policy nodes and governed_by edges). A build into
+// PostgreSQL (dsn set), or a graph.db that cannot be read, reports the
+// manifest's counts.
+func builtCounts(m persist.Manifest, outDir, dsn string) (nodes, edges int) {
+	nodes, edges = m.Stats["nodes"], m.Stats["edges"]
+	if dsn != "" {
+		return nodes, edges
+	}
+	store, err := persist.OpenReadOnly(filepath.Join(outDir, "graph.db"))
+	if err != nil {
+		return nodes, edges
+	}
+	defer func() { _ = store.Close() }()
+	if n, e, err := store.RowCounts(); err == nil {
+		return n, e
+	}
+	return nodes, edges
 }
 
 // resolveOutDir applies --out-tag to --out.

@@ -19,11 +19,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sync/atomic"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/mcp"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
@@ -37,8 +40,8 @@ func newBenchMCPStdioCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bench-mcp-stdio",
 		Short: "Measure MCP tool latency through a real ckg mcp subprocess (stdio + JSON-RPC)",
-		Long: `Spawn ckg mcp as a child process, then drive every tool through
-the stdio + JSON-RPC transport layer. Reports the same JSON shape as
+		Long: `Spawn ckg mcp as a child process, then drive every tool the child
+lists (tools/list) through the stdio + JSON-RPC transport layer. Reports the same JSON shape as
 bench-mcp so the two numbers can be compared side-by-side: bench-mcp
 captures the in-process handler cost, bench-mcp-stdio captures the
 production round-trip including the JSON-RPC framing + subprocess
@@ -46,7 +49,13 @@ pipe overhead.
 
 Sequential (concurrency=1) by design — the stdio pipe carries one
 in-flight request at a time, matching how production clients
-(Claude Desktop, etc.) drive an MCP server.`,
+(Claude Desktop, etc.) drive an MCP server.
+
+Tools whose probe needs a seed the graph lacks are listed under
+not_probed with the reason (see bench-mcp). When the child exits
+before answering (for example because it cannot write its log under
+the user cache directory), the error carries what the child wrote to
+standard error.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if iterations <= 0 || iterations > 1000 {
 				return fmt.Errorf("--iterations must be in [1, 1000], got %d", iterations)
@@ -67,17 +76,27 @@ in-flight request at a time, matching how production clients
 			if err != nil {
 				return fmt.Errorf("open graph: %w", err)
 			}
-			seed, _ := pickFunctionSeed(store)
+			// Seeds are picked in process, by the rules bench-mcp uses, and
+			// sent to the child as arguments.
+			candidates, err := store.TopNodes("pagerank", seedCandidates)
+			if err != nil {
+				_ = store.Close()
+				return fmt.Errorf("rank seed candidates: %w", err)
+			}
+			_, handlers := mcp.NewBenchHandlers(store)
+			pick := func(names []string) ([]mcpProbe, []notProbed, *probeSeed) {
+				return mcpProbesFor(names, candidates, handlerCall(handlers))
+			}
+
+			_, _ = fmt.Fprintf(os.Stderr, "bench-mcp-stdio: graph=%s iters=%d binary=%s\n",
+				graph, iterations, ckgBinary)
+
+			results, skipped, made, err := runStdioBench(ckgBinary, graph, iterations, pick)
 			_ = store.Close()
-			probes := defaultMCPProbes(seed)
-
-			_, _ = fmt.Fprintf(os.Stderr, "bench-mcp-stdio: graph=%s iters=%d probes=%d binary=%s\n",
-				graph, iterations, len(probes), ckgBinary)
-
-			results, err := runStdioBench(ckgBinary, graph, probes, iterations)
 			if err != nil {
 				return err
 			}
+			reportNotProbed(os.Stderr, skipped)
 			for _, r := range results {
 				_, _ = fmt.Fprintf(os.Stderr, "  %-26s p50=%6.2f p95=%6.2f p99=%6.2f mean=%6.2f errors=%d\n",
 					r.Endpoint, r.P50Ms, r.P95Ms, r.P99Ms, r.MeanMs, r.ErrorCount)
@@ -102,6 +121,8 @@ in-flight request at a time, matching how production clients
 				Iterations:     iterations,
 				Concurrency:    1,
 				Results:        results,
+				NotProbed:      skipped,
+				ProbeSeed:      made,
 			}
 			payload, err := json.MarshalIndent(out, "", "  ")
 			if err != nil {
@@ -128,35 +149,68 @@ in-flight request at a time, matching how production clients
 	return cmd
 }
 
+// childStderrTail bounds how much of the child's standard error an error
+// message quotes.
+const childStderrTail = 4096
+
+// tailBuffer keeps the last childStderrTail bytes written to it.
+type tailBuffer struct{ b []byte }
+
+func (t *tailBuffer) Write(p []byte) (int, error) {
+	t.b = append(t.b, p...)
+	if over := len(t.b) - childStderrTail; over > 0 {
+		t.b = t.b[over:]
+	}
+	return len(p), nil
+}
+
 // runStdioBench is the heavy lifting: spawn one `ckg mcp` child,
-// run the MCP handshake, measure each probe `iterations` times,
-// shut the child down cleanly. A failure during handshake aborts the
-// run; failures inside the per-probe loop count as errors but don't
+// run the MCP handshake, list its tools, measure each tool's probe
+// `iterations` times, shut the child down cleanly. A failure before the
+// tools are listed aborts the run with what the child wrote to standard
+// error; failures inside the per-probe loop count as errors but don't
 // kill the bench (a single tool with bad args shouldn't take the
 // whole pass down).
-func runStdioBench(binary, graph string, probes []mcpProbe, iterations int) ([]benchResult, error) {
+func runStdioBench(binary, graph string, iterations int, pick func(names []string) ([]mcpProbe, []notProbed, *probeSeed)) ([]benchResult, []notProbed, *probeSeed, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	cmd := exec.CommandContext(ctx, binary, "mcp", "--graph", graph)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return nil, fmt.Errorf("stdin pipe: %w", err)
+		return nil, nil, nil, fmt.Errorf("stdin pipe: %w", err)
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, fmt.Errorf("stdout pipe: %w", err)
+		return nil, nil, nil, fmt.Errorf("stdout pipe: %w", err)
 	}
-	cmd.Stderr = os.Stderr // server logs go straight through; helpful for failure triage
+	// Server logs go straight through (failure triage) and their tail is
+	// kept for the error of a child that exits early.
+	var tail tailBuffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &tail)
 	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("start ckg mcp: %w", err)
+		return nil, nil, nil, fmt.Errorf("start ckg mcp: %w", err)
+	}
+	waited := false
+	wait := func() error {
+		_ = stdin.Close()
+		if waited {
+			return nil
+		}
+		waited = true
+		return cmd.Wait()
 	}
 	// Cleanup: close stdin → server exits cleanly on EOF; cancel ctx
 	// → kills if the server hangs; Wait reaps the process.
 	defer func() {
-		_ = stdin.Close()
 		cancel()
-		_ = cmd.Wait()
+		_ = wait()
 	}()
+	// childFailed wraps err with how the child ended and its stderr.
+	childFailed := func(what string, err error) error {
+		exit := wait()
+		return fmt.Errorf("%s: %w (ckg mcp exited: %v; its stderr: %s)",
+			what, err, exit, strings.TrimSpace(string(tail.b)))
+	}
 
 	br := bufio.NewReader(stdout)
 	var nextID atomic.Int64
@@ -171,16 +225,22 @@ func runStdioBench(binary, graph string, probes []mcpProbe, iterations int) ([]b
 			"clientInfo":      map[string]any{"name": "ckg-bench", "version": "0"},
 		},
 	}); err != nil {
-		return nil, fmt.Errorf("send initialize: %w", err)
+		return nil, nil, nil, childFailed("send initialize", err)
 	}
 	if _, err := readRPC(br); err != nil {
-		return nil, fmt.Errorf("read initialize response: %w", err)
+		return nil, nil, nil, childFailed("read initialize response", err)
 	}
 	if err := sendRPC(stdin, map[string]any{
 		"jsonrpc": "2.0", "method": "notifications/initialized",
 	}); err != nil {
-		return nil, fmt.Errorf("send initialized: %w", err)
+		return nil, nil, nil, childFailed("send initialized", err)
 	}
+	names, err := listStdioTools(stdin, br, nextID.Add(1))
+	if err != nil {
+		return nil, nil, nil, childFailed("list tools", err)
+	}
+	probes, skipped, made := pick(names)
+	reportProbeSeed(os.Stderr, made)
 
 	results := make([]benchResult, 0, len(probes))
 	for _, p := range probes {
@@ -234,7 +294,37 @@ func runStdioBench(binary, graph string, probes []mcpProbe, iterations int) ([]b
 		}
 		results = append(results, r)
 	}
-	return results, nil
+	return results, skipped, made, nil
+}
+
+// listStdioTools asks the child for its tools and returns their names in
+// sorted order.
+func listStdioTools(w io.Writer, br *bufio.Reader, id int64) ([]string, error) {
+	if err := sendRPC(w, map[string]any{"jsonrpc": "2.0", "id": id, "method": "tools/list"}); err != nil {
+		return nil, err
+	}
+	resp, err := readRPC(br)
+	if err != nil {
+		return nil, err
+	}
+	raw, err := json.Marshal(resp["result"])
+	if err != nil {
+		return nil, fmt.Errorf("tools/list result: %w", err)
+	}
+	var list struct {
+		Tools []struct {
+			Name string `json:"name"`
+		} `json:"tools"`
+	}
+	if err := json.Unmarshal(raw, &list); err != nil {
+		return nil, fmt.Errorf("tools/list result: %w", err)
+	}
+	names := make([]string, 0, len(list.Tools))
+	for _, t := range list.Tools {
+		names = append(names, t.Name)
+	}
+	sort.Strings(names)
+	return names, nil
 }
 
 // sendRPC writes one NDJSON request to the server's stdin. mcp-go's

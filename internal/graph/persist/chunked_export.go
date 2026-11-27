@@ -99,8 +99,9 @@ func (s *sqliteStore) ExportChunked(outDir string, nodeChunkSize, edgeChunkSize 
 		}
 	}
 
-	// Blobs — one raw-text file per node (viewer fetches these as plain text,
-	// not JSON, so no wrapping).
+	// Blobs — one plain-text file per node (viewer fetches these as plain
+	// text, not JSON, so no wrapping). Hunk patches are stored gzipped and
+	// are written decompressed, so every .txt file holds text.
 	br, err := s.db.Query(`SELECT node_id, source FROM blobs`)
 	if err != nil {
 		return err
@@ -112,7 +113,11 @@ func (s *sqliteStore) ExportChunked(outDir string, nodeChunkSize, edgeChunkSize 
 		if err := br.Scan(&id, &b); err != nil {
 			return err
 		}
-		if err := os.WriteFile(filepath.Join(outDir, "blobs", id+".txt"), b, 0o644); err != nil {
+		text, err := BlobText(b)
+		if err != nil {
+			return fmt.Errorf("blob of %s: %w", id, err)
+		}
+		if err := os.WriteFile(filepath.Join(outDir, "blobs", id+".txt"), text, 0o644); err != nil {
 			return err
 		}
 	}

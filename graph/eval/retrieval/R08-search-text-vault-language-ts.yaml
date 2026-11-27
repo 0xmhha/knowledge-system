@@ -17,12 +17,15 @@ expected:
   # (CallSite / ReturnStmt) and Import nodes are now filtered at the
   # FTS layer; File nodes stay (the file path is still a useful
   # symbol-search target).
+  # A qualified name two declarations share (the TypeScript class and the
+  # Solidity contract are both "Vault") is printed and scored in the site
+  # form <qname>@<file>:<line>, the name that opens exactly one node.
   symbols:
     # Classes
-    - Vault
+    - Vault@ts-frontend/src/contracts/Vault.ts:2
     - VaultService
     # Methods
-    - Vault.deposit
+    - Vault.deposit@ts-frontend/src/contracts/Vault.ts:3
     - VaultService.depositFn
     - VaultService.constructor
     # File nodes (path tokens carry "vault")

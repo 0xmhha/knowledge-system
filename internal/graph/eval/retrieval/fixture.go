@@ -1,6 +1,7 @@
 // Package retrieval implements the LLM-free retrieval-accuracy
 // measurement — load YAML probe fixtures, dispatch each
-// to the matching MCP tool through StoreReader, score result symbols
+// to the registered MCP tool (its own handler and defaults, the path an
+// MCP client gets), score result symbols
 // against an expected set with recall / precision / F1.
 //
 // Why this layer exists separately from internal/eval (LLM-driven):
@@ -16,7 +17,7 @@
 //     loads each fixture, executes the probe, scores the result
 //  3. Output is JSON for diffing against eval/baseline/retrieval.json
 //
-// New tool support requires extending dispatchProbe in runner.go;
+// New tool support requires adding the tool to probeTools in runner.go;
 // the fixture format stays stable (map[string]any args).
 package retrieval
 

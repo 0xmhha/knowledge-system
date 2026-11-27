@@ -5,8 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	mcp "github.com/mark3labs/mcp-go/mcp"
-
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -248,13 +246,6 @@ func reverseCallersUnionTraced(reader store.Reader, resolved seedRef, depth int,
 	// Map order differs on every call; the answer must not.
 	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
 	return nodes, edges, nil
-}
-
-// textResult wraps a payload in the mcp-go structured-result envelope.
-// All handlers route their JSON payload through here so the response
-// shape stays uniform across the tool set.
-func textResult(payload any) *mcp.CallToolResult {
-	return mcp.NewToolResultStructured(payload, "")
 }
 
 // callEdgeTypes are the edge types find_callers / find_callees follow.

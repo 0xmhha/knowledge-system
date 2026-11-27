@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -207,6 +209,22 @@ func TestExportStaticCmd_Success(t *testing.T) {
 	}
 }
 
+// TestExportStatic_SaysDataOnly: the report says the bundle holds data only
+// and that the dashboard assets come from the separate cks binary; the help
+// lists the layout with blobs as text. The report named `cks viewer
+// export` as if it were a ckg command.
+func TestExportStatic_SaysDataOnly(t *testing.T) {
+	msg := exportStaticDoneMessage("out/dir")
+	for _, want := range []string{"out/dir", "data only", "separate cks binary", "cks viewer export --out out/dir"} {
+		if !strings.Contains(msg, want) {
+			t.Errorf("message %q lacks %q", msg, want)
+		}
+	}
+	if long := newExportStaticCmd().Long; !strings.Contains(long, "blobs/<node id>.txt") || !strings.Contains(long, "decompressed") {
+		t.Errorf("help does not describe the blob files: %q", long)
+	}
+}
+
 func TestExportStaticCmd_MissingRequiredFlags(t *testing.T) {
 	cmd := newExportStaticCmd()
 	cmd.SetArgs(nil)
@@ -261,6 +279,25 @@ func TestAPICmd_PortInUse(t *testing.T) {
 
 	if err := cmd.Execute(); err == nil {
 		t.Errorf("expected error when port is already in use")
+	}
+}
+
+// TestRunAPI_BindFailureClaimsNothing: when the port cannot be bound,
+// runAPI returns the bind error and prints no "serving" line. It printed
+// "serving ... on" before binding, so a failed bind still claimed to serve.
+func TestRunAPI_BindFailureClaimsNothing(t *testing.T) {
+	graphDir := t.TempDir()
+	reapGraphDir(t, graphDir)
+	buildGraph(t, graphDir)
+	bindErr := errors.New("bind: refused")
+	var out strings.Builder
+	err := runAPI(apiOpts{GraphDir: graphDir, Port: 1, Out: &out,
+		Listen: func(string) (net.Listener, error) { return nil, bindErr }})
+	if !errors.Is(err, bindErr) {
+		t.Fatalf("err = %v, want the bind error", err)
+	}
+	if strings.Contains(out.String(), "serving") {
+		t.Errorf("printed %q although the bind failed", out.String())
 	}
 }
 
