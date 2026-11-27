@@ -213,7 +213,7 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		rg.Edges = append(rg.Edges, gop.OrderDispatchEdges(append(dEdges, dFacts.Counted()...))...)
 		log.Info("dispatch edges emitted", "interface_method", dst.InterfaceEdges, "func_value", dst.FuncValueEdges,
 			"packages", dst.Packages, "ssa_packages", dst.SSAPackages, "own_errors", dst.OwnErrors, "build_panics", dst.BuildPanics,
-			"channel_ops", dst.ChannelOps, "channel_linked", dst.ChannelLinked, "channel_aliases", dst.ChannelAliases,
+			"channel_ops", dst.ChannelOps, "channel_linked", dst.ChannelLinked, "channel_aliases", dst.ChannelAliases, "closes", dst.Closes, "value_calls", dst.ValueCalls, "sync_followed", dst.SyncFollowed, "sync_no_origin", dst.SyncNoOrigin, "sync_unresolved", dst.SyncUnresolved,
 			"type_hierarchy", dst.TypeHierarchy, "goroutine_code", dst.GoroutineCode,
 			"receives", dst.Receives, "handles", dst.Handles, "received_flows", dst.ReceivedFlows,
 			"triggers", dst.Triggers, "sender_handled_pairs", dst.HandledPairs,
@@ -233,6 +233,14 @@ func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, role
 		// accessed_under_lock rule does not follow; their uses have no edge.
 		log.Info("lock edges emitted", "count", len(lockEdges), "undecided_functions", lst.UndecidedFunctions,
 			"propagated", lst.PropagatedEdges, "undecided_callees", lst.UndecidedCallees)
+
+		// Operations on sync primitives (concfacts SyncUse, RunsLater):
+		// operates_on from a call or receive to the primitive's declaration,
+		// runs_func to a function such a call runs later.
+		syncFacts, yst := gop.SyncFacts(p.Pkgs(), rg.Nodes)
+		rg.Edges = append(rg.Edges, syncFacts.Edges()...)
+		log.Info("sync edges emitted", "operates_on", yst.Uses, "runs_func", yst.RunsFunc,
+			"no_declaration", yst.NoDeclaration, "no_site", yst.NoSite)
 
 		// Statement links: conditions, guarded writes, nesting, call sites.
 		sEdges, sst := gop.EmitStatementEdges(p.Pkgs(), rg.Nodes)

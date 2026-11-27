@@ -92,9 +92,8 @@ func BuildPkgTree(g *graph.Graph) *PkgTree {
 	}
 	// Logic blocks (L4): parent = enclosing function (qname prefix before '#').
 	for _, n := range g.Nodes {
-		switch n.Type {
-		case types.NodeIfStmt, types.NodeLoopStmt, types.NodeSwitchStmt,
-			types.NodeReturnStmt, types.NodeCallSite:
+		switch {
+		case n.Type.IsStatement():
 			i := strings.IndexByte(n.QualifiedName, '#')
 			if i < 0 {
 				continue

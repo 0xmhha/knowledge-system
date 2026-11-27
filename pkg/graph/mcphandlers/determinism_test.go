@@ -88,6 +88,7 @@ var determinismCalls = [][]struct {
 	{{"impact_of_change", map[string]any{"seed_qname": "fanin.leaf"}}},
 	{{"concurrency_impact", map[string]any{"seed_qname": "fanin.hub"}}},
 	{{"change_history", map[string]any{"qname": "fanin.hub"}}},
+	{{"execution_flow", map[string]any{"qname": "fanin.hub"}}, {"execution_flow", map[string]any{"qname": "fanin.leaf", "direction": "backward"}}},
 	{{"evidence_for_intent", map[string]any{"intent": "hub leaf"}}},
 	{{"search_text", map[string]any{"query": "caller"}}},
 	{{"find_symbol", map[string]any{"name": "hub", "exact": false}}},

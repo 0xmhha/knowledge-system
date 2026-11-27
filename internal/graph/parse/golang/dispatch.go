@@ -61,6 +61,11 @@ type DispatchStats struct {
 	FuncValueEdges int // dispatches_to edges of kind func_value or closure
 	NoNode         int // resolved targets or sources without a graph node
 	ChannelOps     int // channel sends and receives in function bodies
+	Closes         int // close(ch) calls in function bodies
+	ValueCalls     int // calls edges of calls through a function value whose one callee SSA knows
+	SyncFollowed   int // operates_on and runs_func facts of primitives the syntax could not name and of functions passed as parameters (sync_flow.go)
+	SyncNoOrigin   int // operations (and functions run later) left without an edge: some source is unresolved
+	SyncUnresolved int // the unresolved sources of the operations SyncNoOrigin counts
 	ChannelLinked  int // of those, linked to the channel they operate on
 	ChannelAliases int // flows_to edges: a channel stored in a field or variable
 	TypeHierarchy  int // dispatches_to edges of kind type_hierarchy
@@ -316,21 +321,31 @@ func EmitDispatchEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		}
 		add(src, dst, "type_hierarchy", 0)
 	}
+	// Calls through a function value whose one callee SSA knows: VTA skips
+	// them with the static calls (value_calls.go).
+	vc := valueCalls(prog, funcs, pkgs, nodeOf)
+	st.ValueCalls = len(vc)
+	out = append(out, vc...)
 	ch := &chanLinker{prog: prog, cg: cg, nodeOf: nodeOf, values: values, fields: newFieldIndex(prog.Fset, nodes), chans: chans,
 		memo: map[ssa.Value][]chanOrigin{}, started: goroutineStarts(prog, funcs, gors), methodNode: methodNode,
 		inPlace: calledInPlace(funcs), aliasNodes: map[string]*types.Node{}}
+	ch.carriedValues(funcs)
 	for fn := range funcs {
 		ch.function(fn, &st)
 		ch.stores(fn)
 		ch.goroutineCode(fn)
 	}
 	ch.dynamicGoEntries(funcs, gors)
+	ch.reflectChannels(funcs, nodes)
 	st.ChannelAliases = len(ch.aliases)
 	ch.locks, st.ChanLocks = ch.channelLocks(funcs)
 	facts := make(concfacts.Facts, 0, len(ch.ops))
 	for _, op := range append(ch.ops, ch.messageLinks(funcs, nodes, &st)...) {
 		facts = append(facts, op.fact())
 	}
+	_, _, syn := syncSyntax(pkgs, nodes)
+	facts = append(facts, ch.syncParams(funcs, syn, nodes, &st)...)
+	out = append(out, ch.literalUses(funcs, nodes)...)
 	for _, e := range append(out, facts.Counted()...) {
 		switch {
 		case types.IsGoroutineCode(e):
@@ -392,11 +407,9 @@ func (op chanOp) fact() concfacts.Fact {
 	case op.kind == GoroutineKind || op.kind == types.DispatchGoroutineWrite:
 		return concfacts.ExecContext{Goroutine: src, File: file, Certainty: concfacts.Approx(concfacts.ReasonInterleaving),
 			Runs: []concfacts.CodeUse{{Edge: op.typ, Target: dst, Line: op.line, Write: op.kind == types.DispatchGoroutineWrite}}}
-	case op.typ == types.EdgeSendsTo || op.typ == types.EdgeRecvsFrom:
-		dir := concfacts.Send
-		if op.typ == types.EdgeRecvsFrom {
-			dir = concfacts.Recv
-		}
+	case op.typ == types.EdgeSendsTo || op.typ == types.EdgeRecvsFrom || op.typ == types.EdgeCloses:
+		dir := map[types.EdgeType]concfacts.Direction{types.EdgeSendsTo: concfacts.Send, types.EdgeRecvsFrom: concfacts.Recv,
+			types.EdgeCloses: concfacts.Close}[op.typ]
 		return concfacts.ChanOp{Actor: src, Origin: dst, OriginKind: op.kind, Dir: dir, Line: op.line, File: file,
 			Certainty: concfacts.Approx(concfacts.ReasonAliasing)}
 	case op.typ == types.EdgeFlowsTo && op.kind == concfacts.ReceivedKind:
@@ -420,6 +433,10 @@ func (op chanOp) fact() concfacts.Fact {
 type chanOrigin struct {
 	node *types.Node
 	kind string // make, field, global
+	// carried: the channel value was received from another channel, which
+	// carries it from where it was sent (approximated: every value sent on
+	// the carrier).
+	carried bool
 }
 
 type chanOp struct {
@@ -457,6 +474,9 @@ type chanLinker struct {
 	locks ChanLocks
 	// selectors caches selectorNames.
 	selectors map[*ssa.Function]map[token.Pos]string
+	// sentOn are the channel values sent on a channel of channels, by the
+	// carrier's origin (carriedValues).
+	sentOn map[string][]ssa.Value
 }
 
 // calledInPlace returns the function literals of funcs that their parent
@@ -824,14 +844,18 @@ func (c *chanLinker) function(fn *ssa.Function, st *DispatchStats) {
 		return
 	}
 	op := func(v ssa.Value, typ types.EdgeType, pos token.Pos) {
-		st.ChannelOps++
 		line := 0
 		if pos.IsValid() {
 			line = c.prog.Fset.Position(pos).Line
 		}
 		os := c.origins(v, 0, map[ssa.Value]bool{})
-		if len(os) > 0 {
-			st.ChannelLinked++
+		if typ == types.EdgeCloses {
+			st.Closes++
+		} else {
+			st.ChannelOps++
+			if len(os) > 0 {
+				st.ChannelLinked++
+			}
 		}
 		c.events = append(c.events, chanEvent{fn: fn, typ: typ, pos: pos, origins: os})
 		// The function the operation is written in gets the edge, and so
@@ -855,6 +879,14 @@ func (c *chanLinker) function(fn *ssa.Function, st *DispatchStats) {
 				if x.Op == token.ARROW {
 					op(x.X, types.EdgeRecvsFrom, x.Pos())
 				}
+			case *ssa.Call, *ssa.Defer:
+				// close(ch) wakes every receive on ch, as a send wakes one;
+				// defer close(ch) closes it when the function returns. The
+				// close is at its call's parenthesis, as a channel lock's.
+				call := x.(ssa.CallInstruction).Common()
+				if b, ok := call.Value.(*ssa.Builtin); ok && b.Name() == "close" && len(call.Args) == 1 {
+					op(call.Args[0], types.EdgeCloses, call.Pos())
+				}
 			case *ssa.Select:
 				for _, s := range x.States {
 					typ := types.EdgeRecvsFrom
@@ -876,6 +908,11 @@ func (c *chanLinker) origins(v ssa.Value, depth int, busy map[ssa.Value]bool) []
 	if os, ok := c.memo[v]; ok {
 		return os
 	}
+	// Only a value followed from the start is complete: one reached while
+	// others are being followed misses the origins that cycle back through
+	// them (a variable made before a loop and again inside it is a phi of
+	// both), so it is not remembered.
+	top := len(busy) == 0
 	busy[v] = true
 	defer delete(busy, v)
 	var out []chanOrigin
@@ -883,18 +920,21 @@ func (c *chanLinker) origins(v ssa.Value, depth int, busy map[ssa.Value]bool) []
 	switch x := v.(type) {
 	case *ssa.MakeChan:
 		if n := c.makeSite(x); n != nil {
-			out = append(out, chanOrigin{n, "make"})
+			out = append(out, chanOrigin{node: n, kind: "make"})
 		}
 	case *ssa.UnOp:
+		if x.Op == token.ARROW { // a channel received from a channel
+			add(c.carried(x.X, depth, busy))
+		}
 		if x.Op == token.MUL { // a load: of a field, a global or a local cell
 			switch a := x.X.(type) {
 			case *ssa.FieldAddr:
 				if n := c.field(a.X.Type(), a.Field); n != nil {
-					out = append(out, chanOrigin{n, "field"})
+					out = append(out, chanOrigin{node: n, kind: "field"})
 				}
 			case *ssa.Global:
 				if n := c.values[goCanonicalID(a.Object())]; n != nil {
-					out = append(out, chanOrigin{n, "global"})
+					out = append(out, chanOrigin{node: n, kind: "global"})
 				}
 			case *ssa.Alloc:
 				add(c.stored(a, depth, busy))
@@ -908,7 +948,7 @@ func (c *chanLinker) origins(v ssa.Value, depth int, busy map[ssa.Value]bool) []
 		}
 	case *ssa.Field:
 		if n := c.field(x.X.Type(), x.Field); n != nil {
-			out = append(out, chanOrigin{n, "field"})
+			out = append(out, chanOrigin{node: n, kind: "field"})
 		}
 	case *ssa.ChangeType:
 		add(c.origins(x.X, depth, busy))
@@ -932,10 +972,90 @@ func (c *chanLinker) origins(v ssa.Value, depth int, busy map[ssa.Value]bool) []
 		if call, ok := x.Tuple.(*ssa.Call); ok {
 			add(c.returned(&call.Call, x.Index, x.Parent(), depth, busy))
 		}
+		if sel, ok := x.Tuple.(*ssa.Select); ok {
+			// A select's tuple is (index, recvOk, the value of each
+			// receive case in order): a channel received in a case.
+			if st := selectRecvState(sel, x.Index-selectRecvBase); st != nil {
+				add(c.carried(st.Chan, depth, busy))
+			}
+		}
 	}
 	out = dedupOrigins(out)
-	if depth == 0 {
+	if top {
 		c.memo[v] = out
+	}
+	return out
+}
+
+// carriedValues indexes, by the origin of the carrier, the channel values
+// funcs send on a channel of channels (a send or a select case), so that a
+// channel received from the carrier is followed to the ones sent on it.
+func (c *chanLinker) carriedValues(funcs map[*ssa.Function]bool) {
+	c.sentOn = map[string][]ssa.Value{}
+	fns := make([]*ssa.Function, 0, len(funcs))
+	for fn := range funcs {
+		fns = append(fns, fn)
+	}
+	sort.Slice(fns, func(i, j int) bool { return fns[i].String() < fns[j].String() })
+	note := func(carrier, v ssa.Value) {
+		if _, isChan := v.Type().Underlying().(*gotypes.Chan); !isChan {
+			return
+		}
+		for _, o := range c.origins(carrier, 0, map[ssa.Value]bool{}) {
+			c.sentOn[o.node.ID] = append(c.sentOn[o.node.ID], v)
+		}
+	}
+	for _, fn := range fns {
+		for _, b := range fn.Blocks {
+			for _, in := range b.Instrs {
+				switch x := in.(type) {
+				case *ssa.Send:
+					note(x.Chan, x.X)
+				case *ssa.Select:
+					for _, s := range x.States {
+						if s.Dir == gotypes.SendOnly {
+							note(s.Chan, s.Send)
+						}
+					}
+				}
+			}
+		}
+	}
+	// The origins followed while the index was being built missed the
+	// carried values: forget them.
+	c.memo = map[ssa.Value][]chanOrigin{}
+}
+
+// selectRecvBase is the index of the first received value in the tuple of
+// a select (after the chosen case and recvOk).
+const selectRecvBase = 2
+
+// selectRecvState returns the i-th receive state of sel, nil when there is
+// none.
+func selectRecvState(sel *ssa.Select, i int) *ssa.SelectState {
+	for _, s := range sel.States {
+		if s.Dir != gotypes.RecvOnly {
+			continue
+		}
+		if i == 0 {
+			return s
+		}
+		i--
+	}
+	return nil
+}
+
+// carried returns the origins of the channels sent on the carrier channel
+// whose value is carrier, marked carried.
+func (c *chanLinker) carried(carrier ssa.Value, depth int, busy map[ssa.Value]bool) []chanOrigin {
+	var out []chanOrigin
+	for _, o := range c.origins(carrier, depth+1, busy) {
+		for _, v := range c.sentOn[o.node.ID] {
+			for _, so := range c.origins(v, depth+1, busy) {
+				so.carried = true
+				out = append(out, so)
+			}
+		}
 	}
 	return out
 }
@@ -1103,6 +1223,9 @@ func dedupOrigins(os []chanOrigin) []chanOrigin {
 	out := os[:0]
 	for _, o := range os {
 		k := o.node.ID + o.kind
+		if o.carried {
+			k += "|carried"
+		}
 		if !seen[k] {
 			seen[k] = true
 			out = append(out, o)

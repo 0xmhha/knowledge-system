@@ -65,11 +65,15 @@ type programFacts struct {
 	// goChan are the expected Goroutine -> Channel links; undecidedChan the
 	// Goroutine links whose operand's origin is not one make.
 	goChan, undecidedChan map[[3]string]bool
+	// exec are the closes, operates_on and runs_func facts (execorder.go).
+	exec *execFacts
+	// pflow follows the primitives passed as parameters (paramflow.go).
+	pflow *paramFlow
 }
 
 func collectProgramFacts(pkgs []*packages.Package, root string, scope map[string]bool, chanLocks chanLockNames) *programFacts {
 	pf := &programFacts{root: root, scope: scope, invoked: map[string]*gotypes.Func{}, named: map[string]*gotypes.Named{},
-		goChan: map[[3]string]bool{}, undecidedChan: map[[3]string]bool{}, localChan: map[[2]string]bool{}, msg: newMessageFacts(), chanLocks: chanLocks}
+		goChan: map[[3]string]bool{}, undecidedChan: map[[3]string]bool{}, localChan: map[[2]string]bool{}, msg: newMessageFacts(), chanLocks: chanLocks, exec: newExecFacts(), pflow: newParamFlow()}
 	seen := map[string]bool{}
 	for _, pkg := range pkgs {
 		if pkg.TypesInfo == nil {
@@ -85,8 +89,10 @@ func collectProgramFacts(pkgs []*packages.Package, root string, scope map[string
 				// A call outside the covered files still invokes the
 				// method: the build's program holds every loaded body.
 				pf.invokes(pkg.TypesInfo, f)
+				pf.collectParams(pkg.TypesInfo, f, "")
 				continue
 			}
+			pf.collectParams(pkg.TypesInfo, f, filepath.ToSlash(rel))
 			if seen[rel] {
 				continue
 			}
@@ -94,6 +100,8 @@ func collectProgramFacts(pkgs []*packages.Package, root string, scope map[string
 			pf.file(pkg.TypesInfo, f, filepath.ToSlash(rel))
 		}
 	}
+	pf.resolveParams()
+	pf.heldUses()
 	return pf
 }
 
@@ -130,6 +138,8 @@ func (pf *programFacts) file(info *gotypes.Info, f *ast.File, rel string) {
 	for _, d := range f.Decls {
 		if fd, ok := d.(*ast.FuncDecl); ok && fd.Body != nil {
 			pf.goroutines(info, fd.Body, rel)
+			pf.execOrder(info, fd, rel)
+			pf.syncAliases(info, fd, rel)
 		}
 	}
 }

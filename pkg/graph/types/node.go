@@ -182,6 +182,12 @@ type Node struct {
 	// when nil so existing payloads (HTTP / MCP / chunked export)
 	// stay byte-identical until a caller asks for breadcrumbs.
 	RecentPRs []PRRef `json:"recent_prs,omitempty"`
+	// SyncUnknown, on a CallSite, are the operations on a sync primitive
+	// made there whose primitive the graph does not name: the site has no
+	// operates_on edge for that operation, and this says so and why (Go
+	// frontend, sync_flow.go). Nil for every other node and for a site
+	// whose every operation is named.
+	SyncUnknown []SyncUnknown `json:"sync_unknown,omitempty"`
 }
 
 // ExternalPackage names the package an External node belongs to.

@@ -33,6 +33,7 @@ func newRootCmd() *cobra.Command {
 		newReportCmd(), newQuickstartCmd(), newPathCmd(), newBenchmarkCmd(),
 		newQueryCmd(), newEvalRetrievalCmd(), newAuditCmd(),
 		newValidateCmd(), newEvidenceCmd(), newBenchServerCmd(),
-		newBenchMCPCmd(), newBenchMCPStdioCmd(), newBenchIndexCmd(), newVerifyCmd(), newScopeCmd(), newObserveCmd())
+		newBenchMCPCmd(), newBenchMCPStdioCmd(), newBenchIndexCmd(), newVerifyCmd(), newScopeCmd(), newObserveCmd(),
+		newFlowCmd())
 	return root
 }

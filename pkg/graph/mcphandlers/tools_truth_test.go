@@ -223,8 +223,8 @@ func TestSearchCode_GroupLines(t *testing.T) {
 		t.Errorf("the spec in the group: hits %v, want types.grouped", hitNames(out))
 	}
 	for _, must := range []string{"the opening line of a `var (`, `const (` or `type (` group and its closing `)` line"} {
-		if !strings.Contains(Instructions(), must) {
-			t.Errorf("guide does not say %q", must)
+		if !strings.Contains(searchCodeTexts(t, s), must) {
+			t.Errorf("search_code does not say %q", must)
 		}
 	}
 }

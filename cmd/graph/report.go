@@ -416,8 +416,10 @@ func confidenceCounts(edges []types.Edge) map[types.Confidence]int {
 //   - concept-like (FilePath empty): nodes the parser couldn't anchor
 //     to a real source location are usually placeholder pending refs,
 //     not real abstractions.
+//   - statement nodes (types.NodeType.IsStatement): parts of a function
+//     body, not declarations.
 func godNodeFilter(t types.NodeType, filePath string) bool {
-	if filePath == "" {
+	if filePath == "" || t.IsStatement() {
 		return true
 	}
 	switch t {

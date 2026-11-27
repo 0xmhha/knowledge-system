@@ -39,6 +39,7 @@ type nodeAttrs struct {
 	HasSelfReentrantCall          bool                   `json:"has_self_reentrant_call,omitempty"`
 	HasSelfDelegatecallDead       bool                   `json:"has_self_delegatecall_dead,omitempty"`
 	External                      *types.ExternalPackage `json:"external,omitempty"`
+	SyncUnknown                   []types.SyncUnknown    `json:"sync_unknown,omitempty"`
 }
 
 // marshalNodeAttrs serialises a Node's marker surface into the
@@ -62,6 +63,7 @@ func marshalNodeAttrs(n *types.Node) string {
 		HasSelfReentrantCall:          n.HasSelfReentrantCall,
 		HasSelfDelegatecallDead:       n.HasSelfDelegatecallDead,
 		External:                      n.External,
+		SyncUnknown:                   n.SyncUnknown,
 	}
 	if isZeroAttrs(a) {
 		return ""
@@ -113,6 +115,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
 	n.HasSelfReentrantCall = a.HasSelfReentrantCall
 	n.HasSelfDelegatecallDead = a.HasSelfDelegatecallDead
 	n.External = a.External
+	n.SyncUnknown = a.SyncUnknown
 }
 
 func isZeroAttrs(a nodeAttrs) bool {
@@ -129,5 +132,6 @@ func isZeroAttrs(a nodeAttrs) bool {
 		!a.HasFunctionPointerPropagation &&
 		!a.HasSelfReentrantCall &&
 		!a.HasSelfDelegatecallDead &&
-		a.External == nil
+		a.External == nil &&
+		len(a.SyncUnknown) == 0
 }

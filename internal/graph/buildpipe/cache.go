@@ -329,7 +329,27 @@ import (
 // The pending_refs table is no longer written (only the removed incremental
 // build read it); an older graph.db keeps it until the next build replaces
 // the file.
-const SchemaVersion = "1.43"
+//
+// 1.44 (2026-11-27): facts for reading code in execution order. closes (a
+// closer to the channel it closes; its CallSite has sub kind close) and
+// triggers from the closer to every receive on the channel; a select
+// statement is a SwitchStmt of sub kind select or select_default that
+// encloses its cases' sends and receives as cond; runs_under_lock (a call,
+// send or receive site to each mutex held there); operates_on (a call or
+// receive on a sync primitive to the declaration that holds it) and
+// runs_func (to the function sync.Once.Do, time.AfterFunc or
+// sync.WaitGroup.Go runs later); literal_passed_to also from the Goroutine
+// of a go statement in the literal. SwitchStmt nodes, encloses, cond_reads,
+// cond_calls, body_writes and triggers change. Every build is cold.
+//
+// 1.45 (2026-11-27): control transfer and code extents. Node types
+// BranchStmt (break, continue, goto, fallthrough), CaseClause (one clause
+// of a switch or select), DeferStmt and FuncLit; edge type jumps_to (a
+// BranchStmt or ReturnStmt to where it goes); literal_passed_to also from a
+// FuncLit to its callee, its kind what the callee does with it; flows_to of
+// kind sync (a sync primitive stored into a field); a CallSite may carry
+// sync_unknown; Channel qualified names name the line. Every build is cold.
+const SchemaVersion = "1.45"
 
 // ComputeCacheKey returns the SHA256 of:
 //

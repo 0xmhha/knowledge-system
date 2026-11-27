@@ -421,8 +421,11 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr, c
 	sig := formatChannelSignature(cm)
 	startLn, startBy := v.pos(call.Pos())
 	endLn, endBy := v.pos(call.End())
-	qname := fmt.Sprintf("chan@%s:%d", v.relPath, startBy)
-	nodeID := v.declID(qname, startBy)
+	// The id keeps the byte offset (it is stable and unique); the name a
+	// reader sees names the line and column, and nameChannels drops the
+	// column of a channel alone on its line.
+	nodeID := v.declID(fmt.Sprintf("%s%s:%d", channelQnamePrefix, v.relPath, startBy), startBy)
+	qname := fmt.Sprintf("%s%s:%d:%d", channelQnamePrefix, v.relPath, startLn, v.fset.Position(call.Pos()).Column)
 	v.nodes = append(v.nodes, types.Node{
 		ID: nodeID, Type: types.NodeChannel,
 		Name: "channel", QualifiedName: qname,
@@ -436,6 +439,28 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr, c
 		Confidence: types.ConfExtracted,
 	})
 	return nodeID
+}
+
+// channelQnamePrefix starts the qualified name of a Channel node, which
+// names where the channel is made: "chan@<file>:<line>", with ":<column>"
+// when several channels are made on that line.
+const channelQnamePrefix = "chan@"
+
+// nameChannels drops the column from the name of each Channel node of the
+// file that is the only one made on its line (see channelQnamePrefix).
+func (v *declVisitor) nameChannels() {
+	perLine := map[int]int{}
+	for _, n := range v.nodes {
+		if n.Type == types.NodeChannel {
+			perLine[n.StartLine]++
+		}
+	}
+	for i := range v.nodes {
+		n := &v.nodes[i]
+		if n.Type == types.NodeChannel && perLine[n.StartLine] == 1 {
+			n.QualifiedName = fmt.Sprintf("%s%s:%d", channelQnamePrefix, v.relPath, n.StartLine)
+		}
+	}
 }
 
 // Directions of a Channel node (its sub kind).

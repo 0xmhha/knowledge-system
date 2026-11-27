@@ -819,7 +819,35 @@ func RegisterSearchCode(s *server.MCPServer, reader store.Reader) {
 	registerCodeSearch(s, reader, "search_test_code", codeSearchSide{tests: "only"},
 		"grep over the test code of the graph (the files the build records as test code): a regular expression (RE2; alternatives with |) over the source of every test function, helper, type, constant and variable, "+
 			"answered per declaration: its qname, file, lines, the matched lines with line numbers, and the distinct texts it matched (lowercased). "+
-			"Order: a match in the name first, then more matches, then wider use in the repository (PageRank). ")
+			"Order: a match in the name first, then more matches, then wider use in the repository (PageRank). "+
+			"Arguments, result keys and the parts of a large result are those of search_code (its description and parameters explain them). ")
+}
+
+// readingFor is the part of a code search tool's description that explains
+// its result: in full for search_code, which search_test_code points to.
+func readingFor(name string) string {
+	if name != "search_code" {
+		return ""
+	}
+	return guideText(searchCodeReading)
+}
+
+// ruleFor is the full rule for search_code and a pointer to it for the
+// other code search, which takes the same arguments.
+func ruleFor(name, rule, short string) string {
+	if name != "search_code" {
+		return short
+	}
+	return guideText(rule)
+}
+
+// nameAsBothNote is said in the in parameter when in=name returns body
+// matches too.
+func nameAsBothNote() string {
+	if searchCodeNameAsBoth {
+		return searchCodeNameAsBothManual
+	}
+	return ""
 }
 
 // codeSearchSide is which code a code search covers.
@@ -832,24 +860,24 @@ func registerCodeSearch(s *server.MCPServer, reader store.Reader, name string, s
 	params := []mcp.ToolOption{
 		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithDescription(about +
-			"A result too large for one response comes as an index: every matched declaration in one short row with its matched line numbers and the uses on them, without code; ask for the code of the ones you choose with ids=[qname, ...] (the server guide explains every key). " +
+			"A result too large for one response comes as an index: every matched declaration in one short row with its matched line numbers and the uses on them, without code; ask for the code of the ones you choose with ids=[qname, ...] (see ids). " +
 			"Each matched line lists the calls and value uses the graph resolved on it (resolve), and expand=[\"callers\",\"callees\",\"references\"] attaches the next hop. " +
 			"Use it as you would grep: enumerate the names and code shapes you expect (\"Flush|flush|Writer\", \"sql\\\\.Open\\\\(\", \"func \\\\(.*\\\\) \\\\w*Render\\\\w*\\\\(\"). " +
-			"Covers the build's files as of the last graph build; packages outside the build and uncommitted edits are not searched."),
-		mcp.WithString("pattern", mcp.Required(), mcp.Description("RE2 regular expression; | separates alternatives. With fixed=true, a literal string.")),
+			"Covers the build's files as of the last graph build; packages outside the build and uncommitted edits are not searched." + readingFor(name)),
+		mcp.WithString("pattern", mcp.Required(), mcp.Description(ruleFor(name, searchCodePatternRule, "RE2 regular expression; | separates alternatives. With fixed=true, a literal string. What is searched is as in search_code (its pattern parameter)."))),
 		mcp.WithBoolean("fixed", mcp.Description("treat pattern as a literal string")),
 		mcp.WithBoolean("ignore_case", mcp.Description("case-insensitive match")),
 		mcp.WithBoolean("word", mcp.Description("match whole words only")),
-		mcp.WithString("in", mcp.Description("body (default: declaration source, signature included), name (the qualified name, or the declaration's first line from its first token with its comments left out, e.g. \"func (t *Template) Render(\"; never comment text), or both")),
+		mcp.WithString("in", mcp.Description("body (default: declaration source, signature included), name (the qualified name, or the declaration's first line from its first token with its comments left out, e.g. \"func (t *Template) Render(\"; never comment text), or both."+nameAsBothNote())),
 		mcp.WithString("path", mcp.Description("only files under this path prefix, or matching this glob (* and **)")),
 		mcp.WithArray("expand", mcp.Description("attach for each hit: callers, callees, references (who reads or writes a value); at most 10 of each, callers and callees the first 10 by qualified name, then file and line, references in the order find_references gives; when there are more, the hit has callers_total, callees_total or references_total. The counted set is exactly what find_callers or find_callees with qname=<the hit's canonical_id, or its qname when it has none> and depth=1 returns besides the hit itself, and what find_references with that qname and limit=<references_total> returns"), mcp.WithStringItems()),
 		mcp.WithBoolean("resolve", mcp.Description("list the calls and value uses on each matched line (default true)")),
 		mcp.WithNumber("context", mcp.Description("lines of context around each matched line (0 to 3, default 0)")),
-		mcp.WithArray("ids", mcp.Description("qname (or canonical_id) of declarations to return in full: their matched lines with code, uses and expansion. Use it after a result that came as an index"), mcp.WithStringItems()),
-		mcp.WithNumber("page", mcp.Description("part to return when a result asked for with ids is still too large for one response (default 1)")),
+		mcp.WithArray("ids", mcp.Description(ruleFor(name, searchCodeIdsRule, "qname (or canonical_id) of declarations to return in full, after a result that came as an index (as in search_code: its ids parameter explains the index)")), mcp.WithStringItems()),
+		mcp.WithNumber("page", mcp.Description(ruleFor(name, searchCodePageRule, "part to return when a result asked for with ids is still too large (default 1; as in search_code)"))),
 	}
 	if searchCodeReasons {
-		params = append(params, mcp.WithArray("reasons", mcp.Description("words for why you search: the behaviour or mechanism the problem is about, as words or identifier parts (\"retry\", \"expire\", \"cache\"). Declarations next to the hits in the graph (callers, callees, values read or written) whose source or name holds one of them are listed after the hits, under related"), mcp.WithStringItems()))
+		params = append(params, mcp.WithArray("reasons", mcp.Description(guideText(searchCodeReasonsManual)), mcp.WithStringItems()))
 	}
 	tool := nsTool(name, params...)
 	if searchCodeMaxResultChars > 0 {
@@ -1840,7 +1868,7 @@ func fileSearchCode(out map[string]any, t *callTrace, tool string) (any, bool) {
 	text := fmt.Sprintf("This result is too large for one response, so none of it is here: all %d matched declarations "+
 		"(%d bytes, %d lines of indented JSON) are saved in the file %s. Read that file before you draw any conclusion from this search; "+
 		"when the reader says the file is too large, read it in parts with offset and limit until you reach the end. "+
-		"It has the keys of a full %s result, which the server guide explains. "+
+		"It has the keys of a full %s result, which its tool description explains. "+
 		"For the code of a few declarations you can also call %s with the same pattern and ids=[their qname, ...].",
 		len(rows), len(body), lines, path, ToolName(tool), ToolName(tool))
 	t.add("search_code.file", map[string]any{"path": path, "declarations": len(rows), "bytes": len(body), "lines": lines,

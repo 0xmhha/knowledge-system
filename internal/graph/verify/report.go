@@ -22,9 +22,12 @@ type Report struct {
 	OutsideTypeRefs RelationStats `json:"outside_type_refs"`
 	// DynamicCallSites are calls through function values, method values and
 	// closures. go/types gives them no callee, so they are counted, not checked.
-	DynamicCallSites  int             `json:"dynamic_call_sites"`
-	CallsOutsideFuncs int             `json:"calls_outside_funcs"`
-	Unexpected        UnexpectedStats `json:"unexpected_edges"`
+	DynamicCallSites int `json:"dynamic_call_sites"`
+	// DynamicTargets counts those sites by what the called value is
+	// (valuecalls.go) and how many have a target edge in the graph.
+	DynamicTargets    map[string]TargetStats `json:"dynamic_call_targets,omitempty"`
+	CallsOutsideFuncs int                    `json:"calls_outside_funcs"`
+	Unexpected        UnexpectedStats        `json:"unexpected_edges"`
 	// Statements compares the statement links (schema 1.32) by edge type;
 	// nil for a graph without them.
 	Statements map[string]StmtRelStats `json:"statement_links,omitempty"`
@@ -53,6 +56,24 @@ type Report struct {
 	// syntax (messages.go).
 	Handles  UnderLockStats `json:"handles"`
 	Triggers UnderLockStats `json:"triggers"`
+	// Closes compares the closes edges to a field or package-level
+	// variable, SyncOps the operates_on edges and RunsFunc the runs_func
+	// edges with the syntax and go/types (execorder.go); SiteLocks and
+	// SiteLocksPropagated the runs_under_lock edges with the must-hold data
+	// flow (underlock.go), direct and held by a caller.
+	Closes  UnderLockStats `json:"closes"`
+	SyncOps UnderLockStats `json:"operates_on"`
+	// SyncUnknown are the operations marked on their site as of a primitive
+	// no declaration names (types.Node.SyncUnknown), by site and operation.
+	SyncUnknown UnderLockStats `json:"sync_unknown"`
+	// Extents are the BranchStmt, CaseClause, DeferStmt and FuncLit nodes,
+	// by file, type, sub kind and lines; SyncAliases the flows_to edges of
+	// kind sync (extents.go).
+	Extents             UnderLockStats `json:"extents"`
+	SyncAliases         UnderLockStats `json:"sync_aliases"`
+	RunsFunc            UnderLockStats `json:"runs_func"`
+	SiteLocks           UnderLockStats `json:"runs_under_lock"`
+	SiteLocksPropagated UnderLockStats `json:"runs_under_lock_propagated"`
 	// Load is what the go command reported while loading the truth. Graph
 	// and truth come from the same go command, so a package it cannot load
 	// is missing from both and the counts above cannot show it.
@@ -167,6 +188,11 @@ func (r Report) WriteText(w io.Writer) error {
 			rel.s.EndpointMissing, rel.s.Recall())
 	}
 	p("dynamic call sites (not checked): %d\n", r.DynamicCallSites)
+	for _, c := range []string{causeOwnLiteral, causeLocal, causeParam, causeField, causeGlobal, causeResult, causeOther} {
+		if t, ok := r.DynamicTargets[c]; ok {
+			p("  %s: %d sites, %d with a calls or dispatches_to target\n", c, t.Sites, t.WithTarget)
+		}
+	}
 	p("calls in package-level initialisers (not checked): %d\n", r.CallsOutsideFuncs)
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
 	p("accessed_under_lock: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
@@ -181,6 +207,16 @@ func (r Report) WriteText(w io.Writer) error {
 		r.Handles.Matched, r.Handles.Truth, r.Handles.Unsupported, r.Handles.Edges)
 	p("triggers (decided local channels): %d of %d true links in the graph; %d of %d edges unsupported\n",
 		r.Triggers.Matched, r.Triggers.Truth, r.Triggers.Unsupported, r.Triggers.Edges)
+	for _, x := range []struct {
+		name string
+		s    UnderLockStats
+	}{
+		{"closes (fields and package-level variables)", r.Closes}, {"runs_under_lock", r.SiteLocks},
+		{"runs_under_lock propagated", r.SiteLocksPropagated}, {"operates_on", r.SyncOps}, {"sync_unknown (marked sites)", r.SyncUnknown}, {"runs_func", r.RunsFunc},
+		{"extents (branch, clause, defer, literal nodes)", r.Extents}, {"flows_to sync", r.SyncAliases},
+	} {
+		p("%s: %d of %d true links in the graph; %d of %d edges unsupported\n", x.name, x.s.Matched, x.s.Truth, x.s.Unsupported, x.s.Edges)
+	}
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
 	if r.Statements == nil {
 		p("statement links: none in this graph\n")
@@ -243,6 +279,7 @@ func (r Report) WriteText(w io.Writer) error {
 		}
 		p("  interface calls linked only by the type hierarchy: %d\n", o.InterfaceByTypeOnly)
 		p("  sender-receiver pairs not joined: both linked to different channel nodes %d, one not linked %d\n", o.ChannelPairsDisjoint, o.ChannelPairsUnlinked)
+		p("  receives on a channel the runtime sends on (timers, context Done; outside the build): %d\n", o.ChannelOpsRuntime)
 		p("  dispatches_to edges that ran: %d of %d\n", o.DispatchObserved, o.DispatchEdges)
 		section("observed interface calls the graph lacks", o.Interface.MissingSamples)
 		section("observed function-value calls the graph lacks", o.FuncValue.MissingSamples)

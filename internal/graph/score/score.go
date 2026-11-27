@@ -53,11 +53,15 @@ func Compute(g *graph.Graph) {
 //
 // The message links (schema 1.42: handles, triggers) stay out as well: they
 // start at statement sites or repeat what the channel edges say, and were
-// not part of the measured ranks.
+// not part of the measured ranks. So do the execution-order facts (schema
+// 1.44): runs_under_lock, operates_on and runs_func start at sites, and
+// closes repeats a channel operation the way sends_to does; the ranks stay
+// those of the graph without them.
 var statementLink = map[types.EdgeType]bool{
 	types.EdgeSiteCalls: true, types.EdgeCondReads: true, types.EdgeCondCalls: true,
 	types.EdgeBodyWrites: true, types.EdgeEncloses: true,
 	types.EdgeHandles: true, types.EdgeTriggers: true, types.EdgeLiteralPassedTo: true,
+	types.EdgeCloses: true, types.EdgeRunsUnderLock: true, types.EdgeOperatesOn: true, types.EdgeRunsFunc: true,
 }
 
 // Type-hierarchy dispatch candidates (dispatches_to, kind type_hierarchy)
@@ -86,7 +90,11 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 		// External nodes (schema 1.36) stay out: time.Now would collect rank
 		// from every caller and pass none back, and how that changes the
 		// order of repository symbols has not been measured.
-		if isMetaNodeType(nd.Type) || nd.Type == types.NodeExternal {
+		// Statement-level nodes (types.NodeType.IsStatement) stay out too:
+		// a rank is a declaration's, and a function's body nodes (its
+		// sites, its returns' jumps_to back to it) moved it by how many
+		// statements it has, not by who depends on it.
+		if isMetaNodeType(nd.Type) || nd.Type == types.NodeExternal || nd.Type.IsStatement() {
 			continue
 		}
 		idx[nd.ID] = len(participants)
@@ -110,8 +118,10 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 		if !ok {
 			continue
 		}
+		// A dispatch marker (an invokes edge from a caller to itself that
+		// says it calls through a function value) names no dependency.
 		if statementLink[e.Type] || e.Type == types.EdgeDispatchesTo && e.DispatchKind == "type_hierarchy" ||
-			e.Type == types.EdgeFlowsTo && e.DispatchKind == types.DispatchReceived {
+			e.Type == types.EdgeFlowsTo && e.DispatchKind == types.DispatchReceived || types.IsDispatchMarker(e) {
 			continue
 		}
 		out[si] = append(out[si], di)

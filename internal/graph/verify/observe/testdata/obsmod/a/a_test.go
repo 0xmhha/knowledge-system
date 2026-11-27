@@ -9,4 +9,7 @@ func TestRun(t *testing.T) {
 	if Hub() != 5 {
 		t.Fatal(Hub())
 	}
+	if Deferred(inc) != 0 {
+		t.Fatal("Deferred")
+	}
 }

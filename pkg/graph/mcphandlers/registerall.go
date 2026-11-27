@@ -36,8 +36,12 @@ func RegisterAll(s *server.MCPServer, reader store.Reader) {
 	RegisterValueDependencies(s, reader)
 	RegisterRuleCandidates(s, reader)
 	RegisterChangeHistory(s, reader)
+	RegisterExecutionFlow(s, reader)
 	// One Cache per Run amortises BM25 corpus indexing across every
 	// evidence_for_intent call. Manifest-keyed invalidation handles
 	// the case where a concurrent `ckg build` rebuilds the graph.
 	RegisterEvidenceForIntent(s, reader, evidence.NewCache())
+	// Every call is checked against the arguments its tool declares
+	// (arguments.go).
+	requireDeclaredArguments(s)
 }

@@ -274,6 +274,7 @@ func expandToDepth(store persist.StoreReader, cands []types.Node, depth, frontie
 
 	for hop := 0; hop < depth && len(frontier) > 0; hop++ {
 		edges, _ := store.QueryEdgesForNodes(frontier)
+		edges = contextEdges(edges)
 		allEdges = append(allEdges, edges...)
 
 		next := make([]string, 0, len(edges))
@@ -293,7 +294,39 @@ func expandToDepth(store persist.StoreReader, cands []types.Node, depth, frontie
 	}
 
 	expanded, _ := store.NodesByIDs(setKeys(seen))
-	return expanded, allEdges
+	return declarations(store, expanded), allEdges
+}
+
+// declarations returns the nodes an agent asks about by name
+// (persist.Declarations, the rule find_symbol and the name resolver use):
+// not the statement nodes of a body, goroutines, the names local to a
+// function, imports or External stubs, which the search and the walk reach
+// and which would take the budget of declarations. A goroutine is opened by
+// its printed name in find_callers' goroutine_callers, not here.
+func declarations(store persist.StoreReader, nodes []types.Node) []types.Node {
+	out, err := persist.Declarations(store, nodes)
+	if err != nil {
+		return nodes
+	}
+	return out
+}
+
+// contextEdges returns the edges the expand stage walks: all but the
+// execution-order facts that start at a statement site (types.IsSiteFact).
+// Those say how a statement runs (the locks held there, the sync primitive
+// it operates on, the function it runs later, where it jumps to); the
+// declarations they lead to
+// (a Mutex, a WaitGroup field) are reached from the function by
+// accessed_under_lock and reads_field already, so walking them only
+// brought statement sites into the budget in place of declarations.
+func contextEdges(edges []types.Edge) []types.Edge {
+	out := edges[:0:0]
+	for _, e := range edges {
+		if !types.IsSiteFact(e.Type) {
+			out = append(out, e)
+		}
+	}
+	return out
 }
 
 // rankCandidates performs the (c) Score step: compute the composite

@@ -2,6 +2,7 @@ package validate
 
 import (
 	"context"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -317,5 +318,95 @@ func TestSchemaValidator_ErrorNeedsFilePath(t *testing.T) {
 	}
 	if len(r.Issues) != 1 || r.Issues[0].Code != "empty-file-path" {
 		t.Errorf("issues %v, want one empty-file-path", r.Issues)
+	}
+}
+
+// The execution-order facts (schema 1.44) have fixed shapes: closes from a
+// closer to a channel, runs_under_lock from a site to a Mutex, operates_on
+// from a site to a primitive's declaration with a known operation, runs_func
+// from a site to a declared function.
+// TestSchemaValidator_JumpShapes: jumps_to goes from a BranchStmt (a
+// ReturnStmt for return) to a target of its kind; a FuncLit may start
+// literal_passed_to.
+func TestSchemaValidator_JumpShapes(t *testing.T) {
+	g := &graph.Graph{
+		Nodes: []types.Node{
+			validNode("f", "pkg.F", types.NodeFunction),
+			validNode("b", "pkg.F#BranchStmt@1", types.NodeBranchStmt),
+			validNode("r", "pkg.F#ReturnStmt@2", types.NodeReturnStmt),
+			validNode("l", "pkg.F#LoopStmt@3", types.NodeLoopStmt),
+			validNode("c", "pkg.F#CaseClause@4", types.NodeCaseClause),
+			validNode("s", "pkg.F#SwitchStmt@5", types.NodeSwitchStmt),
+			validNode("x", "pkg.F#FuncLit@6", types.NodeFuncLit),
+		},
+		Edges: []types.Edge{
+			{Src: "b", Dst: "l", Type: types.EdgeJumpsTo, Line: 1, Confidence: types.ConfExtracted, DispatchKind: types.JumpContinue},
+			{Src: "b", Dst: "s", Type: types.EdgeJumpsTo, Line: 1, Confidence: types.ConfExtracted, DispatchKind: types.JumpBreak},
+			{Src: "b", Dst: "c", Type: types.EdgeJumpsTo, Line: 1, Confidence: types.ConfExtracted, DispatchKind: types.JumpFallthrough},
+			{Src: "r", Dst: "x", Type: types.EdgeJumpsTo, Line: 2, Confidence: types.ConfExtracted, DispatchKind: types.JumpReturn},
+			{Src: "x", Dst: "f", Type: types.EdgeLiteralPassedTo, Line: 6, Confidence: types.ConfExtracted, DispatchKind: types.LiteralUseGo},
+			// Bad: a continue cannot go to a switch; a return starts at a ReturnStmt.
+			{Src: "b", Dst: "s", Type: types.EdgeJumpsTo, Line: 7, Confidence: types.ConfExtracted, DispatchKind: types.JumpContinue},
+			{Src: "b", Dst: "f", Type: types.EdgeJumpsTo, Line: 8, Confidence: types.ConfExtracted, DispatchKind: types.JumpReturn},
+		},
+	}
+	r, err := NewSchemaValidator().Validate(context.Background(), g, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]int{}
+	for _, iss := range r.Issues {
+		got[iss.Code+" "+iss.EdgeKey]++
+	}
+	want := map[string]int{"jumps-to-bad-shape jumps_to:b:s:7": 1, "jumps-to-bad-shape jumps_to:b:f:8": 1}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("issues %v, want %v", got, want)
+	}
+}
+
+func TestSchemaValidator_ExecutionOrderShapes(t *testing.T) {
+	g := &graph.Graph{
+		Nodes: []types.Node{
+			validNode("f", "pkg.F", types.NodeFunction),
+			validNode("c", "pkg.S.quit", types.NodeField),
+			validNode("s", "pkg.F#CallSite@1-2", types.NodeCallSite),
+			validNode("m", "pkg.S.mu#mutex", types.NodeMutex),
+			validNode("w", "pkg.F.wg", types.NodeLocalVariable),
+			validNode("x", "pkg.F#CallSite@3-4", types.NodeCallSite),
+			validNode("e", "time.After", types.NodeExternal),
+		},
+		Edges: []types.Edge{
+			{Src: "f", Dst: "c", Type: types.EdgeCloses, Line: 1, Confidence: types.ConfInferred, DispatchKind: "field"},
+			{Src: "s", Dst: "m", Type: types.EdgeRunsUnderLock, Line: 1, Confidence: types.ConfInferred},
+			{Src: "s", Dst: "w", Type: types.EdgeOperatesOn, Line: 1, Confidence: types.ConfExtracted, DispatchKind: "wg_add"},
+			{Src: "s", Dst: "x", Type: types.EdgeOperatesOn, Line: 1, Confidence: types.ConfExtracted, DispatchKind: "timer_recv"},
+			{Src: "s", Dst: "f", Type: types.EdgeRunsFunc, Line: 1, Confidence: types.ConfExtracted, DispatchKind: "once_do"},
+			// Bad: a site does not close; a Field is not a Mutex; an unknown
+			// operation; a function is not a primitive; a field is not run.
+			{Src: "s", Dst: "c", Type: types.EdgeCloses, Line: 2, Confidence: types.ConfInferred},
+			{Src: "s", Dst: "c", Type: types.EdgeRunsUnderLock, Line: 2, Confidence: types.ConfInferred},
+			{Src: "s", Dst: "w", Type: types.EdgeOperatesOn, Line: 2, Confidence: types.ConfExtracted, DispatchKind: "spin"},
+			{Src: "s", Dst: "f", Type: types.EdgeOperatesOn, Line: 3, Confidence: types.ConfExtracted, DispatchKind: "wg_add"},
+			{Src: "s", Dst: "e", Type: types.EdgeOperatesOn, Line: 4, Confidence: types.ConfExtracted, DispatchKind: "timer_recv"},
+			{Src: "s", Dst: "c", Type: types.EdgeRunsFunc, Line: 2, Confidence: types.ConfExtracted, DispatchKind: "once_do"},
+		},
+	}
+	r, err := NewSchemaValidator().Validate(context.Background(), g, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]int{}
+	for _, iss := range r.Issues {
+		got[iss.Code+" "+iss.EdgeKey]++
+	}
+	for _, key := range []string{"closes-bad-shape closes:s:c:2", "runs_under_lock-bad-shape runs_under_lock:s:c:2",
+		"operates_on-bad-shape operates_on:s:w:2", "operates_on-bad-shape operates_on:s:f:3", "operates_on-bad-shape operates_on:s:e:4", "runs_func-bad-shape runs_func:s:c:2"} {
+		if got[key] != 1 {
+			t.Errorf("issue %q reported %d times, want once; got %v", key, got[key], got)
+		}
+		delete(got, key)
+	}
+	if len(got) != 0 {
+		t.Errorf("unexpected issues %v", got)
 	}
 }

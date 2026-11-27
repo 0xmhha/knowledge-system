@@ -2,6 +2,7 @@ package validate
 
 import (
 	"context"
+	"slices"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -54,6 +55,11 @@ var fileScopedTypes = map[types.NodeType]struct{}{
 	types.NodeSwitchStmt: {},
 	types.NodeReturnStmt: {},
 	types.NodeError:      {},
+	// Schema 1.45 statement nodes.
+	types.NodeBranchStmt: {},
+	types.NodeCaseClause: {},
+	types.NodeDeferStmt:  {},
+	types.NodeFuncLit:    {},
 }
 
 // Validate executes all schema checks and returns one report aggregating
@@ -256,12 +262,24 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeLiteralPassedTo:
-			// Schema 1.42: a call site in a function literal -> the function
-			// the literal is passed to.
-			if src.Type != types.NodeCallSite || !isCallable(dst.Type) {
+			// Schema 1.42: a call site (schema 1.44: or a go statement) in a
+			// function literal -> the function the literal is passed to;
+			// schema 1.45: or the literal itself (FuncLit), its kind what the
+			// callee does with it.
+			if src.Type != types.NodeCallSite && src.Type != types.NodeGoroutine && src.Type != types.NodeFuncLit || !isCallable(dst.Type) {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "literal-passed-to-bad-shape",
-					Message:  "literal_passed_to must go from a CallSite to a callable (got " + string(src.Type) + " -> " + string(dst.Type) + ")",
+					Message:  "literal_passed_to must go from a CallSite, Goroutine or FuncLit to a callable (got " + string(src.Type) + " -> " + string(dst.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeJumpsTo:
+			// Schema 1.45: a jump to where it goes.
+			if bad := jumpShape(e, src.Type, dst.Type); bad != "" {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "jumps-to-bad-shape",
+					Message:  "jumps_to " + bad,
 					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
 					FilePath: e.FilePath,
 				})
@@ -271,6 +289,16 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 			// the handled code; triggers starts at a sender and ends at a
 			// receive's CallSite.
 			if bad := messageLinkShape(e.Type, src.Type, dst.Type); bad != "" {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: string(e.Type) + "-bad-shape",
+					Message:  string(e.Type) + " " + bad,
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeCloses, types.EdgeRunsUnderLock, types.EdgeOperatesOn, types.EdgeRunsFunc:
+			// Schema 1.44: the execution-order facts (executionOrderShape).
+			if bad := executionOrderShape(e, src.Type, dst.Type); bad != "" {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: string(e.Type) + "-bad-shape",
 					Message:  string(e.Type) + " " + bad,
@@ -363,6 +391,75 @@ func messageLinkShape(t types.EdgeType, src, dst types.NodeType) string {
 		return "src is not a Function, Method or Goroutine (got " + string(src) + ")"
 	case dst != types.NodeCallSite:
 		return "dst is not a CallSite (got " + string(dst) + ")"
+	}
+	return ""
+}
+
+// primitiveHolders are the node types an operates_on edge ends at: the
+// declaration that holds a sync primitive, or the site of the call that
+// makes a timer whose channel no declaration holds (<-time.After(d)).
+var primitiveHolders = map[types.NodeType]bool{types.NodeField: true, types.NodeVariable: true,
+	types.NodeLocalVariable: true, types.NodeCallSite: true}
+
+// executionOrderShape returns what is wrong with a closes, runs_under_lock,
+// operates_on or runs_func edge e from a src node to a dst node, or "".
+func executionOrderShape(e types.Edge, src, dst types.NodeType) string {
+	switch e.Type {
+	case types.EdgeCloses:
+		// As sends_to: the closer, to the close's site or bound Channel
+		// (syntax), or to the channel's origin (SSA, with its kind).
+		if src != types.NodeFunction && src != types.NodeMethod && src != types.NodeGoroutine {
+			return "src is not a Function, Method or Goroutine (got " + string(src) + ")"
+		}
+		if dst != types.NodeChannel && dst != types.NodeField && dst != types.NodeVariable && dst != types.NodeCallSite {
+			return "dst is not a Channel, Field, Variable or CallSite (got " + string(dst) + ")"
+		}
+	case types.EdgeRunsUnderLock:
+		if src != types.NodeCallSite || dst != types.NodeMutex && dst != types.NodeChannel {
+			return "must go from a CallSite to a Mutex or a Channel used as a lock (got " + string(src) + " -> " + string(dst) + ")"
+		}
+	case types.EdgeOperatesOn:
+		if src != types.NodeCallSite || !primitiveHolders[dst] {
+			return "must go from a CallSite to a Field, Variable, LocalVariable or CallSite (got " + string(src) + " -> " + string(dst) + ")"
+		}
+		if !slices.Contains(types.AllSyncOps(), types.SyncOp(e.DispatchKind)) {
+			return "has an unknown operation " + e.DispatchKind
+		}
+	case types.EdgeRunsFunc:
+		if src != types.NodeCallSite || dst != types.NodeFunction && dst != types.NodeMethod {
+			return "must go from a CallSite to a Function or Method (got " + string(src) + " -> " + string(dst) + ")"
+		}
+		if !slices.Contains(types.RunsFuncKinds(), types.SyncOp(e.DispatchKind)) {
+			return "has an unknown kind " + e.DispatchKind
+		}
+	}
+	return ""
+}
+
+// jumpShape returns what is wrong with a jumps_to edge e from a src node to
+// a dst node, or "": a return goes from a ReturnStmt to a Function, Method
+// or FuncLit; a break to a LoopStmt or SwitchStmt; a continue to a
+// LoopStmt; a fallthrough to a CaseClause; a goto from a BranchStmt to a
+// statement node.
+func jumpShape(e types.Edge, src, dst types.NodeType) string {
+	want := map[string][]types.NodeType{
+		types.JumpReturn:      {types.NodeFunction, types.NodeMethod, types.NodeFuncLit},
+		types.JumpBreak:       {types.NodeLoopStmt, types.NodeSwitchStmt},
+		types.JumpContinue:    {types.NodeLoopStmt},
+		types.JumpFallthrough: {types.NodeCaseClause},
+		types.JumpGoto: {types.NodeLoopStmt, types.NodeSwitchStmt, types.NodeIfStmt, types.NodeReturnStmt,
+			types.NodeDeferStmt, types.NodeBranchStmt},
+	}
+	dsts, ok := want[e.DispatchKind]
+	if !ok {
+		return "has an unknown kind " + e.DispatchKind
+	}
+	from := types.NodeBranchStmt
+	if e.DispatchKind == types.JumpReturn {
+		from = types.NodeReturnStmt
+	}
+	if src != from || !slices.Contains(dsts, dst) {
+		return "of kind " + e.DispatchKind + " must go from a " + string(from) + " (got " + string(src) + " -> " + string(dst) + ")"
 	}
 	return ""
 }

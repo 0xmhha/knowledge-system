@@ -484,6 +484,11 @@ func attachBlobs(reader store.Reader, nodes []types.Node, include bool) []map[st
 		if n.CanonicalID != "" {
 			m["canonical_id"] = n.CanonicalID
 		}
+		// The operations on a sync primitive at a site whose primitive the
+		// graph does not name, and why (the legend explains them).
+		if len(n.SyncUnknown) > 0 {
+			m["sync_unknown"] = n.SyncUnknown
+		}
 		if include {
 			if b, err := reader.GetBlob(n.ID); err == nil {
 				m["source"] = string(b)
