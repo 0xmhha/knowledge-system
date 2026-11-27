@@ -37,6 +37,13 @@ func Compute(g *graph.Graph) {
 		if !ok {
 			continue
 		}
+		// History edges (changed_in, blame, modifies, has_hunk, adjacent)
+		// end at or start from a meta node: they record when code changed,
+		// not how it depends on other code, and PageRank leaves meta nodes
+		// out for that reason; degrees follow the same rule.
+		if isMetaNodeType(g.Nodes[si].Type) || isMetaNodeType(g.Nodes[di].Type) {
+			continue
+		}
 		g.Nodes[si].OutDegree += e.Count
 		g.Nodes[di].InDegree += e.Count
 		if e.Type == types.EdgeCalls || e.Type == types.EdgeInvokes {

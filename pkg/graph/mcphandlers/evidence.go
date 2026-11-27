@@ -12,9 +12,10 @@ import (
 
 // RegisterEvidenceForIntent wires the EvidencePack assembler
 // (docs/graph/design/hunk-graph.md §5). Returns an EvidencePack JSON for
-// an intent string + optional seed_qname / issue_id, ranked by BM25
-// over the (commit subject || patch || modifies-qnames) virtual
-// document and grouped by parent commit.
+// an intent string + optional seed_qname / issue_id, ranked by BM25 over
+// per-hunk documents (commit subject || patch || modifies-qnames) and
+// per-commit documents (subject || body || changed symbol names), grouped
+// by commit and ordered by score.
 //
 // The cache parameter is shared across the lifetime of one Run
 // invocation so the BM25 corpus is built once and reused across
@@ -38,7 +39,10 @@ import (
 func RegisterEvidenceForIntent(s *server.MCPServer, reader store.Reader, cache *evidence.Cache) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("evidence_for_intent",
-		mcp.WithDescription("Past changes like this one: ranks the hunks of past commits against an intent (BM25 over commit subjects, patches and changed names) and returns the top K with their patches and the symbols they modified. Use it to see how similar changes were made before. History that is not reachable from the indexed commit is left out. When the graph was built from a source without git history the answer has history: \""+historyUnavailable+"\"."),
+		mcp.WithDescription("Past changes like this one: ranks past commits against an intent (BM25 over each commit's subject, body and changed symbol names, and over the patches of the hunks the graph holds) and returns the top K, best match first. "+
+			"A commit among the newest ones whose hunks the graph holds comes with its patches and the symbols they modified (in_hunk_window: true); an older commit comes with the declarations it changed instead (changed, changed_total). "+
+			"`searched` says what was ranked: how many commits have hunks and from when, and how many commits were searched by message. Use it to see how similar changes were made before. "+
+			"History that is not reachable from the indexed commit is left out. When the graph was built from a source without git history the answer has history: \""+historyUnavailable+"\"."),
 		mcp.WithString("intent",
 			mcp.Description("Free-text task description. Tokenised with the bm25 splitter (camelCase + snake_case + qname-aware). Required unless issue_id is set.")),
 		mcp.WithString("seed_qname",

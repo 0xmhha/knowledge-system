@@ -312,13 +312,17 @@ const (
 	EdgeListensOn      EdgeType = "listens_on"
 	EdgeHandlesMessage EdgeType = "handles_message"
 	EdgeRPCCalls       EdgeType = "rpc_calls"
-	// Schema 1.4 (temporal): git-history derived edges.
-	// changed_in: any symbol whose file was touched by a commit → that
-	//             commit. Heuristic — file-level (not line-level). Bounded
-	//             by Options.TemporalDepth (default 10) most-recent commits
-	//             per file. Line-level blame is deferred.
-	// blame:      File node → most-recent commit touching that file
-	//             (simplification of `file:line → commit`).
+	// Schema 1.4 (temporal): git-history derived edges, recorded for File
+	// nodes and declarations (functions, methods, types, contracts and the
+	// other kinds in buildpipe's lineHistoryNodeTypes).
+	// changed_in: node → a commit that changed the node's lines (the
+	//             commits git log -L lists for the node's range, renames
+	//             followed): a File node's edges are the commits that changed
+	//             the file, a declaration's the commits that changed its own
+	//             lines, located at each commit. Every commit of the walked
+	//             history unless the build caps it (Options.TemporalDepth).
+	// blame:      node → a commit that last changed some of its lines today
+	//             (git blame), Count = how many lines.
 	// Appended (not interleaved) so existing edge-type hash positions /
 	// test snapshots stay stable.
 	EdgeChangedIn EdgeType = "changed_in"
@@ -365,13 +369,10 @@ const (
 	EdgeHasHunk  EdgeType = "has_hunk"
 	EdgeAdjacent EdgeType = "adjacent"
 	// Schema 1.8 (Hunk-graph AST overlap):
-	//   modifies: Hunk → CodeNode (Function/Method/Struct/Interface/Field
-	//             /etc) when the hunk's [start_line, end_line] interval
-	//             overlaps the CodeNode's interval inside the same file.
-	//             Whitelisted to "FunctionLike + TypeLike + Field-ish" so
-	//             noise-level statement nodes (CallSite / IfStmt / ...)
-	//             don't blow up the edge count without retrieval signal.
-	//             See docs/graph/design/hunk-graph.md §4.
+	//   modifies: Hunk → declaration when a line the hunk added, replaced
+	//             or deleted (context lines excluded) lies in the
+	//             declaration's lines as they were in the hunk's commit — the
+	//             changed_in rule applied to one hunk.
 	// Appended at the end so existing hash positions stay stable.
 	EdgeModifies EdgeType = "modifies"
 	// Schema 1.9 (cross-language interop — HTTP client calls):

@@ -26,6 +26,7 @@ package buildpipe
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"fmt"
 	"maps"
 	"os"
@@ -37,7 +38,6 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
-	"github.com/0xmhha/knowledge-system/pkg/graph/hunkmodifies"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -67,56 +67,14 @@ var hunkLanguageWhitelist = map[string]string{
 //     recording them in per-file FileEntry.NodeIDs would inflate the
 //     manifest and trigger spurious cache invalidations.
 //   - are skipped by extractBlobs (they have no on-disk source range;
-//     their blob, if any, is materialised by emitHunkGraph from the
+//     their blob, if any, is materialised by emitTemporalEdges from the
 //     git diff and merged into InsertBlobs separately).
 func isMetaNodeType(t types.NodeType) bool {
 	return t == types.NodeCommit || t == types.NodeHunk
 }
 
-// emitHunkGraph runs `git log -p` over the repoRoot, parses the diff
-// stream into HunkInfo records, and appends:
-//
-//   - one NodeHunk per hunk (target file remapped from repoRoot to
-//     srcRoot-relative — same idiom as emitTemporalEdges' commit pass),
-//   - one EdgeHasHunk per (commit, hunk) pair,
-//   - one EdgeAdjacent per consecutive (commit, file)-grouped hunk pair.
-//
-// Returns the gzip-compressed patch blobs keyed by Hunk node ID; caller
-// merges them into the existing extractBlobs map before InsertBlobs so
-// hunks live alongside CodeNode source slices in the same blobs table.
-//
-// Skips silently when:
-//   - LoadHunks returns no hunks (non-git tree, empty subtree, or
-//     repos with only merge commits under --no-merges).
-//   - The hunk's file falls outside srcRoot's subtree (orphaned by
-//     remapping; same filter rule as remapToSrcRel).
-//   - The hunk's commit isn't in commitIDByteSHA — the commit pass
-//     either dropped it (e.g. malformed header) or filtered it out
-//     because it touched no in-srcRoot files.
-func emitHunkGraph(g *graph.Graph, srcRel string, commitIDByteSHA map[string]string,
-	repoRoot string, filter *filterlist.FilterList) (map[string][]byte, error) {
-	hunks, err := temporal.LoadHunks(repoRoot, 0)
-	if err != nil {
-		return nil, fmt.Errorf("temporal LoadHunks: %w", err)
-	}
-	if len(hunks) == 0 {
-		return nil, nil
-	}
-	relHunks, prefix := remapHunksToSrcRel(hunks, srcRel)
-	relHunks = scopeHunksToFilter(relHunks, filter)
-	if len(relHunks) == 0 {
-		return nil, nil
-	}
-	subjectBySHA := commitSubjectMapFromGraph(g)
-	nodes, hasHunkEdges, adjacentEdges, blobs := buildHunkNodes(relHunks, prefix, commitIDByteSHA, subjectBySHA, types.ConfExtracted)
-	g.Nodes = append(g.Nodes, nodes...)
-	g.Edges = append(g.Edges, hasHunkEdges...)
-	g.Edges = append(g.Edges, adjacentEdges...)
-	return blobs, nil
-}
-
 // commitSubjectMapFromGraph extracts SHA → subject from the Commit
-// nodes already present in g (emitted by buildCommitNodes earlier in
+// nodes already present in g (emitted earlier in
 // emitTemporalEdges). The subject lives in Node.Signature as
 // "<unix>: <subject>" — we strip the timestamp prefix to recover the
 // bare subject text issue-ID extraction needs.
@@ -149,64 +107,64 @@ func commitSubjectMapFromGraph(g *graph.Graph) map[string]string {
 // EXTRACTED so the LLM never sees code paths that were rolled back.
 //
 // Commit nodes for unreachable SHAs are emitted here (not by
-// buildCommitNodes, which only sees the HEAD-reachable hist.Commits).
+// the line-history pass, which only sees the HEAD-reachable commits).
 // They share the same shape as reachable Commits — only confidence
 // differs — so viewer/MCP code that already knows how to render
 // NodeCommit doesn't need a parallel "unreachable commit" path.
 //
-// Returns the gzipped patch blobs map; caller merges into InsertBlobs.
-func emitUnreachableHunkGraph(g *graph.Graph, srcRoot, srcRel, repoRoot string,
-	existingCommitIDs map[string]string, filter *filterlist.FilterList) (map[string][]byte, error) {
-	commits, hunks, err := temporal.LoadUnreachableHunks(repoRoot, 0)
+// Their metadata (author, times, subject, body) is read from the commit
+// objects, which the object store still holds, and is marked Unreachable.
+// Commits none of whose hunks touch a file in scope are not recorded.
+//
+// Returns the gzipped patch blobs map (caller merges into InsertBlobs) and
+// the number of Commit and Hunk nodes added.
+func emitUnreachableHunkGraph(ctx context.Context, g *graph.Graph, srcRoot, srcRel, repoRoot string,
+	cm *commitMinter, filter *filterlist.FilterList) (map[string][]byte, int, int, error) {
+	_, hunks, err := temporal.LoadUnreachableHunks(repoRoot, 0)
 	if err != nil {
-		return nil, fmt.Errorf("LoadUnreachableHunks: %w", err)
+		return nil, 0, 0, fmt.Errorf("LoadUnreachableHunks: %w", err)
 	}
-	if len(commits) == 0 || len(hunks) == 0 {
-		return nil, nil
-	}
-	// Build Commit nodes for any unreachable SHA we don't already have.
-	// (HEAD-reachable Commits were materialised earlier; the unreachable
-	// set is supposed to be disjoint, but defensive de-dup costs nothing.)
-	filePath := srcRel
-	if filePath == "" || filePath == "." {
-		filePath = ".git"
-	}
-	commitNodes := make([]types.Node, 0, len(commits))
-	commitIDByteSHA := make(map[string]string, len(commits))
-	maps.Copy(commitIDByteSHA, existingCommitIDs)
-	for _, ci := range commits {
-		if _, present := commitIDByteSHA[ci.SHA]; present {
-			continue
-		}
-		node := makeCommitNode(ci.SHA, ci, filePath)
-		// Override confidence on the Commit row so downstream queries
-		// can spot recovery-track commits without a join through Hunk.
-		node.Confidence = types.ConfAmbiguous
-		commitNodes = append(commitNodes, node)
-		commitIDByteSHA[ci.SHA] = node.ID
-	}
-	g.Nodes = append(g.Nodes, commitNodes...)
-
-	// Reuse the existing hunk-build helper so binary / large-patch /
-	// adjacency semantics stay consistent across the EXTRACTED and
-	// AMBIGUOUS paths. Pass the unreachable hunks directly — they
-	// already have repo-rooted file paths since git show emits the
-	// same shape git log -p does.
 	relHunks, prefix := remapHunksToSrcRel(hunks, srcRel)
 	relHunks = scopeRecoveryHunksToFilter(relHunks, filter, srcRoot)
-	if len(relHunks) == 0 {
-		return nil, nil
+	var shas []string
+	seen := map[string]bool{}
+	for _, h := range relHunks {
+		if _, reachable := cm.ids[h.SHA]; !reachable && !seen[h.SHA] {
+			seen[h.SHA] = true
+			shas = append(shas, h.SHA)
+		}
 	}
-	// Build subjectBySHA from BOTH the previously-emitted commits and
-	// the newly-discovered unreachable ones — the latter were just
-	// appended to g.Nodes via the commitNodes loop above, so they're
-	// already visible.
+	if len(shas) == 0 {
+		return nil, 0, 0, nil
+	}
+	metas, err := temporal.ReadCommits(ctx, repoRoot, shas)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	commitIDs := make(map[string]string, len(cm.ids)+len(shas))
+	maps.Copy(commitIDs, cm.ids)
+	commitNodes := make([]types.Node, 0, len(shas))
+	for _, sha := range shas {
+		c, ok := metas[sha]
+		if !ok {
+			continue
+		}
+		meta := cm.commitMeta(c)
+		meta.Unreachable = true
+		node := makeCommitNode(sha, meta, cm.filePath)
+		// Confidence on the Commit row lets downstream queries spot
+		// recovery-track commits without a join through Hunk.
+		node.Confidence = types.ConfAmbiguous
+		commitNodes = append(commitNodes, node)
+		commitIDs[sha] = node.ID
+	}
+	g.Nodes = append(g.Nodes, commitNodes...)
 	subjectBySHA := commitSubjectMapFromGraph(g)
-	nodes, hasHunkEdges, adjacentEdges, blobs := buildHunkNodes(relHunks, prefix, commitIDByteSHA, subjectBySHA, types.ConfAmbiguous)
+	nodes, hasHunkEdges, adjacentEdges, blobs := buildHunkNodes(relHunks, prefix, commitIDs, subjectBySHA, types.ConfAmbiguous)
 	g.Nodes = append(g.Nodes, nodes...)
 	g.Edges = append(g.Edges, hasHunkEdges...)
 	g.Edges = append(g.Edges, adjacentEdges...)
-	return blobs, nil
+	return blobs, len(commitNodes), len(nodes), nil
 }
 
 // scopeHunksToFilter drops hunks for files the build scope excludes. Paths
@@ -504,40 +462,4 @@ func gzipPatch(b []byte) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-// emitModifiesEdges walks every Hunk node and emits a `modifies`
-// edge for each whitelisted CodeNode in the same file whose
-// [start_line, end_line] interval overlaps the hunk's. Confidence
-// follows the hunk: EXTRACTED for HEAD-reachable hunks, AMBIGUOUS for
-// the unreachable-history track populated by emitUnreachableHunkGraph.
-//
-// Algorithm (mirrors design §4.1):
-//
-//	for hunk in hunks(g):
-//	    for codeNode in nodesByFile[hunk.file_path]:
-//	        if !modifiesNodeWhitelist[codeNode.Type] continue
-//	        if overlap(hunk_lines, codeNode_lines) emit modifies(hunk -> codeNode)
-//
-// Determinism: hunks iterate in g.Nodes order (already deterministic
-// from buildHunkNodes' sortNodesByID); candidates iterate in their
-// original parser-emission order (file-path bucket preserves insertion).
-//
-// Performance: per design §4.3, 700 hunks × ~50 candidates × O(1) test
-// ≈ 35K comparisons, < 50 ms. Real go-stablenet (~9K hunks × ~190
-// candidates) ~1.7M ops — still sub-second.
-func emitModifiesEdges(g *graph.Graph) {
-	newEdges := BuildModifiesEdges(g.Nodes)
-	if len(newEdges) > 0 {
-		g.Edges = append(g.Edges, newEdges...)
-	}
-}
-
-// BuildModifiesEdges retained as a buildpipe-internal alias for
-// historical callers and tests; the canonical implementation lives
-// in pkg/hunkmodifies so consumers outside this repository's
-// internal tree can compose the hunk-to-code join without crossing the
-// internal boundary. Both forms call the same underlying function.
-func BuildModifiesEdges(nodes []types.Node) []types.Edge {
-	return hunkmodifies.BuildEdges(nodes)
 }

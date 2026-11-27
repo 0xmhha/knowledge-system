@@ -58,7 +58,7 @@ Pick the tool by the question:
 - Who sets or reads a field, a package-level variable, a constant or a Solidity state variable: {find_references}. Use it when the bug is a wrong, stale or missing value: the fix is usually where the value is written.
 - Data races, deadlocks, goroutines, channels, locks: {concurrency_impact}.
 - What breaks if a symbol changes: {impact_of_change}.
-- When and why a symbol changed: {change_history}.
+- When and why a symbol or file changed: {change_history} lists every commit that changed its lines (with or without a pull request number); {evidence_for_intent} finds past commits like an intended change.
 - How a value flows inside one function: {value_dependencies}.
 - Everything around one symbol: {get_subgraph}.
 

@@ -54,6 +54,9 @@ type Profile struct {
 	ExtraGlobs    []string `yaml:"extra_globs"`
 	// ExcludeGlobs remove files from the whole scope, inclusions included.
 	ExcludeGlobs []string `yaml:"exclude_globs"`
+	// History says which repository the pull request numbers of the
+	// source's commits belong to; the scope carries it to the build.
+	History *History `yaml:"history"`
 }
 
 // Inclusion is one exception: code the build does not compile that belongs
@@ -129,6 +132,9 @@ func LoadProfile(p string) (*Profile, []byte, error) {
 	dec.KnownFields(true)
 	if err := dec.Decode(&prof); err != nil {
 		return nil, nil, fmt.Errorf("buildscope: parse profile %s: %w", p, err)
+	}
+	if err := prof.History.check(); err != nil {
+		return nil, nil, fmt.Errorf("buildscope: profile %s: %w", p, err)
 	}
 	seen := map[string]bool{}
 	for i, in := range prof.Inclusions {
@@ -209,6 +215,7 @@ func ExtractProject(ctx context.Context, cfg ProjectConfig) (*Scope, error) {
 		return nil, err
 	}
 	s.Profile = ref
+	s.History = prof.History
 	if err := applyInclusions(s, incs); err != nil {
 		return nil, err
 	}

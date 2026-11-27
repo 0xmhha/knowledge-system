@@ -64,6 +64,18 @@ func IsGoroutineCode(e Edge) bool {
 // dispatch kind, which a goroutine's edge uses to say it is a goroutine's.)
 const DispatchGoroutineWrite = "goroutine_write"
 
+// DispatchPastCopy is the dispatch kind of a changed_in edge to a commit
+// older than the copy that created the node's file: the line history goes
+// on into the copied file, which git log -L does for some copies and not
+// for others.
+const DispatchPastCopy = "past_copy"
+
+// DispatchCopy is the dispatch kind of a changed_in edge to the commit that
+// created the node's file as a copy of another file: it brought the lines
+// into the file (git log -L lists it unless it follows the copy and the
+// copy left the lines as they were).
+const DispatchCopy = "copy"
+
 // WithoutGoroutineCode returns edges without the goroutine code edges
 // (IsGoroutineCode), in order. It returns edges itself when there are none.
 func WithoutGoroutineCode(edges []Edge) []Edge {

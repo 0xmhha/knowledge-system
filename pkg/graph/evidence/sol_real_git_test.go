@@ -1,6 +1,7 @@
 package evidence_test
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -111,9 +112,14 @@ func TestBuildPack_RealGitFixture(t *testing.T) {
 		t.Fatalf("Resolve: %v", err)
 	}
 
-	hist, err := temporal.LoadHistory(tmp, 10)
+	rel, err := filepath.Rel(tmp, walletPath)
 	if err != nil {
-		t.Fatalf("LoadHistory: %v", err)
+		t.Fatal(err)
+	}
+	hist, err := temporal.TrackLines(context.Background(), tmp, []string{"*.sol"},
+		[]temporal.Item{{ID: "wallet", Path: filepath.ToSlash(rel)}}, nil)
+	if err != nil {
+		t.Fatalf("TrackLines: %v", err)
 	}
 	if len(hist.Commits) < 2 {
 		t.Fatalf("expected >=2 commits in real git fixture, got %d", len(hist.Commits))
@@ -137,7 +143,7 @@ func TestBuildPack_RealGitFixture(t *testing.T) {
 			ID: id, Type: types.NodeCommit,
 			QualifiedName: "commit:" + sha,
 			Name:          sha[:8],
-			Signature:     fmt.Sprintf("%d: %s", ci.Timestamp, ci.Subject),
+			Signature:     fmt.Sprintf("%d: %s", ci.AuthorTime, ci.Subject),
 			Confidence:    types.ConfExtracted,
 		})
 	}

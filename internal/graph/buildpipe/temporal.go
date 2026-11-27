@@ -1,255 +1,386 @@
-// Package buildpipe — temporal.go wires temporal (git history) edges into
-// the cold-rebuild path. Conceptually:
+// Package buildpipe — temporal.go wires the git history into the build:
 //
-//   - Run a single `git log --raw` over the repo root containing srcRoot.
-//   - Translate repo-rooted paths into srcRoot-relative slash paths so they
-//     align with the rel paths the parsers stamped on Node.FilePath.
-//   - For every distinct commit, append a NodeCommit (one per SHA).
-//   - For every (file, commit) the log surfaces, emit `changed_in` from
-//     EVERY symbol in that file → that commit (file-level heuristic; line-
-//     level blame is deferred — see EdgeChangedIn doc-comment).
-//   - For every file, emit ONE `blame` edge from its File node → its most
-//     recent commit (V0 simplification of `file:line → commit`).
+//   - The line history of every File node and declaration
+//     (lineHistoryNodeTypes) is followed back through HEAD's history once
+//     (temporal.TrackLines): which commits changed its lines, and which
+//     commit last changed each of its lines today.
+//   - One Commit node per commit those facts name, with its author, author
+//     and commit times, whole subject and pull request number.
+//   - changed_in: node → each commit that changed the node's lines.
+//   - blame: node → each commit that last changed some of its lines today.
+//   - The hunk graph of the newest commits (temporal_hunks.go), whose
+//     modifies edges follow the same rule.
+//   - The pull request breadcrumbs (node_prs) of the same nodes.
 //
 // Skips silently (no error) when srcRoot isn't inside a git checkout, so
 // non-git source trees still build cleanly without temporal edges.
 package buildpipe
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"maps"
-	"path/filepath"
+	"path"
+	"slices"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// temporalDepthDefault bounds per-file commit count when callers don't pass
-// an explicit Options.TemporalDepth. 10 is the spec recommendation; keeps storage bounded for large monorepos while still
-// surfacing enough churn signal for the viewer.
-const temporalDepthDefault = 10
+// HistoryOptions configures the history pass of a build.
+//   - Depth caps the changed_in edges kept per node, newest first; 0 keeps
+//     every commit that changed the node.
+//   - Spaces says which repository a pull request number belongs to; an
+//     empty Repo is read from the origin remote when it is a GitHub URL.
+type HistoryOptions struct {
+	Depth  int
+	Spaces temporal.NumberSpaces
+}
 
-// emitTemporalEdges adds NodeCommit + NodeHunk nodes and the corresponding
-// temporal edges (changed_in / blame for the file-level pass; has_hunk /
-// adjacent for the hunk-graph pass) to g. Returns the gzip-compressed
-// hunk patch blobs keyed by Hunk node ID — caller merges them into the
-// InsertBlobs map alongside CodeNode source slices.
+// lineHistoryNodeTypes are the node kinds whose line history and blame the
+// build records: files, and the declarations an agent asks "how and why did
+// this change?" about — callables and type declarations. Sub-symbol nodes
+// (fields, variables, parameters) and statements get none.
+var lineHistoryNodeTypes = map[types.NodeType]bool{
+	types.NodeFile:        true,
+	types.NodeFunction:    true,
+	types.NodeMethod:      true,
+	types.NodeStruct:      true,
+	types.NodeInterface:   true,
+	types.NodeConstructor: true,
+	types.NodeModifier:    true,
+	types.NodeContract:    true,
+	types.NodeEvent:       true,
+	types.NodeClass:       true,
+	types.NodeTypeAlias:   true,
+	types.NodeEnum:        true,
+}
+
+// recordedRule says which walked commits get a Commit node.
+const recordedRule = "a commit is recorded when it changed lines that a file or declaration in scope holds today (its line history), or its hunks are stored; " +
+	"a commit that changed only files outside the scope, or only lines no longer present, is walked but not recorded"
+
+// renamesRule is how the history follows renamed files.
+const renamesRule = "followed (git rename detection); when a file is added as a copy of another (git copy detection), a declaration goes on into the source only if at least half of its code lines (not blank, not only a comment) are unchanged there, and the commits that adds beyond git log -L are marked copy and past_copy; lines moved within or between files are not traced"
+
+// temporalResult is what the history pass hands the rest of the build.
+type temporalResult struct {
+	hunkBlobs map[string][]byte
+	prRefs    map[string][]types.PRRef
+	record    *persist.HistoryRecord
+}
+
+// emitTemporalEdges adds Commit and Hunk nodes and the history edges
+// (changed_in, blame, has_hunk, adjacent, modifies) to g, and returns the
+// hunk patch blobs, the pull request breadcrumbs per node and the account of
+// the history read.
 //
-// The filter is the build-scope list the discovery pass applied. git history
-// is enumerated independently of that pass, so without it the temporal axis
-// would carry commits and hunks for files the dataset deliberately excludes —
-// citations an agent cannot follow, because no symbol, body or convention for
-// that file exists anywhere else in the graph. A nil filter keeps every file
-// (the unscoped build). Note the trade-off it encodes: the include list is
-// derived from the current tree, so history for a file that has since been
-// deleted is dropped along with the out-of-scope files.
+// The filter is the build-scope list the discovery pass applied: history is
+// recorded for nodes of files it allows (nil allows every file). Hunks of
+// files it excludes are dropped too.
 //
 // Behavior:
-//   - srcRoot not in a git checkout → no-op, log debug, return (nil, nil).
-//   - git history empty for srcRoot subtree → no-op, log debug, return (nil, nil).
+//   - srcRoot not in a git checkout → no-op, zero result, nil error.
 //   - Otherwise: append nodes/edges in place. Caller MUST re-run
 //     graph.Validate after to catch any dangling refs introduced.
-//
-// The maxPerFile parameter caps per-file commit count for the changed_in /
-// blame pass; pass 0 to use the default (10). The hunk pass uses its
-// own commit cap (temporal.LoadHunks default) since hunks are bounded by
-// total commits walked, not per-file.
-func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, maxPerFile int,
-	filter *filterlist.FilterList) (map[string][]byte, error) {
-	if maxPerFile <= 0 {
-		maxPerFile = temporalDepthDefault
-	}
+func emitTemporalEdges(g *graph.Graph, srcRoot string, log *slog.Logger, opt HistoryOptions,
+	filter *filterlist.FilterList) (temporalResult, error) {
 	repoRoot, srcRel, ok := gitRepoRel(srcRoot)
 	if !ok {
-		log.Debug("temporal: srcRoot is not a git checkout; skipping G6 edges", "src", srcRoot)
-		return nil, nil
+		log.Debug("temporal: srcRoot is not a git checkout; no history recorded", "src", srcRoot)
+		return temporalResult{}, nil
 	}
-	hist, err := temporal.LoadHistory(repoRoot, maxPerFile)
+	ctx := context.Background()
+	items, nodeOf := historyItems(g.Nodes, srcRel, filter)
+	if len(items) == 0 {
+		return temporalResult{}, nil
+	}
+	boundaries := shallowBoundaries(repoRoot)
+	started := time.Now()
+	log.Info("temporal: following line history", "nodes", len(items), "files", countFiles(items))
+	hist, err := temporal.TrackLines(ctx, repoRoot, historyPathspec(items), items, boundaries)
 	if err != nil {
-		return nil, fmt.Errorf("temporal LoadHistory: %w", err)
+		return temporalResult{}, fmt.Errorf("temporal line history: %w", err)
 	}
-	if len(hist.Commits) == 0 || len(hist.Files) == 0 {
-		log.Debug("temporal: empty git history under srcRoot; no G6 edges emitted",
-			"repo", repoRoot, "rel", srcRel)
-		return nil, nil
+	log.Info("temporal: line history followed", "commits", len(hist.Order),
+		"nodes_with_history", len(hist.Touches), "seconds", time.Since(started).Seconds())
+	if len(hist.Order) == 0 {
+		return temporalResult{}, nil
 	}
-	// Translate repo-rooted paths → srcRoot-relative slash paths. The
-	// parsers stamp Node.FilePath using filepath.Rel(srcRoot, file) which
-	// is the OS separator on disk; we normalise to forward slashes so the
-	// match is portable across darwin/linux/windows.
-	inSubtree := remapToSrcRel(hist.Files, srcRel)
-	relHist := scopeToFilter(inSubtree, filter)
-	if len(relHist) == 0 {
-		// Separate the two ways this lands empty. An over-narrow --files-from
-		// list reads as a git or srcRoot problem otherwise, and the operator
-		// goes looking in the wrong place.
-		if len(inSubtree) > 0 {
-			log.Debug("temporal: build-scope filter excluded every file with git history",
-				"repo", repoRoot, "rel", srcRel, "in_subtree", len(inSubtree))
-		} else {
-			log.Debug("temporal: no overlap between srcRoot subtree and git history",
-				"repo", repoRoot, "rel", srcRel)
-		}
-		return nil, nil
+	spaces := opt.Spaces
+	if spaces.Repo == "" {
+		spaces.Repo = scanGitRemoteRepo(repoRoot)
 	}
+	upstream, err := temporal.UpstreamCommits(ctx, repoRoot, spaces.UpstreamBase)
+	if err != nil {
+		return temporalResult{}, fmt.Errorf("temporal number spaces: %w", err)
+	}
+	cm := newCommitMinter(hist, spaces, upstream, srcRel)
 
-	commitNodes := buildCommitNodes(hist.Commits, srcRel, relHist)
-	g.Nodes = append(g.Nodes, commitNodes...)
+	changedIn, blame := historyEdges(hist, nodeOf, opt.Depth, srcRel, cm)
 
-	nodesByPath, fileByPath := indexNodesByPath(g.Nodes)
-	commitIDByteSHA := commitIDs(commitNodes)
-	changedIn, blame := buildTemporalEdges(relHist, nodesByPath, fileByPath, commitIDByteSHA)
+	hunkStarted := time.Now()
+	hunks, err := temporal.LoadHunks(repoRoot, 0)
+	if err != nil {
+		return temporalResult{}, fmt.Errorf("temporal LoadHunks: %w", err)
+	}
+	relHunks, _ := remapHunksToSrcRel(hunks, srcRel)
+	relHunks = scopeHunksToFilter(relHunks, filter)
+	relHunks = slices.DeleteFunc(relHunks, func(h temporal.HunkInfo) bool { return cm.id(h.SHA) == "" })
+	window := hunkWindow(relHunks, hist)
+
+	g.Nodes = append(g.Nodes, cm.nodes...)
 	g.Edges = append(g.Edges, changedIn...)
 	g.Edges = append(g.Edges, blame...)
+	hunkNodes, hasHunk, adjacent, hunkBlobs := buildHunkNodes(relHunks, "", cm.ids, subjectsOf(hist), types.ConfExtracted)
+	g.Nodes = append(g.Nodes, hunkNodes...)
+	g.Edges = append(g.Edges, hasHunk...)
+	g.Edges = append(g.Edges, adjacent...)
+	modifies := modifiesEdges(relHunks, hist, nodeOf, srcRel)
+	g.Edges = append(g.Edges, modifies...)
 
-	// Hunk graph: append NodeHunk + has_hunk + adjacent edges, returning
-	// the gzip-compressed patch blobs. Hunks reuse the same commitIDByteSHA
-	// map so they anchor on the commits we just emitted (and only those —
-	// hunks for commits the file-overlap test dropped are skipped).
-	hunkBlobs, err := emitHunkGraph(g, srcRel, commitIDByteSHA, repoRoot, filter)
+	// Hunks of commits reachable only via reflog or fsck-unreachable
+	// (force-pushed-away history) come as AMBIGUOUS Commit + Hunk nodes for
+	// a recovery workflow. No line history reaches them, so they get no
+	// modifies edges.
+	recorded := len(cm.nodes)
+	unreachableBlobs, lostCommits, lostHunks, err := emitUnreachableHunkGraph(ctx, g, srcRoot, srcRel, repoRoot, cm, filter)
 	if err != nil {
-		return nil, fmt.Errorf("temporal hunk graph: %w", err)
-	}
-
-	// Hunk-graph §11.3 follow-up: append AMBIGUOUS-confidence Commit +
-	// Hunk nodes for SHAs reachable only via reflog or fsck-unreachable.
-	// These represent force-pushed-away history that the LLM retrieval
-	// layer must filter out — but a human "Recovery"
-	// workflow can browse them in the viewer when an agent has
-	// overwritten code that needs to come back.
-	unreachableBlobs, err := emitUnreachableHunkGraph(g, srcRoot, srcRel, repoRoot, commitIDByteSHA, filter)
-	if err != nil {
-		return nil, fmt.Errorf("temporal unreachable hunk graph: %w", err)
+		return temporalResult{}, fmt.Errorf("temporal unreachable hunk graph: %w", err)
 	}
 	maps.Copy(hunkBlobs, unreachableBlobs)
 
-	// Hunk graph: every Hunk gets `modifies` edges to whitelisted
-	// CodeNodes in the same file whose line range overlaps the hunk's.
-	// Runs after both EXTRACTED and AMBIGUOUS hunks have been added so
-	// recovery-track hunks also get their AST overlap edges (still
-	// confidence-stamped per their parent hunk so the retrieval boundary
-	// can filter consistently).
-	emitModifiesEdges(g)
-
-	hunkCount, hunkEdgeCount := 0, 0
-	for _, n := range g.Nodes {
-		if n.Type == types.NodeHunk {
-			hunkCount++
-		}
-	}
-	for _, e := range g.Edges {
-		if e.Type == types.EdgeHasHunk || e.Type == types.EdgeAdjacent {
-			hunkEdgeCount++
-		}
-	}
 	log.Info("temporal G6 emitted",
-		"commit_nodes", len(commitNodes),
-		"hunk_nodes", hunkCount,
+		"commit_nodes", recorded+lostCommits,
+		"unreachable_commit_nodes", lostCommits,
+		"hunk_nodes", len(hunkNodes)+lostHunks,
+		"unreachable_hunk_nodes", lostHunks,
 		"changed_in_edges", len(changedIn),
 		"blame_edges", len(blame),
-		"hunk_edges", hunkEdgeCount,
+		"modifies_edges", len(modifies),
+		"hunk_edges", len(hasHunk)+len(adjacent),
 		"hunk_blobs", len(hunkBlobs),
-		"max_per_file", maxPerFile)
-	return hunkBlobs, nil
+		"depth_per_node", opt.Depth,
+		"hunk_seconds", time.Since(hunkStarted).Seconds())
+	return temporalResult{
+		hunkBlobs: hunkBlobs,
+		prRefs:    prRefsFromHistory(hist, nodeOf, cm),
+		record:    historyRecord(hist, opt.Depth, window, spaces, recorded, lostCommits),
+	}, nil
 }
 
-// scopeToFilter drops history for files the build scope excludes. A nil
-// filter (no --files-from) keeps everything.
-func scopeToFilter(files map[string][]string, filter *filterlist.FilterList) map[string][]string {
-	if filter == nil {
-		return files
-	}
-	out := make(map[string][]string, len(files))
-	for path, shas := range files {
-		if filter.Allow(path) {
-			out[path] = shas
-		}
-	}
-	return out
-}
-
-// remapToSrcRel filters out files outside srcRoot's subtree and rewrites
-// their paths to be relative to srcRoot (slash form). srcRel is the
-// repoRoot-relative slash path of srcRoot (or "." when srcRoot == repoRoot).
-//
-// Example: srcRel = "tools/cks", path = "tools/cks/internal/foo.go" →
-// "internal/foo.go". A path outside srcRoot's subtree (e.g. "docs/bar.md"
-// when srcRel = "tools/cks") is dropped.
-func remapToSrcRel(files map[string][]string, srcRel string) map[string][]string {
-	out := make(map[string][]string, len(files))
-	prefix := ""
-	if srcRel != "." && srcRel != "" {
-		prefix = strings.TrimSuffix(srcRel, "/") + "/"
-	}
-	for path, shas := range files {
-		var rel string
-		switch {
-		case prefix == "":
-			rel = path
-		case strings.HasPrefix(path, prefix):
-			rel = path[len(prefix):]
-		default:
-			continue // outside srcRoot subtree
-		}
-		if rel == "" {
+// historyItems lists the nodes whose history is followed, with their
+// repository-relative paths, and maps item IDs back to the nodes.
+func historyItems(nodes []types.Node, srcRel string, filter *filterlist.FilterList) ([]temporal.Item, map[string]types.Node) {
+	prefix := srcRelPrefix(srcRel)
+	var items []temporal.Item
+	nodeOf := map[string]types.Node{}
+	for _, n := range nodes {
+		if !lineHistoryNodeTypes[n.Type] || n.FilePath == "" || n.StartLine < 1 {
 			continue
 		}
-		out[rel] = shas
-	}
-	return out
-}
-
-// buildCommitNodes constructs one NodeCommit per distinct SHA referenced
-// from relHist, in stable-sorted SHA order so the graph snapshot is
-// deterministic across builds. Only commits actually used by surviving
-// (in-srcRoot) files are emitted — keeps the node count tight for
-// sub-directory builds inside a large monorepo.
-func buildCommitNodes(commits map[string]temporal.CommitInfo,
-	srcRel string, relHist map[string][]string) []types.Node {
-	wanted := map[string]bool{}
-	for _, shas := range relHist {
-		for _, sha := range shas {
-			wanted[sha] = true
-		}
-	}
-	out := make([]types.Node, 0, len(wanted))
-	// Use srcRel as the node FilePath sentinel — commits don't live in any
-	// real file, but FilePath is `validate:"required"` on Node and Pass-2
-	// reload code paths expect non-empty. Convention: the rel path of the
-	// build root, which is stable across builds.
-	filePath := srcRel
-	if filePath == "" || filePath == "." {
-		filePath = ".git"
-	}
-	for sha := range wanted {
-		info, ok := commits[sha]
-		if !ok {
+		if filter != nil && !filter.Allow(n.FilePath) {
 			continue
 		}
-		out = append(out, makeCommitNode(sha, info, filePath))
+		it := temporal.Item{ID: n.ID, Path: prefix + n.FilePath, Start: n.StartLine, End: n.EndLine, Name: simpleName(n.Name)}
+		if n.Type == types.NodeFile {
+			it.Start, it.End, it.Name = 1, 0, "" // the whole file, whatever its node's span
+		} else if n.EndLine < n.StartLine {
+			continue
+		}
+		items = append(items, it)
+		nodeOf[n.ID] = n
 	}
-	// Stable order (sort by SHA) so build snapshots compare cleanly.
-	sortNodesByID(out)
-	return out
+	return items, nodeOf
 }
 
-// makeCommitNode produces a NodeCommit for one CommitInfo. ID derives from
+// historicalPath is a commit-time path relative to srcRoot when it lies
+// under it, else relative to the repository root.
+func historicalPath(repoPath, prefix string) string {
+	if rel, ok := strings.CutPrefix(repoPath, prefix); ok {
+		return rel
+	}
+	return repoPath
+}
+
+// srcRelPrefix is the repository-relative prefix of srcRoot's files.
+func srcRelPrefix(srcRel string) string {
+	if srcRel == "" || srcRel == "." {
+		return ""
+	}
+	return strings.TrimSuffix(srcRel, "/") + "/"
+}
+
+// historyPathspec limits the walked history to the items' file types: one
+// "*.<ext>" per extension, so a file renamed from another name of the same
+// type is still followed; files without an extension are named exactly.
+func historyPathspec(items []temporal.Item) []string {
+	set := map[string]bool{}
+	for _, it := range items {
+		if ext := path.Ext(it.Path); ext != "" {
+			set["*"+ext] = true
+		} else {
+			set[it.Path] = true
+		}
+	}
+	return slices.Sorted(maps.Keys(set))
+}
+
+func countFiles(items []temporal.Item) int {
+	set := map[string]bool{}
+	for _, it := range items {
+		set[it.Path] = true
+	}
+	return len(set)
+}
+
+// commitFilePath is the FilePath of Commit nodes: they live in no file, but
+// FilePath is required; the build root's path is stable across builds.
+func commitFilePath(srcRel string) string {
+	if srcRel == "" || srcRel == "." {
+		return ".git"
+	}
+	return srcRel
+}
+
+// commitMinter creates each Commit node once, on first use, and remembers
+// its ID.
+type commitMinter struct {
+	hist     *temporal.LineHistory
+	spaces   temporal.NumberSpaces
+	upstream map[string]bool
+	filePath string
+	ids      map[string]string
+	nodes    []types.Node
+	// upstreamMax is the largest number that merged an upstream commit:
+	// how far the upstream's numbering had come at the fork point.
+	upstreamMax int
+}
+
+// newCommitMinter prepares the Commit nodes of a walked history.
+func newCommitMinter(hist *temporal.LineHistory, spaces temporal.NumberSpaces, upstream map[string]bool, srcRel string) *commitMinter {
+	m := &commitMinter{hist: hist, spaces: spaces, upstream: upstream, filePath: commitFilePath(srcRel), ids: map[string]string{}}
+	if spaces.UpstreamBase != "" {
+		for sha, c := range hist.Commits {
+			if upstream[sha] {
+				m.upstreamMax = max(m.upstreamMax, temporal.PRNumber(c.Subject))
+			}
+		}
+	}
+	return m
+}
+
+// earlierNumberRule decides the repository of a number a subject names
+// besides its own (a ported or a reverted pull request).
+const earlierNumberRule = "a number a subject names besides its own (a port's or a revert's) is read in the upstream repository when the commit is upstream, " +
+	"or when it is larger than every number of the upstream commits (a pull request the upstream merged after the fork point, which a port carries over); otherwise it is one of the source's own pull requests"
+
+// earlierRepo places such a number by earlierNumberRule.
+func (m *commitMinter) earlierRepo(n int, upstreamCommit bool) string {
+	if m.spaces.UpstreamBase == "" {
+		return m.spaces.Repo
+	}
+	if upstreamCommit || n > m.upstreamMax {
+		return m.spaces.UpstreamRepo
+	}
+	return m.spaces.Repo
+}
+
+// id returns the node ID of commit sha, creating the node; "" when sha is
+// not a commit of the walked history.
+func (m *commitMinter) id(sha string) string {
+	if id, ok := m.ids[sha]; ok {
+		return id
+	}
+	meta, ok := m.hist.Commits[sha]
+	if !ok {
+		return ""
+	}
+	n := makeCommitNode(sha, m.commitMeta(meta), m.filePath)
+	m.ids[sha] = n.ID
+	m.nodes = append(m.nodes, n)
+	return n.ID
+}
+
+// commitMeta is the node metadata of one walked commit, its pull request
+// number placed in its number space.
+func (m *commitMinter) commitMeta(c temporal.CommitMeta) types.CommitMeta {
+	nums := temporal.PRNumbers(c.Subject)
+	meta := types.CommitMeta{
+		Author: c.Author, AuthorTime: c.AuthorTime, CommitTime: c.CommitTime,
+		Subject: c.Subject, Body: bodyExcerpt(c.Body), PR: nums.Own, Ported: nums.Ported, Reverts: nums.Reverts,
+		Upstream: m.upstream[c.SHA],
+	}
+	if meta.PR > 0 {
+		meta.PRRepo = m.spaces.Repo
+		if meta.Upstream {
+			meta.PRRepo = m.spaces.UpstreamRepo
+		}
+	}
+	if len(nums.Ported) > 0 {
+		meta.PortedRepo = m.earlierRepo(nums.Ported[0], meta.Upstream)
+	}
+	if len(nums.Reverts) > 0 {
+		meta.RevertsRepo = m.earlierRepo(nums.Reverts[0], meta.Upstream)
+	}
+	return meta
+}
+
+// historyEdges turns the line history into changed_in and blame edges.
+// depth > 0 keeps the newest depth commits per node. A changed_in edge
+// carries the node's place in that commit: FilePath is the file's name then
+// (it differs from the node's after a rename) and Line the node's first line
+// then. A blame edge carries today's file.
+func historyEdges(hist *temporal.LineHistory, nodeOf map[string]types.Node, depth int, srcRel string, cm *commitMinter) (changedIn, blame []types.Edge) {
+	prefix := srcRelPrefix(srcRel)
+	for _, id := range slices.Sorted(maps.Keys(nodeOf)) {
+		n := nodeOf[id]
+		touches := hist.Touches[id]
+		if depth > 0 && len(touches) > depth {
+			touches = touches[:depth]
+		}
+		for _, tc := range touches {
+			if cid := cm.id(tc.SHA); cid != "" {
+				e := types.Edge{Src: id, Dst: cid, Type: types.EdgeChangedIn,
+					FilePath: historicalPath(tc.Path, prefix), Line: tc.Start, Count: 1, Confidence: types.ConfExtracted}
+				switch {
+				case tc.Copy:
+					e.DispatchKind = types.DispatchCopy
+				case tc.PastCopy != "":
+					e.DispatchKind = types.DispatchPastCopy
+				}
+				changedIn = append(changedIn, e)
+			}
+		}
+		lines := hist.Blame[id]
+		for _, sha := range slices.Sorted(maps.Keys(lines)) {
+			if cid := cm.id(sha); cid != "" {
+				blame = append(blame, types.Edge{Src: id, Dst: cid, Type: types.EdgeBlame,
+					FilePath: n.FilePath, Count: lines[sha], Confidence: types.ConfExtracted})
+			}
+		}
+	}
+	return changedIn, blame
+}
+
+// makeCommitNode produces the Commit node of one commit. ID derives from
 // (`commit:<sha>`, "git", 0) so the same commit consistently hashes to the
 // same node ID across rebuilds + across srcRoots inside the same repo.
-func makeCommitNode(sha string, info temporal.CommitInfo, filePath string) types.Node {
+// Signature keeps the "<author time>: <subject>" form readers parse, with
+// the subject whole.
+func makeCommitNode(sha string, meta types.CommitMeta, filePath string) types.Node {
 	qname := "commit:" + sha
 	displayName := sha
 	if len(displayName) > 12 {
 		displayName = displayName[:12]
-	}
-	signature := fmt.Sprintf("%d: %s", info.Timestamp, info.Subject)
-	if len(signature) > 100 {
-		signature = signature[:100]
 	}
 	return types.Node{
 		ID:            parse.MakeID(qname, "git", 0),
@@ -263,96 +394,163 @@ func makeCommitNode(sha string, info temporal.CommitInfo, filePath string) types
 		EndByte:       1,
 		Language:      "git", // sentinel for meta nodes (no source language). Picked specifically so DistinctFilePaths(language=go|ts|sol) audit queries don't see commit nodes — keeps the audit's per-language file-set diff clean.
 		SubKind:       "git",
-		Signature:     signature,
+		Signature:     fmt.Sprintf("%d: %s", meta.AuthorTime, meta.Subject),
 		Confidence:    types.ConfExtracted,
+		Commit:        &meta,
 	}
 }
 
-// sortNodesByID sorts in place by ID for deterministic snapshots.
-func sortNodesByID(ns []types.Node) {
-	for i := 1; i < len(ns); i++ {
-		for j := i; j > 0 && ns[j-1].ID > ns[j].ID; j-- {
-			ns[j-1], ns[j] = ns[j], ns[j-1]
-		}
-	}
-}
-
-// commitIDs maps SHA → node ID for built commit nodes.
-func commitIDs(commitNodes []types.Node) map[string]string {
-	out := make(map[string]string, len(commitNodes))
-	for _, n := range commitNodes {
-		// QualifiedName is "commit:<sha>"; strip prefix for the SHA key.
-		sha := strings.TrimPrefix(n.QualifiedName, "commit:")
-		out[sha] = n.ID
+// subjectsOf maps every walked commit to its subject.
+func subjectsOf(hist *temporal.LineHistory) map[string]string {
+	out := make(map[string]string, len(hist.Commits))
+	for sha, c := range hist.Commits {
+		out[sha] = c.Subject
 	}
 	return out
 }
 
-// indexNodesByPath returns (nodesByFile, fileNodeByFile) where keys are
-// slash-normalised file paths. fileNodeByFile points at the single
-// NodeFile per path (when present) — used as the `blame` edge source.
-func indexNodesByPath(nodes []types.Node) (map[string][]string, map[string]string) {
-	nodesByPath := map[string][]string{}
-	fileByPath := map[string]string{}
-	for _, n := range nodes {
-		if n.FilePath == "" {
+// modifiesEdges links each hunk to the declarations it changed: a line the
+// hunk added, replaced or deleted (context lines do not count) lies in the
+// declaration's lines as they were in the hunk's commit. That is the
+// changed_in rule (temporal.LineChange.Touches) applied to one hunk, so a
+// hunk only modifies a declaration whose line history holds its commit.
+func modifiesEdges(hunks []temporal.HunkInfo, hist *temporal.LineHistory, nodeOf map[string]types.Node, srcRel string) []types.Edge {
+	type at struct{ sha, path string }
+	type declAt struct {
+		id         string
+		start, end int
+	}
+	prefix := srcRelPrefix(srcRel)
+	byCommitFile := map[at][]declAt{}
+	for _, id := range slices.Sorted(maps.Keys(hist.Touches)) {
+		n, ok := nodeOf[id]
+		if !ok || n.Type == types.NodeFile {
 			continue
 		}
-		key := filepath.ToSlash(n.FilePath)
-		nodesByPath[key] = append(nodesByPath[key], n.ID)
-		if n.Type == types.NodeFile {
-			fileByPath[key] = n.ID
+		for _, tc := range hist.Touches[id] {
+			rel := strings.TrimPrefix(tc.Path, prefix)
+			byCommitFile[at{tc.SHA, rel}] = append(byCommitFile[at{tc.SHA, rel}], declAt{id, tc.Start, tc.End})
 		}
 	}
-	return nodesByPath, fileByPath
+	var out []types.Edge
+	for _, h := range hunks {
+		decls := byCommitFile[at{h.SHA, h.FilePath}]
+		if len(decls) == 0 || h.Binary {
+			continue
+		}
+		changes, ok := temporal.PatchChanges(h.Patch)
+		if !ok {
+			continue
+		}
+		hunkID := makeHunkNode(h, types.ConfExtracted).ID
+		for _, d := range decls {
+			if touchesAny(changes, d.start, d.end) {
+				out = append(out, types.Edge{Src: hunkID, Dst: d.id, Type: types.EdgeModifies,
+					FilePath: h.FilePath, Count: 1, Confidence: types.ConfExtracted})
+			}
+		}
+	}
+	return out
 }
 
-// buildTemporalEdges emits the two edge populations:
-//
-//   - changed_in: every symbol in a touched file → every commit that
-//     touched that file (within the per-file cap).
-//   - blame:      File node → most-recent commit touching that file.
-//
-// Files with no matching nodes (e.g. binaries, test fixtures the parser
-// skipped) contribute nothing — silent miss is the correct behaviour.
-func buildTemporalEdges(relHist map[string][]string, nodesByPath map[string][]string,
-	fileByPath map[string]string, commitIDByteSHA map[string]string) ([]types.Edge, []types.Edge) {
-	var changedIn, blame []types.Edge
-	for path, shas := range relHist {
-		nodeIDs, ok := nodesByPath[path]
-		if !ok || len(nodeIDs) == 0 {
-			continue
-		}
-		// changed_in for every (symbol, commit) pair on this file.
-		for _, sha := range shas {
-			cid, ok := commitIDByteSHA[sha]
-			if !ok {
-				continue
-			}
-			for _, nid := range nodeIDs {
-				changedIn = append(changedIn, types.Edge{
-					Src:        nid,
-					Dst:        cid,
-					Type:       types.EdgeChangedIn,
-					FilePath:   path,
-					Count:      1,
-					Confidence: types.ConfExtracted,
-				})
-			}
-		}
-		// blame: File node → most recent commit (first entry by construction).
-		if fileID, ok := fileByPath[path]; ok && len(shas) > 0 {
-			if cid, ok := commitIDByteSHA[shas[0]]; ok {
-				blame = append(blame, types.Edge{
-					Src:        fileID,
-					Dst:        cid,
-					Type:       types.EdgeBlame,
-					FilePath:   path,
-					Count:      1,
-					Confidence: types.ConfExtracted,
-				})
-			}
+func touchesAny(changes []temporal.LineChange, start, end int) bool {
+	for _, c := range changes {
+		if c.Touches(start, end) {
+			return true
 		}
 	}
-	return changedIn, blame
+	return false
+}
+
+// hunkWindow describes the commits whose hunks were stored.
+func hunkWindow(hunks []temporal.HunkInfo, hist *temporal.LineHistory) persist.HunkWindow {
+	w := persist.HunkWindow{Limit: temporal.HunkCommitsDefault}
+	seen := map[string]bool{}
+	for _, h := range hunks {
+		if seen[h.SHA] {
+			continue
+		}
+		seen[h.SHA] = true
+		c := hist.Commits[h.SHA]
+		if w.Newest == "" || c.AuthorTime > w.NewestTime {
+			w.Newest, w.NewestTime = h.SHA, c.AuthorTime
+		}
+		if w.Oldest == "" || c.AuthorTime < w.OldestTime {
+			w.Oldest, w.OldestTime = h.SHA, c.AuthorTime
+		}
+	}
+	w.Commits = len(seen)
+	return w
+}
+
+// historyRecord is the manifest's account of the history read.
+func historyRecord(hist *temporal.LineHistory, depth int, window persist.HunkWindow, spaces temporal.NumberSpaces, recorded, unreachable int) *persist.HistoryRecord {
+	tracked := make([]string, 0, len(lineHistoryNodeTypes))
+	for t := range lineHistoryNodeTypes {
+		tracked = append(tracked, string(t))
+	}
+	sort.Strings(tracked)
+	return &persist.HistoryRecord{
+		Commits:      len(hist.Order),
+		Recorded:     recorded,
+		Unreachable:  unreachable,
+		RecordedRule: recordedRule,
+		Tracked:      tracked,
+		DepthPerNode: depth,
+		Renames:      renamesRule,
+		Boundaries:   hist.Boundaries,
+		HunkWindow:   window,
+		NumberSpaces: persist.NumberSpaceDoc{
+			Repo: spaces.Repo, UpstreamRepo: spaces.UpstreamRepo,
+			UpstreamBase: spaces.UpstreamBase, Rule: spaces.Rule() + "; " + earlierNumberRule,
+		},
+	}
+}
+
+// prRefsFromHistory lists, per node, the pull requests whose commits changed
+// the node's lines, newest first: the node_prs breadcrumbs. A number is kept
+// once per node (node_prs is keyed by node and number); when two number
+// spaces share a number the newer commit's pull request is kept.
+func prRefsFromHistory(hist *temporal.LineHistory, nodeOf map[string]types.Node, cm *commitMinter) map[string][]types.PRRef {
+	out := map[string][]types.PRRef{}
+	for id := range nodeOf {
+		for _, tc := range hist.Touches[id] {
+			c := hist.Commits[tc.SHA]
+			meta := cm.commitMeta(c)
+			if meta.PR == 0 {
+				continue
+			}
+			ref := types.PRRef{
+				Number:      meta.PR,
+				Title:       cleanPRTitle(c.Subject),
+				Summary:     meta.Body,
+				HeadSHA:     c.SHA,
+				MergedAtUTC: time.Unix(c.CommitTime, 0).UTC(),
+				Repo:        meta.PRRepo,
+			}
+			if len(c.Parents) >= 1 {
+				ref.BaseSHA = c.Parents[0]
+			}
+			if len(c.Parents) >= 2 {
+				ref.HeadSHA = c.Parents[1]
+			}
+			out[id] = append(out[id], ref)
+		}
+	}
+	dedupePRRefsByNode(out)
+	return out
+}
+
+// sortNodesByID sorts in place by ID for deterministic snapshots.
+func sortNodesByID(ns []types.Node) {
+	sort.Slice(ns, func(i, j int) bool { return ns[i].ID < ns[j].ID })
+}
+
+// simpleName is the last part of a node's name, the identifier its
+// declaration line holds ("Method" of "Type.Method").
+func simpleName(name string) string {
+	if i := strings.LastIndexByte(name, '.'); i >= 0 {
+		return name[i+1:]
+	}
+	return name
 }
