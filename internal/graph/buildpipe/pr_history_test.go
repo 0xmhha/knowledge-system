@@ -6,14 +6,21 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/graph"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
+// prRefsFor runs the history pass over nodes in root and returns its PR
+// breadcrumbs.
+func prRefsFor(t *testing.T, root string, nodes []types.Node) (map[string][]types.PRRef, error) {
+	t.Helper()
+	res, err := emitTemporalEdges(&graph.Graph{Nodes: nodes}, root, discardLog(), HistoryOptions{}, nil)
+	return res.prRefs, err
+}
+
 // initPRRepo materialises a temp directory with two commits whose
-// subjects carry "(#NNN)" markers, so ScanPRHistory has something to
-// chew on. Returns the temp root.
+// subjects carry "(#NNN)" markers. Returns the temp root.
 //
 // Commit layout:
 //
@@ -102,13 +109,13 @@ func writeFile(t *testing.T, root, rel, content string) {
 	}
 }
 
-// TestScanPRHistory_BasicOverlap exercises the load-bearing case: a
+// TestPRRefs_BasicOverlap exercises the load-bearing case: a
 // node whose [StartLine, EndLine] range intersects a PR-tagged
 // commit's patch range gets the PRRef attached. The two-commit
 // fixture above produces #42 (lines 1–5) and #43 (lines 7+); a node
 // at lines 3–4 must see #42 alone, a node at lines 8–9 must see #43,
 // and a span node 1–10 must see both.
-func TestScanPRHistory_BasicOverlap(t *testing.T) {
+func TestPRRefs_BasicOverlap(t *testing.T) {
 	root := initPRRepo(t)
 
 	nodes := []types.Node{
@@ -123,9 +130,9 @@ func TestScanPRHistory_BasicOverlap(t *testing.T) {
 			Language: "go"},
 	}
 
-	got, err := ScanPRHistory(root, nodes)
+	got, err := prRefsFor(t, root, nodes)
 	if err != nil {
-		t.Fatalf("ScanPRHistory: %v", err)
+		t.Fatalf("prRefsFor: %v", err)
 	}
 
 	if len(got["n1"]) != 1 || got["n1"][0].Number != 42 {
@@ -160,13 +167,12 @@ func TestScanPRHistory_BasicOverlap(t *testing.T) {
 	}
 }
 
-// TestScanPRHistory_NonGitTree confirms a tree without `.git` returns
-// an empty map and no error — PR breadcrumb is strictly additive
-// metadata.
-func TestScanPRHistory_NonGitTree(t *testing.T) {
+// TestPRRefs_NonGitTree confirms a tree without `.git` gives no PR
+// breadcrumbs and no error — PR breadcrumb is strictly additive metadata.
+func TestPRRefs_NonGitTree(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "foo.go", "package foo\n")
-	got, err := ScanPRHistory(root, []types.Node{
+	got, err := prRefsFor(t, root, []types.Node{
 		{ID: "n1", FilePath: "foo.go", StartLine: 1, EndLine: 1,
 			Type: types.NodeFile, Name: "foo.go", QualifiedName: "file:foo.go",
 			Language: "go"},
@@ -179,25 +185,11 @@ func TestScanPRHistory_NonGitTree(t *testing.T) {
 	}
 }
 
-// TestScanPRHistory_EmptyInputs documents the early-return contract:
-// empty srcRoot or nodes slice returns an empty map without spawning
-// git at all (cheap fast path).
-func TestScanPRHistory_EmptyInputs(t *testing.T) {
-	got, err := ScanPRHistory("", []types.Node{{ID: "n1"}})
-	if err != nil || len(got) != 0 {
-		t.Errorf("empty srcRoot: got %+v, err=%v", got, err)
-	}
-	got, err = ScanPRHistory("/tmp", nil)
-	if err != nil || len(got) != 0 {
-		t.Errorf("nil nodes: got %+v, err=%v", got, err)
-	}
-}
-
-// TestScanPRHistory_ShallowBoundarySkipped covers a depth-2 clone of the
+// TestPRRefs_ShallowBoundarySkipped covers a depth-2 clone of the
 // fixture: c1 (#42) becomes the shallow boundary, which git shows as adding
 // the whole file. It must not be attributed, while c2 (#43), whose parent is
 // present, still is.
-func TestScanPRHistory_ShallowBoundarySkipped(t *testing.T) {
+func TestPRRefs_ShallowBoundarySkipped(t *testing.T) {
 	origin := initPRRepo(t)
 	clone := filepath.Join(t.TempDir(), "clone")
 	if out, err := exec.Command("git", "clone", "-q", "--depth", "1", "file://"+origin, clone).CombinedOutput(); err != nil {
@@ -218,9 +210,9 @@ func TestScanPRHistory_ShallowBoundarySkipped(t *testing.T) {
 			Type: types.NodeFile, Name: "foo.go", QualifiedName: "file:foo.go",
 			Language: "go"},
 	}
-	got, err := ScanPRHistory(clone, nodes)
+	got, err := prRefsFor(t, clone, nodes)
 	if err != nil {
-		t.Fatalf("ScanPRHistory: %v", err)
+		t.Fatalf("prRefsFor: %v", err)
 	}
 	if len(got["n1"]) != 0 {
 		t.Errorf("n1: boundary commit #42 must not be attributed, got %+v", got["n1"])
@@ -232,75 +224,6 @@ func TestScanPRHistory_ShallowBoundarySkipped(t *testing.T) {
 		t.Errorf("n3: want [#43], got %+v", got["n3"])
 	}
 }
-
-// TestParsePatchLineRanges reads past a line longer than the reader buffer
-// and still records the hunks before and after it.
-func TestParsePatchLineRanges(t *testing.T) {
-	long := "+" + strings.Repeat("x", 3*patchReadBufferBytes)
-	patch := strings.Join([]string{
-		"diff --git a/a.json b/a.json",
-		"--- /dev/null",
-		"+++ b/a.json",
-		"@@ -0,0 +1,2 @@",
-		long,
-		"+@@ -9,9 +9,9 @@ not a header",
-		"diff --git a/b.go b/b.go",
-		"--- a/b.go",
-		"+++ b/b.go",
-		"@@ -3,0 +4,3 @@ func B() {",
-		"@@ -9 +11,0 @@",
-		"diff --git a/c.go b/c.go",
-		"--- a/c.go",
-		"+++ /dev/null",
-		"@@ -1,2 +0,0 @@",
-		"",
-	}, "\n")
-
-	got, err := parsePatchLineRanges(strings.NewReader(patch))
-	if err != nil {
-		t.Fatalf("parsePatchLineRanges: %v", err)
-	}
-	want := map[string][]hunkRange{
-		"a.json": {{Start: 1, End: 2}},
-		"b.go":   {{Start: 4, End: 6}},
-	}
-	if len(got) != len(want) {
-		t.Fatalf("files: got %+v, want %+v", got, want)
-	}
-	for file, ranges := range want {
-		if len(got[file]) != len(ranges) || got[file][0] != ranges[0] {
-			t.Errorf("%s: got %+v, want %+v", file, got[file], ranges)
-		}
-	}
-}
-
-// TestRangesOverlap is a smoke around the inclusive-both-ends overlap
-// helper that drives the hunk × node match.
-func TestRangesOverlap(t *testing.T) {
-	cases := []struct {
-		a1, a2, b1, b2 int
-		want           bool
-	}{
-		{1, 5, 3, 8, true},   // partial overlap
-		{1, 5, 6, 10, false}, // no overlap, b above a
-		{6, 10, 1, 5, false}, // no overlap, a above b
-		{1, 10, 5, 6, true},  // a contains b
-		{5, 6, 1, 10, true},  // b contains a
-		{5, 5, 5, 5, true},   // single-line both
-		{5, 5, 6, 6, false},  // adjacent single lines
-	}
-	for _, c := range cases {
-		if got := rangesOverlap(c.a1, c.a2, c.b1, c.b2); got != c.want {
-			t.Errorf("rangesOverlap(%d,%d,%d,%d) = %v, want %v",
-				c.a1, c.a2, c.b1, c.b2, got, c.want)
-		}
-	}
-}
-
-// _ "discards" the time.Time temporal field — kept in scope so the
-// (#NNN) regex test below can lean on time.RFC3339 parsing without an
-// unused-import warning.
-var _ = time.RFC3339
 
 // TestBodyExcerpt locks down the "왜" history transformation —
 // the cleaned body that drives CKV's semantic search. The function

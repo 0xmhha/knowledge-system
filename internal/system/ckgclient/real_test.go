@@ -1151,6 +1151,44 @@ func TestMatchQname_DocShiftedAndPseudo(t *testing.T) {
 	}
 }
 
+// TestMatchNode_PromotedMethodSharesSpan pins which node a span shared by a
+// method and its promoted copies resolves to. The graph gives every promoted
+// method a node at the declaring method's position, without a canonical id
+// and without call edges; a walk started there ends at once. Storage order
+// must not decide, in any of the three tiers.
+func TestMatchNode_PromotedMethodSharesSpan(t *testing.T) {
+	const file = "params/config.go"
+	promoted := types.Node{QualifiedName: "wbft.wrapper.CheckCompatible", Type: types.NodeMethod, StartLine: 20, EndLine: 30}
+	declared := types.Node{QualifiedName: "params.ChainConfig.CheckCompatible", Type: types.NodeMethod, StartLine: 20, EndLine: 30,
+		CanonicalID: "example.com/params.(*ChainConfig).CheckCompatible"}
+	orders := map[string][]types.Node{
+		"promoted first": {promoted, declared},
+		"declared first": {declared, promoted},
+	}
+	spans := map[string]contract.Citation{
+		"exact":                  {File: file, StartLine: 20, EndLine: 30},
+		"citation contains node": {File: file, StartLine: 15, EndLine: 30},
+		"node contains citation": {File: file, StartLine: 22, EndLine: 25},
+	}
+	for oname, cands := range orders {
+		for sname, cit := range spans {
+			got, ok := matchNode(cands, cit)
+			if !ok || got.QualifiedName != declared.QualifiedName {
+				t.Errorf("%s, %s: got %q (ok=%v), want %q", oname, sname, got.QualifiedName, ok, declared.QualifiedName)
+			}
+		}
+	}
+	// A canonical id must not beat a better span.
+	inner := types.Node{QualifiedName: "params.inner", Type: types.NodeFunction, StartLine: 22, EndLine: 25}
+	if got, _ := matchNode([]types.Node{declared, inner}, spans["node contains citation"]); got.QualifiedName != inner.QualifiedName {
+		t.Errorf("closer span lost to a canonical id: got %q", got.QualifiedName)
+	}
+	// Without canonical ids the first node still wins, as before.
+	if got, _ := matchNode([]types.Node{promoted, {QualifiedName: "b.X", Type: types.NodeMethod, StartLine: 20, EndLine: 30}}, spans["exact"]); got.QualifiedName != promoted.QualifiedName {
+		t.Errorf("no canonical ids: got %q, want storage order", got.QualifiedName)
+	}
+}
+
 // TestIsStructuralQname pins the pseudo-node classifier, including the
 // path-shaped file nodes ("pkg/internal/x/a.go") that slipped past the
 // original prefix-only filter and flooded neighbor lists with

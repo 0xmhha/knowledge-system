@@ -52,8 +52,10 @@ func traceStage(rec map[string]any, stage string) map[string]any {
 // every matched line, so nothing is cut or hidden; a larger result is split
 // into parts, and the trace records how many.
 func TestTrace_SearchCode(t *testing.T) {
+	// The budgets below are sized for one copy of the answer.
+	withContentMode(t, ContentStructured)
 	store := newFixtureStore(t)
-	rec := tracedCall(t, store, "search_code", map[string]any{"pattern": `.`, "limit": 2})
+	rec := tracedCall(t, store, "search_code", map[string]any{"pattern": `.`})
 	if rec["tool"] != "search_code" || rec["result"] == nil {
 		t.Fatalf("record without tool or result: %v", rec)
 	}

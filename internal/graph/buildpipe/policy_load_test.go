@@ -74,7 +74,7 @@ policies:
 		t.Fatalf("write policy yaml: %v", err)
 	}
 
-	_, err := Run(Options{
+	m, err := Run(Options{
 		SrcRoot:    "../parse/golang/testdata/resolve",
 		OutDir:     outDir,
 		Languages:  []string{"auto"},
@@ -90,6 +90,21 @@ policies:
 		t.Fatalf("open graph.db: %v", err)
 	}
 	defer func() { _ = store.Close() }()
+
+	// The manifest's counts are the database's, the policy rows included,
+	// and say how many of them the enrichment added.
+	allNodes, err := store.AllNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	allEdges, err := store.AllEdges()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Stats[statNodes] != len(allNodes) || m.Stats[statEdges] != len(allEdges) || m.Stats[statEnrichmentNodes] != 1 {
+		t.Errorf("manifest stats %v; the database holds %d nodes, %d edges, 1 policy node",
+			m.Stats, len(allNodes), len(allEdges))
+	}
 
 	// Assert: at least one NodePolicy row landed. The YAML declares
 	// exactly one policy entry; FindSymbol on its qname should find

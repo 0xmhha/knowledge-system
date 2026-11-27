@@ -344,14 +344,19 @@ func (e *Expander) emitFootprint(ctx context.Context, intent contract.Intent, ou
 	e.fp.Event(ctx, "composer.stage3_expanded", fields...)
 }
 
-// orientFromSeed returns n with the seed side as Source and the neighbor as
-// Target, the shape ScoredNeighbor.Edge promises. ckgclient keeps the graph's
-// orientation: on a callers walk a calls edge still runs caller -> callee, so
-// the seed comes back as Target. The seed side is the endpoint overlapping the
-// seed citation; a seed chunk and its graph node can start on different lines
-// (a doc comment is part of the chunk, not the node).
+// orientFromSeed returns n with the end nearer the seed as Source and the
+// neighbor as Target, the shape ScoredNeighbor.Edge promises. ckgclient keeps
+// the graph's orientation: on a callers walk a calls edge still runs caller ->
+// callee, so the neighbor is the Source at every hop. Past the first hop, and
+// through an interface method, neither end is the seed, so the relation tells
+// the direction. An edge that already starts at the seed stays as it is.
+//
+// For other relations the seed side is the endpoint overlapping the seed
+// citation; a seed chunk and its graph node can start on different lines (a
+// doc comment is part of the chunk, not the node).
 func orientFromSeed(seed contract.Citation, n contract.Neighbor) contract.Neighbor {
-	if overlaps(n.Target, seed) && !overlaps(n.Source, seed) {
+	seedAtSource, seedAtTarget := overlaps(n.Source, seed), overlaps(n.Target, seed)
+	if !seedAtSource && (seedAtTarget || n.Relation == contract.RelationCalledBy) {
 		n.Source, n.Target = n.Target, n.Source
 	}
 	return n

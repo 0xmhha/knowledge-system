@@ -29,3 +29,34 @@ func TestEdgesOfFacts(t *testing.T) {
 		t.Errorf("counted %+v", c)
 	}
 }
+
+// TestEdgesOfExecutionFacts: a close, the locks held at a site, an operation
+// on a sync primitive and a function run later are stored as closes,
+// runs_under_lock, operates_on and runs_func edges.
+func TestEdgesOfExecutionFacts(t *testing.T) {
+	fs := Facts{
+		ChanOp{Actor: "f", Origin: "c", OriginKind: "field", Dir: Close, Line: 4, File: "a.go", Certainty: Approx(ReasonAliasing)},
+		SiteLock{Site: "s", Mutex: "m", Propagated: true, Line: 5, File: "a.go", Certainty: Approx(ReasonBranches)},
+		SyncUse{Site: "s", Primitive: "w", Op: types.SyncWaitGroupAdd, Line: 6, File: "a.go", Certainty: Proof},
+		RunsLater{Site: "s", Func: "g", Op: types.SyncOnceDo, Line: 7, File: "a.go", Certainty: Proof},
+	}
+	e := fs.Edges()
+	want := []struct {
+		typ  types.EdgeType
+		kind string
+		conf types.Confidence
+	}{
+		{types.EdgeCloses, "field", types.ConfInferred},
+		{types.EdgeRunsUnderLock, PropagatedKind, types.ConfInferred},
+		{types.EdgeOperatesOn, "wg_add", types.ConfExtracted},
+		{types.EdgeRunsFunc, "once_do", types.ConfExtracted},
+	}
+	if len(e) != len(want) {
+		t.Fatalf("edges %+v", e)
+	}
+	for i, w := range want {
+		if e[i].Type != w.typ || e[i].DispatchKind != w.kind || e[i].Confidence != w.conf || e[i].Line == 0 {
+			t.Errorf("edge %d = %+v, want %v %q %v", i, e[i], w.typ, w.kind, w.conf)
+		}
+	}
+}

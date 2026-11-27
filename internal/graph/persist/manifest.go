@@ -77,12 +77,35 @@ type Manifest struct {
 	// consumers watch it to detect "the enrichment moved" without a vector
 	// realignment. Additive + omitempty (no SchemaVersion bump).
 	EnrichDigest string `json:"enrich_digest,omitempty"`
+	// History says how much git history the build recorded and what bounded
+	// it, so a history answer can say what it could not see. nil when the
+	// source had no git history. Additive + omitempty.
+	History *HistoryRecord `json:"history,omitempty"`
 	// Files is the per-file incremental-cache record (schema 1.2).
 	// Each entry tracks the SHA256 + cache key of one source file plus the
 	// node/edge IDs it produced, enabling subsequent builds to skip parsing
 	// for unchanged files. omitempty so pre-1.2 manifests reload as nil and
 	// trigger a full rebuild on the next ckg build invocation.
 	Files []FileEntry `json:"files,omitempty"`
+	// OptionalInputs are the optional input files the build was given
+	// (ckg build --policy-file, --security-pattern-file), one record each;
+	// none when the build had none. A reader tells "this project has no
+	// policies" from "built without a policy file" by it.
+	OptionalInputs []OptionalInput `json:"optional_inputs,omitempty"`
+}
+
+// OptionalInput is one optional input file of a build.
+type OptionalInput struct {
+	Kind string `json:"kind"` // "policy_file" | "security_pattern_file"
+	// Path is the path as given on the command line.
+	Path string `json:"path"`
+	// SHA256 is the hex digest of its content; empty when it could not be
+	// read (the build then has no rows from it).
+	SHA256 string `json:"sha256"`
+	// RowPath is the path the graph's rows from this file carry: relative
+	// to the source root when the file is inside it, else its base name
+	// and the start of SHA256.
+	RowPath string `json:"row_path"`
 }
 
 // FileEntry records the cache fingerprint and produced node/edge IDs for one
@@ -180,11 +203,13 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"parse_errors_count", m.ParseErrorsCount},
 		{"unresolved_refs_count", m.UnresolvedRefsCount},
 		{"go_load_errors_count", m.GoLoadErrorsCount},
+		{"history", m.History},
 		// "files" is the incremental-cache fingerprint blob. It can be large
 		// on big repos (~120 bytes per file), but JSON-blob storage in the
 		// existing kv table is fine for now — a later change may move this to
 		// per-file rows for partial query performance.
 		{"files", m.Files},
+		{"optional_inputs", m.OptionalInputs},
 	}
 	for _, r := range jsonRows {
 		buf, err := json.Marshal(r.v)
@@ -268,9 +293,11 @@ func readManifest(ctx context.Context, q manifestQueryer) (Manifest, error) {
 		{"ckgignore", &m.CKGIgnore},
 		{"parse_errors_count", &m.ParseErrorsCount},
 		{"unresolved_refs_count", &m.UnresolvedRefsCount},
+		{"history", &m.History},
 		// pre-1.2 manifests have no "files" key; the empty branch leaves
 		// m.Files as nil, which buildpipe interprets as "no cache available".
 		{"files", &m.Files},
+		{"optional_inputs", &m.OptionalInputs},
 	} {
 		if v, ok := kv[j.k]; ok && v != "" {
 			if err := json.Unmarshal([]byte(v), j.dst); err != nil {

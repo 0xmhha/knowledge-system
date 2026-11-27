@@ -119,6 +119,7 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 
 	seenModule := map[string]bool{}
 	seenFile := map[string]bool{}
+	var stderrLines []string
 	list := func(deps bool, patterns []string, set string) error {
 		args := []string{"list", "-e", "-json"}
 		if deps {
@@ -128,9 +129,12 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 			args = append(args, "-tags", strings.Join(cfg.Tags, ","))
 		}
 		args = append(args, patterns...)
-		out, err := run(ctx, goPath, root, env, args...)
+		out, warn, err := runStderr(ctx, goPath, root, env, args...)
 		if err != nil {
 			return err
+		}
+		if warn != "" {
+			stderrLines = append(stderrLines, warn)
 		}
 		// Only the entry points' build embeds files into the outputs.
 		return addPackages(scope, root, out, packageListing{skipTests: cfg.SkipTests, set: set, embeds: deps}, seenModule, seenFile)
@@ -143,8 +147,9 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 			return nil, err
 		}
 	}
+	scope.GoStderr = stderrLines
 	if len(scope.Files) == 0 {
-		return nil, fmt.Errorf("buildscope: go list found no main-module files for %v in %s", cfg.EntryPoints, root)
+		return nil, noFilesError(cfg.EntryPoints, root, scope.Problems, stderrLines)
 	}
 	sortScope(scope)
 	return scope, nil
@@ -346,6 +351,14 @@ func fileSHA256(path string) (string, error) {
 }
 
 func run(ctx context.Context, bin, dir string, env []string, args ...string) ([]byte, error) {
+	out, _, err := runStderr(ctx, bin, dir, env, args...)
+	return out, err
+}
+
+// runStderr is run that also returns what the command wrote to standard
+// error when it succeeded: go list -e exits 0 after load errors and after
+// warnings (a build or module cache it cannot write), and says so only there.
+func runStderr(ctx context.Context, bin, dir string, env []string, args ...string) ([]byte, string, error) {
 	cmd := exec.CommandContext(ctx, bin, args...)
 	cmd.Dir = dir
 	cmd.Env = env
@@ -353,8 +366,65 @@ func run(ctx context.Context, bin, dir string, env []string, args ...string) ([]
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("buildscope: %s %s in %s: %w (stderr: %s)",
+		return nil, "", fmt.Errorf("buildscope: %s %s in %s: %w (stderr: %s)",
 			filepath.Base(bin), strings.Join(args, " "), dir, err, strings.TrimSpace(stderr.String()))
 	}
-	return out, nil
+	return out, strings.TrimSpace(stderr.String()), nil
 }
+
+// maxReportedProblems bounds how many go command errors an error message
+// quotes.
+const maxReportedProblems = 3
+
+// noFilesError says that go list put no main-module file into the scope,
+// with what the go command reported (goReport).
+func noFilesError(entries []string, root string, problems, stderr []string) error {
+	msg := fmt.Sprintf("buildscope: go list found no main-module files for %v in %s", entries, root)
+	msg += "; " + goReport(problems, stderr)
+	if len(problems) == 0 && len(stderr) == 0 {
+		msg += "; check that the entry points name main-module packages"
+	}
+	return errors.New(msg)
+}
+
+// loadErrorsError says that the go command reported load errors, so the
+// scope may be incomplete, with what it reported (goReport).
+func loadErrorsError(problems, stderr []string) error {
+	return errors.New("buildscope: the scope may be incomplete: " + goReport(problems, stderr))
+}
+
+// goReport is the one wording of what the go command reported: how many
+// load errors and the first maxReportedProblems of them, and what it wrote
+// to standard error, or that it wrote nothing there.
+func goReport(problems, stderr []string) string {
+	var msg string
+	switch n := len(problems); {
+	case n > maxReportedProblems:
+		msg = fmt.Sprintf("the go command reported %d load errors, the first %d: %s", n, maxReportedProblems,
+			strings.Join(problems[:maxReportedProblems], "; "))
+	case n > 0:
+		msg = fmt.Sprintf("the go command reported %d load errors: %s", n, strings.Join(problems, "; "))
+	default:
+		msg = "the go command reported no load errors"
+	}
+	var lines []string
+	for _, out := range stderr {
+		for _, l := range strings.Split(out, "\n") {
+			if l = strings.TrimSpace(l); l != "" {
+				lines = append(lines, l)
+			}
+		}
+	}
+	if len(lines) == 0 {
+		return msg + "; the go command wrote nothing to standard error"
+	}
+	msg += "; go command standard error: " + strings.Join(lines[:min(len(lines), maxStderrLines)], " | ")
+	if left := len(lines) - maxStderrLines; left > 0 {
+		msg += fmt.Sprintf(" (%d more lines left out)", left)
+	}
+	return msg
+}
+
+// maxStderrLines bounds how many lines of the go command's standard error
+// an error message quotes.
+const maxStderrLines = 3

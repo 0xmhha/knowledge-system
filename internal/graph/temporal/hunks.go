@@ -5,15 +5,8 @@
 // adjacent edges, with the gzip-compressed unified-diff text persisted as
 // a blob keyed by the Hunk's node ID.
 //
-// Why a fresh collector instead of extending LoadHistory: LoadHistory uses
-// `git log --raw` to enumerate (commit, file) pairs — it never sees the
-// patch body. The hunk pass needs `git log -p` to materialise diff text;
-// the two streams have incompatible parse states. Keeping them separate
-// lets each pass stay simple and lets the build pipeline run them
-// concurrently if the budget ever requires it.
-//
 // Repos that aren't git checkouts return nil + nil error so callers
-// degrade gracefully (mirrors LoadHistory's contract).
+// degrade gracefully.
 package temporal
 
 import (
@@ -26,11 +19,12 @@ import (
 	"strings"
 )
 
-// hunkCommitsDefault bounds the commit walk for cold-rebuild hunk
+// HunkCommitsDefault is the number of newest non-merge commits whose hunks a
+// build stores (LoadHunks with maxCommits 0). It bounds the commit walk for cold-rebuild hunk
 // extraction. 200 most-recent reachable commits is the design §3.7
 // budget for the self-graph (~178 commits, ~700 hunks, ~700KB blob mass).
 // Callers can override via LoadHunks(maxCommits=...).
-const hunkCommitsDefault = 200
+const HunkCommitsDefault = 200
 
 // HunkInfo is one unified-diff hunk extracted from a single commit. The
 // fields mirror the @@ -OldStart,OldLines +NewStart,NewLines @@ header:
@@ -50,9 +44,8 @@ const hunkCommitsDefault = 200
 //     multiple hunks per commit-file pair don't collide.
 //
 // SHA is the full 40-char hex commit ID. FilePath is the post-image
-// (b/) side of the `diff --git` header — for renames under --no-renames
-// the file appears as a deletion of the old path + an addition of the
-// new path, so SHA × FilePath × Index uniquely identifies any hunk.
+// (b/) side of the `diff --git` header (the new name after a rename), so
+// SHA × FilePath × Index uniquely identifies any hunk.
 type HunkInfo struct {
 	SHA      string
 	FilePath string
@@ -69,14 +62,14 @@ type HunkInfo struct {
 
 // LoadHunks runs `git log -p` over the most-recent maxCommits HEAD-reachable
 // commits and parses the patch stream into HunkInfo records. maxCommits<=0
-// uses hunkCommitsDefault.
+// uses HunkCommitsDefault.
 //
-// Returns (nil, nil) if repoRoot isn't a git checkout — same graceful-degrade
-// contract as LoadHistory. Other git failures bubble up as errors.
+// Returns (nil, nil) if repoRoot isn't a git checkout. Other git failures
+// bubble up as errors.
 //
-// Why --no-renames: matches LoadHistory's flag set so changed_in (file-level)
-// and has_hunk (per-hunk) agree on the path identity. Renames appear as
-// delete+add hunk pairs; the modifies-edge pass can re-link them via AST overlap if needed.
+// Renames are detected (-M), as the line history (TrackLines) detects them,
+// so a renamed file's hunk holds its real change rather than the whole file
+// deleted and added again.
 //
 // Why --no-merges: merge commits' patches are noisy (they show the resolution
 // against one parent, not the actual code change), and the few cases where
@@ -85,13 +78,13 @@ type HunkInfo struct {
 // branches without losing signal.
 func LoadHunks(repoRoot string, maxCommits int) ([]HunkInfo, error) {
 	if maxCommits <= 0 {
-		maxCommits = hunkCommitsDefault
+		maxCommits = HunkCommitsDefault
 	}
 	if !isGitCheckout(repoRoot) {
 		return nil, nil
 	}
 	cmd := exec.Command("git", "-C", repoRoot,
-		"log", "--no-renames", "--no-color", "--no-merges",
+		"log", "-M", "--no-color", "--no-merges",
 		"--pretty=format:"+commitHeaderFormat,
 		"-p", "--unified=3",
 		fmt.Sprintf("-n%d", maxCommits),

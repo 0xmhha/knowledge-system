@@ -182,6 +182,45 @@ type Node struct {
 	// when nil so existing payloads (HTTP / MCP / chunked export)
 	// stay byte-identical until a caller asks for breadcrumbs.
 	RecentPRs []PRRef `json:"recent_prs,omitempty"`
+	// Commit is the git metadata of a Commit node; nil for every other node.
+	Commit *CommitMeta `json:"commit,omitempty"`
+	// SyncUnknown, on a CallSite, are the operations on a sync primitive
+	// made there whose primitive the graph does not name: the site has no
+	// operates_on edge for that operation, and this says so and why (Go
+	// frontend, sync_flow.go). Nil for every other node and for a site
+	// whose every operation is named.
+	SyncUnknown []SyncUnknown `json:"sync_unknown,omitempty"`
+}
+
+// CommitMeta is what a Commit node records of its commit. Times are unix
+// seconds.
+//   - Subject: the whole subject line; Body: the message body without git
+//     trailers, capped on a line boundary.
+//   - PR: the pull request number the subject names ("(#N)" or "Merge pull
+//     request #N"), 0 when it names none; PRRepo: the repository that number
+//     belongs to ("owner/name"), "" when unknown; Upstream: the commit is
+//     part of the upstream history the build was configured with, so PR is
+//     a pull request of the upstream repository.
+//   - Ported: the earlier "(#N)" numbers of the subject, the pull requests
+//     of the change a port carries over, numbered in PortedRepo; Reverts:
+//     the numbers in the quoted title of a Revert subject, the pull
+//     requests the commit undoes, numbered in RevertsRepo.
+//   - Unreachable: no ref reaches the commit (history rewritten away); it
+//     is kept for recovery, its node AMBIGUOUS and out of every tool answer.
+type CommitMeta struct {
+	Author      string `json:"author"`
+	AuthorTime  int64  `json:"author_time"`
+	CommitTime  int64  `json:"commit_time"`
+	Subject     string `json:"subject"`
+	Body        string `json:"body,omitempty"`
+	PR          int    `json:"pr,omitempty"`
+	PRRepo      string `json:"pr_repo,omitempty"`
+	Upstream    bool   `json:"upstream,omitempty"`
+	Ported      []int  `json:"ported,omitempty"`
+	PortedRepo  string `json:"ported_repo,omitempty"`
+	Reverts     []int  `json:"reverts,omitempty"`
+	RevertsRepo string `json:"reverts_repo,omitempty"`
+	Unreachable bool   `json:"unreachable,omitempty"`
 }
 
 // ExternalPackage names the package an External node belongs to.

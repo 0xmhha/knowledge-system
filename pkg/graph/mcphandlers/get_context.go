@@ -25,7 +25,7 @@ func RegisterGetContextForTask(s *server.MCPServer, reader store.Reader) {
 	tool := nsTool("get_context_for_task",
 		mcp.WithDescription("One-call context for a task described in words: the best-matching code bodies and their neighbours. "+
 			"Matches the words against symbol names, signatures and doc comments only (not bodies), so results can be loosely related; to search the code itself use search_code. "+
-			"Pipeline: BM25 -> 1-hop expand -> score -> diversify -> pack. "+
+			"Pipeline: BM25 -> 1-hop expand -> score -> diversify -> pack; the expand step does not walk the facts that start at a statement site (runs_under_lock, operates_on, runs_func, jumps_to), and keeps declarations only: statement nodes, local names and External stubs it reaches are left out. "+
 			"Optionally folds PR breadcrumbs (include_recent_prs) and reverse-dep impact "+
 			"(include_impact) into the same response so coding agents avoid extra round-trips."),
 		mcp.WithString("task_description", mcp.Required()),

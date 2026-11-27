@@ -190,6 +190,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		// emitDistributedDecls so the same v.nodes function-ID lookup is
 		// usable. Self-loop edges only — never produces new nodes.
 		v.emitContextPaths(tf.file)
+		v.nameChannels()
 		p.mergeFuncFieldTouches(v.funcFieldTouches)
 		return &parse.ParseResult{
 			Path: rel, Nodes: v.nodes, Edges: v.edges, Pending: v.pending,
@@ -206,6 +207,7 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 	ast.Walk(v, f)
 	v.emitDistributedDecls(f)
 	v.emitContextPaths(f)
+	v.nameChannels()
 	p.mergeFuncFieldTouches(v.funcFieldTouches)
 	return &parse.ParseResult{
 		Path: rel, Nodes: v.nodes, Edges: v.edges, Pending: v.pending,

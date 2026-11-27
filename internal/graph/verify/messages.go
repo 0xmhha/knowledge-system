@@ -20,12 +20,12 @@ import (
 //     of a range over a channel, the body of a select case. Code in a
 //     function literal written in the range is the literal's, not the
 //     range's.
-//   - triggers: a sender -> a receive on the same channel. Decided only
-//     for a local channel that one make sets, that nothing else assigns
-//     and that is used only as the channel of sends, receives, ranges,
-//     close, len and cap (it reaches no other code). The sender of a send
-//     in a go statement's literal is that goroutine; else the function
-//     the send is written in.
+//   - triggers: a sender (or a closer: a close wakes every receive) -> a
+//     receive on the same channel. Decided only for a local channel that
+//     one make sets, that nothing else assigns and that is used only as the
+//     channel of sends, receives, ranges, close, len and cap (it reaches no
+//     other code). The sender of a send in a go statement's literal is that
+//     goroutine; else the function the send is written in.
 //
 // A CallSite is named by its file and span, a Goroutine by the file and
 // start of its go statement, a field by its declaration.
@@ -335,6 +335,17 @@ func (pf *programFacts) triggersIn(info *gotypes.Info, d *ast.FuncDecl, rel stri
 						for _, a := range y.Args {
 							if aid, ok := ast.Unparen(a).(*ast.Ident); ok {
 								operand[aid] = true
+							}
+						}
+						// A close wakes every receive, as a send can
+						// wake each one: the closer is a sender.
+						if id.Name != "close" || len(y.Args) != 1 {
+							return true
+						}
+						if l, ok := get(y.Args[0]); ok {
+							l.sends = append(l.sends, sender)
+							if inClosure {
+								l.escapes = true
 							}
 						}
 					}

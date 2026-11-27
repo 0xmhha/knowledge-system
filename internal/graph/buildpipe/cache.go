@@ -329,7 +329,47 @@ import (
 // The pending_refs table is no longer written (only the removed incremental
 // build read it); an older graph.db keeps it until the next build replaces
 // the file.
-const SchemaVersion = "1.43"
+//
+// 1.44 (2026-11-27), line history: history facts follow lines. changed_in and blame are
+// recorded for File nodes and declarations only: a declaration's changed_in
+// edges are the commits that changed its own lines (git log -L, renames
+// followed, every commit unless --temporal-depth caps it; Line = its first
+// line in that commit), blame edges the commits that last changed its lines
+// today (git blame, Count = lines). modifies links a hunk to a declaration
+// only when a changed line (not context) lies in the declaration at the
+// hunk's commit. Commit nodes carry attrs.commit (author, author and commit
+// times, the whole subject, body, pull request number and its repository)
+// and their Signature keeps the whole subject. node_prs comes from the same
+// line history, Repo set per number space. The manifest gains "history" and
+// stats enrichment_nodes/enrichment_edges, and its node and edge counts
+// include the enrichment rows. Force a cold rebuild (every build is).
+//
+// 1.44 (2026-11-27), execution flow: facts for reading code in execution order. closes (a
+// closer to the channel it closes; its CallSite has sub kind close) and
+// triggers from the closer to every receive on the channel; a select
+// statement is a SwitchStmt of sub kind select or select_default that
+// encloses its cases' sends and receives as cond; runs_under_lock (a call,
+// send or receive site to each mutex held there); operates_on (a call or
+// receive on a sync primitive to the declaration that holds it) and
+// runs_func (to the function sync.Once.Do, time.AfterFunc or
+// sync.WaitGroup.Go runs later); literal_passed_to also from the Goroutine
+// of a go statement in the literal. SwitchStmt nodes, encloses, cond_reads,
+// cond_calls, body_writes and triggers change. Every build is cold.
+//
+// 1.45 (2026-11-27): control transfer and code extents. Node types
+// BranchStmt (break, continue, goto, fallthrough), CaseClause (one clause
+// of a switch or select), DeferStmt and FuncLit; edge type jumps_to (a
+// BranchStmt or ReturnStmt to where it goes); literal_passed_to also from a
+// FuncLit to its callee, its kind what the callee does with it; flows_to of
+// kind sync (a sync primitive stored into a field); a CallSite may carry
+// sync_unknown; Channel qualified names name the line. Every build is cold.
+//
+// 1.46 (2026-11-27): the two 1.44 lines of work and 1.45 in one graph: the
+// line history of the first 1.44 entry and the execution-flow facts of the
+// second 1.44 entry and of 1.45, together with External call targets in
+// calls and invokes. A graph of either branch alone lacks the other's facts,
+// so neither 1.44 nor 1.45 names this graph. Every build is cold.
+const SchemaVersion = "1.46"
 
 // ComputeCacheKey returns the SHA256 of:
 //

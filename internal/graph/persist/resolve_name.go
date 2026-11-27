@@ -268,6 +268,24 @@ func ClassifyNames(r StoreReader, nodes []types.Node) (map[string]NameClass, err
 	return out, nil
 }
 
+// Declarations returns the nodes of nodes that are declarations of the
+// build an agent asks about by name (ClassifyName: NameDeclared or
+// NamePromoted), in order: not statement nodes, goroutines or names local to
+// a function, imports or External stubs.
+func Declarations(r StoreReader, nodes []types.Node) ([]types.Node, error) {
+	classes, err := ClassifyNames(r, nodes)
+	if err != nil {
+		return nil, err
+	}
+	out := nodes[:0:0]
+	for _, n := range nodes {
+		if c := classes[n.ID]; c == NameDeclared || c == NamePromoted {
+			out = append(out, n)
+		}
+	}
+	return out, nil
+}
+
 // NameResolution is what a caller-supplied symbol name resolved to: one
 // qualified name and its nodes, or the candidates of an ambiguous bare name,
 // or nothing.

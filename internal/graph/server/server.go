@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"sync"
@@ -154,20 +156,36 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // http.ErrServerClosed is suppressed because that is the expected outcome
 // of a clean Shutdown — surfacing it would force every caller to special-case it.
 func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", addr, err)
+	}
+	return s.Serve(ctx, ln)
+}
+
+// Serve serves on a listener the caller has already bound, so the caller
+// can report that it serves only after the bind succeeded. It closes ln
+// and returns when ctx is done or serving fails.
+func (s *Server) Serve(ctx context.Context, ln net.Listener) error {
 	srv := &http.Server{
-		Addr:              addr,
 		Handler:           s,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
+	stop := make(chan struct{})
+	defer close(stop)
 	go func() {
-		<-ctx.Done()
+		select {
+		case <-ctx.Done():
+		case <-stop:
+			return
+		}
 		// Use a detached context with a small deadline so in-flight requests
 		// get a chance to finish but a stuck handler can't pin the server.
 		shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(shutCtx)
 	}()
-	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 	return nil

@@ -25,7 +25,18 @@ import (
 // only when every branch that goes on holds it; a branch that returns, panics
 // or jumps away does not count), and a loop's state found by repeating its
 // body until the state at its head stops changing. `defer L.Unlock()` runs at
-// the end, so L stays held to the end of the function. A function literal is
+// the end, so L stays held to the end of the function.
+//
+// Deferred calls run when the function returns, last registered first, each
+// with what is held at that moment: what is held at the return (on every
+// path that returns), less what the defers that ran before it released. So
+// a defer registered after `defer L.Unlock()` runs while L is held, and the
+// Unlock itself runs with L held. A deferred function literal runs its body
+// then, starting with that state, and what its body leaves held is what the
+// next deferred call starts with (a literal that unlocks L, or returns a
+// channel lock's token, releases it for the defers registered before it).
+// A defer written in a branch counts as registered (the must-hold rule reads
+// the paths together). A function literal is
 // a function of its own and starts with nothing held, so a lock it takes does
 // not cover the code around it and the reverse; a literal called where it is
 // written (`func() { ... }()`) runs there and starts with what is held at the
@@ -114,6 +125,17 @@ type lockFlow struct {
 	// a mutex is held, with what is held there, for propagation.
 	calleeOf func(call *ast.CallExpr) (funcSource, bool)
 	calls    []heldCall
+	// sites are the calls, sends and receives made while a mutex is held,
+	// with what is held there (runs_under_lock).
+	sites []heldSite
+}
+
+// heldSite is the span of a call, send or receive and the mutexes held
+// where it runs: before it, so a Lock call is not under the mutex it takes
+// and an Unlock call is under the one it releases.
+type heldSite struct {
+	from, to token.Pos
+	held     heldMutexes
 }
 
 // heldCall is a call of a declared function made while held is held.
@@ -127,11 +149,21 @@ type funcWalk struct {
 	flow    *lockFlow
 	targets []*jumpTarget
 	returns []heldMutexes
-	// deferredUnlocks are the mutexes a deferred call unlocks at the end.
-	deferredUnlocks map[string]bool
+	// defers are the calls of the defer statements, in the order they are
+	// first registered, with the mutex each unlocks; registered holds each
+	// call once (a loop's body is walked more than once).
+	defers     []deferredCall
+	registered map[*ast.CallExpr]bool
 	// record says whether uses are recorded: off while a loop's state is
 	// still being found, on for the pass with the final state.
 	record bool
+}
+
+// deferredCall is the call of a defer statement and the mutex it unlocks,
+// or "".
+type deferredCall struct {
+	call    *ast.CallExpr
+	unlocks string
 }
 
 // body walks a function body that starts with entry held and returns what
@@ -141,17 +173,70 @@ func (f *lockFlow) body(b *ast.BlockStmt, entry heldMutexes, record bool) (heldM
 	if b == nil {
 		return entry, true
 	}
-	w := &funcWalk{flow: f, deferredUnlocks: map[string]bool{}, record: record}
+	w := &funcWalk{flow: f, registered: map[*ast.CallExpr]bool{}, record: record}
 	out, live := w.stmts(b.List, entry.clone())
 	ends := w.returns
 	if live {
 		ends = append(ends, out)
 	}
 	end, ok := meetHeld(ends)
-	for id := range w.deferredUnlocks {
-		delete(end, id)
+	if !ok {
+		return end, false
 	}
-	return end, ok
+	return w.runDefers(end), true
+}
+
+// runDefers runs the deferred calls at the return, where end is held, last
+// registered first (see the rule at the top), recording each call's site
+// with what is held when it runs and walking a deferred literal's body from
+// there. It returns what is held after the last of them.
+func (w *funcWalk) runDefers(end heldMutexes) heldMutexes {
+	held := end.clone()
+	for i := len(w.defers) - 1; i >= 0; i-- {
+		d := w.defers[i]
+		if runsCode(w.flow.info, d.call) {
+			w.site(d.call.Pos(), d.call.End(), held)
+		}
+		if lit, ok := ast.Unparen(d.call.Fun).(*ast.FuncLit); ok {
+			if after, ends := w.flow.body(lit.Body, held, w.record); ends {
+				held = after
+			}
+			continue
+		}
+		if d.unlocks != "" {
+			delete(held, d.unlocks)
+		}
+		if op, ok := w.flow.chanLocks[d.call.Lparen]; ok && op.Kind != ChanLockAcquire {
+			delete(held, op.Lock.ID) // defer close(lock)
+		}
+	}
+	return held
+}
+
+// runsCode reports whether call calls code: not a conversion and not a
+// builtin, other than close. Only such a call is a site that runs under a
+// lock. The rule for close: a close is a channel operation with a CallSite
+// of its own (sub kind close) and a closes fact; a close written where a
+// mutex is held, in place or deferred to a point where it is still held, is
+// a site under that mutex like any call, always (closing a channel while
+// holding a lock is what a reader of the close wants to know).
+//
+// A site is the call expression's span, not its start: new(T).M() starts
+// two calls at one byte, the call of new (a builtin, no site) and the call
+// of M (a site); siteLocks.facts finds the CallSite by both ends.
+func runsCode(info *gotypes.Info, call *ast.CallExpr) bool {
+	tv, ok := info.Types[call.Fun]
+	if !ok {
+		return true
+	}
+	if tv.IsType() {
+		return false
+	}
+	if tv.IsBuiltin() {
+		id, isID := ast.Unparen(call.Fun).(*ast.Ident)
+		return isID && id.Name == "close"
+	}
+	return true
 }
 
 func (w *funcWalk) stmts(list []ast.Stmt, held heldMutexes) (heldMutexes, bool) {
@@ -198,16 +283,28 @@ func (w *funcWalk) stmt(s ast.Stmt, held heldMutexes, label string) (heldMutexes
 			}
 		}
 		return after, true
-	case *ast.IncDecStmt, *ast.DeclStmt:
+	case *ast.DeclStmt:
+		// A constant is computed when the program is compiled: nothing in
+		// its declaration runs here.
+		if g, ok := x.Decl.(*ast.GenDecl); ok && g.Tok == token.CONST {
+			return held, true
+		}
+		return w.exprs(x, held), true
+	case *ast.IncDecStmt:
 		return w.exprs(x, held), true
 	case *ast.GoStmt:
 		w.callApart(x.Call, held)
 		return held, true
 	case *ast.DeferStmt:
+		d := deferredCall{call: x.Call}
 		if method, ok := lockMethodName(x.Call); ok && (method == lockMethodUnlock || method == lockMethodRUnlock) {
 			if mu := w.flow.mutexOf(x.Call.Fun.(*ast.SelectorExpr).X); mu != nil {
-				w.deferredUnlocks[mu.ID] = true
+				d.unlocks = mu.ID
 			}
+		}
+		if !w.registered[x.Call] {
+			w.registered[x.Call] = true
+			w.defers = append(w.defers, d)
 		}
 		w.callApart(x.Call, held)
 		return held, true
@@ -446,6 +543,7 @@ func (w *funcWalk) lockCall(call *ast.CallExpr, held heldMutexes) (heldMutexes, 
 	if mu == nil {
 		return held, false
 	}
+	w.site(call.Pos(), call.End(), held)
 	held = w.receiver(recv, mu, held)
 	next := held.clone()
 	if method == lockMethodLock || method == lockMethodRLock {
@@ -532,11 +630,20 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 		case *ast.FuncLit:
 			w.flow.body(x.Body, heldMutexes{}, w.record)
 			return false
+		case *ast.UnaryExpr:
+			if x.Op == token.ARROW {
+				w.site(x.Pos(), x.End(), held)
+			}
+		case *ast.SendStmt:
+			w.site(x.Pos(), x.End(), held)
 		case *ast.CallExpr:
 			lit, ok := ast.Unparen(x.Fun).(*ast.FuncLit)
 			if !ok {
 				// A call evaluated here runs here, with what is held
 				// (calls of go and defer statements do not come here).
+				if runsCode(w.flow.info, x) {
+					w.site(x.Pos(), x.End(), held)
+				}
 				if w.record && len(held) > 0 && w.flow.calleeOf != nil {
 					if callee, ok := w.flow.calleeOf(x); ok {
 						w.flow.calls = append(w.flow.calls, heldCall{callee: callee, held: held.clone()})
@@ -547,6 +654,8 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 			for _, a := range x.Args {
 				w.exprs(a, held)
 			}
+			// The call of a literal where it is written runs here too.
+			w.site(x.Pos(), x.End(), held)
 			end, ends := w.flow.body(lit.Body, held, w.record)
 			if ends {
 				kept := heldMutexes{}
@@ -563,6 +672,14 @@ func (w *funcWalk) exprs(n ast.Node, held heldMutexes) heldMutexes {
 		return true
 	})
 	return after
+}
+
+// site records the call, send or receive spanning [from, to) as run while
+// held is held.
+func (w *funcWalk) site(from, to token.Pos, held heldMutexes) {
+	if w.record && len(held) > 0 {
+		w.flow.sites = append(w.flow.sites, heldSite{from: from, to: to, held: held.clone()})
+	}
 }
 
 // declares reports whether field is the field that declares the mutex mu

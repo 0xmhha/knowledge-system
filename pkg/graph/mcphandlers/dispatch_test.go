@@ -27,11 +27,10 @@ func TestFindCallees_DispatchTargets(t *testing.T) {
 	if !ok {
 		t.Fatal("fixture has no coll1.useTip")
 	}
-	ns, es, err := seed.neighborhood(store, 1, false, callEdgeTypes...)
+	ns, _, err := forwardCallees(store, seed, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	ns, _, added := withDispatchTargets(store, ns, es)
 	got := qnames(ns)
 	for _, want := range []string{"coll1.Tipper.Tip", "coll1.govTip.Tip", "coll1.fixedTip.Tip"} {
 		if !hasQname(got, want) {
@@ -40,9 +39,6 @@ func TestFindCallees_DispatchTargets(t *testing.T) {
 	}
 	if hasQname(got, "coll1.unusedTip.Tip") {
 		t.Errorf("find_callees(useTip) names unusedTip.Tip, which no Tipper value holds")
-	}
-	if added != 2 {
-		t.Errorf("dispatch targets added = %d, want 2", added)
 	}
 }
 

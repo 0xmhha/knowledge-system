@@ -5,8 +5,8 @@
   "failed": 0,
   "aggregate": {
     "recall": 1,
-    "precision": 0.896551724137931,
-    "f1": 0.9454545454545454
+    "precision": 0.925,
+    "f1": 0.961038961038961
   },
   "results": [
     {
@@ -21,8 +21,8 @@
         "f1": 1
       },
       "got": [
-        "service.SafeVault.SafeDeposit",
-        "api.Handler.HandleDeposit"
+        "api.Handler.HandleDeposit",
+        "service.SafeVault.SafeDeposit"
       ]
     },
     {
@@ -37,6 +37,11 @@
         "f1": 1
       },
       "got": [
+        "builtin.error.Error",
+        "http.Error",
+        "http.ResponseWriter.WriteHeader",
+        "json.Decoder.Decode",
+        "json.NewDecoder",
         "service.Vault.Deposit"
       ]
     },
@@ -68,10 +73,9 @@
         "f1": 1
       },
       "got": [
-        "service.SafeVault.vault",
-        "Vault",
         "service.Vault",
-        "api.Handler.vault"
+        "Vault@sol-contract/contracts/Vault.sol:3",
+        "Vault@ts-frontend/src/contracts/Vault.ts:2"
       ]
     },
     {
@@ -108,15 +112,15 @@
       "got": [
         "service.Vault.Deposit",
         "domain.DepositRequest",
-        "domain.DepositRequest.Amount",
         "domain.DepositRequest.From",
+        "domain.DepositRequest.Amount",
         "service.SafeVault.SafeDeposit",
-        "api.Handler.HandleDeposit",
         "service.Vault",
         "api.Handler.vault",
         "service.SafeVault.vault",
         "service.Vault.wallets",
         "service/go-backend/service/vault.go",
+        "api.Handler.HandleDeposit",
         "service.New",
         "service.SafeVault.mu",
         "service.SafeVault.mu#mutex",
@@ -153,11 +157,11 @@
         "f1": 1
       },
       "got": [
+        "Vault@ts-frontend/src/contracts/Vault.ts:2",
         "VaultService",
-        "Vault",
         "VaultService.constructor",
         "VaultService.depositFn",
-        "Vault.deposit",
+        "Vault.deposit@ts-frontend/src/contracts/Vault.ts:3",
         "file:ts-frontend/src/contracts/Vault.ts",
         "file:ts-frontend/src/services/vault.ts"
       ]
@@ -174,10 +178,12 @@
         "f1": 1
       },
       "got": [
-        "Vault",
-        "Vault.deposit",
+        "Vault@sol-contract/contracts/Vault.sol:3",
+        "Vault.balances",
+        "Vault.deposit@sol-contract/contracts/Vault.sol:9",
+        "file:sol-contract/contracts/Vault.sol",
         "Vault.nonZero",
-        "file:sol-contract/contracts/Vault.sol"
+        "Vault.Deposited"
       ]
     },
     {
@@ -192,10 +198,10 @@
         "f1": 1
       },
       "got": [
-        "domain.DepositRequest",
         "service.Vault.Deposit",
-        "domain.DepositRequest.Amount",
+        "domain.DepositRequest",
         "domain.DepositRequest.From",
+        "domain.DepositRequest.Amount",
         "api.Handler.HandleDeposit",
         "service.SafeVault.SafeDeposit"
       ]
@@ -227,7 +233,9 @@
         "f1": 1
       },
       "got": [
-        "service.Vault.Deposit"
+        "service.Vault.Deposit",
+        "sync.Mutex.Lock",
+        "sync.Mutex.Unlock"
       ]
     },
     {
@@ -242,8 +250,8 @@
         "f1": 1
       },
       "got": [
-        "service.SafeVault.SafeDeposit",
-        "api.Handler.HandleDeposit"
+        "api.Handler.HandleDeposit",
+        "service.SafeVault.SafeDeposit"
       ]
     },
     {
@@ -263,8 +271,8 @@
       },
       "got": [
         "service.Vault.Deposit#IfStmt@276",
-        "api.Handler.HandleDeposit#IfStmt@337",
-        "api.Handler.HandleDeposit#IfStmt@445"
+        "api.Handler.HandleDeposit#IfStmt@445",
+        "api.Handler.HandleDeposit#IfStmt@337"
       ]
     }
   ]

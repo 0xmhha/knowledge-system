@@ -9,9 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/0xmhha/knowledge-system/internal/buildscope"
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
+	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
 )
 
 func newBuildCmd() *cobra.Command {
@@ -65,6 +68,9 @@ func newBuildCmd() *cobra.Command {
 			// fileRoles carries each scoped file's role to the build, so
 			// is_test follows the scope and not the file's name alone.
 			var fileRoles buildpipe.FileRoles
+			// spaces says which repository a pull request number belongs
+			// to, from the scope's history section.
+			var spaces temporal.NumberSpaces
 			if scopePath != "" {
 				if filesFrom != "" || len(filesFromMain) > 0 {
 					return fmt.Errorf("--scope cannot be combined with --files-from or --files-from-main")
@@ -74,6 +80,7 @@ func newBuildCmd() *cobra.Command {
 					return err
 				}
 				generatedFilter, goBuild = fl, b
+				spaces = numberSpaces(s.History)
 				fileRoles = make(buildpipe.FileRoles, len(s.Files))
 				for _, f := range s.Files {
 					fileRoles[f.Path] = buildpipe.FileRole(f.Role)
@@ -114,6 +121,7 @@ func newBuildCmd() *cobra.Command {
 				PolicyFile:          policyFile,
 				SecurityPatternFile: securityPatternFile,
 				TemporalDepth:       temporalDepth,
+				NumberSpaces:        spaces,
 			})
 			if err != nil {
 				return err
@@ -122,16 +130,17 @@ func newBuildCmd() *cobra.Command {
 			// build, so a plain success line would misreport a partial graph
 			// as complete. --fail-on-parse-errors turns that into a hard
 			// failure for CI / reproducible builds.
+			nodes, edges := builtCounts(m, effectiveOut, dbDsn)
 			if m.ParseErrorsCount > 0 {
 				_, _ = fmt.Fprintf(os.Stderr, "ckg: built %d nodes / %d edges into %s (%d files failed to parse and were skipped)\n",
-					m.Stats["nodes"], m.Stats["edges"], effectiveOut, m.ParseErrorsCount)
+					nodes, edges, effectiveOut, m.ParseErrorsCount)
 				if failOnParseErrors {
 					return fmt.Errorf("ckg: %d files failed to parse (--fail-on-parse-errors)", m.ParseErrorsCount)
 				}
 				return nil
 			}
 			_, _ = fmt.Fprintf(os.Stderr, "ckg: built %d nodes / %d edges into %s\n",
-				m.Stats["nodes"], m.Stats["edges"], effectiveOut)
+				nodes, edges, effectiveOut)
 			return nil
 		},
 	}
@@ -175,7 +184,7 @@ func newBuildCmd() *cobra.Command {
 	cmd.Flags().StringVar(&policyFile, "policy-file", "",
 		"path to governance/protocol policy YAML (pkg/policy); enriches the graph with NodePolicy + EdgeGovernedBy rows")
 	cmd.Flags().IntVar(&temporalDepth, "temporal-depth", 0,
-		"max commits per file the temporal pass walks for changed_in/Hunk/blame edges (0 = default 10; higher deepens commit history at ~linear graph-size cost; does not affect node_prs symbol history)")
+		"keep at most this many changed_in edges per file or declaration, newest first (0 = every commit that changed its lines); blame, hunks and node_prs are not capped by it")
 	cmd.Flags().StringVar(&securityPatternFile, "security-pattern-file", "",
 		"path to security risk pattern YAML (pkg/security); enriches the graph with NodeSecurityPattern + EdgeHasSecurityPattern rows")
 	cmd.Flags().BoolVar(&failOnParseErrors, "fail-on-parse-errors", false,
@@ -230,6 +239,27 @@ func checkoutWorktree(repoSrc, commit string) (string, func(), error) {
 	return wtDir, cleanup, nil
 }
 
+// builtCounts returns the node and edge counts a build reports: the rows
+// of the graph.db it wrote, which hold rows the build writes after its
+// manifest counts them (Policy nodes and governed_by edges). A build into
+// PostgreSQL (dsn set), or a graph.db that cannot be read, reports the
+// manifest's counts.
+func builtCounts(m persist.Manifest, outDir, dsn string) (nodes, edges int) {
+	nodes, edges = m.Stats["nodes"], m.Stats["edges"]
+	if dsn != "" {
+		return nodes, edges
+	}
+	store, err := persist.OpenReadOnly(filepath.Join(outDir, "graph.db"))
+	if err != nil {
+		return nodes, edges
+	}
+	defer func() { _ = store.Close() }()
+	if n, e, err := store.RowCounts(); err == nil {
+		return n, e
+	}
+	return nodes, edges
+}
+
 // resolveOutDir applies --out-tag to --out.
 func resolveOutDir(out, tag, srcRoot string) (string, error) {
 	if tag == "" {
@@ -262,4 +292,17 @@ func srcCommitHash(srcRoot string) (string, error) {
 		return "", fmt.Errorf("git log in %s: %w", absRoot, err)
 	}
 	return strings.TrimSpace(string(out)), nil
+}
+
+// numberSpaces turns a scope's history section into the build's pull request
+// number spaces; nil gives the zero value (every number is the origin's).
+func numberSpaces(h *buildscope.History) temporal.NumberSpaces {
+	if h == nil {
+		return temporal.NumberSpaces{}
+	}
+	ns := temporal.NumberSpaces{Repo: h.Repo}
+	if h.Upstream != nil {
+		ns.UpstreamRepo, ns.UpstreamBase = h.Upstream.Repo, h.Upstream.Base
+	}
+	return ns
 }

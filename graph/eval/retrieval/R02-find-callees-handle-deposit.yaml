@@ -16,6 +16,9 @@ expected:
     - "http.ResponseWriter.WriteHeader"
     - "json.Decoder.Decode"
     - "json.NewDecoder"
+    # err.Error() in both error branches: the method of the builtin error
+    # interface, a real callee.
+    - "builtin.error.Error"
 scoring:
   recall_min: 1.0
   precision_min: 0.0

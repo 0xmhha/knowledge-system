@@ -57,10 +57,12 @@ func spawnersOf(reader store.Reader, senders map[string]types.Node) (map[string]
 // goroutines that run the send (goroutines). A send in a function that
 // goroutines run has an edge from each, listed once; a send in a goroutine's
 // own literal names the function that starts the goroutine (spawner).
-func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string]types.Node, spawner map[string]types.Node) map[string][]map[string]any {
+func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string]types.Node, spawner map[string]types.Node,
+	closes map[lineAt]bool) map[string][]map[string]any {
 	type sendKey struct {
 		recv, channel string
 		line          int
+		by            string
 	}
 	type group struct {
 		fn     []string
@@ -74,7 +76,7 @@ func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string
 		if !ok {
 			continue
 		}
-		k := sendKey{e.Dst, e.DispatchKind, e.Line}
+		k := sendKey{e.Dst, e.DispatchKind, e.Line, wakeKind(e, closes)}
 		g := groups[k]
 		if g == nil {
 			g = &group{}
@@ -100,7 +102,8 @@ func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string
 			// The goroutine's own literal sends: the function that starts
 			// it is the sender.
 			for i, name := range g.gors {
-				row := map[string]any{"sender": name, "line": k.line, "channel": k.channel}
+				row := map[string]any{"sender": name}
+				wakeRow(row, k.by, k.line, k.channel)
 				if f, ok := spawner[g.gorIDs[i]]; ok {
 					row["sender"], row["goroutines"] = store.PrintedName(reader, f), []string{name}
 				}
@@ -109,7 +112,8 @@ func sendersByReceive(reader store.Reader, trig []types.Edge, senders map[string
 			continue
 		}
 		for _, name := range g.fn {
-			row := map[string]any{"sender": name, "line": k.line, "channel": k.channel}
+			row := map[string]any{"sender": name}
+			wakeRow(row, k.by, k.line, k.channel)
 			if len(g.gors) > 0 {
 				row["goroutines"] = g.gors
 			}
@@ -172,7 +176,15 @@ func addHandledBy(reader store.Reader, seed seedRef, out map[string]any) error {
 	if err != nil {
 		return err
 	}
-	sendersOf := sendersByReceive(reader, trig, senders, spawner)
+	closes, err := closeLines(reader, idsOf(nodeList(senders)))
+	if err != nil {
+		return err
+	}
+	runtime, err := runtimeWakes(reader, recvIDs)
+	if err != nil {
+		return err
+	}
+	sendersOf := sendersByReceive(reader, trig, senders, spawner, closes)
 	rows := []map[string]any{}
 	for _, e := range handles {
 		r, ok := recvs[e.Src]
@@ -183,6 +195,20 @@ func addHandledBy(reader store.Reader, seed seedRef, out map[string]any) error {
 			"call": store.PrintedName(reader, sites[e.Dst]), "call_line": e.Line}
 		if s := sendersOf[r.ID]; len(s) > 0 {
 			row["senders"] = s
+		} else if w, ok := runtime[r.ID]; ok {
+			// The runtime sends when a timer fires; a context's Done is
+			// closed when it is cancelled.
+			for k, v := range w {
+				row[k] = v
+			}
+		} else if w, held, err := heldChannelWake(reader, r); err != nil {
+			return err
+		} else if held {
+			// A field holding ctx.Done(), or a channel handed to a
+			// subscription.
+			for k, v := range w {
+				row[k] = v
+			}
 		} else {
 			// The channel comes from outside the build (time.Tick, a
 			// library), or nothing in the build sends on it.
@@ -243,14 +269,19 @@ func addTriggers(reader store.Reader, seed seedRef, out map[string]any) error {
 		}
 		handledOf[e.Src] = append(handledOf[e.Src], h)
 	}
+	closes, err := closeLines(reader, idsOf(own))
+	if err != nil {
+		return err
+	}
 	rows := []map[string]any{}
 	for _, e := range trig {
 		r, ok := recvs[e.Dst]
 		if !ok {
 			continue
 		}
-		row := map[string]any{"receive": store.PrintedName(reader, r), "file": r.FilePath, "line": r.StartLine,
-			"channel": e.DispatchKind, "send_line": e.Line}
+		by := wakeKind(e, closes)
+		row := map[string]any{"receive": store.PrintedName(reader, r), "file": r.FilePath, "line": r.StartLine}
+		wakeRow(row, by, e.Line, e.DispatchKind)
 		if h := handledOf[r.ID]; len(h) > 0 {
 			row["handles"] = h
 		}
@@ -309,6 +340,16 @@ func putRows(out map[string]any, key string, rows []map[string]any) {
 		rows = rows[:messageLimit]
 	}
 	out[key] = rows
+}
+
+// nodeList returns the nodes of a map by id, in id order.
+func nodeList(m map[string]types.Node) []types.Node {
+	out := make([]types.Node, 0, len(m))
+	for _, n := range m {
+		out = append(out, n)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
 }
 
 // idsOf returns the ids of nodes.

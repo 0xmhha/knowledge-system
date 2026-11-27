@@ -114,7 +114,7 @@ eval: build-no-viewer
 	@echo "  → eval/results/latest/validate.json"
 	@echo
 	@echo "=== ckg eval: step 3/5 — benchmark (token reduction) ==="
-	./bin/ckg benchmark --graph=eval/.ckg-data --format=json > eval/results/latest/benchmark.json
+	./bin/ckg benchmark --graph=eval/.ckg-data --src=.. --format=json > eval/results/latest/benchmark.json
 	@echo "  → eval/results/latest/benchmark.json"
 	@echo
 	@echo "=== ckg eval: step 4/5 — bench-mcp (latency, depth sweep) ==="

@@ -64,6 +64,11 @@ type Truth struct {
 	// DynamicCallSites counts calls through a function value, method value or
 	// closure: go/types gives them no callee, so there is no pair to check.
 	DynamicCallSites int
+	// DynamicSites are those calls with what the called value is;
+	// StaticLines the lines of each caller with a static call, whose calls
+	// edges are not a dynamic site's target.
+	DynamicSites []DynamicSite
+	StaticLines  map[string]map[int]bool
 	// CallsOutsideFuncs counts static calls in package-level initialisers.
 	// They have no enclosing function and are not compared.
 	CallsOutsideFuncs int
@@ -89,6 +94,16 @@ type Truth struct {
 	GoroutineLocalChans map[[2]string]bool
 	// Messages are the handles and triggers facts (messages.go).
 	Messages *messageFacts
+	// Exec are the closes, operates_on and runs_func facts (execorder.go).
+	Exec *execFacts
+	// SiteLocks are the (site, mutex) pairs of runs_under_lock: a call,
+	// send or receive made where the mutex is held (underlock.go); a site
+	// is keyed by its file and span. SiteLocksPropagated are those held by
+	// a caller, less the direct ones.
+	SiteLocks, SiteLocksPropagated map[[2]string]bool
+	// Extents are the BranchStmt, CaseClause, DeferStmt and FuncLit facts:
+	// file, type, sub kind and lines (extents.go).
+	Extents map[string]bool
 	// Load is what the go command reported while loading the truth's
 	// packages; Modules compares the outside modules with the scope's.
 	Load    detect.LoadProblems
@@ -128,7 +143,8 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	// The truth comes from the same go command as the graph. When it cannot
 	// load a package, both lose the same references and agree, so the
 	// problems are reported with the comparison.
-	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, UnderLockPropagated: map[[2]string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
+	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, UnderLockPropagated: map[[2]string]bool{},
+		SiteLocks: map[[2]string]bool{}, SiteLocksPropagated: map[[2]string]bool{}, Extents: map[string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}
@@ -163,6 +179,7 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	t.Dispatch = pf.dispatchTruth()
 	t.GoroutineChans, t.GoroutineChansUndecided, t.GoroutineLocalChans = pf.goChan, pf.undecidedChan, pf.localChan
 	t.Messages = pf.msg
+	t.Exec = pf.exec
 	t.StaticCalls = static.sorted()
 	t.InterfaceCalls = iface.sorted()
 	t.TypeRefs = typeRefs.sorted()
@@ -203,6 +220,9 @@ func (s pairSet) sorted() []Pair {
 }
 
 type fileWalker struct {
+	// returnsTo names the function whose body statements walks (a return
+	// outside every literal goes there), "" outside one.
+	returnsTo string
 	t         *Truth
 	info      *gotypes.Info
 	fset      *token.FileSet
@@ -218,13 +238,19 @@ type fileWalker struct {
 	funcs     map[token.Position]truthFunc
 	calls     *[]truthCall
 	chanLocks chanLockNames
+	// locals and funcSpans are the local variables and the functions of
+	// the file (valuecalls.go).
+	locals    map[*gotypes.Var]*localValue
+	funcSpans []ast.Node
 }
 
 func (w *fileWalker) walk(f *ast.File) {
 	// The file's bytes, for the blanks between a function and the comment
 	// after it; without them a function ends at its last token.
 	src, _ := os.ReadFile(filepath.Join(w.root, filepath.FromSlash(w.rel)))
-	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock, funcs: w.funcs, calls: w.calls, chanLocks: w.chanLocks}
+	w.localValues(f)
+	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock, sites: w.t.SiteLocks,
+		funcs: w.funcs, calls: w.calls, chanLocks: w.chanLocks}
 	for _, d := range f.Decls {
 		switch d := d.(type) {
 		case *ast.FuncDecl:
@@ -428,6 +454,7 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 			fn = fn.Origin()
 		}
 		w.addCall(w.static, Pair{From: caller, File: w.rel, Line: line, InClosure: inClosure}, fn)
+		w.t.markStaticLine(caller, line)
 		return
 	}
 	if sel, ok := ast.Unparen(c.Fun).(*ast.SelectorExpr); ok {
@@ -444,7 +471,20 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 	if tv, ok := w.info.Types[c.Fun]; ok && (tv.IsType() || tv.IsBuiltin()) {
 		return // conversion or builtin, not a call to code
 	}
+	if _, lit := ast.Unparen(c.Fun).(*ast.FuncLit); lit {
+		// A literal called where it is written: the caller's own code.
+		w.t.DynamicCallSites++
+		w.t.DynamicSites = append(w.t.DynamicSites, DynamicSite{Caller: caller, File: w.rel, Line: line, Cause: causeOwnLiteral})
+		return
+	}
+	fn, cause := w.valueCallee(c)
+	if fn != nil {
+		// A local set once to a function: a static call (valuecalls.go).
+		w.addCall(w.static, Pair{From: caller, File: w.rel, Line: line, InClosure: inClosure}, fn)
+		return
+	}
 	w.t.DynamicCallSites++
+	w.t.DynamicSites = append(w.t.DynamicSites, DynamicSite{Caller: caller, File: w.rel, Line: line, Cause: cause})
 }
 
 // addCall records the call p of fn: in set when fn is declared in a covered

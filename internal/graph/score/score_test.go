@@ -90,3 +90,23 @@ func TestPageRankIgnoresTypeHierarchy(t *testing.T) {
 		}
 	}
 }
+
+// A dispatch marker (an invokes edge from a node to itself carrying the
+// dispatch kind of a call through a function value) is not a dependency:
+// it does not move PageRank.
+func TestPageRankIgnoresDispatchMarkers(t *testing.T) {
+	base := triangle()
+	score.Compute(base)
+	g := triangle()
+	a := g.Nodes[0].ID
+	for range 19 {
+		g.Edges = append(g.Edges, types.Edge{Src: a, Dst: a, Type: types.EdgeInvokes, DispatchKind: "func_value", Count: 1,
+			Confidence: types.ConfInferred})
+	}
+	score.Compute(g)
+	for i := range g.Nodes {
+		if math.Abs(g.Nodes[i].PageRank-base.Nodes[i].PageRank) > 1e-9 {
+			t.Errorf("%s: rank %.6f with markers, %.6f without", g.Nodes[i].ID, g.Nodes[i].PageRank, base.Nodes[i].PageRank)
+		}
+	}
+}

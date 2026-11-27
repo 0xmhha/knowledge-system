@@ -89,8 +89,8 @@ func buildManifestSkeleton(opt Options, goCount, tsCount, solCount, protoCount i
 			"go": goCount, "ts": tsCount, "sol": solCount, "proto": protoCount,
 		},
 		Stats: map[string]int{
-			"nodes":          len(g.Nodes),
-			"edges":          len(g.Edges),
+			statNodes:        len(g.Nodes),
+			statEdges:        len(g.Edges),
 			"pkg_tree_edges": len(pkgTree.Edges),
 		},
 		GraphDigest:      ComputeGraphDigest(g.Nodes, g.Edges),

@@ -5,8 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	mcp "github.com/mark3labs/mcp-go/mcp"
-
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
@@ -77,76 +75,6 @@ func hasDispatch(reader store.Reader) bool {
 	return has
 }
 
-// withDispatchTargets adds, for every interface method the walk reached
-// through an invokes edge, the implementations its dispatches_to edges name,
-// without counting that step as a hop: a call through an interface reaches
-// the implementation at the same depth as a static call reaches its callee.
-func withDispatchTargets(reader store.Reader, nodes []types.Node, edges []types.Edge) ([]types.Node, []types.Edge, int) {
-	have := map[string]bool{}
-	for _, n := range nodes {
-		have[n.ID] = true
-	}
-	var ifaces []string
-	seen := map[string]bool{}
-	for _, e := range edges {
-		if e.Type == types.EdgeInvokes && e.DispatchKind == "interface_method" && have[e.Dst] && !seen[e.Dst] {
-			seen[e.Dst] = true
-			ifaces = append(ifaces, e.Dst)
-		}
-	}
-	if len(ifaces) == 0 {
-		return nodes, edges, 0
-	}
-	ns, es, err := reader.NeighborhoodByIDs(ifaces, 1, false, string(types.EdgeDispatchesTo))
-	if err != nil {
-		return nodes, edges, 0
-	}
-	// Value-flow targets of an interface method hide its type-hierarchy
-	// ones; a method with no value-flow target keeps the type hierarchy's.
-	flow := map[string]bool{}
-	for _, e := range es {
-		if e.DispatchKind == "interface_method" {
-			flow[e.Src] = true
-		}
-	}
-	keep := map[string]bool{}
-	var kept []types.Edge
-	for _, e := range es {
-		if e.DispatchKind == "type_hierarchy" && flow[e.Src] {
-			continue
-		}
-		keep[e.Dst] = true
-		kept = append(kept, e)
-	}
-	es = kept
-	var ns2 []types.Node
-	for _, n := range ns {
-		if keep[n.ID] {
-			ns2 = append(ns2, n)
-		}
-	}
-	ns = ns2
-	edgeSeen := map[string]bool{}
-	for _, e := range edges {
-		edgeSeen[e.Src+"|"+e.Dst+"|"+string(e.Type)] = true
-	}
-	added := 0
-	for _, n := range ns {
-		if !have[n.ID] {
-			have[n.ID] = true
-			nodes = append(nodes, n)
-			added++
-		}
-	}
-	for _, e := range es {
-		if k := e.Src + "|" + e.Dst + "|" + string(e.Type); !edgeSeen[k] {
-			edgeSeen[k] = true
-			edges = append(edges, e)
-		}
-	}
-	return nodes, edges, added
-}
-
 // implementsSeeds is the type-hierarchy bridge: the same-named method on
 // each interface the seed's receiver type implements.
 func implementsSeeds(reader store.Reader, methodQname string) []string {
@@ -206,8 +134,8 @@ func leafOf(q string) string {
 }
 
 // reverseCallersUnion walks the reverse call graph from `resolved` AND from every
-// interface method it satisfies (the interface-dispatch bridge), unioning the
-// nodes/edges. Dedups nodes by ID and edges by (src,dst,type).
+// interface method it satisfies (the interface-dispatch bridge). See walkCalls
+// for how hops are counted.
 func reverseCallersUnion(reader store.Reader, resolved seedRef, depth int) ([]types.Node, []types.Edge, error) {
 	return reverseCallersUnionTraced(reader, resolved, depth, nil)
 }
@@ -221,40 +149,24 @@ func reverseCallersUnionTraced(reader store.Reader, resolved seedRef, depth int,
 		seeds = append(seeds, seedRef{QName: q})
 	}
 	t.add("interface_seeds", map[string]any{"source": source, "seeds": ifaces})
-	nodeByID := map[string]types.Node{}
-	edgeSeen := map[string]struct{}{}
-	var edges []types.Edge
+	var ids []string
 	for _, sd := range seeds {
-		ns, es, err := sd.neighborhood(reader, depth, true /*reverse*/, callEdgeTypes...)
+		sdIDs, err := sd.nodeIDs(reader)
 		if err != nil {
 			return nil, nil, err
 		}
-		for _, n := range ns {
-			nodeByID[n.ID] = n
-		}
-		for _, e := range es {
-			k := e.Src + "|" + e.Dst + "|" + string(e.Type)
-			if _, ok := edgeSeen[k]; ok {
-				continue
-			}
-			edgeSeen[k] = struct{}{}
-			edges = append(edges, e)
-		}
+		ids = append(ids, sdIDs...)
 	}
-	nodes := make([]types.Node, 0, len(nodeByID))
-	for _, n := range nodeByID {
-		nodes = append(nodes, n)
-	}
-	// Map order differs on every call; the answer must not.
-	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
-	return nodes, edges, nil
+	return walkCalls(reader, ids, depth, true /*reverse*/)
 }
 
-// textResult wraps a payload in the mcp-go structured-result envelope.
-// All handlers route their JSON payload through here so the response
-// shape stays uniform across the tool set.
-func textResult(payload any) *mcp.CallToolResult {
-	return mcp.NewToolResultStructured(payload, "")
+// forwardCallees walks the forward call graph from the seed.
+func forwardCallees(reader store.Reader, seed seedRef, depth int) ([]types.Node, []types.Edge, error) {
+	ids, err := seed.nodeIDs(reader)
+	if err != nil {
+		return nil, nil, err
+	}
+	return walkCalls(reader, ids, depth, false /*reverse*/)
 }
 
 // callEdgeTypes are the edge types find_callers / find_callees follow.
@@ -330,6 +242,22 @@ func (s seedRef) subgraph(reader store.Reader, depth int) ([]types.Node, []types
 	// Map order differs on every call; the answer must not.
 	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID < nodes[j].ID })
 	return nodes, append(fwdE, revE...), nil
+}
+
+// nodeIDs returns the ids of the seed's own nodes.
+func (s seedRef) nodeIDs(reader store.Reader) ([]string, error) {
+	if len(s.IDs) > 0 {
+		return s.IDs, nil
+	}
+	ns, err := s.nodes(reader)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, 0, len(ns))
+	for _, n := range ns {
+		ids = append(ids, n.ID)
+	}
+	return ids, nil
 }
 
 // nodes returns the seed's own nodes.
@@ -483,6 +411,11 @@ func attachBlobs(reader store.Reader, nodes []types.Node, include bool) []map[st
 		// unambiguous seed to the traversal tools. Omitted when empty.
 		if n.CanonicalID != "" {
 			m["canonical_id"] = n.CanonicalID
+		}
+		// The operations on a sync primitive at a site whose primitive the
+		// graph does not name, and why (the legend explains them).
+		if len(n.SyncUnknown) > 0 {
+			m["sync_unknown"] = n.SyncUnknown
 		}
 		if include {
 			if b, err := reader.GetBlob(n.ID); err == nil {

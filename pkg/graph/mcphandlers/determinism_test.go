@@ -88,6 +88,7 @@ var determinismCalls = [][]struct {
 	{{"impact_of_change", map[string]any{"seed_qname": "fanin.leaf"}}},
 	{{"concurrency_impact", map[string]any{"seed_qname": "fanin.hub"}}},
 	{{"change_history", map[string]any{"qname": "fanin.hub"}}},
+	{{"execution_flow", map[string]any{"qname": "fanin.hub"}}, {"execution_flow", map[string]any{"qname": "fanin.leaf", "direction": "backward"}}},
 	{{"evidence_for_intent", map[string]any{"intent": "hub leaf"}}},
 	{{"search_text", map[string]any{"query": "caller"}}},
 	{{"find_symbol", map[string]any{"name": "hub", "exact": false}}},
@@ -131,14 +132,15 @@ func runSequence(t *testing.T, store persist.StoreReader, calls []struct {
 		if err != nil {
 			t.Fatalf("%s: %v", c.tool, err)
 		}
-		out.Write(elapsedMicros.ReplaceAll(raw, []byte(`"elapsed_micros":0`)))
+		out.Write(elapsedMicros.ReplaceAll(raw, []byte(`elapsed_micros${q}:0`)))
 		out.WriteByte('\n')
 	}
 	return out.Bytes()
 }
 
-// elapsedMicros matches the measured time in a response.
-var elapsedMicros = regexp.MustCompile(`"elapsed_micros":\d+`)
+// elapsedMicros matches the measured time in a response, in the structured
+// content and in the text block, where the quote is escaped.
+var elapsedMicros = regexp.MustCompile(`elapsed_micros(?P<q>\\?"):\d+`)
 
 // TestToolsAreDeterministic: the same calls give the same bytes, on a fresh
 // server each time and on two stores built from the same nodes. A search hit
@@ -228,6 +230,8 @@ func TestExpandTotalIsFindCallersAtDepthOne(t *testing.T) {
 // canonical_id it had while such rows shared the plain qname (535 search
 // hits on go-stablenet lost it).
 func TestIndexKeepsCanonicalIDOfSharedName(t *testing.T) {
+	// The budgets below are sized for one copy of the answer.
+	withContentMode(t, ContentStructured)
 	old := searchCodePageBytes
 	t.Cleanup(func() { searchCodePageBytes = old })
 	searchCodePageBytes = 2500

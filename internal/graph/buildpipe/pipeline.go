@@ -11,6 +11,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
@@ -21,6 +22,7 @@ import (
 	solp "github.com/0xmhha/knowledge-system/internal/graph/parse/solidity"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/score"
+	"github.com/0xmhha/knowledge-system/internal/graph/temporal"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -33,14 +35,14 @@ import (
 // exist. The build wipes the store first (openColdStore).
 func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	log *slog.Logger, strict bool,
-	temporalDepth int, filter *filterlist.FilterList,
-) (*cluster.PkgTree, *cluster.TopicTree, map[string][]byte, error) {
+	history HistoryOptions, filter *filterlist.FilterList,
+) (*cluster.PkgTree, *cluster.TopicTree, temporalResult, error) {
 	if solParser != nil {
 		abi := convertABI(solParser.ABI())
 		xlEdges := link.SolToTS(g.Nodes, abi)
 		g.Edges = append(g.Edges, xlEdges...)
 		if _, err := validateAndSanitize(g, log, "xlang", strict); err != nil {
-			return nil, nil, nil, err
+			return nil, nil, temporalResult{}, err
 		}
 		log.Info("xlang linked", "binds_to", len(xlEdges))
 	}
@@ -53,7 +55,7 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	g.Nodes = newNodes
 	g.Edges = newEdges
 	if _, err := validateAndSanitize(g, log, "http_match", strict); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, temporalResult{}, err
 	}
 	log.Info("http client matching",
 		"rewired", httpResult.Rewired,
@@ -61,12 +63,12 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 		"wildcard_hits", httpResult.WildcardHits,
 		"ambiguous_retained", httpResult.AmbiguousRetained,
 		"placeholders_dropped", httpResult.PlaceholdersDropped)
-	hunkBlobs, err := emitTemporalEdges(g, srcRoot, log, temporalDepth, filter)
+	hist, err := emitTemporalEdges(g, srcRoot, log, history, filter)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("temporal: %w", err)
+		return nil, nil, temporalResult{}, fmt.Errorf("temporal: %w", err)
 	}
 	if _, err := validateAndSanitize(g, log, "temporal", strict); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, temporalResult{}, err
 	}
 	// Scores first: topic labels name each community after its highest-
 	// PageRank member (cluster.LabelCommunity), so PageRank must be filled
@@ -75,7 +77,7 @@ func emitDerivedPasses(g *graph.Graph, srcRoot string, solParser *solp.Parser,
 	score.Compute(g)
 	pkgTree := cluster.BuildPkgTree(g)
 	topicTree := cluster.BuildTopicTree(g, []float64{0.5, 1.0, 2.0}, 42)
-	return pkgTree, topicTree, hunkBlobs, nil
+	return pkgTree, topicTree, hist, nil
 }
 
 // Options controls one ckg build invocation.
@@ -146,13 +148,13 @@ type Options struct {
 	// means "no security enrichment".
 	SecurityPatternFile string
 
-	// TemporalDepth caps the per-file commit count the temporal pass
-	// walks when emitting Commit/Hunk nodes and changed_in/blame edges.
-	// 0 (the zero value) means "use the built-in default" (temporalDepthDefault
-	// = 10). Raising it deepens commit-level history at a roughly linear cost
-	// in Commit/Hunk nodes, changed_in edges, and graph size; node_prs symbol
-	// history is independent of this cap (see pr_history.go).
+	// TemporalDepth caps the changed_in edges kept per node, newest first.
+	// 0 (the zero value) keeps every commit that changed the node's lines.
 	TemporalDepth int
+	// NumberSpaces says which repository a pull request number belongs to
+	// (from the scope's history section); the zero value reads every number
+	// as one of the origin repository.
+	NumberSpaces temporal.NumberSpaces
 }
 
 // resolveFilter returns the effective include/exclude filter for the build:
@@ -342,7 +344,8 @@ func runCold(opt Options, log *slog.Logger,
 	// by temporal living only in cold; the helper makes that recurrence
 	// structurally impossible.
 	log.Debug("metrics.start")
-	pkgTree, topicTree, hunkBlobs, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate, opt.TemporalDepth, filter)
+	pkgTree, topicTree, hist, err := emitDerivedPasses(g, opt.SrcRoot, solParser, log, opt.StrictValidate,
+		HistoryOptions{Depth: opt.TemporalDepth, Spaces: opt.NumberSpaces}, filter)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -361,23 +364,20 @@ func runCold(opt Options, log *slog.Logger,
 			_ = store.Close()
 		}
 	}()
-	if err := persistColdArtifacts(store, opt.SrcRoot, g, pkgTree, topicTree, hunkBlobs); err != nil {
+	persistStarted := time.Now()
+	log.Info("persist: writing the graph", "nodes", len(g.Nodes), "edges", len(g.Edges), "blobs", len(hist.hunkBlobs))
+	if err := persistColdArtifacts(store, opt.SrcRoot, g, pkgTree, topicTree, hist.hunkBlobs, log); err != nil {
 		return persist.Manifest{}, err
 	}
-	// PR breadcrumb (schema 1.12): scan git log for PR-tagged
-	// commits and persist the node ↔ PR mapping. Runs after the node
-	// rows land so the node_prs FK has its targets. Failure here is
-	// logged but non-fatal — PR metadata is strictly additive and a
-	// missing remote (non-git source tree, sparse clone, etc.) must
-	// not break the cold build.
-	prByNode, prErr := ScanPRHistory(opt.SrcRoot, g.Nodes)
-	if prErr != nil {
-		log.Warn("scan pr_history failed; node_prs left empty", "err", prErr)
-	} else if len(prByNode) > 0 {
-		if err := store.InsertNodePRs(prByNode); err != nil {
+	log.Info("persist: graph written", "seconds", time.Since(persistStarted).Seconds())
+	// PR breadcrumb (schema 1.12): the pull requests whose commits changed
+	// each node's lines, from the history pass. Runs after the node rows
+	// land so the node_prs FK has its targets.
+	if len(hist.prRefs) > 0 {
+		if err := store.InsertNodePRs(hist.prRefs); err != nil {
 			return persist.Manifest{}, fmt.Errorf("persist node_prs: %w", err)
 		}
-		log.Info("pr_history emitted", "nodes_with_prs", len(prByNode))
+		log.Info("pr_history emitted", "nodes_with_prs", len(hist.prRefs))
 	}
 	// Policy metadata (schema 1.14): load the operator-supplied
 	// YAML, resolve governs[] qnames against the parsed graph, persist
@@ -394,10 +394,25 @@ func runCold(opt Options, log *slog.Logger,
 	// see graph_digest.go).
 	var enrichNodes []types.Node
 	var enrichEdges []types.Edge
+	var inputs []persist.OptionalInput
+	rowPath := func(kind, given string) string {
+		if given == "" {
+			return ""
+		}
+		in, err := describeInput(kind, given, opt.SrcRoot)
+		if err != nil {
+			log.Warn("optional input not readable", "kind", kind, "err", err)
+		}
+		inputs = append(inputs, in)
+		return in.RowPath
+	}
+	policyRows := rowPath(inputPolicyFile, opt.PolicyFile)
+	securityRows := rowPath(inputSecurityPatternFile, opt.SecurityPatternFile)
 	if policyNodes, policyEdges, perr := loadPolicy(opt.PolicyFile, g.Nodes, log); perr != nil {
 		log.Warn("policy enrichment failed; policy nodes/edges left empty",
 			"file", opt.PolicyFile, "err", perr)
 	} else if len(policyNodes) > 0 {
+		relocateRows(policyNodes, policyEdges, policyRows)
 		if err := store.InsertNodes(policyNodes); err != nil {
 			return persist.Manifest{}, fmt.Errorf("persist policy nodes: %w", err)
 		}
@@ -422,6 +437,7 @@ func runCold(opt Options, log *slog.Logger,
 		log.Warn("security enrichment failed; security nodes/edges left empty",
 			"file", opt.SecurityPatternFile, "err", serr)
 	} else if len(secNodes) > 0 {
+		relocateRows(secNodes, secEdges, securityRows)
 		if err := store.InsertNodes(secNodes); err != nil {
 			return persist.Manifest{}, fmt.Errorf("persist security nodes: %w", err)
 		}
@@ -443,11 +459,14 @@ func runCold(opt Options, log *slog.Logger,
 	m := buildManifestSkeleton(opt, len(goFiles), len(files.TS), len(files.Sol), len(files.Proto),
 		g, pkgTree, parseErrs)
 	m.UnresolvedRefsCount = unresolvedTotal(resolved)
+	m.History = hist.record
 	m.GoLoadErrorsCount = goLoadErrors(resolved)
 	// buildManifestSkeleton computes EnrichDigest from g, which is code-only, so
 	// it is always "" here. Recompute it over the overlay actually injected into
 	// the store so the manifest pins the enrichment (empty when none was applied).
 	m.EnrichDigest = ComputeEnrichDigest(enrichNodes, enrichEdges)
+	countEnrichment(m.Stats, len(enrichNodes), len(enrichEdges))
+	m.OptionalInputs = inputs
 	// Files: every discovered file becomes an entry. This is the cache
 	// fingerprint that subsequent builds will diff against. We computed
 	// SHAs / cache_keys lazily here — once per cold build, so the cost
@@ -470,7 +489,8 @@ func runCold(opt Options, log *slog.Logger,
 	}
 	committed = true
 	log.Info("build complete",
-		"nodes", len(g.Nodes), "edges", len(g.Edges),
+		"nodes", m.Stats[statNodes], "edges", m.Stats[statEdges],
+		"enrichment_nodes", m.Stats[statEnrichmentNodes], "enrichment_edges", m.Stats[statEnrichmentEdges],
 		"pkg_tree_edges", len(pkgTree.Edges),
 		"topic_resolutions", len(topicTree.Resolutions))
 	return m, nil
@@ -548,25 +568,34 @@ type TopicTreeForPersist = persist.TopicTreeInput
 // CodeNode source slices and hunk patches under the same blobs.node_id PK.
 func persistColdArtifacts(store persist.Store, srcRoot string,
 	g *graph.Graph, pkgTree *cluster.PkgTree, topicTree TopicTreeForPersist,
-	hunkBlobs map[string][]byte) error {
-	if err := store.InsertNodes(g.Nodes); err != nil {
+	hunkBlobs map[string][]byte, log *slog.Logger) error {
+	step := func(name string, count int, run func() error) error {
+		started := time.Now()
+		if err := run(); err != nil {
+			return err
+		}
+		log.Info("persist: "+name, "rows", count, "seconds", time.Since(started).Seconds())
+		return nil
+	}
+	if err := step("nodes written", len(g.Nodes), func() error { return store.InsertNodes(g.Nodes) }); err != nil {
 		return err
 	}
-	if err := store.InsertEdges(g.Edges); err != nil {
+	if err := step("edges written", len(g.Edges), func() error { return store.InsertEdges(g.Edges) }); err != nil {
 		return err
 	}
-	if err := store.InsertPkgTreeFromCluster(pkgTree.PersistEdges()); err != nil {
+	pkgEdges := pkgTree.PersistEdges()
+	if err := step("package tree written", len(pkgEdges), func() error { return store.InsertPkgTreeFromCluster(pkgEdges) }); err != nil {
 		return err
 	}
-	if err := store.InsertTopicTree(topicTree); err != nil {
+	if err := step("topic tree written", 0, func() error { return store.InsertTopicTree(topicTree) }); err != nil {
 		return err
 	}
 	blobs := extractBlobs(srcRoot, g.Nodes)
 	maps.Copy(blobs, hunkBlobs)
-	if err := store.InsertBlobs(blobs); err != nil {
+	if err := step("blobs written", len(blobs), func() error { return store.InsertBlobs(blobs) }); err != nil {
 		return err
 	}
-	return store.RebuildFTS()
+	return step("search index rebuilt", len(g.Nodes), store.RebuildFTS)
 }
 
 // computeColdFileEntries hashes every discovered file and returns FileEntry
@@ -677,4 +706,23 @@ func writeManifestJSON(path string, m persist.Manifest) error {
 		return fmt.Errorf("marshal manifest: %w", err)
 	}
 	return os.WriteFile(path, buf, 0o644)
+}
+
+// Manifest stats keys. nodes and edges count every row the graph database
+// holds; the enrichment keys say how many of them are the operator-injected
+// overlay (policy and security pattern nodes and their edges).
+const (
+	statNodes           = "nodes"
+	statEdges           = "edges"
+	statEnrichmentNodes = "enrichment_nodes"
+	statEnrichmentEdges = "enrichment_edges"
+)
+
+// countEnrichment adds the overlay rows, which the code graph g does not
+// hold, to the node and edge counts, so the counts agree with the database.
+func countEnrichment(stats map[string]int, nodes, edges int) {
+	stats[statNodes] += nodes
+	stats[statEdges] += edges
+	stats[statEnrichmentNodes] = nodes
+	stats[statEnrichmentEdges] = edges
 }

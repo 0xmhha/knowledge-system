@@ -1,6 +1,7 @@
 package mcphandlers
 
 import (
+	"encoding/json"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -54,8 +55,9 @@ func TestWhatRunsThisCode(t *testing.T) {
 	}
 	callees := callTool(t, s, "find_callees", map[string]any{"qname": "mutex_fixture.RunServe", "depth": 1})
 	trig := asSlice(callees[triggersKey])
-	if len(trig) != 3 {
-		t.Fatalf("triggers of RunServe = %d, want 3 (nums, names, done): %v", len(trig), callees[triggersKey])
+	// The close of done wakes its receive as the send after it does.
+	if len(trig) != 4 {
+		t.Fatalf("triggers of RunServe = %d, want 4 (nums, names, the close and the send on done): %v", len(trig), callees[triggersKey])
 	}
 	for _, r := range trig {
 		if len(asSlice(r.(map[string]any)["handles"])) == 0 {
@@ -182,11 +184,13 @@ func TestClosureCallsAndLocalLock(t *testing.T) {
 }
 
 // TestSeveralEntriesOnOneLine: the determinism subjects do have several
-// entries on one line under each key.
+// entries on one line under the keys whose fixture code puts them there
+// (the fixture's two go statements now stand on lines of their own, as
+// gofmt writes them, so goroutine_callers is not among them).
 func TestSeveralEntriesOnOneLine(t *testing.T) {
 	s := messagesFixture(t)
 	callers := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.multi", "depth": 1})
-	for _, k := range []string{handledByKey, goroutineCallersKey, closureCallsKey} {
+	for _, k := range []string{handledByKey, closureCallsKey} {
 		lines := map[any]int{}
 		for _, r := range asSlice(callers[k]) {
 			lines[r.(map[string]any)["line"]]++
@@ -204,5 +208,147 @@ func TestSeveralEntriesOnOneLine(t *testing.T) {
 	callees := callTool(t, s, "find_callees", map[string]any{"qname": "mutex_fixture.RunTwo", "depth": 1})
 	if len(asSlice(callees[triggersKey])) < 2 {
 		t.Errorf("triggers of RunTwo: %v", callees[triggersKey])
+	}
+}
+
+// TestWakeRows: a row says what wakes a receive. A close is a close, not a
+// send (close_line, by close); a receive on a timer's channel is woken by
+// the runtime when the timer made at a site fires; a receive on ctx.Done()
+// when the context is cancelled, with who calls its cancel function.
+func TestWakeRows(t *testing.T) {
+	s := messagesFixture(t)
+	callees := callTool(t, s, "find_callees", map[string]any{"qname": "mutex_fixture.Crew.Stop", "depth": 1})
+	closes := 0
+	for _, r := range asSlice(callees[triggersKey]) {
+		row := r.(map[string]any)
+		if row["by"] != "close" || row["close_line"] != float64(25) || row["send_line"] != nil {
+			t.Errorf("Stop's trigger row should be a close at line 25: %v", row)
+		}
+		closes++
+	}
+	if closes == 0 {
+		t.Fatalf("no triggers for Stop: %v", callees)
+	}
+	wake := map[string]map[string]any{}
+	for _, q := range []string{"mutex_fixture.Crew.init", "mutex_fixture.Crew.flush"} {
+		callers := callTool(t, s, "find_callers", map[string]any{"qname": q, "depth": 1})
+		for _, r := range asSlice(callers[handledByKey]) {
+			row := r.(map[string]any)
+			if row["line"] == float64(174) || row["line"] == float64(176) {
+				wake[q] = row
+			}
+		}
+	}
+	timer := wake["mutex_fixture.Crew.init"]
+	if timer["woken_by"] != "timer" || !strings.Contains(asString(timer["timer_made_at"]), "execfacts.go:172") || timer[noSenderKey] != nil {
+		t.Errorf("timer receive row: %v", timer)
+	}
+	ctx := wake["mutex_fixture.Crew.flush"]
+	if ctx["woken_by"] != "cancel" || !strings.Contains(asString(ctx["cancelled_by"]), `"caller":"mutex_fixture.Crew.Tick","file":"execfacts.go","line":171`) || ctx[noSenderKey] != nil {
+		t.Errorf("ctx.Done receive row: %v", ctx)
+	}
+}
+
+func asString(v any) string {
+	b, _ := json.Marshal(v)
+	return string(b)
+}
+
+// TestFindSymbolBareName: a bare name with the default exact=true is
+// resolved as every tool resolves a name: one declaration ends in it -> its
+// node; several -> the candidates.
+func TestFindSymbolBareName(t *testing.T) {
+	s := messagesFixture(t)
+	out := callTool(t, s, "find_symbol", map[string]any{"name": "Deferring"})
+	nodes := asSlice(out["nodes"])
+	if len(nodes) != 1 || nodes[0].(map[string]any)["qname"] != "mutex_fixture.Crew.Deferring" {
+		t.Errorf("find_symbol Deferring = %v", out)
+	}
+	if out["resolved_by"] != "bare name" {
+		t.Errorf("the answer should say it resolved a bare name: %v", out)
+	}
+	amb := callTool(t, s, "find_symbol", map[string]any{"name": "Stop"})
+	if amb["ambiguous"] != true || len(asSlice(amb["candidates"])) < 2 {
+		t.Errorf("find_symbol Stop should list candidates: %v", amb)
+	}
+}
+
+// TestGoStartIsNotACall: go Serve(...) starts Serve: RunServe is listed
+// under goroutine_callers with the go line, and not among the callers.
+func TestGoStartIsNotACall(t *testing.T) {
+	s := messagesFixture(t)
+	out := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.Serve", "depth": 1})
+	for _, n := range asSlice(out["nodes"]) {
+		if n.(map[string]any)["qname"] == "mutex_fixture.RunServe" {
+			t.Errorf("RunServe, which starts Serve, is among its callers: %v", out["edges"])
+		}
+	}
+	found := false
+	for _, r := range asSlice(out[goroutineCallersKey]) {
+		row := r.(map[string]any)
+		if row["spawned_by"] == "mutex_fixture.RunServe" {
+			found = true
+			if row["line"] != float64(58) {
+				t.Errorf("goroutine row line = %v, want the go line 58", row["line"])
+			}
+		}
+	}
+	if !found {
+		t.Errorf("no goroutine row spawned by RunServe: %v", out[goroutineCallersKey])
+	}
+}
+
+// TestSenderRowShape: a handled_by sender row has the shape of a triggers
+// row (by with send_line or close_line), and both answers explain the keys
+// in their legend.
+func TestSenderRowShape(t *testing.T) {
+	s := messagesFixture(t)
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": "mutex_fixture.record", "depth": 1})
+	n := 0
+	for _, r := range asSlice(callers[handledByKey]) {
+		for _, sd := range asSlice(r.(map[string]any)["senders"]) {
+			row := sd.(map[string]any)
+			n++
+			if row["line"] != nil || (row["send_line"] == nil) == (row["close_line"] == nil) || row["by"] == nil {
+				t.Errorf("sender row %v", row)
+			}
+		}
+	}
+	if n == 0 {
+		t.Fatalf("no sender rows: %v", callers[handledByKey])
+	}
+	callees := callTool(t, s, "find_callees", map[string]any{"qname": "mutex_fixture.RunServe", "depth": 1})
+	for name, out := range map[string]map[string]any{"find_callers": callers, "find_callees": callees} {
+		if l, _ := out[legendKey].(map[string]any); l["by"] == nil {
+			t.Errorf("%s: legend does not explain by: %v", name, out[legendKey])
+		}
+	}
+}
+
+// TestContextHoldsDeclarations: get_context_for_task answers with
+// declarations: no statement node, goroutine or name local to a function
+// among its bodies, summaries or subgraph nodes.
+func TestContextHoldsDeclarations(t *testing.T) {
+	s := messagesFixture(t)
+	out := callTool(t, s, "get_context_for_task", map[string]any{"task_description": "serve record worker loop crew stop tick goroutine", "budget_tokens": 4000})
+	seen := 0
+	for _, key := range []string{"bodies", "summaries"} {
+		for _, r := range asSlice(out[key]) {
+			seen++
+			// A mutex is named "<field>#mutex"; any other # is a statement's.
+			if q, _ := r.(map[string]any)["qname"].(string); strings.Contains(strings.TrimSuffix(q, "#mutex"), "#") {
+				t.Errorf("%s holds %s", key, q)
+			}
+		}
+	}
+	sub, _ := out["subgraph"].(map[string]any)
+	for _, n := range asSlice(sub["nodes"]) {
+		switch tp := n.(map[string]any)["type"]; tp {
+		case "Goroutine", "LocalVariable", "CallSite", "FuncLit", "DeferStmt", "CaseClause", "BranchStmt", "IfStmt", "LoopStmt", "ReturnStmt", "SwitchStmt":
+			t.Errorf("subgraph holds a %v", tp)
+		}
+	}
+	if seen == 0 {
+		t.Fatalf("no answer: %v", out)
 	}
 }

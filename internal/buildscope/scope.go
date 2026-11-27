@@ -11,6 +11,7 @@ package buildscope
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -57,9 +58,45 @@ type Scope struct {
 	// Problems are load errors the build tool reported; a scope with problems
 	// may be incomplete, so extraction fails on them unless told otherwise.
 	Problems []string `json:"problems,omitempty"`
+	// GoStderr is what the go command wrote to standard error while the
+	// scope was extracted; it goes into error messages, not the file.
+	GoStderr []string `json:"-"`
 	// CheckedBinaries are built binaries whose recorded build settings were
 	// compared with Target and EntryPoints and matched.
 	CheckedBinaries []CheckedBinary `json:"checked_binaries,omitempty"`
+	// History is the profile's history section, for the build; nil when the
+	// profile has none.
+	History *History `json:"history,omitempty"`
+}
+
+// History configures how the graph reads the source's history.
+//   - Repo: the repository of the source's own commits ("owner/name");
+//     empty reads it from the origin remote when that is a GitHub URL.
+//   - Upstream: the repository the source was forked from, when the
+//     source's history carries it.
+type History struct {
+	Repo     string    `yaml:"repo" json:"repo,omitempty"`
+	Upstream *Upstream `yaml:"upstream" json:"upstream,omitempty"`
+}
+
+// Upstream names the forked repository (Repo, "owner/name") and the fork
+// point (Base, a revision of the source's history: a commit id or a tag).
+// Base and every commit reachable from it are upstream commits; the pull
+// request numbers in their subjects are pull requests of Repo.
+type Upstream struct {
+	Repo string `yaml:"repo" json:"repo"`
+	Base string `yaml:"base" json:"base"`
+}
+
+// check refuses an upstream without its repository or fork point.
+func (h *History) check() error {
+	if h == nil || h.Upstream == nil {
+		return nil
+	}
+	if h.Upstream.Repo == "" || h.Upstream.Base == "" {
+		return errors.New("history.upstream needs both repo and base")
+	}
+	return nil
 }
 
 // ProfileRef names a build profile by path and content.

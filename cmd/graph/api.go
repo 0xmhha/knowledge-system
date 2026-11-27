@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
+	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -59,6 +61,11 @@ type apiOpts struct {
 	DBDsn    string // PostgreSQL DSN (overrides GraphDir when set)
 	Port     int    // bind port on 127.0.0.1
 	Log      *slog.Logger
+	// Out receives the "serving" lines (default standard error).
+	Out io.Writer
+	// Listen binds the address (default net.Listen on tcp); a seam for
+	// tests of a failed bind.
+	Listen func(addr string) (net.Listener, error)
 }
 
 // runAPI opens the configured store, builds the HTTP server, installs
@@ -93,7 +100,20 @@ func runAPI(o apiOpts) error {
 	defer cancel()
 
 	addr := fmt.Sprintf("127.0.0.1:%d", o.Port)
-	_, _ = fmt.Fprintf(os.Stderr, "ckg: serving %s API on http://%s/api/\n", sourceLabel, addr)
-	_, _ = fmt.Fprintf(os.Stderr, "ckg: dashboard: cks viewer --api-url http://%s\n", addr)
-	return srv.ListenAndServe(ctx, addr)
+	listen := o.Listen
+	if listen == nil {
+		listen = func(addr string) (net.Listener, error) { return net.Listen("tcp", addr) }
+	}
+	ln, err := listen(addr)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", addr, err)
+	}
+	out := o.Out
+	if out == nil {
+		out = os.Stderr
+	}
+	// Printed only once the port is bound, so the line is true.
+	_, _ = fmt.Fprintf(out, "ckg: serving %s API on http://%s/api/\n", sourceLabel, addr)
+	_, _ = fmt.Fprintf(out, "ckg: dashboard (separate cks binary): cks viewer --api-url http://%s\n", addr)
+	return srv.Serve(ctx, ln)
 }

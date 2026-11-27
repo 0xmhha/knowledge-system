@@ -1,11 +1,8 @@
 package server
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -290,39 +287,15 @@ func (s *Server) handleBlob(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	if isHunkBlob(src) {
-		if decompressed, dErr := gunzipBytes(src); dErr == nil {
-			src = decompressed
-		}
-		// On gzip-decompress error fall through with the raw bytes — the
-		// caller still sees something rather than a 500, and the only way
-		// to land here in practice is a legacy Hunk row written by a
-		// pre-hunk-graph build.
+	if decompressed, dErr := persist.BlobText(src); dErr == nil {
+		src = decompressed
 	}
+	// On gzip-decompress error fall through with the raw bytes — the
+	// caller still sees something rather than a 500, and the only way
+	// to land here in practice is a legacy Hunk row written by a
+	// pre-hunk-graph build.
 	w.Header().Set("content-type", "text/plain; charset=utf-8")
 	_, _ = w.Write(src)
-}
-
-// isHunkBlob detects gzip-compressed payloads via the standard 1f 8b 08
-// magic. Used by handleBlob to decide whether to invoke the gunzip pass.
-// We don't peek at the persisted node row to check Type=Hunk because the
-// magic-byte check is both cheaper and forward-compatible: any future
-// node kind that stores a gzipped blob gets the same treatment for free.
-func isHunkBlob(b []byte) bool {
-	return len(b) >= 3 && b[0] == 0x1f && b[1] == 0x8b && b[2] == 0x08
-}
-
-// gunzipBytes is the inverse of internal/buildpipe/temporal_hunks.go's
-// gzipPatch — wraps a bytes.Reader in a gzip.Reader and reads to EOF.
-// Errors propagate unchanged so handleBlob can fall back to the raw
-// payload on malformed gzip headers.
-func gunzipBytes(b []byte) ([]byte, error) {
-	gr, err := gzip.NewReader(bytes.NewReader(b))
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = gr.Close() }()
-	return io.ReadAll(gr)
 }
 
 // handleNodesByIDs returns full node records for a caller-supplied id list.

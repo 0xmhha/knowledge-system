@@ -4,8 +4,7 @@
 // regressions; the JSON output is machine-readable so a comparison
 // table can be diffed in CI.
 //
-// The server runs in-process via httptest (no port allocation, no
-// cleanup races). Each endpoint is hit `iterations` times sequentially
+// The server runs in-process on a free loopback port (benchServerAddr). Each endpoint is hit `iterations` times sequentially
 // per worker, with `concurrency` workers in parallel — the same load
 // profile as a "warm cache, steady-state read" benchmark.
 //
@@ -17,11 +16,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"sort"
@@ -32,6 +32,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/graph/server"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // benchProbe is one endpoint to measure. Path may include query
@@ -75,6 +76,36 @@ func defaultProbes(seedQname string) []benchProbe {
 	return probes
 }
 
+// benchServerAddr is where bench-server binds its in-process server: a
+// free loopback port.
+const benchServerAddr = "127.0.0.1:0"
+
+// startBenchServer serves h on a free loopback port and returns its base
+// URL and a function that stops it. listen binds the address (net.Listen
+// on tcp when nil). A failed bind is returned, wrapped.
+func startBenchServer(h http.Handler, listen func(addr string) (net.Listener, error)) (string, func(), error) {
+	if listen == nil {
+		listen = func(addr string) (net.Listener, error) { return net.Listen("tcp", addr) }
+	}
+	ln, err := listen(benchServerAddr)
+	if err != nil {
+		return "", nil, fmt.Errorf("bench-server: listen on %s: %w", benchServerAddr, err)
+	}
+	srv := &http.Server{Handler: h, ReadHeaderTimeout: 5 * time.Second}
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = srv.Serve(ln)
+	}()
+	stop := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = srv.Shutdown(ctx)
+		<-done
+	}
+	return "http://" + ln.Addr().String(), stop, nil
+}
+
 // benchResult is one row in the output JSON / text table.
 type benchResult struct {
 	Endpoint     string  `json:"endpoint"`
@@ -88,6 +119,9 @@ type benchResult struct {
 	MaxMs        float64 `json:"max_ms"`
 	ErrorCount   int     `json:"error_count"`
 	Status200Pct float64 `json:"status_200_pct"`
+	// ResultBytes is the size of one answer as JSON (bench-mcp), so a fast
+	// probe can be told from an empty one.
+	ResultBytes int `json:"result_bytes,omitempty"`
 }
 
 // benchOutput is the full bench-server result envelope. Captures the
@@ -101,6 +135,12 @@ type benchOutput struct {
 	Iterations     int           `json:"iterations"`
 	Concurrency    int           `json:"concurrency"`
 	Results        []benchResult `json:"results"`
+	// NotProbed lists the registered MCP tools a run did not call, and
+	// why (bench-mcp and bench-mcp-stdio).
+	NotProbed []notProbed `json:"not_probed,omitempty"`
+	// ProbeSeed is the node the MCP probes were made from and how
+	// (bench-mcp).
+	ProbeSeed *probeSeed `json:"probe_seed,omitempty"`
 }
 
 func newBenchServerCmd() *cobra.Command {
@@ -119,8 +159,9 @@ p50/p95/p99/mean/min/max latencies + error counts as JSON.
 
 Designed as a regression baseline: re-run after any change touching
 internal/server or pkg/* read paths and diff the JSON to spot
-unintended slowdowns. The server runs via httptest so there's no
-port allocation or cleanup race; safe to invoke from CI.`,
+unintended slowdowns. The server runs in this process on a free
+loopback port (` + benchServerAddr + `), so the host must allow binding
+one; a failed bind is reported as an error.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if iterations <= 0 || iterations > 10000 {
 				return fmt.Errorf("--iterations must be in [1, 10000], got %d", iterations)
@@ -140,19 +181,22 @@ port allocation or cleanup race; safe to invoke from CI.`,
 				// Non-fatal — just skip the impact probe.
 				_, _ = fmt.Fprintf(os.Stderr, "ckg bench-server: no Function node for impact seed; skipping that probe\n")
 			}
-			probes := defaultProbes(seed)
+			probes := defaultProbes(seed.QualifiedName)
 
 			srv := server.New(store, nil)
 			defer srv.Close()
-			ts := httptest.NewServer(srv)
-			defer func() { ts.Close() }()
+			baseURL, stop, err := startBenchServer(srv, nil)
+			if err != nil {
+				return err
+			}
+			defer stop()
 
 			_, _ = fmt.Fprintf(os.Stderr, "bench-server: graph=%s iters=%d concurrency=%d probes=%d\n",
 				graph, iterations, concurrency, len(probes))
 
 			results := make([]benchResult, 0, len(probes))
 			for _, p := range probes {
-				r := runBench(ts.URL, p, iterations, concurrency)
+				r := runBench(baseURL, p, iterations, concurrency)
 				results = append(results, r)
 				_, _ = fmt.Fprintf(os.Stderr, "  %-26s p50=%6.2f p95=%6.2f p99=%6.2f mean=%6.2f errors=%d\n",
 					r.Endpoint, r.P50Ms, r.P95Ms, r.P99Ms, r.MeanMs, r.ErrorCount)
@@ -195,8 +239,10 @@ port allocation or cleanup race; safe to invoke from CI.`,
 	return cmd
 }
 
-// pickFunctionSeed returns the qualified_name of a Function node from the
-// graph. The bench harness uses it as the /api/impact seed so we don't need
+// seedCandidates is how many top-PageRank nodes pickFunctionSeed looks at.
+const seedCandidates = 500
+
+// pickFunctionSeed returns a Function node of the graph. The bench harness uses it as the /api/impact seed so we don't need
 // a fixture-specific qname per graph.
 //
 // QueryNodes("") was the original implementation but it returns top-level
@@ -205,17 +251,17 @@ port allocation or cleanup race; safe to invoke from CI.`,
 // TopNodes(pagerank) — the ranking is type-agnostic so Functions surface
 // naturally, and the top of the ranking is where the most interesting
 // bench seeds live anyway (hub functions exercise more of the graph).
-func pickFunctionSeed(store persist.StoreReader) (string, error) {
-	nodes, err := store.TopNodes("pagerank", 500)
+func pickFunctionSeed(store persist.StoreReader) (types.Node, error) {
+	nodes, err := store.TopNodes("pagerank", seedCandidates)
 	if err != nil {
-		return "", err
+		return types.Node{}, err
 	}
 	for _, n := range nodes {
-		if string(n.Type) == "Function" && n.QualifiedName != "" {
-			return n.QualifiedName, nil
+		if n.Type == types.NodeFunction && n.QualifiedName != "" {
+			return n, nil
 		}
 	}
-	return "", fmt.Errorf("no Function node found")
+	return types.Node{}, fmt.Errorf("no Function node found")
 }
 
 // runBench hits one probe `iterations * concurrency` total times,

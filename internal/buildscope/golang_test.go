@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -96,6 +97,59 @@ func TestExtractGo_Deterministic(t *testing.T) {
 	jb, _ := json.Marshal(b)
 	if string(ja) != string(jb) {
 		t.Errorf("two runs differ:\n%s\n%s", ja, jb)
+	}
+}
+
+// TestExtractGo_NoFilesNamesTheGoError: when go list yields no file, the
+// error carries what the go command reported (here a missing entry
+// directory), not only that no file was found. A build cache that could not
+// be written was reported as "found no main-module files" alone.
+func TestExtractGo_NoFilesNamesTheGoError(t *testing.T) {
+	_, err := ExtractGo(context.Background(), GoConfig{Root: "testdata/mod", EntryPoints: []string{"./missing"}})
+	if err == nil {
+		t.Fatal("want an error for an entry point with no files")
+	}
+	if !strings.Contains(err.Error(), "directory not found") {
+		t.Errorf("error %q does not carry the go command's reason", err)
+	}
+}
+
+// TestNoFilesError_SaysHowManyItQuotes: with more load errors than it
+// quotes, the message says it quotes the first ones, and it says what the
+// go command wrote to standard error, or that it wrote nothing. It said "4
+// load errors" and listed 3.
+func TestNoFilesError_SaysHowManyItQuotes(t *testing.T) {
+	msg := noFilesError([]string{"./x"}, "/r", []string{"a", "b", "c", "d"}, nil).Error()
+	for _, want := range []string{"4 load errors, the first 3: a; b; c", "wrote nothing to standard error"} {
+		if !strings.Contains(msg, want) {
+			t.Errorf("%q lacks %q", msg, want)
+		}
+	}
+	if msg := noFilesError([]string{"./x"}, "/r", nil, []string{"go: warning"}).Error(); !strings.Contains(msg, "standard error: go: warning") {
+		t.Errorf("%q does not quote the go command's standard error", msg)
+	}
+	// One wording for "nothing reported", and stderr quoted on one line,
+	// bounded: five "go: downloading" lines were quoted whole.
+	if msg := noFilesError([]string{"./x"}, "/r", nil, nil).Error(); !strings.Contains(msg, "reported no load errors; the go command wrote nothing to standard error") {
+		t.Errorf("%q: not the one wording", msg)
+	}
+	long := []string{"go: downloading a\ngo: downloading b\ngo: downloading c\ngo: downloading d\ngo: downloading e"}
+	got := noFilesError([]string{"./x"}, "/r", nil, long).Error()
+	if strings.Contains(got, "\n") || !strings.Contains(got, "go: downloading c (2 more lines left out)") || strings.Contains(got, "downloading d") {
+		t.Errorf("%q: stderr not bounded to %d lines", got, maxStderrLines)
+	}
+}
+
+// TestLoadErrorsError_SameWording: a scope with files but load errors (a
+// build cache that fails partway) is reported in the same words as one
+// with no files. It said "N load errors, so the scope may be incomplete
+// (first: ...)" and nothing about standard error.
+func TestLoadErrorsError_SameWording(t *testing.T) {
+	msg := loadErrorsError([]string{"a", "b", "c", "d"}, nil).Error()
+	for _, want := range []string{"may be incomplete", "4 load errors, the first 3: a; b; c", "wrote nothing to standard error"} {
+		if !strings.Contains(msg, want) {
+			t.Errorf("%q lacks %q", msg, want)
+		}
 	}
 }
 

@@ -6,10 +6,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -26,7 +28,7 @@ func graphExportMessage(e graphExportError) string {
 	case "requires_v2":
 		return "This source requires the v2 graph JSON format."
 	case "reindex_required":
-		return "Complete source identity is required; rebuild the graph."
+		return "Complete source identity is required; rebuild the graph with ckg build --project-id, --dataset-id, --snapshot-id, --file-manifest-digest, --capture-policy-digest and --source-mode (see ckg export-json --help)."
 	case "invalid_request":
 		return "Select a supported graph export format."
 	case "output_exists":
@@ -198,8 +200,12 @@ func writeGraphV2(ctx context.Context, out io.Writer, store graphVisitor, pretty
 func exportGraphV2(ctx context.Context, graph, output string, pretty, minimal bool) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	err := publishGraphV2(ctx, output, func(w io.Writer) error {
-		store, err := persist.OpenReadOnly(filepath.Join(graph, "graph.db"))
+	db, err := graphDB(graph)
+	if err != nil {
+		return fmt.Errorf("%w: %w", graphExportError("export_failed"), err)
+	}
+	err = publishGraphV2(ctx, output, func(w io.Writer) error {
+		store, err := persist.OpenReadOnly(db)
 		if err != nil {
 			return err
 		}
@@ -219,7 +225,24 @@ func exportGraphV2(ctx context.Context, graph, output string, pretty, minimal bo
 	if errors.Is(err, context.DeadlineExceeded) {
 		return graphExportError("request_timeout")
 	}
-	return graphExportError("export_failed")
+	return fmt.Errorf("%w: %w", graphExportError("export_failed"), err)
+}
+
+// graphDB returns the graph.db of a graph directory, or an error naming
+// the file when it is not there (a build that failed writes none). Every
+// export opens its graph through it.
+func graphDB(graph string) (string, error) {
+	db := filepath.Join(graph, "graph.db")
+	if _, err := os.Stat(db); err != nil {
+		return "", fmt.Errorf("read the graph: %w", err)
+	}
+	return db, nil
+}
+
+// graphExportCause is what err says beyond its code: the cause of an
+// export_failed error, "" for an error that is only its code.
+func graphExportCause(err error, code graphExportError) string {
+	return strings.TrimPrefix(strings.TrimPrefix(err.Error(), string(code)), ": ")
 }
 
 // A new, same-directory file is published only after a complete read, flush,

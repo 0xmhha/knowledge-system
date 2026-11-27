@@ -1,25 +1,20 @@
 // Package evidence implements the EvidencePack assembler — given a
-// free-form intent string and an optional seed qname, ranks the
-// schema-1.8 Hunk corpus by BM25 over a (commit subject || patch text
-// || modifies qnames) virtual document, groups the top-K hunks by
-// their parent commit, decorates each with its `modifies` neighbours,
-// and returns the Pack JSON the Coding Agent can fold into a few-shot
-// prompt frame.
+// free-form intent string and an optional seed qname, ranks past commits by
+// BM25, decorates each with its hunks (or, outside the hunk window, the
+// declarations it changed), and returns the Pack JSON the Coding Agent can
+// fold into a few-shot prompt frame.
 //
-// Algorithm (mirrors docs/graph/design/hunk-graph.md §5.2):
+// Algorithm (after docs/graph/design/hunk-graph.md §5.2):
 //
-//  1. Build per-hunk virtual document = subject + decompressed patch
-//     + modifies-qnames.
-//  2. BM25-score against intent → top 50 hunks.
-//  3. If seed_qname set: filter to hunks reaching seed via the
-//     modifies edge directly OR via one hop on the call graph
-//     (calls/invokes). Take top-K survivors.
-//  4. Group by parent commit; attach all hunks the commit contains
-//     (the adjacent edge means the Agent reads the full change).
-//  5. Decorate each hunk with its `modifies` neighbours' metadata
-//     (qname, type, file_path, start/end lines — no body bytes).
-//  6. Order commits by author timestamp DESC; stop emitting once
-//     cumulative patch text exceeds budget_tokens.
+//  1. Documents: one per hunk = subject + decompressed patch +
+//     modifies-qnames; two per recorded commit = its subject, and its body
+//     + the qnames of the declarations its changed_in edges come from.
+//  2. BM25-score against intent → top bm25TopN documents.
+//  3. If seed_qname set: keep documents reaching the seed (or a 1-hop
+//     call-graph neighbour) via modifies or changed_in edges.
+//  4. Group by commit; a commit's score is its best document's.
+//  5. Order commits by score DESC (then author time, then SHA); stop
+//     emitting once cumulative patch text exceeds budget_tokens.
 //
 // §11.3 retrieval boundary: only EXTRACTED-confidence Hunks and
 // Commits enter the corpus. AMBIGUOUS rows (the unreachable-history
@@ -30,10 +25,14 @@ package evidence
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
+	"maps"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/pkg/bm25"
@@ -89,11 +88,44 @@ type Pack struct {
 	// graph was built from a source without git history. The tool layer
 	// sets it; BuildPack leaves it empty.
 	History string `json:"history,omitempty"`
+	// Searched says what the ranking read, so an answer without the commit
+	// sought can be told from one whose commit was never searchable.
+	Searched Searched `json:"searched"`
 }
 
+// Searched describes the corpus a pack was ranked over: the patches of the
+// HunkCommits commits whose hunks the graph holds (author times
+// HunkOldestTime to HunkNewestTime, unix seconds), and the subject, body
+// and changed symbol names of all Commits recorded commits.
+type Searched struct {
+	// Walked, Unrecorded and RecordedRule come from the build: of the
+	// Walked commits only the recorded ones have documents.
+	Walked         int    `json:"walked,omitempty"`
+	Unrecorded     int    `json:"unrecorded,omitempty"`
+	RecordedRule   string `json:"recorded_rule,omitempty"`
+	HunkCommits    int    `json:"hunk_commits"`
+	HunkOldest     string `json:"hunk_oldest,omitempty"`
+	HunkOldestTime int64  `json:"hunk_oldest_time,omitempty"`
+	HunkNewestTime int64  `json:"hunk_newest_time,omitempty"`
+	Commits        int    `json:"commits"`
+	Summary        string `json:"summary"`
+}
+
+// Hit is one commit of a pack: its hunks when the graph holds them
+// (InHunkWindow), else the declarations it changed (Changed, at most
+// changedListMax of ChangedTotal).
 type Hit struct {
 	Commit CommitInfo `json:"commit"`
-	Hunks  []HunkRow  `json:"hunks"`
+	// Score is the commit's BM25 score, its best document's; Matched names
+	// the kinds of its documents that matched (docSubject, docBody,
+	// docHunk); SearchedBy says what of the commit could match.
+	Score        float64        `json:"score"`
+	Matched      []string       `json:"matched"`
+	SearchedBy   string         `json:"searched_by"`
+	InHunkWindow bool           `json:"in_hunk_window"`
+	Hunks        []HunkRow      `json:"hunks"`
+	Changed      []ModifiesInfo `json:"changed,omitempty"`
+	ChangedTotal int            `json:"changed_total,omitempty"`
 }
 
 type CommitInfo struct {
@@ -133,7 +165,23 @@ type ModifiesInfo struct {
 const (
 	defaultK            = 5
 	defaultBudgetTokens = 6000
-	bm25TopN            = 50 // first-stage shortlist size before seed/budget filtering
+	bm25TopN            = 200 // first-stage shortlist size before seed/budget filtering
+	// changedListMax bounds the declarations listed for a commit whose
+	// hunks the graph does not hold.
+	changedListMax = 20
+	// subjectDocPrefix and commitDocPrefix start the BM25 document ids of
+	// a commit's own documents: its subject alone, so that a subject given
+	// as the intent finds its commit however long the commit's other text
+	// is, and its body with the changed symbol names. Hunk documents use the
+	// hunk node id.
+	subjectDocPrefix = "subject:"
+	commitDocPrefix  = "commit:"
+	// Kinds of matched documents, and what a hit could be matched by.
+	docSubject      = "subject"
+	docBody         = "body_and_changed_names"
+	docHunk         = "hunk"
+	searchedMessage = "message only (subject, body, changed symbol names): the graph holds no hunks of this commit"
+	searchedAll     = "message and patches"
 )
 
 // BuildPack runs the full EvidencePack assembly. Returns an empty Pack (with
@@ -165,6 +213,11 @@ type hunkCorpus struct {
 	nodeByID      map[string]types.Node
 	hunkSHA       map[string]string // hunk ID → parent commit SHA
 	hunkModifyIDs map[string]map[string]bool
+	// changedBySHA lists the declarations whose changed_in edges reach a
+	// commit: what it changed, also outside the hunk window.
+	changedBySHA map[string][]types.Node
+	// hunksBySHA lists each commit's hunks.
+	hunksBySHA map[string][]string
 	// issuesBySHA: issue-ID aggregation (hunk-graph.md §10.4). Hunks store their commit's
 	// issue IDs in DocComment with the `issues:` prefix; we union
 	// per-SHA so the EvidencePack's CommitInfo.IssueIDs reflects the
@@ -190,6 +243,8 @@ func indexCorpus(nodes []types.Node, edges []types.Edge) *hunkCorpus {
 		hunkSHA:       make(map[string]string),
 		hunkModifyIDs: make(map[string]map[string]bool),
 		issuesBySHA:   make(map[string]map[string]bool),
+		changedBySHA:  make(map[string][]types.Node),
+		hunksBySHA:    make(map[string][]string),
 	}
 	for _, n := range nodes {
 		c.nodeByID[n.ID] = n
@@ -200,6 +255,7 @@ func indexCorpus(nodes []types.Node, edges []types.Edge) *hunkCorpus {
 				c.hunkByID[n.ID] = n
 				sha := parseHunkSHA(n.QualifiedName)
 				c.hunkSHA[n.ID] = sha
+				c.hunksBySHA[sha] = append(c.hunksBySHA[sha], n.ID)
 				// Parse the `issues:` prefix from doc_comment and
 				// union into the per-SHA aggregate.
 				if ids := decodeIssuesFromDocComment(n.DocComment); len(ids) > 0 {
@@ -240,6 +296,14 @@ func indexCorpus(nodes []types.Node, edges []types.Edge) *hunkCorpus {
 				c.hunkModifyIDs[e.Src] = set
 			}
 			set[dst.ID] = true
+		case types.EdgeChangedIn:
+			src, ok1 := c.nodeByID[e.Src]
+			dst, ok2 := c.nodeByID[e.Dst]
+			if !ok1 || !ok2 || src.Type == types.NodeFile || dst.Type != types.NodeCommit {
+				continue
+			}
+			sha := strings.TrimPrefix(dst.QualifiedName, "commit:")
+			c.changedBySHA[sha] = append(c.changedBySHA[sha], src)
 		case types.EdgeCalls, types.EdgeInvokes:
 			srcN, ok1 := c.nodeByID[e.Src]
 			dstN, ok2 := c.nodeByID[e.Dst]
@@ -317,6 +381,51 @@ func hunkDocTokens(store persist.StoreReader, h types.Node, c *hunkCorpus) []str
 		out = append(out, bm25.Tokenize(m.QualifiedName)...)
 	}
 	return out
+}
+
+// commitDocs builds the BM25 documents of one commit: its whole subject,
+// and its body with the names of the declarations it changed. Every
+// recorded commit has them, so a commit is found by its message even when
+// the graph holds none of its hunks.
+func commitDocs(commit types.Node, c *hunkCorpus, sha string) []bm25.Document {
+	var rest []string
+	if commit.Commit != nil {
+		rest = append(rest, bm25.Tokenize(commit.Commit.Body)...)
+	}
+	for _, n := range c.changedBySHA[sha] {
+		rest = append(rest, bm25.Tokenize(n.QualifiedName)...)
+	}
+	return []bm25.Document{
+		{ID: subjectDocPrefix + sha, Tokens: bm25.Tokenize(stripCommitTimestamp(commit.Signature))},
+		{ID: commitDocPrefix + sha, Tokens: rest},
+	}
+}
+
+// docKind names the kind of a BM25 document.
+func docKind(id string) string {
+	switch {
+	case strings.HasPrefix(id, subjectDocPrefix):
+		return docSubject
+	case strings.HasPrefix(id, commitDocPrefix):
+		return docBody
+	}
+	return docHunk
+}
+
+// commitDocSHA returns the commit of one of a commit's own documents.
+func commitDocSHA(id string) (string, bool) {
+	if sha, ok := strings.CutPrefix(id, subjectDocPrefix); ok {
+		return sha, true
+	}
+	return strings.CutPrefix(id, commitDocPrefix)
+}
+
+// docSHA returns the commit a BM25 document belongs to.
+func docSHA(c *hunkCorpus, id string) string {
+	if sha, ok := commitDocSHA(id); ok {
+		return sha
+	}
+	return c.hunkSHA[id]
 }
 
 // stripCommitTimestamp converts the persisted Signature shape
@@ -408,9 +517,13 @@ func filterByModifiesReach(scored []bm25.ScoredDoc, c *hunkCorpus, allowed map[s
 	}
 	out := make([]bm25.ScoredDoc, 0, len(scored))
 	for _, s := range scored {
-		mods := c.hunkModifyIDs[s.ID]
 		hit := false
-		for id := range mods {
+		if sha, ok := commitDocSHA(s.ID); ok {
+			for _, n := range c.changedBySHA[sha] {
+				hit = hit || allowed[n.ID]
+			}
+		}
+		for id := range c.hunkModifyIDs[s.ID] {
 			if allowed[id] {
 				hit = true
 				break
@@ -423,15 +536,15 @@ func filterByModifiesReach(scored []bm25.ScoredDoc, c *hunkCorpus, allowed map[s
 	return out
 }
 
-// groupByCommit takes the BM25-ranked hunks, groups them under their
-// parent commit, decorates each hunk with its `modifies` metadata,
-// orders commits by recency, and stops emitting once the cumulative
-// patch_text size exceeds budget_tokens.
+// groupByCommit takes the BM25-ranked documents (hunks and commits),
+// groups them under their commit, decorates each hunk with its `modifies`
+// metadata, orders the commits by their best score (then recency, then SHA,
+// so equal scores — an issue_id browse — read newest first and paging is
+// stable), and stops emitting once the cumulative patch_text size exceeds
+// budget_tokens. A commit found by its own document brings all its hunks;
+// one outside the hunk window brings the declarations it changed instead.
 //
-// Token estimation uses the standard ~4-chars-per-token heuristic
-// matching cmd/ckg/benchmark.go's `charsPerToken` constant. Different
-// from the Agent's actual tokeniser but fine for ratio-based budget
-// enforcement at this scale.
+// Token estimation uses the standard ~4-chars-per-token heuristic.
 func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offset int, store persist.StoreReader) []Hit {
 	const charsPerToken = 4
 	if len(scored) == 0 {
@@ -440,19 +553,93 @@ func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offs
 	if offset < 0 {
 		offset = 0
 	}
-
-	// Group hunks by parent SHA. We materialise patch text now so the
-	// budget cap can use real bytes. (Re-fetching the blob in the
-	// final emit pass would either round-trip the store twice or
-	// require a per-hunk cache of comparable size.)
-	type hunkPayload struct {
-		row   HunkRow
-		score float64
-		sha   string
-	}
-	payloads := make([]hunkPayload, 0, len(scored))
+	best := map[string]float64{}
+	kinds := map[string]map[string]bool{}
+	matchedHunks := map[string][]string{}
+	order := []string{}
 	for _, s := range scored {
-		h, ok := c.hunkByID[s.ID]
+		sha := docSHA(c, s.ID)
+		if _, ok := c.commitBySHA[sha]; !ok || sha == "" {
+			continue
+		}
+		if _, seen := best[sha]; !seen {
+			order = append(order, sha)
+			best[sha] = s.Score
+		} else if s.Score > best[sha] {
+			best[sha] = s.Score
+		}
+		if kinds[sha] == nil {
+			kinds[sha] = map[string]bool{}
+		}
+		kinds[sha][docKind(s.ID)] = true
+		if _, own := commitDocSHA(s.ID); !own {
+			matchedHunks[sha] = append(matchedHunks[sha], s.ID)
+		}
+	}
+	sort.SliceStable(order, func(i, j int) bool {
+		if best[order[i]] != best[order[j]] {
+			return best[order[i]] > best[order[j]]
+		}
+		ti := commitTimestamp(c.commitBySHA[order[i]].Signature)
+		tj := commitTimestamp(c.commitBySHA[order[j]].Signature)
+		if ti != tj {
+			return ti > tj
+		}
+		return order[i] < order[j]
+	})
+	if offset >= len(order) {
+		return nil
+	}
+	order = order[offset:]
+
+	out := make([]Hit, 0, min(k, len(order)))
+	usedTokens := 0
+	for _, sha := range order {
+		if len(out) >= k {
+			break
+		}
+		hit := buildHit(sha, matchedHunks[sha], c, store)
+		hit.Score = best[sha]
+		hit.Matched = slices.Sorted(maps.Keys(kinds[sha]))
+		commitTokens := 0
+		for _, h := range hit.Hunks {
+			commitTokens += len(h.PatchText) / charsPerToken
+		}
+		if usedTokens+commitTokens > budgetTokens && len(out) > 0 {
+			// Keep the first commit even if it alone exceeds the budget,
+			// so the Agent always gets some response on a successful query.
+			break
+		}
+		out = append(out, hit)
+		usedTokens += commitTokens
+	}
+	return out
+}
+
+// buildHit assembles one commit's hit: the hunks that matched, or all its
+// hunks when only its own document matched, or the declarations it changed
+// when the graph holds none of its hunks.
+func buildHit(sha string, hunkIDs []string, c *hunkCorpus, store persist.StoreReader) Hit {
+	commitNode := c.commitBySHA[sha]
+	hit := Hit{
+		Commit: CommitInfo{
+			SHA:        sha,
+			Subject:    stripCommitTimestamp(commitNode.Signature),
+			AuthorTime: commitTimestamp(commitNode.Signature),
+			IssueIDs:   sortedIssueIDs(c.issuesBySHA[sha]),
+		},
+		InHunkWindow: len(c.hunksBySHA[sha]) > 0,
+		SearchedBy:   searchedMessage,
+		Hunks:        []HunkRow{},
+	}
+	if hit.InHunkWindow {
+		hit.SearchedBy = searchedAll
+	}
+	if len(hunkIDs) == 0 {
+		hunkIDs = c.hunksBySHA[sha]
+	}
+	for _, id := range hunkIDs {
+		h, ok := c.hunkByID[id]
 		if !ok {
 			continue
 		}
@@ -462,92 +649,41 @@ func groupByCommit(scored []bm25.ScoredDoc, c *hunkCorpus, k, budgetTokens, offs
 				patch = string(dec)
 			}
 		}
-		mods := c.modifiesOf[h.ID]
-		row := HunkRow{
-			ID:        h.ID,
-			FilePath:  h.FilePath,
-			StartLine: h.StartLine,
-			EndLine:   h.EndLine,
-			PatchText: patch,
-			Modifies:  decorateModifies(store, mods),
-		}
-		payloads = append(payloads, hunkPayload{
-			row:   row,
-			score: s.Score,
-			sha:   c.hunkSHA[h.ID],
+		hit.Hunks = append(hit.Hunks, HunkRow{
+			ID: h.ID, FilePath: h.FilePath, StartLine: h.StartLine, EndLine: h.EndLine,
+			PatchText: patch, Modifies: decorateModifies(store, c.modifiesOf[h.ID]),
 		})
 	}
+	if !hit.InHunkWindow {
+		changed := c.changedBySHA[sha]
+		hit.ChangedTotal = len(changed)
+		hit.Changed = decorateModifies(store, changed[:min(len(changed), changedListMax)])
+	}
+	return hit
+}
 
-	// Group by SHA + per-commit order by intra-hunk score desc.
-	commits := map[string]*Hit{}
-	commitOrder := []string{}
-	for _, p := range payloads {
-		if p.sha == "" {
+// searchedCorpus describes what the corpus holds.
+func searchedCorpus(c *hunkCorpus, h *persist.HistoryRecord) Searched {
+	s := Searched{Commits: len(c.commitBySHA)}
+	for sha := range c.hunksBySHA {
+		commit, ok := c.commitBySHA[sha]
+		if !ok {
 			continue
 		}
-		hit, exists := commits[p.sha]
-		if !exists {
-			commitNode, ok := c.commitBySHA[p.sha]
-			if !ok {
-				continue
-			}
-			hit = &Hit{
-				Commit: CommitInfo{
-					SHA:        p.sha,
-					Subject:    stripCommitTimestamp(commitNode.Signature),
-					AuthorTime: commitTimestamp(commitNode.Signature),
-					IssueIDs:   sortedIssueIDs(c.issuesBySHA[p.sha]),
-				},
-				Hunks: []HunkRow{},
-			}
-			commits[p.sha] = hit
-			commitOrder = append(commitOrder, p.sha)
+		s.HunkCommits++
+		t := commitTimestamp(commit.Signature)
+		if s.HunkOldest == "" || t < s.HunkOldestTime {
+			s.HunkOldest, s.HunkOldestTime = sha, t
 		}
-		hit.Hunks = append(hit.Hunks, p.row)
+		s.HunkNewestTime = max(s.HunkNewestTime, t)
 	}
-
-	// Sort commits by author timestamp DESC (recency tie-break per §5.2).
-	// SHA tie-break inside the comparator keeps the order stable across
-	// calls so Offset paging is deterministic — two commits with
-	// identical author_time would otherwise pair-swap between sorts.
-	sort.SliceStable(commitOrder, func(i, j int) bool {
-		ti := commits[commitOrder[i]].Commit.AuthorTime
-		tj := commits[commitOrder[j]].Commit.AuthorTime
-		if ti != tj {
-			return ti > tj
-		}
-		return commitOrder[i] < commitOrder[j]
-	})
-
-	if offset >= len(commitOrder) {
-		return nil
+	s.Summary = fmt.Sprintf("ranked the patches of the %d newest commits whose hunks the graph holds (from %s) and, for every one of the %d recorded commits, its subject, body and changed symbol names; older commits match by their message only",
+		s.HunkCommits, time.Unix(s.HunkOldestTime, 0).UTC().Format(time.RFC3339), s.Commits)
+	if h != nil {
+		s.Walked, s.Unrecorded, s.RecordedRule = h.Commits, max(0, h.Commits-h.Recorded), h.RecordedRule
+		s.Summary += fmt.Sprintf("; %d of the %d commits the build walked are not recorded and cannot be found (%s)", s.Unrecorded, s.Walked, h.RecordedRule)
 	}
-	commitOrder = commitOrder[offset:]
-
-	// k is caller-supplied: size the slice by what can actually be returned.
-	out := make([]Hit, 0, min(k, len(commitOrder)))
-	usedTokens := 0
-	for _, sha := range commitOrder {
-		if len(out) >= k {
-			break
-		}
-		hit := commits[sha]
-		// Estimate this commit's contribution to the budget.
-		commitTokens := 0
-		for _, h := range hit.Hunks {
-			commitTokens += len(h.PatchText) / charsPerToken
-		}
-		if usedTokens+commitTokens > budgetTokens && len(out) > 0 {
-			// Stop — already have at least one hit, and adding this
-			// commit would blow the budget. Keep the first commit
-			// even if it alone exceeds the budget, so the Agent
-			// always gets some response on a successful query.
-			break
-		}
-		out = append(out, *hit)
-		usedTokens += commitTokens
-	}
-	return out
+	return s
 }
 
 // sortedIssueIDs flattens the per-SHA issue set into a deterministic

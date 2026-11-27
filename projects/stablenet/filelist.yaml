@@ -63,3 +63,14 @@ inclusions:
       - ./systemcontracts/compile/...
 
 exclude_globs: []
+
+# Pull request numbers in commit subjects come from two repositories: the
+# fork carries go-ethereum's history up to the release it was forked from
+# (params: release Geth v 1.13.15), and the numbers in those commits are
+# go-ethereum pull requests. That commit and every commit reachable from it
+# are upstream commits; the later ones are the fork's own. The fork's own
+# repository name is read from the origin remote (repo: owner/name sets it).
+history:
+  upstream:
+    repo: ethereum/go-ethereum
+    base: c5ba367eb6232e3eddd7d6226bfd374449c63164

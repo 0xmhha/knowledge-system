@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -14,88 +15,76 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// TestEmitTemporalEdges_BasicGitRepo wires the full temporal path: build a tiny
-// git repo containing one Go file, hand-construct a Graph (mirroring what
-// graph.Build would produce — a Package + File + Function node), then run
-// emitTemporalEdges and verify:
+// TestEmitTemporalEdges_BasicGitRepo wires the full temporal path on a
+// one-commit repo with a Package, a File and a Function node:
 //
-//   - One NodeCommit appended (single commit in the repo).
-//   - changed_in edges: one per (existing node, touched commit) pair.
-//   - blame edge: from the File node → the only commit.
+//   - One Commit node, carrying its subject and times.
+//   - changed_in and blame from the File and the Function (the kinds whose
+//     line history is recorded) to the commit; none from the Package.
+//   - One Hunk (the whole new file) that modifies the Function.
 func TestEmitTemporalEdges_BasicGitRepo(t *testing.T) {
 	repo := initGitRepo(t)
 	relPath := "main.go"
 	commitFileToRepo(t, repo, relPath, "package main\n\nfunc Hello() {}\n", "initial")
 
 	g := buildSyntheticGraph(relPath)
-	originalNodes := len(g.Nodes)
-	originalEdges := len(g.Edges)
-
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, nil); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
-
-	// Exactly one commit node added.
 	commits := nodesByType(g.Nodes, types.NodeCommit)
 	if len(commits) != 1 {
 		t.Fatalf("expected 1 Commit node, got %d", len(commits))
 	}
-	if !strings.HasPrefix(commits[0].QualifiedName, "commit:") {
-		t.Errorf("Commit qname = %q, want prefix commit:", commits[0].QualifiedName)
+	c := commits[0]
+	if !strings.HasPrefix(c.QualifiedName, "commit:") || c.SubKind != "git" || c.Language != "git" {
+		t.Errorf("Commit node shape = %q/%q/%q", c.QualifiedName, c.SubKind, c.Language)
 	}
-	if commits[0].SubKind != "git" {
-		t.Errorf("Commit sub_kind = %q, want git", commits[0].SubKind)
+	if c.Commit == nil || c.Commit.Subject != "initial" || c.Commit.AuthorTime == 0 || c.Commit.CommitTime == 0 {
+		t.Errorf("Commit metadata = %+v", c.Commit)
 	}
-	if commits[0].Language != "git" {
-		t.Errorf("Commit language = %q, want git (sentinel)", commits[0].Language)
+	srcs := func(et types.EdgeType) []string {
+		var out []string
+		for _, e := range edgesByType(g.Edges, et) {
+			out = append(out, e.Src)
+		}
+		slices.Sort(out)
+		return out
 	}
-
-	// Edge bookkeeping: every original node in main.go should have a
-	// changed_in edge to the commit; one blame edge from the File node;
-	// schema 1.8 also adds NodeHunk + has_hunk + (zero or more) adjacent
-	// edges depending on how the file's content split into hunks.
-	changedIn := edgesByType(g.Edges, types.EdgeChangedIn)
-	if len(changedIn) != originalNodes {
-		t.Errorf("expected %d changed_in edges (one per original node in main.go), got %d",
-			originalNodes, len(changedIn))
+	want := []string{"file0000aaaa2222", "func0000bbbb3333"}
+	if got := srcs(types.EdgeChangedIn); !slices.Equal(got, want) {
+		t.Errorf("changed_in sources = %v, want %v (File and Function, not Package)", got, want)
 	}
-	blame := edgesByType(g.Edges, types.EdgeBlame)
-	if len(blame) != 1 {
-		t.Errorf("expected exactly 1 blame edge, got %d", len(blame))
+	if got := srcs(types.EdgeBlame); !slices.Equal(got, want) {
+		t.Errorf("blame sources = %v, want %v", got, want)
 	}
-	hunks := nodesByType(g.Nodes, types.NodeHunk)
-	hasHunk := edgesByType(g.Edges, types.EdgeHasHunk)
-	adjacent := edgesByType(g.Edges, types.EdgeAdjacent)
-	if len(hasHunk) != len(hunks) {
-		t.Errorf("has_hunk edges (%d) must equal Hunk nodes (%d)", len(hasHunk), len(hunks))
+	for _, e := range edgesByType(g.Edges, types.EdgeBlame) {
+		if e.Src == "file0000aaaa2222" && e.Count != 3 {
+			t.Errorf("File blame covers %d lines, want 3", e.Count)
+		}
 	}
-	// Single-file single-commit scenario: the file is wholly new, so the
-	// content collapses to one hunk → 1 NodeHunk, 1 has_hunk, 0 adjacent.
-	if len(hunks) != 1 {
-		t.Errorf("expected 1 Hunk for newly-added file, got %d", len(hunks))
+	if n := len(nodesByType(g.Nodes, types.NodeHunk)); n != 1 {
+		t.Errorf("expected 1 Hunk for the newly added file, got %d", n)
 	}
-	if len(adjacent) != 0 {
-		t.Errorf("expected 0 adjacent edges (single hunk), got %d", len(adjacent))
+	if got := srcsOf(edgesByType(g.Edges, types.EdgeModifies), true); !slices.Equal(got, []string{"func0000bbbb3333"}) {
+		t.Errorf("modifies targets = %v, want the Function", got)
 	}
-	// Sanity: total node + edge counts include all the new pieces.
-	if want := originalNodes + 1 + len(hunks); len(g.Nodes) != want {
-		t.Errorf("Node count = %d, want %d", len(g.Nodes), want)
-	}
-	modifies := edgesByType(g.Edges, types.EdgeModifies)
-	if want := originalEdges + len(changedIn) + len(blame) + len(hasHunk) + len(adjacent) + len(modifies); len(g.Edges) != want {
-		t.Errorf("Edge count = %d, want %d", len(g.Edges), want)
-	}
-	// In the BasicGitRepo fixture (Package + File + Function in main.go,
-	// one whole-file hunk) we expect exactly 1 modifies edge: hunk →
-	// Function. Package + File aren't in modifiesNodeWhitelist.
-	if len(modifies) != 1 {
-		t.Errorf("expected 1 modifies edge (hunk → Function), got %d", len(modifies))
-	}
-
-	// Validate post-emit so a regression in dangling refs surfaces here.
 	if err := graph.Validate(g); err != nil {
 		t.Errorf("graph.Validate after temporal: %v", err)
 	}
+}
+
+// srcsOf lists the sources (or, with dst, the destinations) of edges, sorted.
+func srcsOf(es []types.Edge, dst bool) []string {
+	var out []string
+	for _, e := range es {
+		if dst {
+			out = append(out, e.Dst)
+		} else {
+			out = append(out, e.Src)
+		}
+	}
+	slices.Sort(out)
+	return out
 }
 
 // TestEmitTemporalEdges_NotAGitRepo verifies graceful degrade: the function
@@ -105,7 +94,7 @@ func TestEmitTemporalEdges_NotAGitRepo(t *testing.T) {
 	g := buildSyntheticGraph("main.go")
 	beforeNodes := len(g.Nodes)
 	beforeEdges := len(g.Edges)
-	if _, err := emitTemporalEdges(g, dir, discardLog(), 10, nil); err != nil {
+	if _, err := emitTemporalEdges(g, dir, discardLog(), HistoryOptions{}, nil); err != nil {
 		t.Fatalf("expected nil err on non-git src, got %v", err)
 	}
 	if len(g.Nodes) != beforeNodes || len(g.Edges) != beforeEdges {
@@ -114,62 +103,146 @@ func TestEmitTemporalEdges_NotAGitRepo(t *testing.T) {
 	}
 }
 
-// TestEmitTemporalEdges_MultipleCommitsAndBlameOrder commits twice to the
-// same file then verifies:
-//   - 2 commit nodes,
-//   - changed_in edges = nodes_in_file × 2 commits,
-//   - blame edge points at the MOST RECENT commit (latest SHA).
-func TestEmitTemporalEdges_MultipleCommitsAndBlameOrder(t *testing.T) {
-	repo := initGitRepo(t)
-	relPath := "x.go"
-	commitFileToRepo(t, repo, relPath, "package x\n", "first")
-	c2 := commitFileToRepo(t, repo, relPath, "package x\n\n// edit\n", "second")
+// symbolHistoryRepo commits a file whose two functions change at different
+// times, then removes lines above both, so that today's line numbers no
+// longer match those of the older commits:
+//
+//	c1  add: header comments (lines 2-7), G (8-10), F (11-13)
+//	c2  edit G's body (line 9)
+//	c3  delete the header comments: G is now 2-4, F 5-7
+func symbolHistoryRepo(t *testing.T) (repo, c1, c2, c3 string) {
+	t.Helper()
+	repo = initGitRepo(t)
+	head := "package a\n// c1\n// c2\n// c3\n// c4\n// c5\n// c6\n"
+	c1 = commitFileToRepo(t, repo, "a.go", head+"func G() {\n\tg1()\n}\nfunc F() {\n\tf1()\n}\n", "add G and F")
+	c2 = commitFileToRepo(t, repo, "a.go", head+"func G() {\n\tg2()\n}\nfunc F() {\n\tf1()\n}\n", "edit G")
+	c3 = commitFileToRepo(t, repo, "a.go", "package a\nfunc G() {\n\tg2()\n}\nfunc F() {\n\tf1()\n}\n", "drop the header")
+	return repo, c1, c2, c3
+}
 
-	g := buildSyntheticGraph(relPath)
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, nil); err != nil {
-		t.Fatalf("emitTemporalEdges: %v", err)
+// symbolHistoryGraph is today's graph of symbolHistoryRepo's file.
+func symbolHistoryGraph() *graph.Graph {
+	node := func(id string, nt types.NodeType, name string, a, b int) types.Node {
+		return types.Node{ID: id, Type: nt, Name: name, QualifiedName: "a." + name, FilePath: "a.go",
+			StartLine: a, EndLine: b, EndByte: 1, Language: "go", Confidence: types.ConfExtracted}
 	}
-	commits := nodesByType(g.Nodes, types.NodeCommit)
-	if len(commits) != 2 {
-		t.Fatalf("expected 2 Commit nodes, got %d", len(commits))
+	return &graph.Graph{Nodes: []types.Node{
+		node("file0000000000aa", types.NodeFile, "a.go", 1, 7),
+		node("funcG00000000000", types.NodeFunction, "G", 2, 4),
+		node("funcF00000000000", types.NodeFunction, "F", 5, 7),
+	}}
+}
+
+// edgeShas maps each (src, edge type) to the commits its edges reach.
+func edgeShas(g *graph.Graph, et types.EdgeType, src string) []string {
+	var out []string
+	for _, e := range g.Edges {
+		if e.Type == et && e.Src == src {
+			out = append(out, strings.TrimPrefix(nodeQname(g.Nodes, e.Dst), "commit:"))
+		}
 	}
-	changedIn := edgesByType(g.Edges, types.EdgeChangedIn)
-	want := 3 * 2 // 3 nodes in x.go (Package + File + Function) × 2 commits
-	if len(changedIn) != want {
-		t.Errorf("expected %d changed_in edges, got %d", want, len(changedIn))
+	slices.Sort(out)
+	return out
+}
+
+func sortedOf(s ...string) []string {
+	out := slices.Clone(s)
+	slices.Sort(out)
+	return out
+}
+
+// TestEmitTemporalEdges_ChangedInFollowsTheSymbolsLines: a declaration's
+// changed_in edges are the commits that changed its own lines (located at
+// each commit), not every commit of its file; the file's edges are the
+// commits of the file.
+func TestEmitTemporalEdges_ChangedInFollowsTheSymbolsLines(t *testing.T) {
+	repo, c1, c2, c3 := symbolHistoryRepo(t)
+	g := symbolHistoryGraph()
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil); err != nil {
+		t.Fatal(err)
 	}
-	blame := edgesByType(g.Edges, types.EdgeBlame)
-	if len(blame) != 1 {
-		t.Fatalf("expected 1 blame edge, got %d", len(blame))
-	}
-	// Look up the commit node behind the blame edge — it must be c2 (most
-	// recent), not the earlier one. Map qname back to SHA.
-	dstQname := nodeQname(g.Nodes, blame[0].Dst)
-	wantQname := "commit:" + c2
-	if dstQname != wantQname {
-		t.Errorf("blame edge points at %q, want %q (most recent commit)", dstQname, wantQname)
+	for _, tc := range []struct {
+		src  string
+		want []string
+	}{
+		{"funcG00000000000", sortedOf(c1, c2)},
+		{"funcF00000000000", sortedOf(c1)},
+		{"file0000000000aa", sortedOf(c1, c2, c3)},
+	} {
+		if got := edgeShas(g, types.EdgeChangedIn, tc.src); !slices.Equal(got, tc.want) {
+			t.Errorf("changed_in of %s = %v, want %v", tc.src, got, tc.want)
+		}
 	}
 }
 
-// TestEmitTemporalEdges_PerFileCap exercises the maxPerFile bound by
-// committing 5 edits to the same file and asking for at most 2 commits per
-// file. Expect 2 Commit nodes and 2 × nodes-in-file changed_in edges.
-func TestEmitTemporalEdges_PerFileCap(t *testing.T) {
+// TestEmitTemporalEdges_BlameIsPerLine: blame edges name the commits that
+// last changed the node's lines today, with the number of lines.
+func TestEmitTemporalEdges_BlameIsPerLine(t *testing.T) {
+	repo, c1, c2, _ := symbolHistoryRepo(t)
+	g := symbolHistoryGraph()
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil); err != nil {
+		t.Fatal(err)
+	}
+	lines := map[string]map[string]int{}
+	for _, e := range edgesByType(g.Edges, types.EdgeBlame) {
+		if lines[e.Src] == nil {
+			lines[e.Src] = map[string]int{}
+		}
+		lines[e.Src][strings.TrimPrefix(nodeQname(g.Nodes, e.Dst), "commit:")] = e.Count
+	}
+	want := map[string]map[string]int{
+		"funcG00000000000": {c1: 2, c2: 1},
+		"funcF00000000000": {c1: 3},
+		"file0000000000aa": {c1: 6, c2: 1},
+	}
+	for src, w := range want {
+		if got := lines[src]; len(got) != len(w) || got[c1] != w[c1] || got[c2] != w[c2] {
+			t.Errorf("blame of %s = %v, want %v", src, got, w)
+		}
+	}
+}
+
+// TestEmitTemporalEdges_ModifiesUsesChangedLinesAtTheCommit: a hunk modifies
+// a declaration when a line it changed (not a context line) lies in the
+// declaration as it was at the hunk's commit. c2's hunk, whose context lines
+// reach today's F, modifies G only; c3's deletion above both modifies none.
+func TestEmitTemporalEdges_ModifiesUsesChangedLinesAtTheCommit(t *testing.T) {
+	repo, c1, c2, c3 := symbolHistoryRepo(t)
+	g := symbolHistoryGraph()
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil); err != nil {
+		t.Fatal(err)
+	}
+	got := map[string][]string{}
+	for _, e := range edgesByType(g.Edges, types.EdgeModifies) {
+		sha := strings.SplitN(strings.TrimPrefix(nodeQname(g.Nodes, e.Src), "hunk:"), ":", 2)[0]
+		got[sha] = append(got[sha], e.Dst)
+	}
+	for sha := range got {
+		slices.Sort(got[sha])
+	}
+	want := map[string][]string{
+		c1: {"funcF00000000000", "funcG00000000000"},
+		c2: {"funcG00000000000"},
+	}
+	if len(got[c3]) != 0 || !slices.Equal(got[c1], want[c1]) || !slices.Equal(got[c2], want[c2]) {
+		t.Errorf("modifies by commit = %v, want %v and none for %s", got, want, c3)
+	}
+}
+
+// TestEmitTemporalEdges_DepthCapsChangedIn keeps the newest Depth commits
+// per node when a cap is set.
+func TestEmitTemporalEdges_DepthCapsChangedIn(t *testing.T) {
 	repo := initGitRepo(t)
 	rel := "y.go"
 	for i := 0; i < 5; i++ {
 		commitFileToRepo(t, repo, rel, "package y\n//"+strings.Repeat("edit ", i+1)+"\n", "edit")
 	}
 	g := buildSyntheticGraph(rel)
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 2, nil); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{Depth: 2}, nil); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
-	commits := nodesByType(g.Nodes, types.NodeCommit)
-	if len(commits) != 2 {
-		t.Errorf("expected 2 Commit nodes under cap=2, got %d", len(commits))
-	}
-	if got, want := len(edgesByType(g.Edges, types.EdgeChangedIn)), 3*2; got != want {
-		t.Errorf("expected %d changed_in edges (3 nodes × 2 commits), got %d", want, got)
+	if got := len(edgeShas(g, types.EdgeChangedIn, "file0000aaaa2222")); got != 2 {
+		t.Errorf("File has %d changed_in edges under Depth 2, want 2", got)
 	}
 }
 
@@ -297,7 +370,7 @@ func TestEmitTemporalEdges_FilterScopesHunks(t *testing.T) {
 
 	hunkPaths := func(filter *filterlist.FilterList) map[string]int {
 		g := buildSyntheticGraph("in_scope.go")
-		if _, err := emitTemporalEdges(g, repo, discardLog(), 10, filter); err != nil {
+		if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, filter); err != nil {
 			t.Fatalf("emitTemporalEdges: %v", err)
 		}
 		out := map[string]int{}
@@ -344,7 +417,7 @@ func TestEmitTemporalEdges_FilterKeepsRecoveryForDeletedFiles(t *testing.T) {
 
 	g := buildSyntheticGraph("in_scope.go")
 	filter := &filterlist.FilterList{Include: []string{"in_scope.go"}}
-	if _, err := emitTemporalEdges(g, repo, discardLog(), 10, filter); err != nil {
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, filter); err != nil {
 		t.Fatalf("emitTemporalEdges: %v", err)
 	}
 	recovery := map[string]int{}
@@ -359,5 +432,26 @@ func TestEmitTemporalEdges_FilterKeepsRecoveryForDeletedFiles(t *testing.T) {
 	}
 	if n := recovery["present.go"]; n != 0 {
 		t.Errorf("out-of-scope file still in the tree kept %d recovery hunks; only deleted files earn the carve-out", n)
+	}
+}
+
+// TestEmitTemporalEdges_ChangedInCarriesThePlaceAtTheCommit: after a rename
+// and a shift, an older changed_in edge names the file and line the
+// declaration had in that commit, while the node keeps today's.
+func TestEmitTemporalEdges_ChangedInCarriesThePlaceAtTheCommit(t *testing.T) {
+	repo := initGitRepo(t)
+	c1 := commitFileToRepo(t, repo, "old/a.go", "package a\nfunc F() {\n\tf()\n}\n", "add F")
+	runCmd(t, repo, "git", "mv", "old/a.go", "a.go")
+	runCmd(t, repo, "git", "commit", "-q", "-m", "move")
+	commitFileToRepo(t, repo, "a.go", "package a\n\n// F does f.\nfunc F() {\n\tf2()\n}\n", "edit F")
+	g := &graph.Graph{Nodes: []types.Node{{ID: "funcF00000000000", Type: types.NodeFunction, Name: "F", QualifiedName: "a.F",
+		FilePath: "a.go", StartLine: 4, EndLine: 6, EndByte: 1, Language: "go", Confidence: types.ConfExtracted}}}
+	if _, err := emitTemporalEdges(g, repo, discardLog(), HistoryOptions{}, nil); err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range edgesByType(g.Edges, types.EdgeChangedIn) {
+		if nodeQname(g.Nodes, e.Dst) == "commit:"+c1 && (e.FilePath != "old/a.go" || e.Line != 2) {
+			t.Errorf("edge to the first commit is at %s:%d, want old/a.go:2", e.FilePath, e.Line)
+		}
 	}
 }

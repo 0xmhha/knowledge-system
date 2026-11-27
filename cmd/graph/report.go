@@ -13,8 +13,10 @@ package main
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -35,49 +37,20 @@ func newReportCmd() *cobra.Command {
 that everything flows through, the 6-graph axis distribution (G1-G6),
 the most-connected files, and a few heuristic-suggested questions the
 graph is uniquely positioned to answer. Reads graph.db only — no LLM
-calls, runs in seconds even on 220K-node graphs.`,
+calls, runs in seconds even on 220K-node graphs.
+
+The node and edge counts are the rows of graph.db; the schema, build
+time and language file counts come from the build manifest. The sections
+after the header leave out the goroutine code edges (a Goroutine node's
+edges to the code it runs), as the query tools do; the header says how
+many. The axis section counts every other edge: the edge types that
+belong to none of the six axes are listed under "Outside the six axes".`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			db := filepath.Join(graph, "graph.db")
-			store, err := persist.OpenReadOnly(db)
+			n, err := generateReport(graph, out, topGod)
 			if err != nil {
-				return fmt.Errorf("open graph: %w", err)
+				return err
 			}
-			defer func() { _ = store.Close() }()
-
-			manifest, err := store.GetManifest()
-			if err != nil {
-				return fmt.Errorf("read manifest: %w", err)
-			}
-			nodes, err := store.AllNodes()
-			if err != nil {
-				return fmt.Errorf("load nodes: %w", err)
-			}
-			edges, err := store.AllEdges()
-			if err != nil {
-				return fmt.Errorf("load edges: %w", err)
-			}
-			// A Goroutine's code edges are read apart, as in the tools.
-			edges = types.WithoutGoroutineCode(edges)
-			// Topic tree powers the Communities + cohesion section.
-			// LoadHierarchy returns rows for every resolution; we read the
-			// middle one (Level=1, γ=1.0) by default — the smallest
-			// communities at γ=2.0 are too granular for an at-a-glance
-			// report and the largest at γ=0.5 collapse the whole graph
-			// into a few mega-clusters.
-			topics, err := store.LoadHierarchy("topic")
-			if err != nil {
-				// Non-fatal: a graph built before the topic_tree was added
-				// (or one where Leiden was skipped) still produces a useful
-				// report without the Communities section.
-				topics = nil
-			}
-
-			report := buildReport(manifest, nodes, edges, topics, topGod,
-				func(n types.Node) string { return persist.PrintedName(store, n) })
-			if err := os.WriteFile(out, []byte(report), 0o644); err != nil {
-				return fmt.Errorf("write report: %w", err)
-			}
-			_, _ = fmt.Fprintf(os.Stderr, "ckg: wrote GRAPH_REPORT to %s (%d bytes)\n", out, len(report))
+			_, _ = fmt.Fprintf(os.Stderr, "ckg: wrote GRAPH_REPORT to %s (%d bytes)\n", out, n)
 			return nil
 		},
 	}
@@ -88,7 +61,45 @@ calls, runs in seconds even on 220K-node graphs.`,
 	return cmd
 }
 
-// buildReport produces the markdown. Pure function (no I/O) so it's
+// generateReport writes the report of the graph in graphDir to outPath,
+// listing topGod god nodes, and returns its size. Both ckg report and
+// ckg quickstart write the report through it.
+func generateReport(graphDir, outPath string, topGod int) (int, error) {
+	store, err := persist.OpenReadOnly(filepath.Join(graphDir, "graph.db"))
+	if err != nil {
+		return 0, fmt.Errorf("open graph: %w", err)
+	}
+	defer func() { _ = store.Close() }()
+	manifest, err := store.GetManifest()
+	if err != nil {
+		return 0, fmt.Errorf("read manifest: %w", err)
+	}
+	nodes, err := store.AllNodes()
+	if err != nil {
+		return 0, fmt.Errorf("load nodes: %w", err)
+	}
+	edges, err := store.AllEdges()
+	if err != nil {
+		return 0, fmt.Errorf("load edges: %w", err)
+	}
+	// Topic tree powers the Communities + cohesion section. A graph built
+	// without one (or where Leiden was skipped) still gets a useful report
+	// without the Communities section.
+	topics, err := store.LoadHierarchy("topic")
+	if err != nil {
+		topics = nil
+	}
+	report := buildReport(manifest, nodes, edges, topics, topGod,
+		func(n types.Node) string { return persist.PrintedName(store, n) })
+	if err := os.WriteFile(outPath, []byte(report), 0o644); err != nil {
+		return 0, fmt.Errorf("write report: %w", err)
+	}
+	return len(report), nil
+}
+
+// buildReport produces the markdown. edges are every edge of the graph;
+// the header counts them all and the sections leave out goroutine code
+// edges. Pure function (no I/O) so it's
 // trivially testable; the caller owns reading graph.db and writing the
 // output file.
 //
@@ -105,7 +116,7 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 
 	// ── Header
 	_, _ = fmt.Fprintf(&b, "# GRAPH_REPORT\n\n")
-	_, _ = fmt.Fprintf(&b, "Generated from CKG schema **%s** • %s\n\n",
+	_, _ = fmt.Fprintf(&b, "Generated from CKG schema **%s** • %s (build manifest)\n\n",
 		m.SchemaVersion, m.BuildTimestamp)
 	if m.SrcRoot != "" {
 		_, _ = fmt.Fprintf(&b, "- **Source**: `%s`", m.SrcRoot)
@@ -114,15 +125,21 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 		}
 		b.WriteString("\n")
 	}
-	_, _ = fmt.Fprintf(&b, "- **Nodes**: %d • **Edges**: %d\n",
-		len(nodes), len(edges))
+	allEdges := len(edges)
+	// A Goroutine's code edges are read apart, as in the tools.
+	edges = types.WithoutGoroutineCode(edges)
+	_, _ = fmt.Fprintf(&b, "- **Nodes**: %d • **Edges**: %d (rows of graph.db", len(nodes), allEdges)
+	if left := allEdges - len(edges); left > 0 {
+		_, _ = fmt.Fprintf(&b, "; the sections below leave out %d goroutine code edges, as the query tools do", left)
+	}
+	b.WriteString(")\n")
 	if len(m.Languages) > 0 {
 		var langs []string
 		for k, v := range m.Languages {
 			langs = append(langs, fmt.Sprintf("%s=%d", k, v))
 		}
 		sort.Strings(langs)
-		_, _ = fmt.Fprintf(&b, "- **Languages** (files): %s\n", strings.Join(langs, ", "))
+		_, _ = fmt.Fprintf(&b, "- **Languages** (files, as the build manifest recorded them): %s\n", strings.Join(langs, ", "))
 	}
 	b.WriteString("\n")
 
@@ -134,6 +151,9 @@ func buildReport(m persist.Manifest, nodes []types.Node, edges []types.Edge,
 		bar := bar(c, axisCounts["max"], 30)
 		_, _ = fmt.Fprintf(&b, "- **%s** %s — %d edges %s\n",
 			ax, axisLabel(ax), c, bar)
+	}
+	if outside, n := edgesOutsideAxes(edges); n > 0 {
+		_, _ = fmt.Fprintf(&b, "- **Outside the six axes** — %d edges: %s\n", n, strings.Join(outside, ", "))
 	}
 	b.WriteString("\n")
 
@@ -283,6 +303,32 @@ func axisDistribution(edges []types.Edge) map[string]int {
 	return out
 }
 
+// edgesOutsideAxes counts the edges whose type has no axis (edgeToAxis
+// returns ""), as "type=count" entries by descending count, and their
+// total, so the axis section accounts for every edge it was given.
+func edgesOutsideAxes(edges []types.Edge) ([]string, int) {
+	byType := map[types.EdgeType]int{}
+	total := 0
+	for _, e := range edges {
+		if edgeToAxis(e.Type) == "" {
+			byType[e.Type]++
+			total++
+		}
+	}
+	keys := slices.Collect(maps.Keys(byType))
+	sort.Slice(keys, func(i, j int) bool {
+		if byType[keys[i]] != byType[keys[j]] {
+			return byType[keys[i]] > byType[keys[j]]
+		}
+		return keys[i] < keys[j]
+	})
+	out := make([]string, len(keys))
+	for i, k := range keys {
+		out[i] = fmt.Sprintf("%s=%d", k, byType[k])
+	}
+	return out, total
+}
+
 // edgeToAxis maps backend EdgeType → CKS graph axis (G1..G6). Source of
 // truth for the report's axis breakdown; mirrors tools/viewer/src/lib/
 // edges.ts GRAPH_GROUPS.
@@ -416,8 +462,10 @@ func confidenceCounts(edges []types.Edge) map[types.Confidence]int {
 //   - concept-like (FilePath empty): nodes the parser couldn't anchor
 //     to a real source location are usually placeholder pending refs,
 //     not real abstractions.
+//   - statement nodes (types.NodeType.IsStatement): parts of a function
+//     body, not declarations.
 func godNodeFilter(t types.NodeType, filePath string) bool {
-	if filePath == "" {
+	if filePath == "" || t.IsStatement() {
 		return true
 	}
 	switch t {

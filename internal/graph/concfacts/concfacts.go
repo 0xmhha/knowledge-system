@@ -9,13 +9,17 @@
 // The contract holds what Go produces today:
 //
 //   - ExecContext: a goroutine (a Goroutine node) and the code it runs.
-//   - ChanOp: a send or receive and the origin of its channel (a make site,
-//     a field, a package-level variable); ChanAlias: a channel stored under
-//     another name.
+//   - ChanOp: a send, receive or close and the origin of its channel (a
+//     make site, a field, a package-level variable); ChanAlias: a channel
+//     stored under another name.
 //   - Handles: the code a received message makes run; Received: where the
 //     received value goes; Trigger: a sender and a receive it can wake.
 //   - LockOp: an acquire or release of a mutex; UnderLock: a field used
-//     where a mutex is held, in the function itself or in a callee.
+//     where a mutex is held, in the function itself or in a callee;
+//     SiteLock: a mutex held at a call or channel operation.
+//   - SyncUse: a call on a sync primitive (a WaitGroup, a Once, a Cond, an
+//     atomic value, a context and its cancel function, a timer) named by
+//     its declaration; RunsLater: a function such a call runs later.
 //
 // Every fact states its certainty (Certainty): proved from the code (no
 // runtime value is needed to know it) or approximated, with the reason.
@@ -96,6 +100,9 @@ const (
 	PropagatedKind = "propagated"
 	// AliasKind marks a ChanAlias (flows_to from a channel's origin).
 	AliasKind = "chan"
+	// SyncAliasKind marks a SyncAlias (flows_to from where a sync
+	// primitive is held to the field or variable it is stored into).
+	SyncAliasKind = "sync"
 	// ReceivedKind marks a Received fact (flows_to from a receive).
 	ReceivedKind = types.DispatchReceived
 	// CloseKind marks the LockOp that closes a channel used as a lock.
@@ -132,10 +139,14 @@ type Direction string
 const (
 	Send Direction = "send"
 	Recv Direction = "recv"
+	// Close closes the channel: every receive on it wakes (Trigger), and
+	// gets the zero value from then on.
+	Close Direction = "close"
 )
 
-// ChanOp is a send or receive by Actor (a function or a goroutine) on the
-// channel whose origin is Origin; OriginKind is make, field or global.
+// ChanOp is a send, receive or close by Actor (a function or a goroutine)
+// on the channel whose origin is Origin; OriginKind is make, field or
+// global.
 type ChanOp struct {
 	Actor, Origin string
 	OriginKind    string
@@ -174,8 +185,10 @@ type Received struct {
 	Certainty    Certainty
 }
 
-// Trigger is a sender (a function or a goroutine) whose send at Line can
-// wake the receive at Receive; Channel names the channel's origin.
+// Trigger is a sender (a function or a goroutine) whose send (or close) at
+// Line can wake the receive at Receive; Channel names the channel's origin.
+// A close wakes every receive on the channel; the closer's ChanOp of
+// direction Close on the same line tells a close from a send.
 type Trigger struct {
 	Sender, Receive string
 	Channel         string
@@ -203,6 +216,53 @@ type UnderLock struct {
 	Certainty    Certainty
 }
 
+// SiteLock is Mutex held at Site (a CallSite: a call, a send, a receive, a
+// close) by the must-hold rule: by the site's function, or (Propagated) by
+// a function that calls it while holding the mutex.
+type SiteLock struct {
+	Site, Mutex string
+	Propagated  bool
+	Line        int
+	File        string
+	Certainty   Certainty
+}
+
+// SyncUse is the operation Op of the call (or receive) at Site on the sync
+// primitive Primitive: the declaration that holds it (a field, a variable),
+// or for a timer channel no declaration holds (<-time.After(d)) the site of
+// the call that makes the timer. A primitive passed as a parameter is named
+// by the declarations its value flow reaches (approximated, aliasing).
+type SyncUse struct {
+	Site, Primitive string
+	Op              types.SyncOp
+	Line            int
+	File            string
+	Certainty       Certainty
+}
+
+// SyncAlias is a sync primitive held in Holder (where it was made or
+// first held: a local variable, a field, a variable) stored at Line into
+// Store, a field or package-level variable: what operates on Store operates
+// on what Holder holds (a cancel function made into a local, stored into a
+// field and called through it).
+type SyncAlias struct {
+	Holder, Store string
+	Line          int
+	File          string
+	Certainty     Certainty
+}
+
+// RunsLater is the declared function Func that the call at Site runs later,
+// not where it is written: once (sync.Once.Do), when a timer fires
+// (time.AfterFunc) or in a goroutine (sync.WaitGroup.Go); Op says which.
+type RunsLater struct {
+	Site, Func string
+	Op         types.SyncOp
+	Line       int
+	File       string
+	Certainty  Certainty
+}
+
 // Fact is one of the fact types above.
 type Fact interface {
 	edges() []types.Edge
@@ -225,10 +285,7 @@ func (f ExecContext) edges() []types.Edge {
 }
 
 func (f ChanOp) edges() []types.Edge {
-	t := types.EdgeSendsTo
-	if f.Dir == Recv {
-		t = types.EdgeRecvsFrom
-	}
+	t := map[Direction]types.EdgeType{Send: types.EdgeSendsTo, Recv: types.EdgeRecvsFrom, Close: types.EdgeCloses}[f.Dir]
 	return []types.Edge{{Src: f.Actor, Dst: f.Origin, Type: t, Line: f.Line, Count: 1,
 		Confidence: f.Certainty.Confidence(), DispatchKind: f.OriginKind, FilePath: f.File}}
 }
@@ -273,6 +330,30 @@ func (f UnderLock) edges() []types.Edge {
 	}
 	return []types.Edge{{Src: f.Field, Dst: f.Mutex, Type: types.EdgeAccessedUnderLock, Count: 1,
 		Confidence: f.Certainty.Confidence(), DispatchKind: kind, FilePath: f.File}}
+}
+
+func (f SiteLock) edges() []types.Edge {
+	kind := ""
+	if f.Propagated {
+		kind = PropagatedKind
+	}
+	return []types.Edge{{Src: f.Site, Dst: f.Mutex, Type: types.EdgeRunsUnderLock, Line: f.Line, Count: 1,
+		Confidence: f.Certainty.Confidence(), DispatchKind: kind, FilePath: f.File}}
+}
+
+func (f SyncUse) edges() []types.Edge {
+	return []types.Edge{{Src: f.Site, Dst: f.Primitive, Type: types.EdgeOperatesOn, Line: f.Line, Count: 1,
+		Confidence: f.Certainty.Confidence(), DispatchKind: string(f.Op), FilePath: f.File}}
+}
+
+func (f SyncAlias) edges() []types.Edge {
+	return []types.Edge{{Src: f.Holder, Dst: f.Store, Type: types.EdgeFlowsTo, Line: f.Line, Count: 1,
+		Confidence: f.Certainty.Confidence(), DispatchKind: SyncAliasKind, FilePath: f.File}}
+}
+
+func (f RunsLater) edges() []types.Edge {
+	return []types.Edge{{Src: f.Site, Dst: f.Func, Type: types.EdgeRunsFunc, Line: f.Line, Count: 1,
+		Confidence: f.Certainty.Confidence(), DispatchKind: string(f.Op), FilePath: f.File}}
 }
 
 // Edges returns the graph edges of facts, one per fact use, in order.
