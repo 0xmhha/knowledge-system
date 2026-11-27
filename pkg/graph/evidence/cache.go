@@ -24,6 +24,7 @@ package evidence
 
 import (
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 	"path"
 	"sort"
 	"sync"
@@ -256,7 +257,8 @@ func (c *Cache) ensureIndex(store persist.StoreReader) error {
 	if err != nil {
 		return fmt.Errorf("evidence cache: load edges: %w", err)
 	}
-	corpus := indexCorpus(nodes, edges)
+	// A Goroutine's code edges repeat its function's calls.
+	corpus := indexCorpus(nodes, types.WithoutGoroutineCode(edges))
 
 	docs := make([]bm25.Document, 0, len(corpus.hunks))
 	for _, h := range corpus.hunks {

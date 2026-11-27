@@ -58,7 +58,7 @@ func TestDispatchEdges_BodyThatCannotBeBuilt(t *testing.T) {
 
 	done := make(chan gop.DispatchStats, 1)
 	go func() {
-		_, st := gop.EmitDispatchEdges(pkgs, nil)
+		_, _, st := gop.EmitDispatchEdges(pkgs, nil)
 		done <- st
 	}()
 	select {

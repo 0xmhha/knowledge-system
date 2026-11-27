@@ -785,3 +785,40 @@ func TestIntentToKinds_VocabularyMatchesTaxonomy(t *testing.T) {
 		}
 	}
 }
+
+// rolesFake is a ckg client that knows the graph's test files.
+type rolesFake struct {
+	*ckgclient.Fake
+	roles map[string]bool
+}
+
+func (f rolesFake) TestFileRule() (func(string) bool, error) {
+	return func(file string) bool { return f.roles[file] }, nil
+}
+
+// TestSearch_DemotesByTheGraphRecord: Stage 2 demotes what the graph
+// records as test code (ckgclient.TestFileRule), not what the path says. A
+// scope lists systemcontracts/test/deploy.go as production and
+// core/helper.go as a test helper; by path it was the other way round.
+func TestSearch_DemotesByTheGraphRecord(t *testing.T) {
+	t.Parallel()
+	ckg := rolesFake{
+		Fake: &ckgclient.Fake{BM25Hits: []contract.Hit{
+			bm25Hit("core/helper.go", 1, 10, 1.0),
+			bm25Hit("systemcontracts/test/deploy.go", 1, 10, 1.0),
+		}},
+		roles: map[string]bool{"core/helper.go": true},
+	}
+	s, err := New(ckg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := s.Search(context.Background(), "", []string{"Deploy"}, nil, contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Citations) != 2 || out.Citations[0].Citation.File != "systemcontracts/test/deploy.go" ||
+		out.Citations[0].Score <= out.Citations[1].Score {
+		t.Errorf("citations %+v: want the production file first and core/helper.go demoted", out.Citations)
+	}
+}

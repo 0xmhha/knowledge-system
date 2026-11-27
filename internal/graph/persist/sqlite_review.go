@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // reviewCodeEdgeTypes are the code relations kept in code_edges. Structural
@@ -20,6 +22,10 @@ var reviewCodeEdgeTypes = []string{
 	"spawns", "sends_to", "recvs_from", "acquires_lock", "releases_lock",
 	"accessed_under_lock", "timeout_path", "cancellation_path",
 }
+
+// goroutineCodeOut leaves a Goroutine's code edges (alias e) out of the
+// review index: its callers back to entry points are functions.
+var goroutineCodeOut = types.NotGoroutineCodeSQL("e.")
 
 // RebuildReviewIndex implements StoreWriter. It runs in one transaction so a
 // reader never sees a partial index.
@@ -46,7 +52,7 @@ func (s *sqliteStore) RebuildReviewIndex(testFiles []string) error {
 	if _, err := tx.Exec(`INSERT INTO code_edges (src, dst, type, line)
 		SELECT e.src, e.dst, e.type, COALESCE(e.line, 0)
 		FROM edges e JOIN nodes s ON s.id = e.src JOIN nodes d ON d.id = e.dst
-		WHERE s.is_test = 0 AND d.is_test = 0
+		WHERE s.is_test = 0 AND d.is_test = 0 AND `+goroutineCodeOut+`
 		  AND (e.type IN (`+placeholders(len(reviewCodeEdgeTypes))+`)
 		       OR (e.type = 'defines' AND s.type IN ('Struct', 'Interface')))`, anys(reviewCodeEdgeTypes)...); err != nil {
 		return fmt.Errorf("review index: fill code_edges: %w", err)
@@ -124,6 +130,44 @@ func (s *sqliteStore) Review(qname string, opts ReviewOptions) (Review, error) {
 	r.TestCallersTotal = len(r.TestCallers)
 	r.TestCallers = r.TestCallers[:min(len(r.TestCallers), opts.MaxItems)]
 	return r, nil
+}
+
+// TestFileRoles implements TestFileReader: every file that has nodes, true
+// for those the build marked as test code (nodes.is_test). recorded is false
+// for a graph that holds no such record: one without the review index (built
+// before schema 1.24), or one where the index was never filled (no code edge
+// and no test node).
+func (s *sqliteStore) TestFileRoles() (roles map[string]bool, recorded bool, err error) {
+	has, err := s.hasReviewIndex()
+	if err != nil || !has {
+		return nil, false, err
+	}
+	if err := s.db.QueryRow(`SELECT EXISTS (SELECT 1 FROM code_edges) OR EXISTS (SELECT 1 FROM nodes WHERE is_test = 1)`).Scan(&recorded); err != nil {
+		return nil, false, fmt.Errorf("test files: check the record: %w", err)
+	}
+	if !recorded {
+		return nil, false, nil
+	}
+	rows, err := s.db.Query(`SELECT file_path, MAX(is_test) FROM nodes WHERE file_path <> '' GROUP BY file_path`)
+	if err != nil {
+		return nil, false, fmt.Errorf("test files: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	roles = map[string]bool{}
+	for rows.Next() {
+		var (
+			f    string
+			test int
+		)
+		if err := rows.Scan(&f, &test); err != nil {
+			return nil, false, fmt.Errorf("test files: scan: %w", err)
+		}
+		roles[f] = test != 0
+	}
+	if err := rows.Err(); err != nil {
+		return nil, false, fmt.Errorf("test files: %w", err)
+	}
+	return roles, true, nil
 }
 
 func (s *sqliteStore) hasReviewIndex() (bool, error) {

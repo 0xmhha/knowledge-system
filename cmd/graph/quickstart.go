@@ -25,6 +25,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 func newQuickstartCmd() *cobra.Command {
@@ -126,10 +127,13 @@ func generateReport(graphDir, outPath string) error {
 	if err != nil {
 		return fmt.Errorf("edges: %w", err)
 	}
+	// A Goroutine's code edges are read apart, as in the tools.
+	edges = types.WithoutGoroutineCode(edges)
 	topics, err := store.LoadHierarchy("topic")
 	if err != nil {
 		topics = nil // graphs without a Leiden run still get a useful report
 	}
-	report := buildReport(manifest, nodes, edges, topics, 25)
+	report := buildReport(manifest, nodes, edges, topics, 25,
+		func(n types.Node) string { return persist.PrintedName(store, n) })
 	return os.WriteFile(outPath, []byte(report), 0o644)
 }

@@ -14,20 +14,33 @@ import (
 )
 
 // statements.go checks the statement links of schema 1.32 (site_calls,
-// cond_reads, cond_calls, body_writes, encloses) against facts computed here
-// from go/types and the syntax tree.
+// cond_reads, cond_calls, body_writes, encloses) and literal_passed_to
+// (schema 1.42: a call in a function literal passed as an argument -> the
+// function it is passed to) against facts computed here from go/types and
+// the syntax tree.
 //
 // The build walks a body region by region (parse/golang/statement_links.go).
 // The truth here is computed another way, so that the two can disagree: one
 // flat walk keeps the stack of syntax nodes above each node, and the
 // innermost control statement and its part (cond, then, else, body, case,
 // go) are read off that stack. Canonical ids are formatted by this package
-// (canonicalID, fieldID), not the parser's.
+// (canonicalID), not the parser's. A struct field is named by where it is
+// declared (fieldRef), not by "<importpath>.<Type>.<Field>": that string
+// names the package-level field when a function declares a struct of the
+// same name, and no field at all through a defined type over a struct. While
+// the truth used the string, as the build then did, the two agreed on the
+// wrong field and the comparison showed nothing.
 //
-// A truth fact whose statement has no node in the graph (the build makes
-// only call-site nodes inside a goroutine's function literal, and none for
-// the call of a go statement itself) is counted apart, as is a fact whose
-// value or callee has no node (outside the scope).
+// Nesting (encloses) crosses function literals: a statement written in a
+// literal that is written in a loop lies in that loop. What a literal reads,
+// writes and calls is not the surrounding statement's, so the other links
+// stop at a literal. A go statement encloses the literal it runs and the calls
+// it makes itself to evaluate its function and arguments. Sends, receives and
+// ranges over a channel are sites like calls.
+//
+// A truth fact whose statement has no node in the graph (none is made for
+// the call of a go statement itself) is counted apart, as is a fact whose value
+// or callee has no node (outside the scope).
 
 // StmtFact is one statement link: from a statement to a value, a callee or a
 // statement, in one part of the source statement, on a line.
@@ -80,7 +93,8 @@ func (s StmtRelStats) Recall() float64 {
 	return float64(s.Matched) / float64(d)
 }
 
-var stmtRels = []types.EdgeType{types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses}
+var stmtRels = []types.EdgeType{types.EdgeSiteCalls, types.EdgeCondReads, types.EdgeCondCalls, types.EdgeBodyWrites, types.EdgeEncloses,
+	types.EdgeLiteralPassedTo}
 
 var stmtNodeTypes = map[types.NodeType]bool{
 	types.NodeIfStmt: true, types.NodeLoopStmt: true, types.NodeSwitchStmt: true,
@@ -89,7 +103,7 @@ var stmtNodeTypes = map[types.NodeType]bool{
 
 // stmtKind is the graph node type a statement of the syntax tree becomes.
 func stmtKind(n ast.Node) types.NodeType {
-	switch n.(type) {
+	switch x := n.(type) {
 	case *ast.IfStmt:
 		return types.NodeIfStmt
 	case *ast.ForStmt, *ast.RangeStmt:
@@ -98,8 +112,12 @@ func stmtKind(n ast.Node) types.NodeType {
 		return types.NodeSwitchStmt
 	case *ast.ReturnStmt:
 		return types.NodeReturnStmt
-	case *ast.CallExpr:
+	case *ast.CallExpr, *ast.SendStmt:
 		return types.NodeCallSite
+	case *ast.UnaryExpr:
+		if x.Op == token.ARROW { // a receive is a site, like a call
+			return types.NodeCallSite
+		}
 	case *ast.GoStmt:
 		return types.NodeGoroutine
 	}
@@ -108,10 +126,16 @@ func stmtKind(n ast.Node) types.NodeType {
 
 // statements adds the statement facts of one function body.
 func (w *fileWalker) statements(d *ast.FuncDecl) {
-	if w.stmt == nil {
+	w.statementsIn(d.Body)
+}
+
+// statementsIn adds the statement facts of one piece of code: a function
+// body, or the initialiser of a package-level variable.
+func (w *fileWalker) statementsIn(body ast.Node) {
+	if w.stmt == nil || body == nil {
 		return
 	}
-	writes := writtenExprs(d.Body)
+	writes := writtenExprs(body)
 	key := func(n ast.Node) string {
 		return fmt.Sprintf("%s@L%d", stmtKind(n), w.fset.Position(n.Pos()).Line)
 	}
@@ -119,25 +143,67 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 		w.stmt[StmtFact{Rel: string(rel), File: w.rel, Src: key(src), Dst: dst, Kind: kind, Line: w.fset.Position(p).Line}] = true
 	}
 	var stack []ast.Node
-	ast.Inspect(d.Body, func(n ast.Node) bool {
+	ast.Inspect(body, func(n ast.Node) bool {
 		if n == nil {
 			stack = stack[:len(stack)-1]
 			return false
 		}
-		ctl, part := enclosingControl(stack, n)
+		ctl, part, inLit := enclosingControl(stack, n)
 		if stmtKind(n) != "" && !isGoCall(stack, n) {
 			if ctl != nil && part != "" {
 				add(types.EdgeEncloses, ctl, key(n), part, n.Pos())
 			}
 		}
+		// A range over a channel receives: its site, at the range keyword,
+		// is part of the loop header.
+		if r, ok := n.(*ast.RangeStmt); ok && w.isChan(r.X) {
+			add(types.EdgeEncloses, r, fmt.Sprintf("%s@L%d", types.NodeCallSite, w.fset.Position(r.Range).Line), "cond", r.Range)
+		}
+		if inLit {
+			// A branch that only defines a function writes nothing.
+			ctl, part = nil, ""
+		}
+		// The header a use lies in is a region of the text: it reaches
+		// into function literals and the statements written in them.
+		hdr := headerAround(stack, n)
 		switch x := n.(type) {
 		case *ast.CallExpr:
 			if dst, kind := w.callTarget(x); dst != "" {
 				if !isGoCall(stack, n) {
 					add(types.EdgeSiteCalls, x, dst, kind, x.Pos())
 				}
-				if part == "cond" {
-					add(types.EdgeCondCalls, ctl, dst, "", x.Pos())
+				if hdr != nil {
+					add(types.EdgeCondCalls, hdr, dst, "", x.Pos())
+				}
+				// A function literal passed as an argument: each call in it
+				// (not in a literal nested in it) runs when dst calls it.
+				for _, a := range x.Args {
+					lit, ok := ast.Unparen(a).(*ast.FuncLit)
+					if !ok {
+						continue
+					}
+					goCalls := map[*ast.CallExpr]bool{} // a go statement's call is a goroutine
+					ast.Inspect(lit.Body, func(m ast.Node) bool {
+						switch y := m.(type) {
+						case *ast.FuncLit:
+							return false
+						case *ast.GoStmt:
+							goCalls[y.Call] = true
+						case *ast.CallExpr:
+							if goCalls[y] {
+								return true
+							}
+							if tv, ok := w.info.Types[y.Fun]; !ok || !tv.IsType() && !tv.IsBuiltin() {
+								// Named by its span, not its line: each call
+								// in the literal is one fact, as each is one
+								// edge.
+								w.stmt[StmtFact{Rel: string(types.EdgeLiteralPassedTo), File: w.rel,
+									Src: callSpan(w.fset.Position(y.Pos()).Offset, w.fset.Position(y.End()).Offset),
+									Dst: dst, Kind: "arg", Line: w.fset.Position(x.Pos()).Line}] = true
+							}
+						}
+						return true
+					})
 				}
 			}
 		case *ast.GoStmt:
@@ -150,8 +216,8 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 			}
 		case *ast.SelectorExpr:
 			if s := w.info.Selections[x]; s != nil && s.Kind() == gotypes.FieldVal {
-				if id := fieldID(s); id != "" && w.inScopeID(s.Obj()) {
-					w.valueFact(add, ctl, part, writes[x], id, x.Sel.Pos())
+				if id := w.fieldRef(s.Obj()); id != "" && w.inScopeID(s.Obj()) {
+					w.valueFact(add, hdr, ctl, part, writes[x], id, x.Sel.Pos())
 				}
 			}
 		case *ast.Ident:
@@ -162,7 +228,7 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 			switch obj.(type) {
 			case *gotypes.Var, *gotypes.Const:
 				if id := canonicalID(obj); id != "" && w.inScope(obj) {
-					w.valueFact(add, ctl, part, writes[x], id, x.Pos())
+					w.valueFact(add, hdr, ctl, part, writes[x], id, x.Pos())
 				}
 			}
 		}
@@ -171,19 +237,74 @@ func (w *fileWalker) statements(d *ast.FuncDecl) {
 	})
 }
 
-func (w *fileWalker) valueFact(add func(types.EdgeType, ast.Node, string, string, token.Pos), ctl ast.Node, part string, write bool, id string, p token.Pos) {
-	switch {
-	case ctl == nil || part == "":
-	case part == "cond":
-		if !write {
-			add(types.EdgeCondReads, ctl, id, "", p)
-		}
-	case write:
+// valueFact records a use of the value id: a read in the header hdr, or a
+// write in the part of the statement ctl (never its header).
+func (w *fileWalker) valueFact(add func(types.EdgeType, ast.Node, string, string, token.Pos), hdr, ctl ast.Node, part string, write bool, id string, p token.Pos) {
+	if hdr != nil && !write {
+		add(types.EdgeCondReads, hdr, id, "", p)
+	}
+	if write && ctl != nil && part != "" && part != "cond" {
 		add(types.EdgeBodyWrites, ctl, id, part, p)
 	}
 }
 
+// headerAround returns the innermost statement in whose header n lies, read
+// off the stack of n's ancestors, or nil. The header is the init statement,
+// the condition, the post statement, the range expression, the switch tag and
+// the case expressions; it is a region of the source text, so n may lie in a
+// function literal written there, or in a statement inside such a literal.
+func headerAround(stack []ast.Node, n ast.Node) ast.Node {
+	at := func(i int) ast.Node {
+		if i < len(stack) {
+			return stack[i]
+		}
+		if i == len(stack) {
+			return n
+		}
+		return nil
+	}
+	for i := len(stack) - 1; i >= 0; i-- {
+		child := at(i + 1)
+		switch a := stack[i].(type) {
+		case *ast.IfStmt:
+			if child == ast.Node(a.Init) || child == ast.Node(a.Cond) {
+				return a
+			}
+		case *ast.ForStmt:
+			if child == ast.Node(a.Init) || child == ast.Node(a.Cond) || child == ast.Node(a.Post) {
+				return a
+			}
+		case *ast.RangeStmt:
+			if child == ast.Node(a.X) {
+				return a
+			}
+			if child != ast.Node(a.Body) {
+				return nil // key and value: not a part with links
+			}
+		case *ast.SwitchStmt:
+			if child == ast.Node(a.Init) || child == ast.Node(a.Tag) || child == ast.Node(a.Body) && casePart(at(i+2), at(i+3)) == "cond" {
+				return a
+			}
+		case *ast.TypeSwitchStmt:
+			if child == ast.Node(a.Init) || child == ast.Node(a.Assign) || child == ast.Node(a.Body) && casePart(at(i+2), at(i+3)) == "cond" {
+				return a
+			}
+		}
+	}
+	return nil
+}
+
 func (w *fileWalker) inScopeID(obj gotypes.Object) bool { return w.inScope(obj) }
+
+// isChan reports whether e is of channel type.
+func (w *fileWalker) isChan(e ast.Expr) bool {
+	t := w.info.TypeOf(e)
+	if t == nil {
+		return false
+	}
+	_, ok := t.Underlying().(*gotypes.Chan)
+	return ok
+}
 
 // callTarget is the canonical id of what a call names in scope, and
 // "static" or "interface_method".
@@ -200,11 +321,26 @@ func (w *fileWalker) callTarget(c *ast.CallExpr) (string, string) {
 	if sel, ok := ast.Unparen(c.Fun).(*ast.SelectorExpr); ok {
 		if s := w.info.Selections[sel]; s != nil && s.Kind() == gotypes.MethodVal {
 			if fn, ok := s.Obj().(*gotypes.Func); ok && isInterfaceMethod(fn) && w.inScope(fn) {
-				return canonicalID(fn), "interface_method"
+				if id := canonicalID(fn); id != "" {
+					return id, "interface_method"
+				}
+				// A method of an interface declared in a function or
+				// written without a name: named by where it is declared.
+				pos := w.fset.Position(fn.Pos())
+				if rel, ok := relPath(w.root, pos.Filename); ok {
+					return methodRefAt(rel, pos.Line, fn.Name()), "interface_method"
+				}
 			}
 		}
 	}
 	return "", ""
+}
+
+// methodRefAt names an interface method that has no canonical id by its
+// declaration: the file, the line and the method name. The truth takes them
+// from go/types, the graph side from the Method node.
+func methodRefAt(file string, line int, name string) string {
+	return fmt.Sprintf("method:%s:%d:%s", file, line, name)
 }
 
 // isGoCall reports whether n is the call of a go statement (go f(x) or
@@ -218,10 +354,11 @@ func isGoCall(stack []ast.Node, n ast.Node) bool {
 }
 
 // enclosingControl returns the innermost control statement around n, read
-// off the stack of its ancestors, and the part of it n lies in. A function
-// literal ends the search, except the literal a go statement runs, which
-// belongs to that go statement ("go").
-func enclosingControl(stack []ast.Node, n ast.Node) (ast.Node, string) {
+// off the stack of its ancestors, and the part of it n lies in. inLit is set
+// when a function literal lies between the two, other than the literal a go
+// statement runs, which belongs to that go statement ("go"), as do the
+// function expression and the arguments the go statement evaluates.
+func enclosingControl(stack []ast.Node, n ast.Node) (ctl ast.Node, part string, inLit bool) {
 	at := func(i int) ast.Node {
 		if i < len(stack) {
 			return stack[i]
@@ -235,55 +372,61 @@ func enclosingControl(stack []ast.Node, n ast.Node) (ast.Node, string) {
 		child := at(i + 1)
 		switch a := stack[i].(type) {
 		case *ast.FuncLit:
+			// The literal the go statement runs (go func(){...}()) is the
+			// goroutine's own code; any other literal is crossed.
 			if i >= 2 {
-				// Only the literal the go statement runs (go func(){...}()),
-				// not a literal passed as one of its arguments.
 				if g, ok := stack[i-2].(*ast.GoStmt); ok && ast.Node(g.Call) == stack[i-1] && ast.Node(g.Call.Fun) == stack[i] {
-					return g, "go"
+					return g, "go", inLit
 				}
 			}
-			return nil, ""
+			inLit = true
+		case *ast.GoStmt:
+			// Below the call of the go statement: its function expression
+			// or one of its arguments.
+			if child == ast.Node(a.Call) && at(i+2) != nil {
+				return a, "go", inLit
+			}
 		case *ast.IfStmt:
 			switch child {
 			case ast.Node(a.Init), ast.Node(a.Cond):
-				return a, "cond"
+				return a, "cond", inLit
 			case ast.Node(a.Body):
-				return a, "then"
+				return a, "then", inLit
 			case ast.Node(a.Else):
-				return a, "else"
+				return a, "else", inLit
 			}
 		case *ast.ForStmt:
 			switch child {
 			case ast.Node(a.Init), ast.Node(a.Cond), ast.Node(a.Post):
-				return a, "cond"
+				return a, "cond", inLit
 			case ast.Node(a.Body):
-				return a, "body"
+				return a, "body", inLit
 			}
 		case *ast.RangeStmt:
 			switch child {
 			case ast.Node(a.X):
-				return a, "cond"
+				return a, "cond", inLit
 			case ast.Node(a.Body):
-				return a, "body"
+				return a, "body", inLit
 			}
-			return nil, "" // key and value: not a part with links
+			return nil, "", inLit // key and value: not a part with links
 		case *ast.SwitchStmt:
 			if child == ast.Node(a.Init) || child == ast.Node(a.Tag) {
-				return a, "cond"
+				return a, "cond", inLit
 			}
 			if child == ast.Node(a.Body) {
-				return a, casePart(at(i+2), at(i+3))
+				return a, casePart(at(i+2), at(i+3)), inLit
 			}
 		case *ast.TypeSwitchStmt:
 			if child == ast.Node(a.Init) || child == ast.Node(a.Assign) {
-				return a, "cond"
+				return a, "cond", inLit
 			}
 			if child == ast.Node(a.Body) {
-				return a, casePart(at(i+2), at(i+3))
+				return a, casePart(at(i+2), at(i+3)), inLit
 			}
 		}
 	}
-	return nil, ""
+	return nil, "", inLit
 }
 
 // casePart says whether x, a child of case clause cl, is a case expression
@@ -337,32 +480,30 @@ func writtenExprs(body ast.Node) map[ast.Node]bool {
 	return out
 }
 
-// fieldID formats the field a selection reaches as <importpath>.<Type>.<Field>,
-// following embedded fields to the struct that declares it.
-func fieldID(s *gotypes.Selection) string {
-	t := s.Recv()
-	idx := s.Index()
-	for k, i := range idx {
-		u := gotypes.Unalias(t)
-		if p, ok := u.(*gotypes.Pointer); ok {
-			u = gotypes.Unalias(p.Elem())
-		}
-		st, ok := u.Underlying().(*gotypes.Struct)
-		if !ok || i >= st.NumFields() {
-			return ""
-		}
-		f := st.Field(i)
-		if k == len(idx)-1 {
-			named, ok := u.(*gotypes.Named)
-			if !ok || named.Origin().Obj().Pkg() == nil {
-				return "" // a field of an anonymous struct
-			}
-			o := named.Origin().Obj()
-			return o.Pkg().Path() + "." + o.Name() + "." + f.Name()
-		}
-		t = f.Type()
+// fieldRefAt names a struct field by its declaration: the file, the line and
+// the field name. The truth takes them from go/types, the graph side from the
+// Field node.
+func fieldRefAt(file string, line int, name string) string {
+	return fmt.Sprintf("field:%s:%d:%s", file, line, name)
+}
+
+// fieldRef is the fieldRefAt name of the field obj, or "" when obj is not a
+// field declared under the source root.
+func (w *fileWalker) fieldRef(obj gotypes.Object) string {
+	v, ok := obj.(*gotypes.Var)
+	if !ok || !v.IsField() {
+		return ""
 	}
-	return ""
+	v = v.Origin()
+	if !v.Pos().IsValid() {
+		return ""
+	}
+	pos := w.fset.Position(v.Pos())
+	rel, ok := relPath(w.root, pos.Filename)
+	if !ok {
+		return ""
+	}
+	return fieldRefAt(rel, pos.Line, v.Name())
 }
 
 // compareStatements classifies truth facts and graph edges per type.
@@ -374,14 +515,27 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		byID[n.ID] = n
 		if stmtNodeTypes[n.Type] {
 			stmtNodes[n.FilePath+"|"+fmt.Sprintf("%s@L%d", n.Type, n.StartLine)] = true
+			if n.Type == types.NodeCallSite {
+				stmtNodes[n.FilePath+"|"+callSpan(n.StartByte, n.EndByte)] = true
+			}
 		}
-		if n.CanonicalID != "" {
+		switch {
+		case n.Type == types.NodeField:
+			canon[fieldRefAt(n.FilePath, n.StartLine, n.Name)] = true
+		case n.CanonicalID != "":
 			canon[baseID(n.CanonicalID)] = true
+		case n.Type == types.NodeMethod:
+			canon[methodRefAt(n.FilePath, n.StartLine, n.Name)] = true
 		}
 	}
 	ref := func(n types.Node) string {
-		if stmtNodeTypes[n.Type] {
+		switch {
+		case stmtNodeTypes[n.Type]:
 			return fmt.Sprintf("%s@L%d", n.Type, n.StartLine)
+		case n.Type == types.NodeField:
+			return fieldRefAt(n.FilePath, n.StartLine, n.Name)
+		case n.Type == types.NodeMethod && n.CanonicalID == "":
+			return methodRefAt(n.FilePath, n.StartLine, n.Name)
 		}
 		return baseID(n.CanonicalID)
 	}
@@ -395,7 +549,11 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		edges += len(es)
 		for _, e := range es {
 			s, d := byID[e.Src], byID[e.Dst]
-			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: ref(s), Dst: ref(d), Kind: e.DispatchKind, Line: e.Line}] = true
+			src := ref(s)
+			if rel == types.EdgeLiteralPassedTo {
+				src = callSpan(s.StartByte, s.EndByte)
+			}
+			graph[StmtFact{Rel: string(rel), File: s.FilePath, Src: src, Dst: ref(d), Kind: e.DispatchKind, Line: e.Line}] = true
 		}
 	}
 	if edges == 0 {
@@ -463,4 +621,10 @@ func compareStatements(truth map[StmtFact]bool, nodes []types.Node, g GraphReade
 		out[f.Rel] = s
 	}
 	return out, nil
+}
+
+// callSpan names a call site by its byte span: the facts of
+// literal_passed_to are one per call, so two calls on one line are two.
+func callSpan(start, end int) string {
+	return fmt.Sprintf("%s@%d-%d", types.NodeCallSite, start, end)
 }

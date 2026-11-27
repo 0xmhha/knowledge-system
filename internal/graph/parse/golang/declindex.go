@@ -18,10 +18,13 @@ import (
 type declIndex struct {
 	byCanonical map[string][]*types.Node
 	byQname     map[string][]*types.Node
+	// local are the methods without a canonical id (those of an interface
+	// declared in a function or written inline), by name.
+	local map[string][]*types.Node
 }
 
 func newDeclIndex(nodes []types.Node) declIndex {
-	ix := declIndex{byCanonical: map[string][]*types.Node{}, byQname: map[string][]*types.Node{}}
+	ix := declIndex{byCanonical: map[string][]*types.Node{}, byQname: map[string][]*types.Node{}, local: map[string][]*types.Node{}}
 	for i := range nodes {
 		n := &nodes[i]
 		if n.Type != types.NodeFunction && n.Type != types.NodeMethod {
@@ -29,6 +32,8 @@ func newDeclIndex(nodes []types.Node) declIndex {
 		}
 		if n.CanonicalID != "" {
 			ix.byCanonical[n.CanonicalID] = append(ix.byCanonical[n.CanonicalID], n)
+		} else if n.Type == types.NodeMethod {
+			ix.local[n.Name] = append(ix.local[n.Name], n)
 		}
 		ix.byQname[n.QualifiedName] = append(ix.byQname[n.QualifiedName], n)
 	}
@@ -37,16 +42,35 @@ func newDeclIndex(nodes []types.Node) declIndex {
 
 // at returns the node of the declaration with canonical id cid (or, when no
 // node has that id, qualified name qname) declared at pos.
+//
+// A canonical id names one declaration, so a single candidate found by it is
+// the answer. The qualified name does not: it uses the package name, which
+// two programs share (`package main`), so a candidate found by it counts only
+// when it is declared in pos's file.
 func (ix declIndex) at(cid, qname string, pos token.Position) *types.Node {
 	cands := ix.byCanonical[cid]
-	if cid == "" || len(cands) == 0 {
+	byName := cid == "" || len(cands) == 0
+	if byName {
 		cands = ix.byQname[qname]
 	}
-	return pickDecl(cands, pos)
+	return pickDecl(cands, pos, byName)
 }
 
-func pickDecl(cands []*types.Node, pos token.Position) *types.Node {
-	if len(cands) == 1 {
+// localMethod returns the node of a method without a canonical id (one of
+// an interface declared in a function or written inline in a type
+// assertion) named name and declared at pos: the method node of that name
+// whose lines hold pos in pos's file.
+func (ix declIndex) localMethod(name string, pos token.Position) *types.Node {
+	for _, c := range ix.local[name] {
+		if sameFile(c.FilePath, pos.Filename) && c.StartLine <= pos.Line && pos.Line <= c.EndLine {
+			return c
+		}
+	}
+	return nil
+}
+
+func pickDecl(cands []*types.Node, pos token.Position, needFile bool) *types.Node {
+	if len(cands) == 1 && (!needFile || sameFile(cands[0].FilePath, pos.Filename)) {
 		return cands[0]
 	}
 	var inFile *types.Node

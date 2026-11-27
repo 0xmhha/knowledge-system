@@ -3,6 +3,7 @@ package mcphandlers
 import (
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -62,17 +63,10 @@ func TestCanonicalSeedWalksOneNode(t *testing.T) {
 		t.Fatalf("callers of one p.F: %v", got)
 	}
 
-	// A qualified-name seed still walks every node of that name.
-	byName, _, _, ok := resolveSeed(s, "p.F", "")
-	if !ok || len(byName.IDs) != 0 {
-		t.Fatalf("qname seed = %+v, ok %v", byName, ok)
-	}
-	nodes, _, err = reverseCallersUnion(s, byName, 2)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got := qnames(nodes); !equalQnames(got, "a.CallA", "b.CallB", "p.F", "p.F") {
-		t.Fatalf("callers of every p.F: %v", got)
+	// A qualified name that two declarations carry is ambiguous: its
+	// candidates name each one; it no longer walks both.
+	if _, cands, ambiguous, _ := resolveSeed(s, "p.F", ""); !ambiguous || len(cands) != 2 || !strings.HasPrefix(cands[0], "p.F@a/p/f.go:") || !strings.HasPrefix(cands[1], "p.F@b/p/f.go:") {
+		t.Fatalf("qname seed: ambiguous %v candidates %v", ambiguous, cands)
 	}
 
 	// get_subgraph and change_history read the same seed.

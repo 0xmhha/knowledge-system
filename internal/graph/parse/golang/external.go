@@ -2,7 +2,9 @@ package golang
 
 import (
 	gotypes "go/types"
+	"path/filepath"
 	"strings"
+	"sync"
 
 	"golang.org/x/tools/go/packages"
 
@@ -22,6 +24,14 @@ import (
 // knows every external object the type checker saw, and a node is made the
 // first time an edge needs it.
 
+// BuiltinErrorMethodID is the canonical id of the Error method of the builtin
+// error interface. The method belongs to no package, so it is filed under the
+// pseudo-package builtin, where the Go documentation describes error.
+const BuiltinErrorMethodID = builtinPkgPath + ".error.Error"
+
+// builtinPkgPath is the pseudo-package of the predeclared identifiers.
+const builtinPkgPath = "builtin"
+
 // externalIndex maps the canonical id of each external function, method and
 // type the build's packages use to its go/types object.
 type externalIndex struct {
@@ -30,10 +40,19 @@ type externalIndex struct {
 	loaded map[string]*packages.Package
 }
 
-// newExternalIndex indexes the objects the root packages use whose package is
-// not one of the roots. A root package's symbols are left out even when one
-// has no node (a file outside the build scope): those stay dropped as before.
-func newExternalIndex(pkgs []*packages.Package) *externalIndex {
+// newExternalIndex indexes the objects the root packages use that the build
+// does not contain: those of packages that are not roots (the standard
+// library, dependencies), and those of root packages declared in a file the
+// build leaves out. outside says whether a file is one of those; nil means
+// no file of a root package is.
+//
+// A build scope leaves packages of the module out (ethclient/simulated,
+// internal/cmdtest: test tooling no shipped binary imports) while the code in
+// scope still calls them. Left without a node because their package is a
+// root, 445 calls and 71 type references of go-stablenet had no edge. They
+// are code outside the build like the standard library, with the module's
+// own path as their module.
+func newExternalIndex(pkgs []*packages.Package, outside func(file string) bool) *externalIndex {
 	x := &externalIndex{objs: map[string]gotypes.Object{}, loaded: map[string]*packages.Package{}}
 	roots := map[string]bool{}
 	for _, p := range pkgs {
@@ -49,7 +68,7 @@ func newExternalIndex(pkgs []*packages.Package) *externalIndex {
 			continue
 		}
 		for _, obj := range p.TypesInfo.Uses {
-			if obj == nil || obj.Pkg() == nil || roots[obj.Pkg().Path()] {
+			if obj == nil || obj.Pkg() == nil {
 				continue
 			}
 			switch o := obj.(type) {
@@ -58,6 +77,11 @@ func newExternalIndex(pkgs []*packages.Package) *externalIndex {
 			case *gotypes.TypeName:
 			default:
 				continue
+			}
+			if roots[obj.Pkg().Path()] {
+				if outside == nil || p.Fset == nil || !obj.Pos().IsValid() || !outside(p.Fset.Position(obj.Pos()).Filename) {
+					continue
+				}
 			}
 			if id := goCanonicalID(obj); id != "" {
 				x.objs[id] = obj
@@ -72,12 +96,18 @@ func (x *externalIndex) node(cid string) (types.Node, bool) {
 	if x == nil {
 		return types.Node{}, false
 	}
+	if cid == BuiltinErrorMethodID && builtinErrorMethod != nil {
+		return externalNode(cid, builtinErrorMethod, &types.ExternalPackage{Path: builtinPkgPath, Name: builtinPkgPath, Module: stdModule}), true
+	}
 	obj, ok := x.objs[cid]
 	if !ok {
 		return types.Node{}, false
 	}
 	return externalNode(cid, obj, x.pkgOf(obj.Pkg())), true
 }
+
+// stdModule is the module of an External node of the standard library.
+const stdModule = "std"
 
 // ExternalNodeID is the node id of the External node for canonical id cid.
 func ExternalNodeID(cid string) string {
@@ -97,7 +127,7 @@ func (x *externalIndex) pkgOf(p *gotypes.Package) *types.ExternalPackage {
 			ep.Version = m.Replace.Version
 		}
 	case isStdImportPath(p.Path()):
-		ep.Module = "std"
+		ep.Module = stdModule
 	}
 	return ep
 }
@@ -115,11 +145,7 @@ func externalNode(cid string, obj gotypes.Object, ep *types.ExternalPackage) typ
 		kind = "func"
 		if sig, ok := fn.Type().(*gotypes.Signature); ok && sig.Recv() != nil {
 			kind = "method"
-			rt := sig.Recv().Type()
-			if ptr, ok := rt.(*gotypes.Pointer); ok {
-				rt = ptr.Elem()
-			}
-			if named, ok := rt.(*gotypes.Named); ok {
+			if named, _ := receiverBase(sig.Recv().Type()); named != nil {
 				qname = ep.Name + "." + named.Obj().Name() + "." + fn.Name()
 				if gotypes.IsInterface(named) {
 					kind = "interface_method"
@@ -157,13 +183,59 @@ func (p *Parser) ExternalTarget(cid string) (types.Node, bool) {
 	if len(p.pkgs) == 0 || cid == "" {
 		return types.Node{}, false
 	}
-	p.extOnce.Do(func() { p.ext = newExternalIndex(p.pkgs) })
+	p.extOnce.Do(func() { p.ext = newExternalIndex(p.pkgs, p.outsideBuild()) })
 	return p.ext.node(cid)
 }
 
+// outsideBuild returns the test "is this a source file the build leaves out"
+// for the files the last Resolve was given, or nil before any Resolve: then
+// no file of a root package counts as outside.
+//
+// Only a file under the source root can be left out. A file elsewhere that a
+// root package compiles (what cgo generates into the build cache) is not
+// source of the module, and its symbols stay without a node as before.
+func (p *Parser) outsideBuild() func(file string) bool {
+	if p.buildFiles == nil {
+		return nil
+	}
+	files, root := p.buildFiles, p.srcRoot
+	// go/packages reports absolute file names; a caller may pass the root as
+	// a relative path.
+	if abs, err := filepath.Abs(root); err == nil {
+		root = abs
+	}
+	return func(file string) bool {
+		rel, err := filepath.Rel(root, file)
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return false
+		}
+		for _, in := range files[filepath.Base(file)] {
+			if sameFile(in, file) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+// setBuildFiles records the files of the build: the ones Resolve is given,
+// parsed in this build or reloaded from the store.
+func (p *Parser) setBuildFiles(results []*parse.ParseResult) {
+	files := make(map[string][]string, len(results))
+	for _, r := range results {
+		if r == nil || r.Path == "" {
+			continue
+		}
+		base := filepath.Base(r.Path)
+		files[base] = append(files[base], r.Path)
+	}
+	p.buildFiles = files
+	p.ext, p.extOnce = nil, sync.Once{}
+}
+
 // ExternalEdges binds pending refs whose target is outside the build to
-// External nodes: the uses_type refs of EmitUsesTypeEdges, which run after
-// Resolve. It returns the External nodes not yet in nodes and one edge per
+// External nodes: the uses_type refs of EmitUsesTypeEdges and the extends
+// refs of EmitImplementsEdges, which run after Resolve. It returns the External nodes not yet in nodes and one edge per
 // bound ref. Refs it cannot bind are left to the caller.
 func (p *Parser) ExternalEdges(prs []parse.PendingRef, nodes []types.Node) ([]types.Node, []types.Edge) {
 	have := map[string]bool{}

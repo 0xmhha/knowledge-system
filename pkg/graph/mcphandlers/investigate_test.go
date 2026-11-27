@@ -10,6 +10,7 @@ import (
 	server "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
 // callText calls a tool on a fresh server over store and returns its text.
@@ -227,5 +228,96 @@ func TestFooterCompact(t *testing.T) {
 	f := footer(&investigation{id: "i1"}, cut, 1000)
 	if !strings.Contains(f, "a.B, c.D") || !strings.Contains(f, `open="joins"`) || strings.Count(f, "\n") > 3 {
 		t.Errorf("footer = %q", f)
+	}
+}
+
+// TestInvestigate_TestsExcludedFromCallers: with tests excluded, as the
+// header says, a card lists no caller from test code. Test code is what the
+// build recorded as such (nodes.is_test: the build scope's file role, the
+// path rule without a scope). The card of core.TxIndexer.run listed
+// core.TestTxIndexer under a header that said "tests excluded".
+func TestInvestigate_TestsExcludedFromCallers(t *testing.T) {
+	const caller = "logger.TestPrepare"
+	card := func(t *testing.T, s persist.StoreReader, tests string) string {
+		t.Helper()
+		srv := newInvServer(t, s)
+		head := callTextOn(t, srv, "investigate", map[string]any{"words": "Prepare", "tests": tests})
+		if want := "tests " + tests + "d"; !strings.Contains(head, want) {
+			t.Fatalf("header does not say %q:\n%s", want, head)
+		}
+		return callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:state.StateDB.Prepare"})
+	}
+	recorded := toolStore(t)
+	if err := recorded.RebuildReviewIndex([]string{fxLoggerFile}); err != nil {
+		t.Fatal(err)
+	}
+	if got := card(t, recorded, "exclude"); strings.Contains(got, caller) {
+		t.Errorf("tests excluded, yet the card lists the test caller:\n%s", got)
+	}
+	if got := card(t, recorded, "include"); !strings.Contains(got, caller) {
+		t.Errorf("tests included, yet the card lacks the test caller:\n%s", got)
+	}
+	// The build's record decides, not the file name: a build that
+	// classified no file as test code keeps the caller.
+	none := toolStore(t)
+	if err := none.RebuildReviewIndex(nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := card(t, none, "exclude"); !strings.Contains(got, caller) {
+		t.Errorf("no file is test code in this build, yet the card drops %s:\n%s", caller, got)
+	}
+}
+
+// TestInvestigate_SelfCallIsACaller: a function that calls itself is one of
+// its own callers, in the card as in find_callers. The card of
+// core.ChainIndexer.newHead left out its call at core/chain_indexer.go:272.
+// Only the invokes edge a function has to itself, which stands for a call
+// through a function value, is not a call to itself.
+func TestInvestigate_SelfCallIsACaller(t *testing.T) {
+	s := toolStore(t)
+	srv := newInvServer(t, s)
+	callTextOn(t, srv, "investigate", map[string]any{"words": "wrap"})
+	card := callTextOn(t, srv, "investigate_open", map[string]any{"open": "card:state.wrap"})
+	if !strings.Contains(card, "state.wrap:20") {
+		t.Errorf("the card of a recursive function lacks its own call:\n%s", card)
+	}
+	callers := callTool(t, s, "find_callers", map[string]any{"qname": "state.wrap", "depth": 1})
+	self := false
+	for _, e := range asSlice(callers["edges"]) {
+		m := e.(map[string]any)
+		self = self || m["src"] == "st00000000000005" && m["dst"] == "st00000000000005"
+	}
+	if !self {
+		t.Errorf("find_callers lacks the self-call: %v", callers["edges"])
+	}
+}
+
+// TestInvestigate_StatementLineIsStable: the line a guard names is read from
+// the function that holds the statement, whatever order the index lists the
+// functions in. A promoted copy has the lines of the method it copies and no
+// source; taken from map order, it made a guard read "[then of L167 ; ...]"
+// on some server starts and "[then of L167 if !conf.SkipCode {; ...]" on
+// others (5 of 30 investigate queries differed across fresh servers).
+func TestInvestigate_StatementLineIsStable(t *testing.T) {
+	s := toolStore(t)
+	// A statement of Prepare that writes a field: the index reads guards
+	// only from a graph that has them.
+	stmt := types.Node{ID: "if00000000000001", Type: types.NodeIfStmt, Name: "if", QualifiedName: "state.StateDB.Prepare#IfStmt@40",
+		FilePath: fxStateFile, StartLine: 11, EndLine: 11, Language: "go", Confidence: types.ConfExtracted}
+	if err := s.InsertNodes([]types.Node{stmt}); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.InsertEdges([]types.Edge{{Src: stmt.ID, Dst: "st00000000000002", Type: types.EdgeBodyWrites, FilePath: fxStateFile,
+		Line: 11, Count: 1, Confidence: types.ConfExtracted}}); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 20; i++ {
+		x, err := buildInvIndex(safeReader(s))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := x.stmtLine(stmt); got != "s.logs = rules" {
+			t.Fatalf("build %d: statement line = %q, want the line of state.StateDB.Prepare", i, got)
+		}
 	}
 }

@@ -100,15 +100,14 @@ The scope stops at the compiler. The linker keeps only the functions reachable f
 (75.9%); the graph still holds the other 2,293. Files compiled into the binary without being Go source, such as the
 22 `go:embed` files and the C sources cgo includes, are not listed either.
 
-## 2. Build: entry and cache decision
+## 2. Build: entry
 
 ```mermaid
 sequenceDiagram
   participant U as ckg build (cmd/graph/build.go)
   participant S as loadScope (cmd/graph/scope.go)
   participant R as buildpipe.Run (pipeline.go)
-  participant D as discoveryAll (incremental.go)
-  participant M as old manifest (graph.db)
+  participant D as discoveryAll (manifest_build.go)
   U->>U: --at-commit: git worktree add (temporary source)
   U->>U: graph.db exists and no --force/--no-cache: print and stop
   U->>U: logger: <out>/logs/build-<time>.jsonl and stderr
@@ -116,23 +115,13 @@ sequenceDiagram
   U->>R: Options
   R->>D: detect.Walk + detect.GoFilesFor + filter
   D-->>R: files per language
-  R->>M: readOldManifestFromDB
-  alt --no-cache, no usable manifest, or Go build configuration changed
-    R->>R: runCold
-  else every file cached (mtime or cache key)
-    R->>R: runShortCircuit (manifest only)
-  else some files changed or removed
-    R->>R: runIncremental
-  end
+  R->>R: runCold (every build)
 ```
 
-- A manifest is usable when its schema version equals `SchemaVersion` (`buildpipe/cache.go`, 1.28), the builder
-  version equals the ckg version, and it lists files. `DiffManifest` marks a file cached when its mtime and parser
-  version are unchanged, or when its cache key (sha256 of content, ckg, parser and schema version) is unchanged.
-- `--force` only skips the "graph already exists" check; an unchanged tree still short-circuits, and its help text
-  now says so. `--rebuild-metrics` had no effect and is deprecated.
-- The short circuit rewrites the manifest (time, staleness) and leaves every graph table as it was. Like the
-  incremental build it writes a copy, `graph.db.building`, and renames it over `graph.db` (section 4).
+- Every build is cold (section 4). The graph an output directory already holds is not read.
+- `--force` builds over an existing `graph.db`; `--no-cache` does the same and changes nothing else, and the build log
+  says so. `--rebuild-metrics` had no effect and is deprecated.
+- The manifest still lists every file with its sha256, cache key and parser version: what the graph was built from.
 
 ## 3. Cold build
 
@@ -217,46 +206,24 @@ and count nothing yet.
 
 Each pass that adds edges is followed by `validateAndSanitize`.
 
-## 4. Incremental build
+## 4. Incremental build (removed)
 
-```mermaid
-sequenceDiagram
-  participant I as runIncremental (incremental.go)
-  participant S as graph.db.building (a copy of graph.db)
-  participant L as runLanguagePipelines
-  participant B as graph.Build
-  I->>S: delete edges of types changed_in, blame, binds_to, implements, extends, http_calls
-  I->>S: ReverseDepsForFiles(changed + removed) via pending_refs target names
-  I->>S: DeleteNodesByFilePath(changed + removed), foreign keys cascade
-  I->>L: per language with changed or cached files
-  L->>L: parse changed files, reload cached nodes, reload pending refs of reverse-dependent files
-  L->>L: Resolve over all files, Go post-passes over all nodes, contract records
-  I->>S: reloadCachedEdges (per file, plus cross-file edges between cached nodes)
-  I->>B: reloaded edges first, then new ones
-  I->>I: derived passes (no lock propagation)
-  I->>S: insert new nodes and edges, trees, blobs of changed files, FTS, pending refs, overlay, review index, manifest
-  I->>I: rename graph.db.building to graph.db
-```
+The incremental build was removed; every `ckg build` is cold. Measured with ckg 81274130 on go-stablenet, 11 of 13
+edits gave a graph different from a cold build of the same tree (up to 572 extra and 34 missing edges, mostly calls
+from promoted copies and cross-file calls from unchanged files), a rename of 49 files ran past 900 s twice, and an
+incremental build took 88-125 s where a cold one took 40-60 s. Two cold builds of one tree are identical.
 
-External nodes have `file_path` `(external)`: no per-file delete reaches them, and `reloadCachedEdges` reloads all of
-them as cached, so a changed file that calls `time.Now` does not insert the shared node again (INSERT OR REPLACE would
-cascade away every cached caller's edge to it). An External node that loses its last user stays until a cold build,
-and a module version changed in `go.mod` without a source change is not rewritten.
-
-Known differences from a cold build (roadmap D10, measured on go-stablenet): the package's `contains` edge to a cached
-file of the same package when another of its files changed, duplicate `uses_type` edges, missing
-`extends`, `http_calls`, `implements` and `imports` edges, two cross-file calls missing, scores of cached nodes not
-rewritten in the store, no PR history and no lock propagation. Evaluation graphs are built with `--no-cache`.
+`ckg watch` and `ckg bench-index`, which depended on it, refuse to run and say so; rebuild with `ckg build`.
 
 ## 5. Stored tables
 
 | Table | Written by | Holds | Read by |
 |---|---|---|---|
-| `nodes` | `InsertNodes` (cold, overlay, new nodes on incremental); `RebuildReviewIndex` sets `is_test` | every node: id, type, names, canonical id, file, span, language, signature, doc, scores, confidence, sub kind, attributes, search tokens | every surface |
+| `nodes` | `InsertNodes` (build, overlay); `RebuildReviewIndex` sets `is_test` | every node: id, type, names, canonical id, file, span, language, signature, doc, scores, confidence, sub kind, attributes, search tokens | every surface |
 | `edges` | `InsertEdges` | relations: src, dst, type, file, line, count, confidence, dispatch kind | MCP traversals, impact, concurrency, evidence; HTTP `/api/edges`, impact; CLI query, path, report, verify, exports; CKS neighbors, subgraph, impact, review |
 | `nodes_fts` | `RebuildFTS` | FTS5 over name, qualified name, signature, doc, search tokens | MCP `search_text`, `get_context_for_task`; HTTP `/api/search`; CKS BM25 search |
 | `blobs` | `InsertBlobs` | source slice per node, gzip patch per Hunk | MCP bodies (`include_blobs`), evidence patches, value flow; HTTP `/api/blob`; exports; CKS value flow, review (not composer bodies) |
-| `pending_refs` | `InsertPendingRefs` | Pass-1 references kept for incremental re-resolution | the incremental build only |
+| `pending_refs` | `InsertPendingRefs` | Pass-1 references, kept for the removed incremental build | no reader |
 | `pkg_tree` | `InsertPkgTree` | package hierarchy | HTTP `/api/hierarchy`, `/api/nodes?parent`; export-static |
 | `topic_tree` | `InsertTopicTree` | Leiden communities and labels per resolution | HTTP hierarchy and community labels; report, quickstart, export-static |
 | `node_prs` | `InsertNodePRs` (cold only) | pull requests whose merge touched a node | MCP `change_history`, `get_context_for_task` (recent PRs); CKS |

@@ -2,6 +2,7 @@ package verify
 
 import (
 	"fmt"
+	"github.com/0xmhha/knowledge-system/internal/graph/concfacts"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -76,6 +77,9 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	r.StaticCalls = compare(truth.StaticCalls, calls, declNode, idx, opts.Samples)
 	r.InterfaceCalls = compare(truth.InterfaceCalls, calls, declNode, idx, opts.Samples)
 	r.TypeRefs = compare(truth.TypeRefs, typeEdges, declNode, idx, opts.Samples)
+	external := externalNodes(nodes)
+	r.OutsideCalls = compareOutside(truth.OutsideCalls, calls, declNode, external, opts.Samples)
+	r.OutsideTypeRefs = compareOutside(truth.OutsideTypeRefs, typeEdges, declNode, external, opts.Samples)
 	r.DynamicCallSites = truth.DynamicCallSites
 	r.CallsOutsideFuncs = truth.CallsOutsideFuncs
 	r.Unexpected = unexpected(truth, calls, typeEdges, declNode, opts.Samples)
@@ -83,8 +87,81 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 	if r.Statements, err = compareStatements(truth.Stmts, nodes, g, opts.Samples); err != nil {
 		return Report{}, err
 	}
+	if r.UnderLock, err = compareUnderLock(truth.UnderLock, idx, g, false, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.UnderLockPropagated, err = compareUnderLock(truth.UnderLockPropagated, idx, g, true, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.Dispatch, err = compareDispatch(truth.Dispatch, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.Handles, r.Triggers, err = compareMessages(truth.Messages, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
+	if r.GoroutineChans, err = compareGoroutineChans(truth.GoroutineChans, truth.GoroutineChansUndecided, truth.GoroutineLocalChans, idx, g, opts.Samples); err != nil {
+		return Report{}, err
+	}
 	return r, nil
 }
+
+// compareUnderLock compares the accessed_under_lock edges of g with the
+// truth's pairs. A node is named like a truth declaration: its file, its
+// first line and its name (a Mutex node has its declaration's span and the
+// name of the variable or field, or of the embedded mutex type).
+//
+// propagated selects the edges a build made with lock propagation marks
+// with the dispatch kind propagatedLockKind; the others are the direct ones.
+func compareUnderLock(truth map[[2]string]bool, idx nodeIndex, g GraphReader, propagated bool, samples int) (UnderLockStats, error) {
+	edges, err := g.QueryEdgesByType(string(types.EdgeAccessedUnderLock))
+	if err != nil {
+		return UnderLockStats{}, fmt.Errorf("verify: read accessed_under_lock: %w", err)
+	}
+	key := func(id string) string {
+		n, ok := idx.byID[id]
+		if !ok {
+			return ""
+		}
+		return fmt.Sprintf("%s:%d:%s", n.FilePath, n.StartLine, n.Name)
+	}
+	st := UnderLockStats{Truth: len(truth)}
+	graph := map[[2]string]bool{}
+	var unsupported []string
+	for _, e := range edges {
+		if (e.DispatchKind == propagatedLockKind) != propagated {
+			continue
+		}
+		k := [2]string{key(e.Src), key(e.Dst)}
+		if graph[k] {
+			continue
+		}
+		graph[k] = true
+		st.Edges++
+		if truth[k] {
+			st.Matched++
+			continue
+		}
+		st.Unsupported++
+		unsupported = append(unsupported, k[0]+" -> "+k[1])
+	}
+	missing := make([]string, 0)
+	for k := range truth {
+		if !graph[k] {
+			missing = append(missing, k[0]+" -> "+k[1])
+		}
+	}
+	sort.Strings(missing)
+	sort.Strings(unsupported)
+	st.MissingSamples = firstN(missing, samples)
+	st.UnsupportedSamples = firstN(unsupported, samples)
+	return st, nil
+}
+
+// propagatedLockKind is the dispatch kind the graph gives an
+// accessed_under_lock edge found in a callee (ckg build --lock-propagation),
+// as the concurrency contract names it. Verify takes the contract's
+// vocabulary, not its facts: the truth is its own.
+const propagatedLockKind = concfacts.PropagatedKind
 
 // nodeIndex looks graph nodes up by id and by (file, canonical id base).
 type nodeIndex struct {
@@ -142,6 +219,14 @@ func (r *Report) matchDecls(t *Truth, idx nodeIndex, samples int) map[string]str
 		}
 		r.Decls.Matched++
 		out[key] = hit.ID
+		if hit.StartByte != d.StartByte || hit.EndByte != d.EndByte {
+			r.Decls.OtherSpan++
+			if len(r.Decls.OtherSpanSamples) < samples {
+				r.Decls.OtherSpanSamples = append(r.Decls.OtherSpanSamples,
+					fmt.Sprintf("%s (%s:%d): node spans bytes %d-%d, declaration %d-%d", cid, d.File, d.Line,
+						hit.StartByte, hit.EndByte, d.StartByte, d.EndByte))
+			}
+		}
 	}
 	return out
 }
@@ -210,6 +295,44 @@ func compare(pairs []Pair, edges map[string]map[string]bool, declNode map[string
 				where = " (in a function literal)"
 			}
 			s.MissingSamples = append(s.MissingSamples, fmt.Sprintf("%s -> %s at %s:%d%s", p.From, p.To, p.File, p.Line, where))
+		}
+	}
+	return s
+}
+
+// externalNodes maps the canonical id of each External node to its node id.
+func externalNodes(nodes []types.Node) map[string]string {
+	out := map[string]string{}
+	for _, n := range nodes {
+		if n.Type == types.NodeExternal && n.CanonicalID != "" {
+			out[n.CanonicalID] = n.ID
+		}
+	}
+	return out
+}
+
+// compareOutside classifies the truth pairs whose target is outside the
+// covered files: matched when the graph has an edge from the source's node to
+// the External node of the target, missing when it has no such node or edge.
+func compareOutside(pairs []Pair, edges map[string]map[string]bool, declNode, external map[string]string, samples int) RelationStats {
+	var s RelationStats
+	for _, p := range pairs {
+		s.Truth++
+		from, ok := declNode[p.From]
+		if !ok {
+			s.EndpointMissing++
+			continue
+		}
+		if to, ok := external[p.To]; ok && edges[from][to] {
+			s.Matched++
+			continue
+		}
+		s.Missing++
+		if p.InClosure {
+			s.MissingInClosure++
+		}
+		if len(s.MissingSamples) < samples {
+			s.MissingSamples = append(s.MissingSamples, fmt.Sprintf("%s -> %s at %s:%d", p.From, p.To, p.File, p.Line))
 		}
 	}
 	return s

@@ -1,23 +1,14 @@
-// Package buildpipe — cache.go implements the file-level incremental
-// cache. Cache key composition, manifest diffing (hit/miss/removed
-// classification) and parser-version derivation live here.
-//
-// Scope: per-file SHA256 + cache key, skip parse on hit, full Pass 2
-// re-run, full PageRank/Leiden recompute when ANY file is dirty.
-// Reverse-reference invalidation and partial Pass 2 live in incremental.go.
+// Package buildpipe — cache.go holds the schema version and the per-file
+// keys the manifest records: SHA256, cache key, parser version. No build
+// reads them back (every build is cold); they say what a graph was built
+// from.
 package buildpipe
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"os"
-	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"sort"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 )
 
 // SchemaVersion is the cache-key contributor for the extraction schema. Bumped
@@ -244,42 +235,101 @@ import (
 // references) counted every use twice in packages with in-package tests,
 // whose production files were walked again through the test variant; counts
 // change, so force a cold rebuild.
-const SchemaVersion = "1.37"
-
-// fileClass classifies one source file against the previous manifest.
-type fileClass int
-
-const (
-	classDirty   fileClass = iota // miss: must reparse
-	classCached                   // hit: reuse from DB
-	classRemoved                  // present in old manifest, gone now
-)
-
-// FileDecision is the cache decision for one file in the current discovery.
-// For classRemoved the Path comes from the OLD manifest (file is gone) and
-// Language/SHA256/CacheKey/MTime are zero.
-type FileDecision struct {
-	Path     string
-	Language string
-	Class    fileClass
-	// Populated for classDirty/classCached:
-	SHA256        string
-	CacheKey      string
-	MTime         int64
-	ParserVersion string
-	// Populated for classCached only — the matching entry from the OLD
-	// manifest, so the caller can pull NodeIDs out for reload.
-	Cached *persist.FileEntry
-}
-
-// CacheDecisions is the sorted, fully-classified result of one diff pass.
-// Sorted by Path for deterministic logging.
-type CacheDecisions struct {
-	Decisions []FileDecision
-	Hits      int
-	Misses    int
-	Removed   int
-}
+// Bumped from "1.37" to "1.38": node identity and coverage changed. A call
+// site is named and keyed by its start and end byte (the calls of a chain no
+// longer share one node), embedded fields and the fields of anonymous nested
+// structs have Field nodes, a method of a generic type is named after its
+// type, field uses are tied to the field's declaration position (a use of a
+// function-local struct's field no longer points at the same-named
+// package-level field), statement-link counts no longer double in packages
+// with in-package tests, and handles_message edges need a net/rpc import.
+// Added in the same version: a package-level variable is the caller of the
+// calls in its initialiser, whose statements and call sites have nodes; a
+// local declaration is named under its function; fields of anonymous struct
+// types have Field nodes; a name made by := or a range clause is a
+// LocalVariable node with references edges from its function; uses_type
+// covers receivers, bodies and type declarations (interface signatures,
+// defined types). Solidity in the same version: node ids are keyed by file,
+// a node spans its whole declaration, members are named under and defined by
+// their contract, names resolve in the scope of the contract that uses them,
+// and errors, struct members, enum values, imports, calls, reverts_with and
+// state variable reads and writes have nodes and edges. Node IDs, edges and
+// scores change; force a cold rebuild.
+//
+// 1.39 (2026-11-26): the Go graph agrees with its source where an independent
+// comparison on go-stablenet found it did not. An existing name on the left
+// of := is written, not read (1,117 uses). Lock edges and accessed_under_lock
+// are made after Resolve, so a lock on a mutex declared in another file has
+// its edge (171 sites); a mutex declared by a composite literal or new has a
+// node. uses_type also starts at package-level variables and constants
+// (1,854 references), ends at types declared inside a function, and carries
+// the line of the reference; new(T) of an alias instantiates the alias. Code
+// of the module that the build scope leaves out and the builtin error method
+// are External nodes (445 calls, 71 type references, 222 err.Error() calls).
+// Methods on an alias receiver have a canonical id; methods of interfaces
+// declared in a function or written without a name have nodes and are called
+// by position; a call through an interface embedded in a struct is invokes;
+// a closure called in a package-level initialiser leaves its marker on the
+// variable. The variable of a type switch is a LocalVariable; local constants
+// and array-length constants in signatures and type declarations are read.
+// implements covers types of test files and types declared in functions;
+// extends reaches interfaces outside the build. Every make(chan) has a
+// Channel node with its element type, a range over a channel is a receive,
+// send and receive sites and statements in function literals have encloses
+// edges, and the calls in a go statement's arguments belong to the Goroutine.
+// Single var, const and type declarations keep their doc comment and grouped
+// ones their own. TypeAlias nodes say alias or defined in sub_kind. is_test
+// follows the build scope's file role when a scope is given
+// (Options.FileRoles). In the same version: the span of a type, var, const
+// or import declaration starts at its first token, the keyword when it
+// stands alone, and every name of one specification spans the whole
+// specification (node ids stay keyed by the declaring identifier, and the
+// signature of each such name says which it is, "name 2 of 4"); the span of
+// a specification, a struct field, an interface method, a function and a
+// method runs through the comment after it on its last line; a Mutex node has the span of its
+// Variable or Field; a package
+// node shows its first file that is not test code; instantiates also starts
+// at the Variable of a package-level initialiser; a channel operation in a go
+// literal has an edge from its function; a read or call in a function
+// literal written in a statement header belongs to that header; a lock on a
+// mutex returned by a getter has its edge. Nodes, edges and scores change;
+// force a cold rebuild.
+//
+// 1.40 (2026-11-26): the span of a Solidity declaration runs through the
+// plain comment after it on its last line (after the comma of an enum
+// value), as a Go declaration's does; the comment was in no node's text.
+// accessed_under_lock names a field used where the mutex is held, not every
+// field of a function that locks it somewhere; a function with a goto gets
+// none. Node ids stay; Solidity end bytes and accessed_under_lock edges
+// change; force a cold rebuild.
+//
+// 1.41 (2026-11-26): accessed_under_lock counts the fields a struct literal
+// sets while the mutex is held, as writes_field does (one notion of a field
+// use, fieldUsesAt), and the receiver path of a deferred Unlock, read where
+// the defer stands. accessed_under_lock edges change; force a cold rebuild.
+//
+// 1.42 (2026-11-26): no field is under the mutex it declares (a getter that
+// returns &s.mu while s.mu is held). --lock-propagation follows only calls
+// made where the caller's mutex is held and marks its edges with the
+// dispatch kind "propagated". Interface dispatches_to no longer end at an
+// interface method and reach the methods of interfaces declared in a
+// function or written inline; a Goroutine's sends_to/recvs_from come from
+// the channel linker. Every channel operation has its site, also on a bound
+// channel. A Goroutine is a caller: calls, reads_field and writes_field
+// from it (dispatch kind goroutine), which the walks and the tools keep apart
+// from the function-level edges. New edge types handles (a receive to the
+// code its message runs) and triggers (a sender to a receive it can wake),
+// and flows_to of kind received. accessed_under_lock, dispatches_to,
+// sends_to and recvs_from edges and CallSite nodes change. Every build is
+// cold.
+//
+// 1.43 (2026-11-27): literal_passed_to, a statement link from the call site
+// of each call written in a function literal passed as an argument to the
+// function it is passed to. New edges; force a cold rebuild (every build is).
+// The pending_refs table is no longer written (only the removed incremental
+// build read it); an older graph.db keeps it until the next build replaces
+// the file.
+const SchemaVersion = "1.43"
 
 // ComputeCacheKey returns the SHA256 of:
 //
@@ -376,191 +426,4 @@ func treeSitterModuleVersion() string {
 type DiscoveredFile struct {
 	Path     string
 	Language string
-}
-
-// DiffManifest classifies every discovered file against the OLD manifest and
-// emits a CacheDecisions in deterministic Path order. Files in old but not in
-// the discovery are emitted as classRemoved.
-//
-// Fast/slow path (spec § 4 build flow): mtime-equal entries skip the SHA256
-// recomputation and reuse the old hash; mtime-mismatched entries fall through
-// to a full hash. Either way, the cache decision is byte-equal whether mtime
-// changed or not — mtime is purely a perf hint.
-func DiffManifest(srcRoot string, discovered []DiscoveredFile, old *persist.Manifest, ckgVersion string) (CacheDecisions, error) {
-	oldByPath := map[string]persist.FileEntry{}
-	if old != nil {
-		for _, e := range old.Files {
-			oldByPath[e.Path] = e
-		}
-	}
-	seen := map[string]bool{}
-	out := CacheDecisions{}
-	for _, df := range discovered {
-		seen[df.Path] = true
-		full := filepath.Join(srcRoot, filepath.FromSlash(df.Path))
-		st, statErr := os.Stat(full)
-		var mtime int64
-		if statErr == nil {
-			mtime = st.ModTime().UnixNano()
-		}
-		parserVer := parserVersionFor(df.Language)
-		oldE, hadOld := oldByPath[df.Path]
-
-		// Fast path: mtime + parser_version unchanged AND old cache_key was
-		// computed against the same ckg_version + schema_version. We can't
-		// re-derive cache_key without rehashing content, so we recompute the
-		// "expected key from the stored SHA" via a deterministic prefix check:
-		// the old cache_key is valid iff the version triple matches. Since
-		// SchemaVersion is a build-time constant in this binary, the only
-		// version that can drift between builds is ckg_version. Compare it
-		// implicitly: if the OLD entry's CacheKey was computed under the
-		// CURRENT ckg+parser+schema combo, it's still valid; otherwise the
-		// caller (full-rebuild guard in pipeline.Run) already invalidated it.
-		// Here we trust mtime+parser as the fast-path discriminator.
-		if hadOld && statErr == nil && oldE.MTime == mtime && oldE.ParserVersion == parserVer {
-			e := oldE // copy
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path:          df.Path,
-				Language:      df.Language,
-				Class:         classCached,
-				SHA256:        oldE.SHA256,
-				CacheKey:      oldE.CacheKey,
-				MTime:         mtime,
-				ParserVersion: parserVer,
-				Cached:        &e,
-			})
-			out.Hits++
-			continue
-		}
-
-		// Slow path: read file, hash content, derive full cache key. This
-		// runs when mtime drifted (e.g. git checkout) OR the parser version
-		// changed for this language. Hashing confirms whether the bytes
-		// actually changed.
-		content, err := os.ReadFile(full)
-		if err != nil {
-			// Treat as dirty — the parser will surface the read failure.
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path: df.Path, Language: df.Language, Class: classDirty,
-				MTime: mtime, ParserVersion: parserVer,
-			})
-			out.Misses++
-			continue
-		}
-		sha := SHA256Hex(content)
-		key := ComputeCacheKey(content, ckgVersion, parserVer)
-		if hadOld && oldE.CacheKey == key {
-			// Content identical (and full key matches) — cache hit despite mtime drift.
-			e := oldE
-			out.Decisions = append(out.Decisions, FileDecision{
-				Path:          df.Path,
-				Language:      df.Language,
-				Class:         classCached,
-				SHA256:        sha,
-				CacheKey:      key,
-				MTime:         mtime,
-				ParserVersion: parserVer,
-				Cached:        &e,
-			})
-			out.Hits++
-			continue
-		}
-		out.Decisions = append(out.Decisions, FileDecision{
-			Path:          df.Path,
-			Language:      df.Language,
-			Class:         classDirty,
-			SHA256:        sha,
-			CacheKey:      key,
-			MTime:         mtime,
-			ParserVersion: parserVer,
-		})
-		out.Misses++
-	}
-	// Removed files: present in old manifest, absent from discovery.
-	for path, e := range oldByPath {
-		if seen[path] {
-			continue
-		}
-		out.Decisions = append(out.Decisions, FileDecision{
-			Path: path, Language: e.Language, Class: classRemoved,
-		})
-		out.Removed++
-	}
-	sort.Slice(out.Decisions, func(i, j int) bool {
-		return out.Decisions[i].Path < out.Decisions[j].Path
-	})
-	return out, nil
-}
-
-// ManifestUsable reports whether old can be used as the cache base for a
-// build under (ckgVersion, SchemaVersion). Returns false when the global
-// invariants drifted — caller must discard the cache and full-rebuild
-// (silent reuse with stale schema would corrupt the DB).
-//
-// nil manifest → false. Empty schema/ckg version → false (defensive).
-func ManifestUsable(old *persist.Manifest, ckgVersion string) bool {
-	if old == nil {
-		return false
-	}
-	if old.SchemaVersion != SchemaVersion {
-		return false
-	}
-	if bv := old.EffectiveBuilderVersion(); bv == "" || bv != ckgVersion {
-		return false
-	}
-	if len(old.Files) == 0 {
-		return false
-	}
-	return true
-}
-
-// IsAllCached returns true when every decision is classCached and there are
-// no removals. Used by the build pipeline to short-circuit Pass 2 / metrics
-// when nothing actually changed.
-func (cd CacheDecisions) IsAllCached() bool {
-	return cd.Misses == 0 && cd.Removed == 0
-}
-
-// DirtyPaths returns the srcRoot-relative paths of files needing reparse,
-// in the discovery order they were emitted (deterministic).
-func (cd CacheDecisions) DirtyPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classDirty {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// CachedPaths returns the srcRoot-relative paths whose cache hit, in sorted
-// order. Caller uses these to load nodes/edges from the DB.
-func (cd CacheDecisions) CachedPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classCached {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// RemovedPaths returns the srcRoot-relative paths that were in the old
-// manifest but are not in the current discovery. Caller deletes their data.
-func (cd CacheDecisions) RemovedPaths() []string {
-	var out []string
-	for _, d := range cd.Decisions {
-		if d.Class == classRemoved {
-			out = append(out, d.Path)
-		}
-	}
-	return out
-}
-
-// FormatLogLine returns a single human-readable summary line. Stable phrasing
-// so operator runbooks can grep for it.
-func (cd CacheDecisions) FormatLogLine() string {
-	dirty := len(cd.DirtyPaths())
-	return fmt.Sprintf("Cache: %d hits, %d misses, %d removed; parsed %d files",
-		cd.Hits, cd.Misses, cd.Removed, dirty)
 }

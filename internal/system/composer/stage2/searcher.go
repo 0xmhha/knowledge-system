@@ -27,6 +27,7 @@ package stage2
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math"
 	"time"
 
@@ -254,6 +255,13 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	kinds := intentToKinds(intent)
 	pathGlob := intentPathGlob(intent)
 	agg := newAggregator(s.config.RRFK, s.config.BMWeight, s.config.SymbolWeight, s.config.CkvWeight)
+	// One rule for graph and vector citations: the graph's record of test
+	// files, the path rule for a file the graph does not hold.
+	isTest, err := ckgclient.TestFileRule(s.ckg)
+	if err != nil {
+		return out, fmt.Errorf("stage2: %w", err)
+	}
+	agg.isTest = isTest
 
 	// Fuse the Stage-1 ckv semantic hits as one ranked list before the
 	// per-keyword ckg lists, so the embedding signal contributes citations

@@ -25,35 +25,6 @@ type TopicTreeInput interface {
 	ResolutionMembers(i int) map[string][]string // label -> []nodeID
 }
 
-// PendingRefRow is the storage wire shape for parse.PendingRef. Defined in
-// persist (rather than reusing parse.PendingRef directly) so persist stays
-// import-free of the parse package — buildpipe bridges the two when emitting
-// from cold path or reloading for partial-cache rebuild.
-//
-// Schema 1.5: persisting pending refs lets the partial path replay
-// Pass 2 over the merged dirty + cached input set without re-parsing cached
-// files. Without this table the cached-side pending refs were silently
-// dropped (an earlier cross-file edge regression).
-//
-// DispatchKind (schema 1.7): mirrors the edges table column —
-// preserves the AST-time dispatch classification across the cache boundary.
-// Empty for static `calls`.
-//
-// TargetCanonicalID mirrors parse.PendingRef.TargetCanonicalID. Without it a
-// reloaded ref resolved by short name (x.Do bound to another package named
-// x) or was dropped, so an incremental build undid the canonical-id
-// resolution of a cold build.
-type PendingRefRow struct {
-	FilePath          string
-	SrcID             string
-	TargetQName       string
-	TargetCanonicalID string
-	EdgeType          string
-	Line              int
-	HintFile          string
-	DispatchKind      string
-}
-
 // InsertNodes bulk-inserts nodes (transactional). The trailing
 // attrs column carries the marker JSON blob (SlotIndex,
 // HasAssembly, IsFunctionTyped, HasFunctionPointerCall,
@@ -191,39 +162,6 @@ func (s *sqliteStore) InsertBlobs(blobs map[string][]byte) error {
 	return tx.Commit()
 }
 
-// InsertPendingRefs bulk-inserts pending_refs rows. INSERT OR IGNORE is used
-// because the (file_path, src_id, target_qname, edge_type, line) primary key
-// can naturally collide when a single source line emits the same logical ref
-// twice (e.g. a doubly-imported symbol surfacing in two pending-ref sites of
-// the same file). Cold path always wipes the table beforehand via openColdStore;
-// partial path relies on FK CASCADE from DeleteNodesByFilePath. Either way,
-// IGNORE guards against PK violations without forcing a SELECT-then-INSERT
-// pattern in the hot loop.
-func (s *sqliteStore) InsertPendingRefs(refs []PendingRefRow) error {
-	if len(refs) == 0 {
-		return nil
-	}
-	tx, err := s.db.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() { _ = tx.Rollback() }()
-	stmt, err := tx.Prepare(`INSERT OR IGNORE INTO pending_refs
-		(file_path, src_id, target_qname, target_canonical_id, edge_type, line, hint_file, dispatch_kind)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = stmt.Close() }()
-	for _, r := range refs {
-		if _, err := stmt.Exec(r.FilePath, r.SrcID, r.TargetQName, r.TargetCanonicalID,
-			r.EdgeType, r.Line, r.HintFile, r.DispatchKind); err != nil {
-			return fmt.Errorf("insert pending_ref %s→%s: %w", r.SrcID, r.TargetQName, err)
-		}
-	}
-	return tx.Commit()
-}
-
 // InsertNodePRs writes PR breadcrumbs. INSERT OR REPLACE
 // (rather than OR IGNORE) because the rebuild path frequently has new
 // title/summary text for the same (node_id, number) — keeping the latest
@@ -254,35 +192,6 @@ func (s *sqliteStore) InsertNodePRs(byNode map[string][]types.PRRef) error {
 		}
 	}
 	return tx.Commit()
-}
-
-// DeleteNodesByFilePath drops every node whose file_path matches. The schema
-// 1.2 FK definitions (edges.src/dst, blobs.node_id, pkg_tree.*, topic_tree.*)
-// all carry ON DELETE CASCADE, so dependent rows are removed by SQLite
-// automatically inside this statement. Pre-1.2 DBs lack CASCADE; Open()
-// reports a warning when foreign_key_check fails on the schema invariant.
-func (s *sqliteStore) DeleteNodesByFilePath(path string) error {
-	if path == "" {
-		return nil
-	}
-	if _, err := s.db.Exec(`DELETE FROM nodes WHERE file_path = ?`, path); err != nil {
-		return fmt.Errorf("delete nodes by file_path %q: %w", path, err)
-	}
-	return nil
-}
-
-// DeleteEdgesByType drops every edge of type t. Used by the incremental
-// build path to clear cross-language edges (e.g. binds_to) whose endpoints
-// span files — they don't carry their own file_path and so are not reached
-// by DeleteNodesByFilePath cascade.
-func (s *sqliteStore) DeleteEdgesByType(t string) error {
-	if t == "" {
-		return nil
-	}
-	if _, err := s.db.Exec(`DELETE FROM edges WHERE type = ?`, t); err != nil {
-		return fmt.Errorf("delete edges by type %q: %w", t, err)
-	}
-	return nil
 }
 
 // RebuildFTS reloads the FTS5 virtual table from the nodes content table.

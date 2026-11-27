@@ -45,6 +45,10 @@ import (
 // the upstream interface is a breaking change here.
 type Reader = persist.StoreReader
 
+// TestFileReader is a reader that holds the build's record of test files.
+// See persist.TestFileReader.
+type TestFileReader = persist.TestFileReader
+
 // SearchHit pairs a node with its full-text search relevance score.
 // Returned by Reader.SearchFTS. See persist.SearchHit doc for the
 // Score vs RawScore semantics.
@@ -57,6 +61,144 @@ type SearchFTSOptions = persist.SearchFTSOptions
 // FindSymbolOptions configures filter push-down for Reader.FindSymbol
 // (Language, Kinds). Zero value means "no filter".
 type FindSymbolOptions = persist.FindSymbolOptions
+
+// DefaultFindSymbolLimit is the number of rows Reader.FindSymbol returns when
+// FindSymbolOptions.Limit is zero; FindSymbolNoLimit as Limit returns every
+// match.
+const (
+	DefaultFindSymbolLimit = persist.DefaultFindSymbolLimit
+	FindSymbolNoLimit      = persist.FindSymbolNoLimit
+)
+
+// NameResolution is what ResolveName returns: the qualified name and nodes a
+// caller-supplied name resolved to, or the candidates of an ambiguous bare
+// name. See persist.NameResolution.
+type NameResolution = persist.NameResolution
+
+// NameClass says what a node matched by name is (a declaration of the build,
+// a promoted copy, a function-local name, an External stub). See
+// persist.NameClass.
+type NameClass = persist.NameClass
+
+// The classes of a node matched by name, in the order a bare name prefers.
+const (
+	NameDeclared = persist.NameDeclared
+	NamePromoted = persist.NamePromoted
+	NameLocal    = persist.NameLocal
+	NameExternal = persist.NameExternal
+	NameOther    = persist.NameOther
+)
+
+// ResolveName maps a canonical id, a qualified name or a bare name to nodes.
+// It is the one resolver behind every tool that takes a symbol name; see
+// persist.ResolveName for the order.
+func ResolveName(r Reader, name, language string) (NameResolution, error) {
+	return persist.ResolveName(r, name, language)
+}
+
+// ClassifyNames returns the class of each of nodes by id. See
+// persist.ClassifyNames.
+func ClassifyNames(r Reader, nodes []types.Node) (map[string]NameClass, error) {
+	return persist.ClassifyNames(r, nodes)
+}
+
+// InFunctionBody reports whether n is declared inside a function body, given
+// the enclosers of its file (IsEncloser): the one rule for "known only inside
+// one function". See persist.InFunctionBody.
+func InFunctionBody(n types.Node, enclosers []types.Node) bool {
+	return persist.InFunctionBody(n, enclosers)
+}
+
+// GoroutineCode returns the edges from goroutines to the code they run
+// (types.IsGoroutineCode) that end at ids (reverse) or start at ids; the
+// walks leave them out. See persist.GoroutineCode.
+func GoroutineCode(r any, ids []string, reverse bool) ([]types.Edge, error) {
+	return persist.GoroutineCode(r, ids, reverse)
+}
+
+// LockChannelsOf returns the channels used as locks that the fields and
+// variables among nodes hold. See persist.LockChannelsOf.
+func LockChannelsOf(r Reader, nodes []types.Node) ([]types.Node, error) {
+	return persist.LockChannelsOf(r, nodes)
+}
+
+// TestFileRule returns the one rule for "is this file test code" for code
+// that has a graph: the role the build recorded on a file's nodes, the path
+// rule for a file without nodes or a graph without the record. See
+// persist.TestFileRule.
+func TestFileRule(r any) (func(file string) bool, error) { return persist.TestFileRule(r) }
+
+// MutexSuffix ends the seed name of a mutex: "<field or variable>#mutex".
+// See persist.MutexSuffix.
+const MutexSuffix = persist.MutexSuffix
+
+// NamedNodes leaves the Mutex node of a variable out of nodes found by name:
+// the name names the variable. See persist.NamedNodes.
+func NamedNodes(nodes []types.Node) []types.Node { return persist.NamedNodes(nodes) }
+
+// NameOf returns the name that names n alone: its qualified name, or its
+// site name when several declarations carry it. See persist.NameOf.
+func NameOf(r Reader, n types.Node) (string, error) { return persist.NameOf(r, n) }
+
+// PrintedName is the name a tool prints for n, the one that resolves back to
+// it alone. See persist.PrintedName.
+func PrintedName(r Reader, n types.Node) string { return persist.PrintedName(r, n) }
+
+// PrintedQName is the qualified name a tool prints for n ("<name>#mutex" for
+// the Mutex node of a variable). See persist.PrintedQName.
+func PrintedQName(n types.Node) string { return persist.PrintedQName(n) }
+
+// ParseSiteName splits a site name, "<qname>@<file>:<line>", into its parts;
+// ok is false for any other name. See persist.ParseSiteName.
+func ParseSiteName(name string) (qname, file string, line int, ok bool) {
+	return persist.ParseSiteName(name)
+}
+
+// NodesInFunctions returns, by node id, which of nodes are declared inside a
+// function body (InFunctionBody). See persist.NodesInFunctions.
+func NodesInFunctions(r Reader, nodes []types.Node) (map[string]bool, error) {
+	return persist.NodesInFunctions(r, nodes)
+}
+
+// IsCallable reports whether n is a function, method, modifier or constructor
+// declaration.
+func IsCallable(n types.Node) bool { return persist.IsCallable(n) }
+
+// IsEncloser reports whether other declarations can be declared inside n, the
+// nodes InFunctionBody takes as enclosers: a callable or a variable. See
+// persist.IsEncloser.
+func IsEncloser(n types.Node) bool { return persist.IsEncloser(n) }
+
+// PromotedFrom reports whether n is the copy of a promoted method and, if so,
+// the qualified name of the method it copies.
+func PromotedFrom(n types.Node) (string, bool) { return persist.PromotedFrom(n) }
+
+// DeclSite is where a method is declared; a promoted copy has the site of
+// the method it copies. See persist.DeclSite.
+type DeclSite = persist.DeclSite
+
+// SiteOf returns the declaration site of n.
+func SiteOf(n types.Node) DeclSite { return persist.SiteOf(n) }
+
+// EmbeddingType returns the qualified name of the type a promoted copy is
+// listed under.
+func EmbeddingType(promotedCopy types.Node) string { return persist.EmbeddingType(promotedCopy) }
+
+// PromotedTo returns, by method id, the types that get each of methods
+// through an embedded field. See persist.PromotedTo.
+func PromotedTo(r Reader, methods []types.Node) (map[string][]string, error) {
+	return persist.PromotedTo(r, methods)
+}
+
+// BlankName is the name of a declaration that binds nothing (`var _ = x`).
+const BlankName = persist.BlankName
+
+// The keys a tool adds to its answer when the caller named the copy of a
+// promoted method; NameResolution.SeedNote is the text of the second.
+const (
+	SeedKeyPromotedFrom = persist.SeedKeyPromotedFrom
+	SeedKeyNote         = persist.SeedKeyNote
+)
 
 // PRRef is the public alias for the build-time-derived PR breadcrumb
 // stored per node. External consumers (cks, ckv) read this via

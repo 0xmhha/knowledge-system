@@ -3,7 +3,6 @@ package solidity
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -160,34 +159,20 @@ func (v *declVisitor) runLibraryDecl() {
 	}
 }
 
-// emitContractLikeNode is the shared emit path for contract / library
-// declarations. Mirrors runDecl's emit but additionally stamps SubKind.
-// Kept in this file (rather than declarations.go) to keep the SubKind detector
-// logic localised — easier to extend for interface_declaration without
-// re-touching declarations.go.
+// emitContractLikeNode is the shared emit path for contract, library and
+// interface declarations. The node spans the whole declaration, the file
+// defines it, and its id is keyed by the name identifier (see containerOf).
 func (v *declVisitor) emitContractLikeNode(
 	nameNode, declNode sitter.Node,
 	nt types.NodeType,
 	subKind string,
 ) {
 	ident := nameNode.Utf8Text(v.src)
-	startByte := int(nameNode.StartByte())
-	endByte := int(nameNode.EndByte())
-	id := parse.MakeID(ident, "sol", startByte)
-	v.nodes = append(v.nodes, types.Node{
-		ID: id, Type: nt, Name: ident, QualifiedName: ident,
-		FilePath:  v.rel,
-		StartLine: int(nameNode.StartPosition().Row) + 1,
-		EndLine:   int(nameNode.EndPosition().Row) + 1,
-		StartByte: startByte, EndByte: endByte,
-		Language: "sol", Confidence: types.ConfExtracted,
-		SubKind: subKind,
+	v.emitDecl(declSpec{
+		nt: nt, name: ident, qname: ident, decl: &declNode,
+		idByte: int(nameNode.StartByte()), definer: v.fileID,
+		subKind: subKind, signature: declHeader(&declNode, v.src),
 	})
-	v.edges = append(v.edges, types.Edge{
-		Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-		Count: 1, Confidence: types.ConfExtracted,
-	})
-	_ = declNode // reserved for future use (e.g. inheritance specifier)
 }
 
 // hasAbstractKeyword reports whether a contract_declaration node carries

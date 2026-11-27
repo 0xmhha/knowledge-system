@@ -123,13 +123,31 @@ const (
 	// or interface_method; Signature is the go/types signature. FilePath is
 	// ExternalFilePath, not a file of the repository.
 	NodeExternal NodeType = "External"
+
+	// NodeError (schema 1.38): a Solidity custom error declaration
+	// (`error NotOwner(address who);`), at file level or inside a contract,
+	// interface or library. It is none of the other kinds: it is not emitted
+	// like an event and holds no value like a constant. reverts_with edges
+	// end at it. Signature is the declaration header.
+	NodeError NodeType = "Error"
+)
+
+// Sub kinds of a Go TypeAlias node. The node type covers every named type
+// that is neither a struct nor an interface; the sub kind tells the two Go
+// declarations apart.
+const (
+	// SubKindAlias is `type A = B`: another name for the type B.
+	SubKindAlias = "alias"
+	// SubKindDefinedType is `type A B`: a new type with B's underlying type
+	// and its own method set.
+	SubKindDefinedType = "defined"
 )
 
 // ExternalFilePath is the file_path of every External node. It names no file
 // of the repository, so per-file deletes and reloads never touch these nodes.
 const ExternalFilePath = "(external)"
 
-// AllNodeTypes returns all 38 node types in a stable order.
+// AllNodeTypes returns all 39 node types in a stable order.
 // NOTE: identifier names are stable; positional indices are load-bearing
 // only for tests that snapshot the full slice (TestAllNodeTypes_Stable).
 // NodeMutex was inserted at index 24 to keep the concurrency family
@@ -152,6 +170,7 @@ const ExternalFilePath = "(external)"
 // security risk pattern annotations loaded from an external YAML.
 // NodeExternal (schema 1.36) is appended at index 37 — symbols the build
 // calls but does not contain.
+// NodeError (schema 1.38) is appended at index 38 — Solidity custom errors.
 func AllNodeTypes() []NodeType {
 	return []NodeType{
 		NodePackage, NodeFile, NodeStruct, NodeInterface, NodeClass,
@@ -168,6 +187,7 @@ func AllNodeTypes() []NodeType {
 		NodePolicy,
 		NodeSecurityPattern,
 		NodeExternal,
+		NodeError,
 	}
 }
 
@@ -188,6 +208,11 @@ func AllNodeTypes() []NodeType {
 //     contracts/Vault even when the consumer wanted the class itself.
 //   - External nodes — code outside the build; a search for repository
 //     symbols should not return time.Now.
+//   - Local names (LocalVariable, schema 1.38) — a name made by := or a
+//     range clause inside a function body. There are tens of thousands
+//     (err, ok, i), each known only inside its function; a keyword search
+//     for a symbol should not return them. A caller that wants them
+//     passes NodeKinds.
 //
 // search_text (pkg/mcphandlers + internal/persist.SearchFTS) uses
 // IsSymbol as the default whitelist when SearchFTSOptions.NodeKinds
@@ -200,7 +225,8 @@ func (t NodeType) IsSymbol() bool {
 		NodeAwaitPoint,
 		NodeCommit, NodeHunk,
 		NodeImport, NodeExport,
-		NodeExternal:
+		NodeExternal,
+		NodeLocalVariable:
 		return false
 	default:
 		return true
@@ -261,13 +287,12 @@ const (
 	// Schema 1.1 (concurrency lock semantics) — emitted by the Go
 	// concurrency pass:
 	//   acquires_lock / releases_lock: from
-	//     internal/parse/golang/concurrency.go:maybeEmitLockEdge — matches
-	//     sync.Mutex.Lock/Unlock/RLock/RUnlock by object-identity on the
-	//     receiver (types.Info path, EXTRACTED) or by name match (AST-only,
-	//     INFERRED). False-positive guarded against user-defined Lock() on
-	//     non-mutex types (spec §2 R2.1).
-	//   accessed_under_lock: from
-	//     internal/parse/golang/concurrency_underlock.go — intra-function
+	//     internal/graph/parse/golang/lock_edges.go — a Lock/Unlock/RLock/
+	//     RUnlock call whose receiver go/types resolves to a declaration
+	//     with a Mutex node, in whichever file it is declared (EXTRACTED).
+	//     A user-defined Lock() on a non-mutex type matches nothing (spec
+	//     §2 R2.1).
+	//   accessed_under_lock: from the same pass — intra-function
 	//     lexical heuristic (any field access in a body that holds any lock
 	//     gets one edge per (field, mutex) pair). Cross-function chain
 	//     propagation is a separate pass behind the --lock-propagation
@@ -478,9 +503,41 @@ const (
 	// names; sends_to and recvs_from point at the name each operation uses,
 	// and flows_to joins the names.
 	EdgeFlowsTo EdgeType = "flows_to"
+	// Schema 1.38 (Solidity custom errors): reverts_with from a function,
+	// modifier or constructor to the Error it can revert with, one edge per
+	// line of `revert X(...)` or `require(cond, X(...))`. No existing kind
+	// fits: emits_event ends at an Event and calls at a callable.
+	EdgeRevertsWith EdgeType = "reverts_with"
+	// Schema 1.42 (message-driven code), from the Go frontend's SSA pass,
+	// confidence INFERRED:
+	//   handles   a receive operation's CallSite -> the code its message
+	//             makes run: the CallSite of each call and channel
+	//             operation, the Goroutine of each go statement, and each
+	//             Field used, in its range (a plain receive: the rest of
+	//             its block; range over a channel: the loop body; a select
+	//             case: the case body). dispatch_kind call, send, recv,
+	//             go, read or write; line of the handled code.
+	//   triggers  a sender (the Function, Method or Goroutine whose send
+	//             reaches the channel by its SSA origins) -> each receive
+	//             operation's CallSite on that channel it can wake.
+	//             dispatch_kind is the channel's origin (the qualified
+	//             name of its make site, field or variable); line and file
+	//             are the send's, the receive's line is its CallSite's.
+	// Sender to handled code is two hops: triggers, then handles.
+	EdgeHandles  EdgeType = "handles"
+	EdgeTriggers EdgeType = "triggers"
+	// Schema 1.42 (literals passed to calls), a statement link of the Go
+	// frontend: literal_passed_to from the CallSite of a call written in a
+	// function literal (not in a literal nested in it) to the function or
+	// method the literal is passed to as an argument, with the line of that
+	// call; dispatch_kind arg; confidence EXTRACTED. The literal's code runs
+	// when that function calls it. A literal assigned, returned, called in
+	// place, started with go or deferred gives no edge, nor does one passed
+	// to a function value.
+	EdgeLiteralPassedTo EdgeType = "literal_passed_to"
 )
 
-// AllEdgeTypes returns all 50 edge types in stable order.
+// AllEdgeTypes returns all 54 edge types in stable order.
 // Append-only: existing positions are load-bearing for hash-derived IDs.
 // EdgeAwaits + EdgeOverrides are appended at indices 38-39 for schema 1.10.
 // EdgeUsesFor is appended at index 40 (schema 1.10 — using-for library
@@ -493,6 +550,9 @@ const (
 // EdgeDispatchesTo is appended at index 43 (schema 1.31 — runtime links).
 // The five statement-link types are appended at indices 44-48 (schema 1.32).
 // EdgeFlowsTo is appended at index 49 (schema 1.34 — channel aliases).
+// EdgeRevertsWith is appended at index 50 (schema 1.38 — Solidity errors).
+// EdgeHandles and EdgeTriggers are appended at 51-52 (schema 1.42 —
+// message-driven code), EdgeLiteralPassedTo at 53 (schema 1.42).
 func AllEdgeTypes() []EdgeType {
 	return []EdgeType{
 		EdgeContains, EdgeDefines, EdgeCalls, EdgeInvokes, EdgeUsesType,
@@ -514,6 +574,9 @@ func AllEdgeTypes() []EdgeType {
 		EdgeDispatchesTo,
 		EdgeSiteCalls, EdgeCondReads, EdgeCondCalls, EdgeBodyWrites, EdgeEncloses,
 		EdgeFlowsTo,
+		EdgeRevertsWith,
+		EdgeHandles, EdgeTriggers,
+		EdgeLiteralPassedTo,
 	}
 }
 

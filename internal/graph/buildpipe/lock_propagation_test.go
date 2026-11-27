@@ -111,8 +111,9 @@ func TestLockPropagation_Cycle(t *testing.T) {
 // TestLockPropagation_StdlibSkip verifies §3.3 noise control: callees
 // outside the build (fmt.Println) must not surface as edge endpoints. We
 // can't assert "no edge to fmt.Println" directly (it has no node), but we
-// can verify that the edge count for StdlibSkip-related accessed_under_lock
-// edges is exactly the intra-fn count (1, for the mu field itself).
+// can verify that no accessed_under_lock edge targets StdlibSkip.mu: Log
+// uses no field while it holds mu (the receiver of Lock is the mutex itself,
+// not a use of data), and nothing is propagated from fmt.Println.
 func TestLockPropagation_StdlibSkip(t *testing.T) {
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	muID := findNodeIDBySuffix(nodes, "StdlibSkip.mu#mutex")
@@ -126,10 +127,8 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 			count++
 		}
 	}
-	// Only the mu field itself touches (s.mu.Lock() references s.mu); no
-	// propagation edges from inside fmt.Println (which isn't in the graph).
-	if count != 1 {
-		t.Errorf("expected exactly 1 accessed_under_lock to StdlibSkip.mu (intra-fn only); got %d", count)
+	if count != 0 {
+		t.Errorf("expected no accessed_under_lock to StdlibSkip.mu; got %d", count)
 	}
 }
 
@@ -145,7 +144,9 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 //
 // Q4 ("Goroutine body INFERRED") rides the existing uniform cross-
 // fn INFERRED label — confidence stays consistent with the other
-// propagation paths.
+// TestLockPropagation_NamedGoroutine: a function started with go runs
+// without its starter's locks, so the field it uses is not under them. The
+// old propagator walked the go statement like a call and recorded it.
 func TestLockPropagation_NamedGoroutine(t *testing.T) {
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "GoroutineHolder.value")
@@ -153,12 +154,33 @@ func TestLockPropagation_NamedGoroutine(t *testing.T) {
 	if valueID == "" || muID == "" {
 		t.Fatalf("fixture nodes missing: value=%q mu=%q", valueID, muID)
 	}
-	found := findEdge(edges, valueID, muID, types.EdgeAccessedUnderLock)
-	if found == nil {
-		t.Fatalf("expected accessed_under_lock(GoroutineHolder.value -> GoroutineHolder.mu) via named-goroutine path")
+	if found := findEdge(edges, valueID, muID, types.EdgeAccessedUnderLock); found != nil {
+		t.Errorf("a goroutine's field is taken as under its starter's lock: %+v", *found)
 	}
-	if found.Confidence != types.ConfInferred {
-		t.Errorf("named-goroutine cross-fn emit confidence=%q, want INFERRED (design §5.0 Q4)", found.Confidence)
+}
+
+// TestLockPropagation_HeldAtTheCall: a callee's use is under L only when L
+// is held at the call (the must-hold rule of the direct pass) and the callee
+// has not released L before the use. Propagated edges say so in their
+// dispatch kind. The old propagator recorded every field of every callee of
+// a function that locks L anywhere: 667 of 1,761 edges of go-stablenet were
+// not supported by the source.
+func TestLockPropagation_HeldAtTheCall(t *testing.T) {
+	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
+	muID := findNodeIDBySuffix(nodes, "Ordered.mu#mutex")
+	for field, want := range map[string]bool{"Ordered.inner": true, "Ordered.before": false, "Ordered.after": false, "Ordered.late": false} {
+		id := findNodeIDBySuffix(nodes, field)
+		e := findEdge(edges, id, muID, types.EdgeAccessedUnderLock)
+		if (e != nil) != want {
+			t.Errorf("%s under mu: %v, want %v", field, e != nil, want)
+		}
+		if e != nil && e.DispatchKind != buildpipe.PropagatedLockKind {
+			t.Errorf("%s: dispatch kind %q, want %q", field, e.DispatchKind, buildpipe.PropagatedLockKind)
+		}
+	}
+	// A direct edge is not marked as propagated.
+	if e := findEdge(edges, findNodeIDBySuffix(nodes, "lockprop.Direct.n"), findNodeIDBySuffix(nodes, "Direct.mu#mutex"), types.EdgeAccessedUnderLock); e == nil || e.DispatchKind != "" {
+		t.Errorf("direct edge %+v, want one without a dispatch kind", e)
 	}
 }
 

@@ -57,6 +57,8 @@ type aggregator struct {
 	bmWeight     float64
 	symbolWeight float64
 	ckvWeight    float64
+	// isTest decides which citations are test code (isTestPath when nil).
+	isTest func(file string) bool
 }
 
 func newAggregator(rrfK int, bmWeight, symbolWeight, ckvWeight float64) *aggregator {
@@ -67,6 +69,14 @@ func newAggregator(rrfK int, bmWeight, symbolWeight, ckvWeight float64) *aggrega
 		symbolWeight: symbolWeight,
 		ckvWeight:    ckvWeight,
 	}
+}
+
+// testFile reports whether file is test code by the aggregator's rule.
+func (a *aggregator) testFile(file string) bool {
+	if a.isTest == nil {
+		return isTestPath(file)
+	}
+	return a.isTest(file)
 }
 
 // addCkvList credits every hit in a ranked ckv semantic-search result
@@ -252,7 +262,7 @@ func (a *aggregator) results(cap int, demoteTests, demoteDocs bool) []ScoredCita
 	out := make([]ScoredCitation, 0, len(a.byCitation))
 	for _, sc := range a.byCitation {
 		entry := *sc
-		if demoteTests && isTestPath(entry.Citation.File) {
+		if demoteTests && a.testFile(entry.Citation.File) {
 			entry.Score *= testDemotionFactor
 		}
 		switch {

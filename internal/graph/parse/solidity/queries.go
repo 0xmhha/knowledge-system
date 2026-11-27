@@ -31,13 +31,14 @@ const (
 	// identifier ("fallback" or "receive").
 	queryFallbackReceive = `(fallback_receive_definition) @decl`
 	queryEvent           = `(event_definition name: (identifier) @name) @decl`
+	queryError           = `(error_declaration name: (identifier) @name) @decl`
 	queryStruct          = `(struct_declaration name: (identifier) @name) @decl`
 	queryEnum            = `(enum_declaration name: (identifier) @name) @decl`
 	// queryStateVar was replaced by queryStateVarAll + runStateVarDecl
 	// (mapping detection unified into one visitor pass).
 	// queryStateVar = `(state_variable_declaration name: (identifier) @name) @decl`
 	queryStateVarAll = `(state_variable_declaration) @decl`
-	queryEmit        = `(emit_statement name: (expression (identifier) @event)) @stmt`
+	queryEmit        = `(emit_statement) @stmt`
 	queryHasModifier = `(modifier_invocation (identifier) @mod) @stmt`
 	// Sol inheritance — the `is`-clause exposes each parent as its own
 	// inheritance_specifier sibling under contract_declaration /

@@ -15,10 +15,12 @@ package persist
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // ErrInvalidMetric is returned by StoreReader.TopNodes when the metric
@@ -104,25 +106,9 @@ type StoreReader interface {
 	// Source bodies
 	GetBlob(id string) ([]byte, error)
 
-	// Per-file lookups (incremental cache, schema 1.2). Used by
-	// buildpipe to load nodes/edges/blobs for files whose content hash
-	// matched the previous manifest — those rows are reused as-is rather
-	// than re-parsing.
+	// Per-file lookups: the nodes and the stored sources of one file.
 	NodesByFilePath(path string) ([]types.Node, error)
-	EdgesByFilePath(path string) ([]types.Edge, error)
 	BlobsByFilePath(path string) (map[string][]byte, error)
-	// PendingRefsByFilePath: partial-cache rebuild reads cached files'
-	// unresolved cross-file refs back so Pass 2 Resolve sees the cold-equivalent
-	// input. Schema 1.5.
-	PendingRefsByFilePath(path string) ([]PendingRefRow, error)
-
-	// ReverseDepsForFiles returns every cached file path that has pending_refs
-	// targeting a qualified_name defined in any of dirtyPaths. Used by
-	// reverse-reference invalidation to find which cached files need their
-	// pending_refs re-resolved when dirty files change their exported symbols.
-	// MUST be called BEFORE deleting dirty nodes — the lookup joins
-	// pending_refs to nodes still in DB. Returns nil when dirtyPaths is empty.
-	ReverseDepsForFiles(dirtyPaths []string) ([]string, error)
 
 	// Static export (chunked JSON, spec §6.6). On StoreReader rather than
 	// StoreWriter because ExportChunked only reads from the store and writes
@@ -167,6 +153,61 @@ type StoreReader interface {
 	Review(qname string, opts ReviewOptions) (Review, error)
 }
 
+// TestFileReader is implemented by stores that hold the build's record of
+// which files are test code (nodes.is_test, schema 1.24): the build scope's
+// file role when the build had a scope, the path rule otherwise.
+// TestFileRoles returns every file that has nodes, true for test code, and
+// whether the graph holds the record at all. It is not part of StoreReader,
+// so that readers without the record need not implement it (see
+// TestFileRule).
+type TestFileReader interface {
+	TestFileRoles() (roles map[string]bool, recorded bool, err error)
+}
+
+// GoroutineCodeReader is implemented by stores that read a Goroutine's code
+// edges (types.IsGoroutineCode) apart from the walks, which leave them out.
+// GoroutineCode returns those that end at ids (reverse) or start at ids.
+type GoroutineCodeReader interface {
+	GoroutineCode(ids []string, reverse bool) ([]types.Edge, error)
+}
+
+// GoroutineCode returns r's goroutine code edges at ids (see
+// GoroutineCodeReader), or none when r does not read them.
+func GoroutineCode(r any, ids []string, reverse bool) ([]types.Edge, error) {
+	gr, ok := r.(GoroutineCodeReader)
+	if !ok {
+		return nil, nil
+	}
+	return gr.GoroutineCode(ids, reverse)
+}
+
+// TestFileRule returns the one answer to "is this file test code" for code
+// that has a graph: for a file with nodes, the role the build recorded on
+// them (is_test); for a file without nodes (a path from the vector index the
+// graph does not hold) and for every file of a graph without the record (r
+// is not a TestFileReader, or was built before schema 1.24), the path rule a
+// build applies without a scope (testpath.IsTest). r is any graph reader;
+// the record is read once, when the rule is made.
+func TestFileRule(r any) (func(file string) bool, error) {
+	tr, ok := r.(TestFileReader)
+	if !ok {
+		return testpath.IsTest, nil
+	}
+	roles, recorded, err := tr.TestFileRoles()
+	if err != nil {
+		return nil, fmt.Errorf("test file rule: %w", err)
+	}
+	if !recorded {
+		return testpath.IsTest, nil
+	}
+	return func(file string) bool {
+		if test, ok := roles[file]; ok {
+			return test
+		}
+		return testpath.IsTest(file)
+	}, nil
+}
+
 // StoreWriter is the write surface used by buildpipe to materialise a graph
 // end-to-end (Migrate → Insert* → RebuildFTS → SetManifest).
 type StoreWriter interface {
@@ -180,27 +221,12 @@ type StoreWriter interface {
 	InsertBlobs(blobs map[string][]byte) error
 	InsertPkgTreeFromCluster(edges []cluster.PersistClusterEdge) error
 	InsertTopicTree(t TopicTreeInput) error
-	// InsertPendingRefs: cold path persists every Pass 1 unresolved
-	// cross-file ref so the next partial build can replay Pass 2 over a
-	// merged dirty + cached input. Schema 1.5.
-	InsertPendingRefs(refs []PendingRefRow) error
 
 	// InsertNodePRs writes the PR breadcrumb map (schema 1.12). Keyed by node ID; the slice value is the full list of
 	// PRs whose merge commit overlapped the node's source range.
 	// Idempotent — node_prs has PRIMARY KEY (node_id, number), so
 	// re-runs with INSERT OR REPLACE rewrite the existing rows.
 	InsertNodePRs(byNode map[string][]types.PRRef) error
-
-	// Per-file delete (incremental cache). Drops every node whose
-	// file_path matches; FK ON DELETE CASCADE wipes the dependent edges
-	// and blobs in the same statement. Caller is responsible for then
-	// re-inserting the new parse output.
-	DeleteNodesByFilePath(path string) error
-
-	// Per-type edge delete (incremental cache). Used to clear
-	// cross-language edges (e.g. binds_to) before they are recomputed —
-	// they have no FilePath so the per-file delete cannot reach them.
-	DeleteEdgesByType(t string) error
 
 	// Indexing
 	RebuildFTS() error

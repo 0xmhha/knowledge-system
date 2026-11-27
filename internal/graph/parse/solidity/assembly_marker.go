@@ -2,8 +2,6 @@ package solidity
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
 // Sol HasAssembly marker for callables.
@@ -51,7 +49,7 @@ func (v *declVisitor) runAssemblyMarker() {
 			if !ok {
 				continue
 			}
-			affected[parse.MakeID(fnQ, "sol", fnStart)] = true
+			affected[v.declID(fnQ, fnStart)] = true
 		}
 	}
 	if len(affected) == 0 {

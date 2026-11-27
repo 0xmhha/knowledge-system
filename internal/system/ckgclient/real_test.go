@@ -3,6 +3,7 @@ package ckgclient
 import (
 	"context"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -1369,5 +1370,50 @@ func TestNeighborsUnresolvedSeedIsDistinctFromStoreFailureAndEmptyTraversal(t *t
 	result, err = (&Real{s: found}).Neighbors(context.Background(), seed, NeighborsOpts{})
 	if err != nil || len(result) != 0 || len(found.neighCh) != 1 {
 		t.Fatalf("resolved zero-neighbor seed: result=%v err=%v traversals=%d", result, err, len(found.neighCh))
+	}
+}
+
+// rolesStore is a mock store that holds the build's record of test files.
+type rolesStore struct {
+	*mockStoreReader
+	roles map[string]bool
+}
+
+func (s rolesStore) TestFileRoles() (map[string]bool, bool, error) { return s.roles, true, nil }
+
+// TestReal_ExcludeTestsFollowsTheGraphRecord: exclude_tests drops what the
+// build recorded as test code, not what the path says: a scope may list
+// systemcontracts/test/x.go as production and a helper as test code. A file
+// the graph does not hold is judged by its path.
+func TestReal_ExcludeTestsFollowsTheGraphRecord(t *testing.T) {
+	t.Parallel()
+	m := &mockStoreReader{
+		manifest: ManifestSnapshot{SrcCommit: "h"},
+		searchOut: []store.SearchHit{
+			shit(node("n1", "Deploy", "systemcontracts/test/deploy.go", 1, 5, types.NodeFunction, "go"), 0.9),
+			shit(node("n2", "helper", "core/helper.go", 1, 5, types.NodeFunction, "go"), 0.8),
+			shit(node("n3", "Run", "core/run.go", 1, 5, types.NodeFunction, "go"), 0.7),
+		},
+	}
+	r := newRealWithStore(rolesStore{m, map[string]bool{
+		"systemcontracts/test/deploy.go": false, "core/helper.go": true, "core/run.go": false,
+	}})
+	hits, err := r.BM25Search(context.Background(), "x", SearchOpts{K: 3, Filter: SearchFilter{ExcludeTests: true}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, h := range hits {
+		got = append(got, h.Citation.File)
+	}
+	if want := []string{"systemcontracts/test/deploy.go", "core/run.go"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("kept %v, want %v", got, want)
+	}
+	isTest, err := TestFileRule(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !isTest("other/x_test.go") || isTest("systemcontracts/test/deploy.go") {
+		t.Error("TestFileRule: want the record for held files and the path rule for the others")
 	}
 }

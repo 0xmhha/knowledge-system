@@ -3,15 +3,12 @@
 // way. Inspired by graphify's `graphify path "A" "B"` ergonomic
 // (__main__.py:1622-1683).
 //
-// Resolution order for each argument:
-//
-//  1. Exact qualified_name match (the deterministic case for fully
-//     qualified inputs like `pkg.SubPkg.Foo`).
-//  2. Exact name match — when ambiguous, picks the highest-PageRank
-//     candidate so a user typing a bare `Run` resolves to the project's
-//     primary Run() rather than a test-fixture Run().
-//  3. ID prefix match — useful when copy-pasting from /api/edges output
-//     that surfaces 16-char node IDs.
+// Each argument is resolved by persist.ResolveName, the resolver every tool
+// shares (a canonical id, a qualified name, a site name
+// "<qname>@<file>:<line>", or a bare name); a name that resolves to several
+// declarations is an error that lists the candidates, never a silent pick.
+// A 16-char node ID prefix (copied from /api/edges output) is accepted when
+// the name resolves to nothing.
 //
 // BFS is undirected because "how are X and Y related" doesn't depend on
 // edge direction (matches graphify's nx.shortest_path default behaviour).
@@ -19,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,12 +34,14 @@ func newPathCmd() *cobra.Command {
 		Use:   "path <from> <to>",
 		Short: "Find the shortest path between two nodes (qualified_name / name / ID prefix)",
 		Long: `Print the shortest undirected path between two nodes. Each argument
-can be a fully-qualified name (e.g. ` + "`pkg.Foo`" + `), a bare name
-(highest-PageRank match wins on ambiguity), or a 16-char node ID
-prefix.
+can be a canonical id, a fully-qualified name (e.g. ` + "`pkg.Foo`" + `), a site name
+(` + "`pkg.F.x@file.go:12`" + `, the form candidates take), a bare name, or a 16-char
+node ID prefix. A name that matches several declarations is an error that
+lists them.
 
-Output: a numbered chain of nodes with the edge type that links each
-pair, plus a summary line showing the hop count.`,
+Output: the hop count, then a numbered chain of nodes with the relation
+that links each pair (` + pathArrowDown + ` the node above has it to the node below, ` + pathArrowUp + ` the
+node below has it to the node above).`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			db := filepath.Join(graph, "graph.db")
@@ -59,35 +59,28 @@ pair, plus a summary line showing the hop count.`,
 			if err != nil {
 				return fmt.Errorf("load edges: %w", err)
 			}
+			// A Goroutine's code edges are read apart, as in the tools.
+			edges = types.WithoutGoroutineCode(edges)
 
-			fromID, fromHits := resolveNodeQuery(nodes, args[0])
-			toID, toHits := resolveNodeQuery(nodes, args[1])
-			if fromID == "" {
-				return fmt.Errorf("could not resolve %q to any node", args[0])
+			fromID, err := resolveNodeQuery(store, nodes, args[0])
+			if err != nil {
+				return err
 			}
-			if toID == "" {
-				return fmt.Errorf("could not resolve %q to any node", args[1])
+			toID, err := resolveNodeQuery(store, nodes, args[1])
+			if err != nil {
+				return err
 			}
 			if fromID == toID {
 				fmt.Println("(both endpoints resolved to the same node — distance 0)")
 				return nil
 			}
-			if fromHits > 1 {
-				_, _ = fmt.Fprintf(os.Stderr, "ckg path: %q matched %d nodes; using highest-PageRank.\n",
-					args[0], fromHits)
-			}
-			if toHits > 1 {
-				_, _ = fmt.Fprintf(os.Stderr, "ckg path: %q matched %d nodes; using highest-PageRank.\n",
-					args[1], toHits)
-			}
 
-			path, edgeTypes := bfsShortestPath(nodes, edges, fromID, toID, maxDepth)
+			path, hops := bfsShortestPath(nodes, edges, fromID, toID, maxDepth)
 			if len(path) == 0 {
 				fmt.Printf("(no path of length ≤ %d between the two endpoints)\n", maxDepth)
 				return nil
 			}
-			printPath(os.Stdout, nodes, path, edgeTypes)
-			return nil
+			return printPath(os.Stdout, store, nodes, path, hops)
 		},
 	}
 	cmd.Flags().StringVar(&graph, "graph", "", "graph directory (required)")
@@ -97,60 +90,64 @@ pair, plus a summary line showing the hop count.`,
 	return cmd
 }
 
-// resolveNodeQuery resolves a free-form query to a node ID. Returns the
-// best match and the total count of candidates so the caller can warn
-// when a bare name was ambiguous.
-func resolveNodeQuery(nodes []types.Node, q string) (string, int) {
-	// 1. Exact qualified_name.
-	for _, n := range nodes {
-		if n.QualifiedName == q {
-			return n.ID, 1
-		}
+// resolveNodeQuery resolves one argument of ckg path to a node id (see the
+// package comment): by persist.ResolveName, else by node id prefix.
+func resolveNodeQuery(r persist.StoreReader, nodes []types.Node, q string) (string, error) {
+	res, err := persist.ResolveName(r, q, "")
+	if err != nil {
+		return "", fmt.Errorf("resolve %q: %w", q, err)
 	}
-	// 2. Exact name (highest-PageRank wins on tie).
-	var best types.Node
-	bestPR := -1.0
-	hits := 0
-	for _, n := range nodes {
-		if n.Name == q {
-			hits++
-			if n.PageRank > bestPR {
-				best = n
-				bestPR = n.PageRank
-			}
-		}
+	switch {
+	case res.Ambiguous():
+		return "", fmt.Errorf("%q names several declarations; use one of: %s", q, strings.Join(res.Candidates, ", "))
+	case res.Found():
+		return res.Nodes[0].ID, nil
 	}
-	if hits > 0 {
-		return best.ID, hits
-	}
-	// 3. ID prefix.
 	for _, n := range nodes {
 		if strings.HasPrefix(n.ID, q) {
-			return n.ID, 1
+			return n.ID, nil
 		}
 	}
-	return "", 0
+	return "", fmt.Errorf("could not resolve %q to any node", q)
 }
 
+// pathHop is the relation between two successive nodes of a path.
+type pathHop struct {
+	edgeType string
+	// forward is true when the earlier node of the path has the relation to
+	// the later one, false when the later node has it to the earlier one.
+	forward bool
+}
+
+// pathArrowDown and pathArrowUp mark a hop's direction in the printed path:
+// the node above has the relation to the node below, or the reverse.
+const (
+	pathArrowDown = "↓"
+	pathArrowUp   = "↑"
+)
+
 // bfsShortestPath returns the shortest undirected node sequence from src
-// to dst, plus the edge type used to traverse to each non-root step.
-// edgeTypes has length len(path)-1. Returns (nil, nil) when no path
+// to dst, plus the relation used to traverse to each non-root step and its
+// direction. hops has length len(path)-1. Returns (nil, nil) when no path
 // exists within maxDepth hops.
 //
 // Adjacency is built fresh per call (O(E)) — for repeated path queries
 // the caller could cache it, but the typical interactive use is one
 // query per invocation so the simplicity wins.
 func bfsShortestPath(nodes []types.Node, edges []types.Edge,
-	src, dst string, maxDepth int) ([]string, []string) {
-	type out struct{ id, etype string }
+	src, dst string, maxDepth int) ([]string, []pathHop) {
+	type out struct {
+		id  string
+		hop pathHop
+	}
 	adj := make(map[string][]out, len(nodes))
 	for _, e := range edges {
-		adj[e.Src] = append(adj[e.Src], out{e.Dst, string(e.Type)})
-		adj[e.Dst] = append(adj[e.Dst], out{e.Src, string(e.Type)})
+		adj[e.Src] = append(adj[e.Src], out{e.Dst, pathHop{string(e.Type), true}})
+		adj[e.Dst] = append(adj[e.Dst], out{e.Src, pathHop{string(e.Type), false}})
 	}
 
 	parent := map[string]string{src: ""}
-	parentEdge := map[string]string{}
+	parentEdge := map[string]pathHop{}
 	queue := []string{src}
 	depth := 0
 	found := false
@@ -162,7 +159,7 @@ func bfsShortestPath(nodes []types.Node, edges []types.Edge,
 					continue
 				}
 				parent[o.id] = v
-				parentEdge[o.id] = o.etype
+				parentEdge[o.id] = o.hop
 				if o.id == dst {
 					found = true
 					break
@@ -184,23 +181,28 @@ func bfsShortestPath(nodes []types.Node, edges []types.Edge,
 	}
 
 	var path []string
-	var etypes []string
+	var hops []pathHop
 	cur := dst
 	for {
 		path = append([]string{cur}, path...)
 		if cur == src {
 			break
 		}
-		etypes = append([]string{parentEdge[cur]}, etypes...)
+		hops = append([]pathHop{parentEdge[cur]}, hops...)
 		cur = parent[cur]
 	}
-	return path, etypes
+	return path, hops
 }
 
-// printPath renders the path as a human-readable chain with edge types
-// between successive nodes. Format mirrors graphify's path output but
-// uses CKG's richer schema (Type column + qualified_name).
-func printPath(w *os.File, nodes []types.Node, path []string, edgeTypes []string) {
+// printPath renders the path as a human-readable chain with the relation
+// between successive nodes, drawn in the relation's own direction: the walk
+// crosses edges both ways, so the order of the chain says nothing about who
+// calls or writes whom. Format mirrors graphify's path output but uses CKG's
+// richer schema (Type column + qualified_name).
+// printPath prints path. Each node is shown by the name that names it alone
+// (persist.NameOf): two locals of one name in one function are told apart
+// by their site names, which ckg path also takes as arguments.
+func printPath(w io.Writer, r persist.StoreReader, nodes []types.Node, path []string, hops []pathHop) error {
 	idx := make(map[string]types.Node, len(path))
 	for _, n := range nodes {
 		for _, id := range path {
@@ -210,12 +212,23 @@ func printPath(w *os.File, nodes []types.Node, path []string, edgeTypes []string
 			}
 		}
 	}
-	_, _ = fmt.Fprintf(w, "Path (%d hops):\n\n", len(path)-1)
+	_, _ = fmt.Fprintf(w, "Path (%d hops):\n", len(path)-1)
+	_, _ = fmt.Fprintf(w, "(%s the node above has the relation to the node below; %s the node below has it to the node above)\n\n",
+		pathArrowDown, pathArrowUp)
 	for i, id := range path {
 		n := idx[id]
-		_, _ = fmt.Fprintf(w, "  %2d. [%s] %s — `%s`\n", i+1, n.Type, n.Name, n.QualifiedName)
-		if i < len(edgeTypes) {
-			_, _ = fmt.Fprintf(w, "       └──[%s]──>\n", edgeTypes[i])
+		name, err := persist.NameOf(r, n)
+		if err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintf(w, "  %2d. [%s] %s — `%s`\n", i+1, n.Type, n.Name, name)
+		if i < len(hops) {
+			arrow := pathArrowDown
+			if !hops[i].forward {
+				arrow = pathArrowUp
+			}
+			_, _ = fmt.Fprintf(w, "       %s [%s]\n", arrow, hops[i].edgeType)
 		}
 	}
+	return nil
 }

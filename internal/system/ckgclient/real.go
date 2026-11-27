@@ -21,7 +21,6 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
-	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // DefaultSearchLimit is the limit passed to ckg's SearchFTS when SearchOpts.K
@@ -46,7 +45,7 @@ const subgraphTraversalBudget = 50000
 // usableSubgraphEdges counts, up to limit, the edges GetSubgraph's response
 // would accept: a mapped relation other than uses_type, both endpoints
 // present, and no test endpoint when tests are excluded.
-func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bool, limit int) int {
+func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bool, isTest func(string) bool, limit int) int {
 	byID := make(map[string]types.Node, len(nodes))
 	for _, n := range nodes {
 		byID[n.ID] = n
@@ -62,7 +61,7 @@ func usableSubgraphEdges(nodes []types.Node, edges []types.Edge, excludeTests bo
 		}
 		srcN, srcOK := byID[e.Src]
 		dstN, dstOK := byID[e.Dst]
-		if !srcOK || !dstOK || (excludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath))) {
+		if !srcOK || !dstOK || (excludeTests && (isTest(srcN.FilePath) || isTest(dstN.FilePath))) {
 			continue
 		}
 		count++
@@ -134,6 +133,16 @@ type storeReader interface {
 // which strips the persist.Manifest dependency.
 type realStoreReader struct {
 	r store.Reader
+}
+
+// TestFileRoles forwards the graph's record of test files
+// (store.TestFileReader); a store without it has no record.
+func (a *realStoreReader) TestFileRoles() (map[string]bool, bool, error) {
+	tr, ok := a.r.(store.TestFileReader)
+	if !ok {
+		return nil, false, nil
+	}
+	return tr.TestFileRoles()
 }
 
 func (a *realStoreReader) Review(qname string, opts store.ReviewOptions) (store.Review, error) {
@@ -210,6 +219,12 @@ type Real struct {
 	// production-size graph.
 	commitMu sync.Mutex
 	commitID string
+
+	// testOnce guards testRule and testErr, the graph's test file rule
+	// (store.TestFileRule), read once: the store is immutable.
+	testOnce sync.Once
+	testRule func(file string) bool
+	testErr  error
 }
 
 // Compile-time guarantee Real satisfies Client.
@@ -241,6 +256,19 @@ func NewReal(path string) (*Real, error) {
 // always use NewReal.
 func newRealWithStore(s storeReader) *Real {
 	return &Real{s: s}
+}
+
+// TestFileRule returns the graph's answer to "is this file test code"
+// (store.TestFileRule): the role the build recorded on the file's nodes, the
+// path rule for a file without nodes or a graph without the record.
+func (r *Real) TestFileRule() (func(file string) bool, error) {
+	r.testOnce.Do(func() {
+		r.testRule, r.testErr = store.TestFileRule(r.s)
+		if r.testErr != nil {
+			r.testErr = fmt.Errorf("ckgclient: %w", r.testErr)
+		}
+	})
+	return r.testRule, r.testErr
 }
 
 // BM25Search forwards query to ckg's SearchFTS, then translates the
@@ -289,8 +317,12 @@ func (r *Real) BM25Search(ctx context.Context, query string, opts SearchOpts) ([
 	commit, _ := r.commit()
 	hits := make([]contract.Hit, 0, len(shits))
 	kept := 0
+	isTest, err := r.TestFileRule()
+	if err != nil {
+		return nil, err
+	}
 	for i, sh := range shits {
-		if !matchesFilter(sh.Node, opts.Filter) {
+		if !matchesFilter(sh.Node, opts.Filter, isTest) {
 			continue
 		}
 		hits = append(hits, contract.Hit{
@@ -310,11 +342,11 @@ func (r *Real) BM25Search(ctx context.Context, query string, opts SearchOpts) ([
 // matchesFilter reports whether n satisfies every set field of f.
 // Empty fields are ignored. PathGlob uses filepath.Match semantics —
 // single-star, no "**" expansion — matched against n.FilePath.
-func matchesFilter(n types.Node, f SearchFilter) bool {
+func matchesFilter(n types.Node, f SearchFilter, isTest func(string) bool) bool {
 	if f.Language != "" && f.Language != n.Language {
 		return false
 	}
-	if f.ExcludeTests && testpath.IsTest(n.FilePath) {
+	if f.ExcludeTests && isTest(n.FilePath) {
 		return false
 	}
 	if f.PathGlob != "" {
@@ -465,6 +497,10 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 		depth = 1
 	}
 
+	isTest, err := r.TestFileRule()
+	if err != nil {
+		return nil, err
+	}
 	// Resolve the source citation to its node.
 	cands, err := r.s.NodesByFilePath(src.File)
 	if err != nil {
@@ -566,7 +602,7 @@ func (r *Real) Neighbors(ctx context.Context, src contract.Citation, opts Neighb
 			// ExcludeTests judges the neighbour, never the seed: a test seed
 			// keeps its production callers, and a test neighbour is neither
 			// listed nor walked through.
-			if opts.ExcludeTests && testpath.IsTest(far.FilePath) {
+			if opts.ExcludeTests && isTest(far.FilePath) {
 				continue
 			}
 			if !visited[far.ID] {
@@ -1074,7 +1110,11 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 	// fully-qualified name; SubgraphByQname matches qualified_name exactly, so
 	// an unresolved seed would come back as an empty neighborhood rather than
 	// as the lookup failure it is — see ErrSeedUnresolved.
-	qname, err := r.resolveSeedOrErr(qname)
+	isTest, err := r.TestFileRule()
+	if err != nil {
+		return nil, nil, err
+	}
+	qname, err = r.resolveSeedOrErr(qname)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1131,7 +1171,7 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		if err != nil {
 			return nil, nil, err
 		}
-		if len(edges) >= subgraphTraversalBudget || usableSubgraphEdges(nodes, edges, opts.ExcludeTests, limit) >= limit {
+		if len(edges) >= subgraphTraversalBudget || usableSubgraphEdges(nodes, edges, opts.ExcludeTests, isTest, limit) >= limit {
 			break
 		}
 	}
@@ -1180,7 +1220,7 @@ func (r *Real) GetSubgraph(ctx context.Context, qname string, opts SubgraphOpts)
 		if !srcOK || !dstOK {
 			continue
 		}
-		if opts.ExcludeTests && (testpath.IsTest(srcN.FilePath) || testpath.IsTest(dstN.FilePath)) {
+		if opts.ExcludeTests && (isTest(srcN.FilePath) || isTest(dstN.FilePath)) {
 			continue
 		}
 		d := 1

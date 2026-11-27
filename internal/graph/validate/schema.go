@@ -21,6 +21,7 @@ import (
 //   - implements src must be a Struct or TypeAlias, dst must be Interface
 //   - listens_on src must be Function/Method, dst must be Endpoint
 //   - calls/invokes src and dst must be Function/Method
+//   - reverts_with src must be Function/Modifier, dst must be Error
 //
 // The validator is deterministic, fast, and dependency-free — safe to run
 // on every build. Findings inform Citation Enforcement and the LLM
@@ -52,6 +53,7 @@ var fileScopedTypes = map[types.NodeType]struct{}{
 	types.NodeLoopStmt:   {},
 	types.NodeSwitchStmt: {},
 	types.NodeReturnStmt: {},
+	types.NodeError:      {},
 }
 
 // Validate executes all schema checks and returns one report aggregating
@@ -232,20 +234,66 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 				})
 			}
 		case types.EdgeCalls, types.EdgeInvokes:
-			if !isCallable(src.Type) {
+			if !isCaller(src.Type) {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-src",
-					Message:  "calls/invokes src is not a callable kind (got " + string(src.Type) + ")",
+					Message:  "calls/invokes src is not a caller kind (got " + string(src.Type) + ")",
 					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
 					FilePath: e.FilePath,
 				})
 			}
 			// Schema 1.36: a call to a symbol outside the build ends at an
-			// External node, which never starts one.
-			if !isCallable(dst.Type) && dst.Type != types.NodeExternal {
+			// External node, which never starts one. Schema 1.39: a caller
+			// that calls a closure or a function value carries a marker, an
+			// invokes edge to itself with the dispatch kind; it names no
+			// callee, so a Variable may carry one for its initialiser.
+			if !isCallable(dst.Type) && dst.Type != types.NodeExternal && !isDispatchMarker(e) {
 				report.Issues = append(report.Issues, Issue{
 					Severity: SeverityWarning, Code: "calls-bad-dst",
 					Message:  "calls/invokes dst is not a callable kind (got " + string(dst.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeLiteralPassedTo:
+			// Schema 1.42: a call site in a function literal -> the function
+			// the literal is passed to.
+			if src.Type != types.NodeCallSite || !isCallable(dst.Type) {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "literal-passed-to-bad-shape",
+					Message:  "literal_passed_to must go from a CallSite to a callable (got " + string(src.Type) + " -> " + string(dst.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeHandles, types.EdgeTriggers:
+			// Schema 1.42: handles starts at a receive's CallSite and ends at
+			// the handled code; triggers starts at a sender and ends at a
+			// receive's CallSite.
+			if bad := messageLinkShape(e.Type, src.Type, dst.Type); bad != "" {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: string(e.Type) + "-bad-shape",
+					Message:  string(e.Type) + " " + bad,
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+		case types.EdgeRevertsWith:
+			// Schema 1.38: a Solidity function, modifier or constructor
+			// (a Function with sub kind constructor) reverts with a
+			// custom error.
+			if src.Type != types.NodeFunction && src.Type != types.NodeModifier {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "reverts-with-bad-src",
+					Message:  "reverts_with src is not a Function/Modifier (got " + string(src.Type) + ")",
+					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
+					FilePath: e.FilePath,
+				})
+			}
+			if dst.Type != types.NodeError {
+				report.Issues = append(report.Issues, Issue{
+					Severity: SeverityWarning, Code: "reverts-with-bad-dst",
+					Message:  "reverts_with dst is not an Error (got " + string(dst.Type) + ")",
 					EdgeKey:  edgeKey(string(e.Type), e.Src, e.Dst, e.Line),
 					FilePath: e.FilePath,
 				})
@@ -278,8 +326,55 @@ func (v *SchemaValidator) Validate(ctx context.Context, g *graph.Graph, store pe
 	return report, nil
 }
 
+// isCaller reports whether t is a node type that can start a calls/invokes
+// edge: a callable kind, or a declaration whose own code makes calls without
+// being called itself. Those are a Variable, whose package-level initialiser
+// makes calls outside any function (`var Default = New().Inc()`; schema
+// 1.38), a Solidity Modifier, whose body makes calls (`modifier onlyOwner()
+// { _checkOwner(); _; }`), and a Solidity state variable or constant (Field,
+// Constant), whose initialiser can (`uint256 public cap = _defaultCap();`).
+// None of them ever ends a calls edge.
+func isCaller(t types.NodeType) bool {
+	switch t {
+	case types.NodeVariable, types.NodeModifier, types.NodeField, types.NodeConstant:
+		return true
+	case types.NodeGoroutine:
+		// Schema 1.42: a goroutine calls the function it runs and the
+		// functions its literal calls (dispatch kind goroutine).
+		return true
+	}
+	return isCallable(t)
+}
+
+// messageLinkShape returns what is wrong with a handles or triggers edge
+// from a src node to a dst node, or "".
+func messageLinkShape(t types.EdgeType, src, dst types.NodeType) string {
+	if t == types.EdgeHandles {
+		switch {
+		case src != types.NodeCallSite:
+			return "src is not a CallSite (got " + string(src) + ")"
+		case dst != types.NodeCallSite && dst != types.NodeField && dst != types.NodeGoroutine:
+			return "dst is not a CallSite, Field or Goroutine (got " + string(dst) + ")"
+		}
+		return ""
+	}
+	switch {
+	case src != types.NodeFunction && src != types.NodeMethod && src != types.NodeGoroutine:
+		return "src is not a Function, Method or Goroutine (got " + string(src) + ")"
+	case dst != types.NodeCallSite:
+		return "dst is not a CallSite (got " + string(dst) + ")"
+	}
+	return ""
+}
+
+// isDispatchMarker reports whether e is the marker of a dynamic call: an
+// invokes edge from a node to itself that carries the dispatch kind.
+func isDispatchMarker(e types.Edge) bool {
+	return e.Type == types.EdgeInvokes && e.Src == e.Dst && e.DispatchKind != ""
+}
+
 // isCallable reports whether t is a node type that legitimately appears
-// on either end of a calls/invokes edge.
+// at the callee end of a calls/invokes edge, and, with isCaller, at its start.
 func isCallable(t types.NodeType) bool {
 	switch t {
 	case types.NodeFunction, types.NodeMethod, types.NodeCallSite:

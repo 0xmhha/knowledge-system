@@ -181,7 +181,14 @@ type scoredNode struct {
 func BuildContext(store persist.StoreReader, query string, opt Options) (map[string]any, error) {
 	opt = opt.withDefaults()
 
-	cands, err := store.Search(query, opt.CandidateLimit)
+	// The task description is words, not full-text query syntax: 14 of 26
+	// descriptions holding ( : - * " or an operator word failed with an FTS5
+	// syntax error when passed as they were.
+	words := persist.SearchWords(query)
+	if words == "" {
+		return emptyResult(query), nil
+	}
+	cands, err := store.Search(words, opt.CandidateLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +203,7 @@ func BuildContext(store persist.StoreReader, query string, opt Options) (map[str
 	}
 
 	bodies, summaries, warnings, tokens := packWithinBudget(store, rows, query, opt)
-	subgraph := buildSubgraphView(rows, edges)
+	subgraph := buildSubgraphView(store, rows, edges)
 
 	out := map[string]any{
 		"task_description": query,
@@ -354,7 +361,7 @@ func packWithinBudget(store persist.StoreReader, rows []scoredNode, query string
 				if tokens+cost > opt.BudgetTokens {
 					break
 				}
-				bodies = append(bodies, bodyEntry(r.node, string(b), cite, hasCite))
+				bodies = append(bodies, bodyEntry(store, r.node, string(b), cite, hasCite))
 				tokens += cost
 				continue
 			}
@@ -368,17 +375,17 @@ func packWithinBudget(store persist.StoreReader, rows []scoredNode, query string
 		if tokens+cost > opt.BudgetTokens {
 			continue
 		}
-		summaries = append(summaries, summaryEntry(r.node, cite, hasCite))
+		summaries = append(summaries, summaryEntry(store, r.node, cite, hasCite))
 		tokens += cost
 	}
 	return
 }
 
 // bodyEntry builds the "full source body" payload for a packed row.
-func bodyEntry(n types.Node, source, cite string, hasCite bool) map[string]any {
+func bodyEntry(store persist.StoreReader, n types.Node, source, cite string, hasCite bool) map[string]any {
 	body := map[string]any{
 		"id":     n.ID,
-		"qname":  n.QualifiedName,
+		"qname":  persist.PrintedName(store, n),
 		"source": source,
 	}
 	if hasCite {
@@ -390,10 +397,10 @@ func bodyEntry(n types.Node, source, cite string, hasCite bool) map[string]any {
 }
 
 // summaryEntry builds the "signature + doc" payload for a packed row.
-func summaryEntry(n types.Node, cite string, hasCite bool) map[string]any {
+func summaryEntry(store persist.StoreReader, n types.Node, cite string, hasCite bool) map[string]any {
 	summary := map[string]any{
 		"id":        n.ID,
-		"qname":     n.QualifiedName,
+		"qname":     persist.PrintedName(store, n),
 		"signature": n.Signature,
 		"doc":       n.DocComment,
 	}
@@ -472,7 +479,7 @@ func computeImpactForPrimary(store persist.StoreReader, primary types.Node, opt 
 // buildSubgraphView assembles the JSON subgraph (nodes + edges) for the
 // kept row set. Edges crossing outside the kept set are dropped so the
 // rendered subgraph is self-contained.
-func buildSubgraphView(rows []scoredNode, allEdges []types.Edge) map[string]any {
+func buildSubgraphView(store persist.StoreReader, rows []scoredNode, allEdges []types.Edge) map[string]any {
 	keptIDs := make(map[string]struct{}, len(rows))
 	for _, r := range rows {
 		keptIDs[r.node.ID] = struct{}{}
@@ -493,7 +500,7 @@ func buildSubgraphView(rows []scoredNode, allEdges []types.Edge) map[string]any 
 			"id":    r.node.ID,
 			"name":  r.node.Name,
 			"type":  r.node.Type,
-			"qname": r.node.QualifiedName,
+			"qname": persist.PrintedName(store, r.node),
 			"score": r.score,
 		}
 		if cite, ok := citationFor(r.node); ok {

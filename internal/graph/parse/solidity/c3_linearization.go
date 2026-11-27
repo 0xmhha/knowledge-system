@@ -13,10 +13,11 @@ package solidity
 // base class lands first, then each next class in the
 // linearization, then the derived contract's own state vars.
 //
-// computeC3Linearization returns each contract's full MRO list
-// (self first, then bases derived -> base). The caller dedupes
-// inherited slot counts by summing slotCount(c) over the
-// linearization excluding the contract itself.
+// computeC3LinearizationWithFallbacks returns each contract's
+// linearisation (itself first, then its bases from the most derived
+// to the most base-like). Name lookup walks the list in order;
+// storage layout sums slotCount(c) over the list without the
+// contract itself.
 //
 // Reference: Barrett et al. "A Monotonic Superclass Linearization
 // for Dylan" (OOPSLA '96) — the algorithm Python adopted in
@@ -28,21 +29,11 @@ package solidity
 // depth-first order so storage layout stays computable. The
 // caller's tests still observe a deterministic answer.
 
-// computeC3Linearization returns mro[contractID] = [self, parent1,
-// parent2, grandparent, …] for every contractID reachable from
-// `parents`. The returned slice is owned by the caller; mutation
-// is allowed but unnecessary.
-func computeC3Linearization(parents map[string][]string) map[string][]string {
-	mro, _ := computeC3LinearizationWithFallbacks(parents)
-	return mro
-}
-
-// computeC3LinearizationWithFallbacks is the
-// variant that additionally returns the set of contract IDs whose
-// hierarchy had no consistent C3 linearization and degraded to the
-// depth-first fallback. Downstream tooling can flag those nodes
-// (HasInheritanceMROFallback) so the would-be-rejected hierarchy
-// is visible without re-running solc.
+// computeC3LinearizationWithFallbacks returns mro[contractID] = [self,
+// last base listed, …, most base-like ancestor] for every contract
+// reachable from parents, and the set of contracts whose hierarchy has no
+// consistent linearisation and fell back to a depth-first walk. Those are
+// flagged (HasInheritanceMROFallback): the compiler rejects them.
 func computeC3LinearizationWithFallbacks(parents map[string][]string) (map[string][]string, map[string]bool) {
 	out := make(map[string][]string, len(parents))
 	fallback := map[string]bool{}
@@ -66,13 +57,23 @@ func computeC3LinearizationWithFallbacks(parents map[string][]string) (map[strin
 			return res
 		}
 		// Build the list of parent linearizations plus the bare
-		// parent order — the canonical C3 inputs.
-		lists := make([][]string, 0, len(ps)+1)
-		for _, p := range ps {
-			parentLin := lin(p)
-			lists = append(lists, append([]string(nil), parentLin...))
+		// parent order — the canonical C3 inputs — with the bases
+		// taken from the last one listed to the first. Solidity lists
+		// bases from the most base-like to the most derived (`contract
+		// C is Base, Derived`), the reverse of Python, so the last base
+		// is searched first. Taken in source order, a hierarchy like
+		// `NativeCoinAdapter is AbstractFiatToken, Mintable, EIP3009,
+		// EIP2612` (EIP3009 itself extends AbstractFiatToken) has no
+		// linearisation, and a contract that compiles was flagged.
+		derivedFirst := make([]string, 0, len(ps))
+		for i := len(ps) - 1; i >= 0; i-- {
+			derivedFirst = append(derivedFirst, ps[i])
 		}
-		lists = append(lists, append([]string(nil), ps...))
+		lists := make([][]string, 0, len(ps)+1)
+		for _, p := range derivedFirst {
+			lists = append(lists, append([]string(nil), lin(p)...))
+		}
+		lists = append(lists, derivedFirst)
 
 		merged := mergeC3(lists)
 		if merged == nil {

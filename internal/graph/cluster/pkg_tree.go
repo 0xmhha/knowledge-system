@@ -75,7 +75,7 @@ func BuildPkgTree(g *graph.Graph) *PkgTree {
 	for _, n := range g.Nodes {
 		switch n.Type {
 		case types.NodeStruct, types.NodeInterface, types.NodeClass, types.NodeTypeAlias,
-			types.NodeEnum, types.NodeContract, types.NodeMapping, types.NodeEvent,
+			types.NodeEnum, types.NodeContract, types.NodeMapping, types.NodeEvent, types.NodeError,
 			types.NodeFunction, types.NodeMethod, types.NodeConstructor,
 			types.NodeConstant, types.NodeVariable, types.NodeField,
 			types.NodeImport, types.NodeExport, types.NodeDecorator,

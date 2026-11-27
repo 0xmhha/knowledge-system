@@ -119,19 +119,6 @@ CREATE TABLE IF NOT EXISTS manifest (
     value TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS pending_refs (
-    file_path     TEXT NOT NULL,
-    src_id        TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-    target_qname  TEXT NOT NULL,
-    target_canonical_id TEXT NOT NULL DEFAULT '',
-    edge_type     TEXT NOT NULL,
-    line          INTEGER NOT NULL,
-    hint_file     TEXT,
-    dispatch_kind TEXT,
-    PRIMARY KEY (file_path, src_id, target_qname, edge_type, line)
-);
-ALTER TABLE pending_refs ADD COLUMN IF NOT EXISTS target_canonical_id TEXT NOT NULL DEFAULT '';
-CREATE INDEX IF NOT EXISTS idx_pending_refs_file ON pending_refs(file_path);
 
 -- Schema 1.12: PR breadcrumb. Mirrors the SQLite
 -- node_prs table (see internal/persist/schema.sql). merged_at uses
@@ -221,7 +208,7 @@ func OpenPostgresCold(dsn string) (Store, error) {
 	// Wipe data first (tables may not exist yet on very first run — ignore error).
 	// TRUNCATE … CASCADE handles FK ordering automatically.
 	_, _ = pool.Exec(background,
-		`TRUNCATE TABLE node_prs, pending_refs, topic_tree, pkg_tree, blobs, edges, nodes, manifest CASCADE`)
+		`TRUNCATE TABLE node_prs, topic_tree, pkg_tree, blobs, edges, nodes, manifest CASCADE`)
 	if err := s.Migrate(); err != nil {
 		pool.Close()
 
@@ -479,42 +466,6 @@ func (s *pgStore) InsertTopicTree(t TopicTreeInput) error {
 	return tx.Commit(background)
 }
 
-// InsertPendingRefs bulk-inserts pending cross-file reference rows. ON CONFLICT
-// DO NOTHING mirrors the SQLite INSERT OR IGNORE semantics: the PK collision
-// is benign (same logical ref emitted twice by cold path).
-func (s *pgStore) InsertPendingRefs(refs []PendingRefRow) error {
-	if s.ro {
-		panic("pgStore: InsertPendingRefs called on read-only store")
-	}
-	if len(refs) == 0 {
-		return nil
-	}
-	batch := &pgx.Batch{}
-	const q = `INSERT INTO pending_refs
-        (file_path, src_id, target_qname, target_canonical_id, edge_type, line, hint_file, dispatch_kind)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-        ON CONFLICT (file_path, src_id, target_qname, edge_type, line) DO NOTHING`
-	for _, r := range refs {
-		var hf *string
-		if r.HintFile != "" {
-			hf = &r.HintFile
-		}
-		var dk *string
-		if r.DispatchKind != "" {
-			dk = &r.DispatchKind
-		}
-		batch.Queue(q, r.FilePath, r.SrcID, r.TargetQName, r.TargetCanonicalID, r.EdgeType, r.Line, hf, dk)
-	}
-	br := s.pool.SendBatch(background, batch)
-	defer func() { _ = br.Close() }()
-	for i := range refs {
-		if _, err := br.Exec(); err != nil {
-			return fmt.Errorf("insert pending_ref %s→%s: %w", refs[i].SrcID, refs[i].TargetQName, err)
-		}
-	}
-	return br.Close()
-}
-
 // InsertNodePRs writes PR breadcrumbs into PG. ON CONFLICT
 // UPDATE rather than DO NOTHING because the rebuild path frequently
 // has updated title/summary text for the same (node_id, number) — see
@@ -595,39 +546,6 @@ func (s *pgStore) GetNodePRs(nodeID string, cutoff time.Time) ([]types.PRRef, er
 // Per-file delete
 // ──────────────────────────────────────────────────────────────────────────────
 
-// DeleteNodesByFilePath drops every node whose file_path matches. FK ON DELETE
-// CASCADE wipes dependent edges, blobs, pkg_tree, topic_tree, and pending_refs
-// in the same statement — identical contract to the SQLite implementation.
-func (s *pgStore) DeleteNodesByFilePath(path string) error {
-	if s.ro {
-		panic("pgStore: DeleteNodesByFilePath called on read-only store")
-	}
-	if path == "" {
-		return nil
-	}
-	if _, err := s.pool.Exec(background,
-		`DELETE FROM nodes WHERE file_path = $1`, path); err != nil {
-		return fmt.Errorf("delete nodes by file_path %q: %w", path, err)
-	}
-	return nil
-}
-
-// DeleteEdgesByType drops every edge of the given type. Used by the incremental
-// path to clear always-rebuilt cross-language edges (binds_to, changed_in, blame).
-func (s *pgStore) DeleteEdgesByType(t string) error {
-	if s.ro {
-		panic("pgStore: DeleteEdgesByType called on read-only store")
-	}
-	if t == "" {
-		return nil
-	}
-	if _, err := s.pool.Exec(background,
-		`DELETE FROM edges WHERE type = $1`, t); err != nil {
-		return fmt.Errorf("delete edges by type %q: %w", t, err)
-	}
-	return nil
-}
-
 // ──────────────────────────────────────────────────────────────────────────────
 // FTS
 // ──────────────────────────────────────────────────────────────────────────────
@@ -654,8 +572,8 @@ func (s *pgStore) RebuildFTS() error {
 // ──────────────────────────────────────────────────────────────────────────────
 
 // FindSymbol returns nodes whose qualified_name matches name. When exact is
-// false, a LIKE '%.<name>' suffix match is also accepted. Capped at 100
-// rows (same as SQLite implementation).
+// false, a LIKE '%.<name>' suffix match is also accepted (ILIKE with
+// opts.IgnoreCase). Ordered and capped as the SQLite implementation.
 //
 // opts.Language pushes a `language = $N` predicate when non-empty.
 // opts.Kinds pushes a `type IN ($N, $N+1, ...)` predicate when non-empty,
@@ -663,10 +581,14 @@ func (s *pgStore) RebuildFTS() error {
 func (s *pgStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([]types.Node, error) {
 	args := []any{}
 	q := `SELECT ` + pgNodeColumns + ` FROM nodes WHERE 1=1 `
-	if exact {
+	switch {
+	case exact:
 		q += `AND qualified_name = $1 `
 		args = append(args, name)
-	} else {
+	case opts.IgnoreCase:
+		q += `AND (qualified_name = $1 OR qualified_name ILIKE $2) `
+		args = append(args, name, "%."+name)
+	default:
 		q += `AND (qualified_name = $1 OR qualified_name LIKE $2) `
 		args = append(args, name, "%."+name)
 	}
@@ -682,7 +604,11 @@ func (s *pgStore) FindSymbol(name string, exact bool, opts FindSymbolOptions) ([
 		}
 		q += `AND type IN (` + strings.Join(placeholders, ",") + `) `
 	}
-	q += `LIMIT 100`
+	q += `ORDER BY qualified_name, id `
+	if limit := opts.rowLimit(); limit != FindSymbolNoLimit {
+		args = append(args, limit)
+		q += fmt.Sprintf(`LIMIT $%d`, len(args))
+	}
 	rows, err := s.pool.Query(background, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("find symbol %q: %w", name, err)
@@ -976,6 +902,7 @@ func (s *pgStore) neighborhoodFrom(roots []types.Node, depth int, reverse bool, 
 	for _, n := range seen {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, allEdges, nil
 }
 
@@ -1000,6 +927,7 @@ func (s *pgStore) SubgraphByQname(qname string, depth int) ([]types.Node, []type
 	for _, n := range merged {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, append(fwdE, revE...), nil
 }
 
@@ -1012,11 +940,11 @@ func (s *pgStore) pgEdgesFrom(ids []string, edgeTypes []string) ([]types.Edge, e
 	var args []any
 	if len(edgeTypes) == 0 {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE src = ANY($1)`
+            FROM edges WHERE src = ANY($1) AND ` + types.GoroutineCodeSQL
 		args = []any{ids}
 	} else {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE src = ANY($1) AND type = ANY($2)`
+            FROM edges WHERE src = ANY($1) AND type = ANY($2) AND ` + types.GoroutineCodeSQL
 		args = []any{ids, edgeTypes}
 	}
 	rows, err := s.pool.Query(background, q, args...)
@@ -1036,11 +964,11 @@ func (s *pgStore) pgEdgesPointingTo(ids []string, edgeTypes []string) ([]types.E
 	var args []any
 	if len(edgeTypes) == 0 {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE dst = ANY($1)`
+            FROM edges WHERE dst = ANY($1) AND ` + types.GoroutineCodeSQL
 		args = []any{ids}
 	} else {
 		q = `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-            FROM edges WHERE dst = ANY($1) AND type = ANY($2)`
+            FROM edges WHERE dst = ANY($1) AND type = ANY($2) AND ` + types.GoroutineCodeSQL
 		args = []any{ids, edgeTypes}
 	}
 	rows, err := s.pool.Query(background, q, args...)
@@ -1212,22 +1140,6 @@ func (s *pgStore) NodesByFilePath(path string) ([]types.Node, error) {
 	return scanPGNodes(rows)
 }
 
-// EdgesByFilePath returns every edge whose file_path equals path. Cross-file
-// edges (file_path IS NULL) are not returned.
-func (s *pgStore) EdgesByFilePath(path string) ([]types.Edge, error) {
-	if path == "" {
-		return nil, nil
-	}
-	rows, err := s.pool.Query(background,
-		`SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-        FROM edges WHERE file_path = $1`, path)
-	if err != nil {
-		return nil, fmt.Errorf("edges by file_path %q: %w", path, err)
-	}
-	defer func() { rows.Close() }()
-	return scanPGEdges(rows)
-}
-
 // BlobsByFilePath returns blobs for all nodes with the given file_path.
 // Non-nil empty map is returned when no blobs exist (same contract as SQLite).
 func (s *pgStore) BlobsByFilePath(path string) (map[string][]byte, error) {
@@ -1254,70 +1166,6 @@ func (s *pgStore) BlobsByFilePath(path string) (map[string][]byte, error) {
 		return nil, fmt.Errorf("iterate blob rows: %w", err)
 	}
 	return out, nil
-}
-
-// PendingRefsByFilePath returns pending_refs rows for the given file_path.
-// dispatch_kind (schema 1.7) is COALESCE'd to ” so pre-1.7 NULL rows scan
-// cleanly when an older PG dump is replayed against this binary.
-func (s *pgStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error) {
-	if path == "" {
-		return nil, nil
-	}
-	rows, err := s.pool.Query(background,
-		`SELECT file_path, src_id, target_qname, COALESCE(target_canonical_id,''), edge_type, line,
-        COALESCE(hint_file,''), COALESCE(dispatch_kind,'') FROM pending_refs WHERE file_path = $1`, path)
-	if err != nil {
-		return nil, fmt.Errorf("pending_refs by file_path %q: %w", path, err)
-	}
-	defer func() { rows.Close() }()
-	var out []PendingRefRow
-	for rows.Next() {
-		var r PendingRefRow
-		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName, &r.TargetCanonicalID,
-			&r.EdgeType, &r.Line, &r.HintFile, &r.DispatchKind); err != nil {
-			return nil, fmt.Errorf("scan pending_ref: %w", err)
-		}
-		out = append(out, r)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate pending_refs: %w", err)
-	}
-	return out, nil
-}
-
-// ReverseDepsForFiles returns every cached file whose pending_refs target a
-// qualified_name defined in any of dirtyPaths. Must be called BEFORE dirty
-// nodes are deleted. Returns nil when dirtyPaths is empty.
-func (s *pgStore) ReverseDepsForFiles(dirtyPaths []string) ([]string, error) {
-	if len(dirtyPaths) == 0 {
-		return nil, nil
-	}
-	// pending_refs.target_qname stores the unresolved AST name (e.g. "Helper"),
-	// while nodes.qualified_name is fully-qualified (e.g. "edgepin.Helper").
-	// The LIKE arm matches the suffix after the last dot — mirrors simpleName()
-	// in resolve.go so reverse-reference invalidation finds the same candidates as Pass 2 Resolve does.
-	rows, err := s.pool.Query(background,
-		`SELECT DISTINCT pr.file_path
-		 FROM pending_refs pr
-		 INNER JOIN nodes n ON (
-		     n.qualified_name = pr.target_qname
-		     OR n.qualified_name LIKE ('%.' || pr.target_qname)
-		 )
-		 WHERE n.file_path = ANY($1)
-		   AND pr.file_path != ALL($1)`, dirtyPaths)
-	if err != nil {
-		return nil, fmt.Errorf("reverse deps for %d paths: %w", len(dirtyPaths), err)
-	}
-	defer func() { rows.Close() }()
-	var out []string
-	for rows.Next() {
-		var p string
-		if err := rows.Scan(&p); err != nil {
-			return nil, fmt.Errorf("scan reverse dep path: %w", err)
-		}
-		out = append(out, p)
-	}
-	return out, rows.Err()
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

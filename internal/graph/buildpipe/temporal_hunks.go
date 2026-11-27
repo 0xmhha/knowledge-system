@@ -19,8 +19,8 @@
 //     manifest entries (they live outside file-level
 //     cache invalidation; emitTemporalEdges runs them
 //     wholesale on every build). isMetaNodeType is the
-//     single source of truth that buildFileEntries +
-//     computeColdFileEntries + extractBlobs share.
+//     single source of truth that computeColdFileEntries
+//     and extractBlobs share.
 package buildpipe
 
 import (

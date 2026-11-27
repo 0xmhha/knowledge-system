@@ -6,7 +6,7 @@
 //	knowledge-setup --src /path/to/repo --out /path/to/dataset \
 //	    --embedder ollama --model-name bge-m3
 //
-// The graph build is incremental (the engine reuses its cache), so the same
+// The graph build is cold every time (it parses every file), so the same
 // command serves both first-time setup and refresh runs.
 //
 // --progress selects the output contract: "text" (default) prints

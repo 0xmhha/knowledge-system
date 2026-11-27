@@ -333,9 +333,10 @@ func (s *sqliteStore) GetBlob(id string) ([]byte, error) {
 }
 
 // FindSymbol returns nodes whose qualified_name matches name. When exact is
-// true, only equality matches are returned; when false, a LIKE '%.<name>'
-// suffix match is also accepted (so "Foo" hits "pkg.Foo"). Capped at 100
-// rows to bound MCP response size.
+// true, only equality matches are returned; when false, a suffix match is
+// also accepted (so "Foo" hits "pkg.Foo"), in the case the caller wrote unless
+// opts.IgnoreCase is set. Rows come ordered by qualified name, then id, capped
+// at opts.Limit (DefaultFindSymbolLimit when zero).
 //
 // opts.Language pushes a `language = ?` predicate when non-empty.
 // opts.Kinds pushes a `type IN (...)` predicate when non-empty — this
@@ -353,9 +354,12 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
 
 // findSymbolQuery builds FindSymbol's statement. The suffix match ("Foo" hits
 // "pkg.Foo") is a UNION of two indexed lookups, qualified_name and
-// simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
-// one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
-// the whole nodes table on every MCP seed resolution.
+// simple_name: as one "qualified_name = ? OR simple_name = ?" predicate
+// SQLite 3.53 scanned the whole nodes table on every MCP seed resolution.
+//
+// idx_nodes_simple_name is a COLLATE NOCASE index, so the lookup compares
+// without case and a second, binary comparison then keeps the caller's case
+// (dropped for opts.IgnoreCase). Without it "Pack" returned "pack".
 //
 // A dotted name ("Type.Method") is a suffix of "pkg.Type.Method" that
 // simple_name, holding only the last segment, can never equal. The old
@@ -371,14 +375,25 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
 		q += `qualified_name = ? `
 		args = append(args, name)
 	} else {
+		sameCase, suffixCollation := ` AND simple_name = ?`, ``
+		if opts.IgnoreCase {
+			sameCase, suffixCollation = ``, ` COLLATE NOCASE`
+		}
 		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE`
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE` + sameCase
 		args = append(args, name, name)
+		if !opts.IgnoreCase {
+			args = append(args, name)
+		}
 		if i := strings.LastIndexByte(name, '.'); i > 0 && i < len(name)-1 {
 			q += `
-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE
-				AND substr(qualified_name, -?) = ? COLLATE NOCASE`
-			args = append(args, name[i+1:], len(name)+1, "."+name)
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE` + sameCase + `
+				AND substr(qualified_name, -?) = ?` + suffixCollation
+			args = append(args, name[i+1:])
+			if !opts.IgnoreCase {
+				args = append(args, name[i+1:])
+			}
+			args = append(args, len(name)+1, "."+name)
 		}
 		q += `) `
 	}
@@ -392,7 +407,8 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
 			args = append(args, string(k))
 		}
 	}
-	return q + `LIMIT 100`, args
+	// Ordered so that a capped result is the same rows on every call.
+	return q + `ORDER BY qualified_name, id LIMIT ?`, append(args, opts.rowLimit())
 }
 
 // NeighborhoodByQname returns BFS expansion up to depth starting from any
@@ -469,6 +485,7 @@ func (s *sqliteStore) neighborhoodFrom(roots []types.Node, depth int, reverse bo
 	for _, n := range seen {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, allEdges, nil
 }
 
@@ -496,6 +513,7 @@ func (s *sqliteStore) SubgraphByQname(qname string, depth int) ([]types.Node, []
 	for _, n := range merged {
 		out = append(out, n)
 	}
+	sortNodesByID(out)
 	return out, append(fwdE, revE...), nil
 }
 
@@ -514,8 +532,10 @@ func (s *sqliteStore) edgesByEndpoint(column string, ids []string, edgeTypes []s
 	var out []types.Edge
 	for start := 0; start < len(ids); start += queryEdgesChunk {
 		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		// A walk follows function-level relations: a Goroutine's code
+		// edges are read apart (GoroutineCode).
 		q := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `)`
+		FROM edges WHERE ` + column + ` IN (` + placeholders(len(chunk)) + `) AND ` + types.GoroutineCodeSQL
 		args := anys(chunk)
 		if len(edgeTypes) > 0 {
 			q += ` AND type IN (` + placeholders(len(edgeTypes)) + `)`
@@ -643,22 +663,6 @@ func (s *sqliteStore) NodesByFilePath(path string) ([]types.Node, error) {
 	return scanNodes(rows)
 }
 
-// EdgesByFilePath returns every edge whose file_path equals path. Edges
-// without a file_path (cross-file links emitted by graph.Build) are NOT
-// returned — the cache only reuses per-file edges.
-func (s *sqliteStore) EdgesByFilePath(path string) ([]types.Edge, error) {
-	if path == "" {
-		return nil, nil
-	}
-	rows, err := s.db.Query(`SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
-		FROM edges WHERE file_path = ?`, path)
-	if err != nil {
-		return nil, fmt.Errorf("edges by file_path %q: %w", path, err)
-	}
-	defer func() { _ = rows.Close() }()
-	return scanEdges(rows)
-}
-
 // BlobsByFilePath returns blobs keyed by node_id for every node whose
 // file_path equals path. Empty result is a non-nil empty map.
 func (s *sqliteStore) BlobsByFilePath(path string) (map[string][]byte, error) {
@@ -733,77 +737,28 @@ func (s *sqliteStore) GetNodePRs(nodeID string, cutoff time.Time) ([]types.PRRef
 	return out, nil
 }
 
-// PendingRefsByFilePath returns every pending_refs row where file_path matches.
-// Empty path returns nil. Used by the partial-cache rebuild path: cached files
-// have their pending refs reloaded so Pass 2 Resolve sees the same input set
-// it would have seen under cold rebuild.
-func (s *sqliteStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error) {
-	if path == "" {
-		return nil, nil
+// GoroutineCode implements GoroutineCodeReader: the code edges of
+// goroutines (types.IsGoroutineCode) that end at ids (reverse: who runs
+// them) or start at ids (forward: what the goroutines run), in id order.
+func (s *sqliteStore) GoroutineCode(ids []string, reverse bool) ([]types.Edge, error) {
+	column := "src"
+	if reverse {
+		column = "dst"
 	}
-	rows, err := s.db.Query(`SELECT file_path, src_id, target_qname, COALESCE(target_canonical_id,''),
-		edge_type, line, COALESCE(hint_file,''), COALESCE(dispatch_kind,'')
-		FROM pending_refs WHERE file_path = ?`, path)
-	if err != nil {
-		return nil, fmt.Errorf("pending_refs by file_path %q: %w", path, err)
-	}
-	defer func() { _ = rows.Close() }()
-	var out []PendingRefRow
-	for rows.Next() {
-		var r PendingRefRow
-		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName, &r.TargetCanonicalID,
-			&r.EdgeType, &r.Line, &r.HintFile, &r.DispatchKind); err != nil {
-			return nil, fmt.Errorf("scan pending_ref: %w", err)
+	var out []types.Edge
+	for start := 0; start < len(ids); start += queryEdgesChunk {
+		chunk := ids[start:min(start+queryEdgesChunk, len(ids))]
+		rows, err := s.db.Query(`SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'')
+			FROM edges WHERE `+column+` IN (`+placeholders(len(chunk))+`) AND NOT `+types.GoroutineCodeSQL+` ORDER BY id`, anys(chunk)...)
+		if err != nil {
+			return nil, fmt.Errorf("goroutine code of %d ids: %w", len(ids), err)
 		}
-		out = append(out, r)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate pending_refs: %w", err)
+		es, err := scanEdges(rows)
+		_ = rows.Close()
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, es...)
 	}
 	return out, nil
-}
-
-// ReverseDepsForFiles returns every cached file whose pending_refs target a
-// qualified_name defined in any of dirtyPaths. Must be called BEFORE dirty
-// nodes are deleted — the query joins pending_refs to nodes still in DB.
-// Returns nil when dirtyPaths is empty.
-func (s *sqliteStore) ReverseDepsForFiles(dirtyPaths []string) ([]string, error) {
-	if len(dirtyPaths) == 0 {
-		return nil, nil
-	}
-	ph := placeholders(len(dirtyPaths))
-	// Double the args: one set for the IN(dirty file_path on nodes), one for
-	// the NOT IN(dirty file_path on pending_refs — exclude dirty files themselves).
-	dirtyArgs := anys(dirtyPaths)
-	allArgs := make([]any, 0, len(dirtyArgs)*2)
-	allArgs = append(allArgs, dirtyArgs...)
-	allArgs = append(allArgs, dirtyArgs...)
-	// pending_refs.target_qname stores the unresolved AST name (e.g. "Helper"),
-	// while nodes.qualified_name is fully-qualified (e.g. "edgepin.Helper").
-	// The simple_name arm matches the short name (last dotted segment) via an
-	// indexed equi-join — the same candidates the old `LIKE '%.' || target`
-	// found and the resolver's simpleName() uses, but without the leading
-	// wildcard that defeated the index.
-	q := `SELECT DISTINCT pr.file_path
-	      FROM pending_refs pr
-	      INNER JOIN nodes n ON (
-	          n.qualified_name = pr.target_qname
-	          OR n.simple_name = pr.target_qname COLLATE NOCASE
-	      )
-	      WHERE n.file_path IN (` + ph + `)
-	        AND pr.file_path NOT IN (` + ph + `)`
-	rows, err := s.db.Query(q, allArgs...)
-	if err != nil {
-		return nil, fmt.Errorf("reverse deps for %d paths: %w", len(dirtyPaths), err)
-	}
-	defer func() { _ = rows.Close() }()
-	var out []string
-	for rows.Next() {
-		var p string
-		if err := rows.Scan(&p); err != nil {
-			return nil, fmt.Errorf("scan reverse dep path: %w", err)
-		}
-		out = append(out, p)
-	}
-	return out, rows.Err()
 }

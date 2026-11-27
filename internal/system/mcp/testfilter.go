@@ -3,8 +3,8 @@ package mcp
 import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
+	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
-	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // excludeTestsArg reads the optional exclude_tests boolean. When true the
@@ -17,7 +17,7 @@ func excludeTestsArg(req mcpgo.CallToolRequest) bool {
 // withExcludeTests is the standard tool option documenting the flag.
 func withExcludeTests() mcpgo.ToolOption {
 	return mcpgo.WithBoolean("exclude_tests",
-		mcpgo.Description("Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false."))
+		mcpgo.Description("Drop test code from the result: the files the graph's build records as test code, and by path (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) the files the graph does not hold. Use for design/implementation queries where tests are noise. Default false."))
 }
 
 // withExpand is the standard tool option documenting the glossary-expansion flag.
@@ -37,14 +37,19 @@ func maybeExpand(d Deps, req mcpgo.CallToolRequest, query string) string {
 	return d.Vocab.Resolve(query).Expanded
 }
 
-// filterCitationsTests returns citations that are not test paths.
-func filterCitationsTests(cits []contract.Citation) []contract.Citation {
+// filterCitationsTests returns the citations that are not test code by the
+// graph's rule (ckgclient.TestFileRule).
+func filterCitationsTests(ckg ckgclient.Client, cits []contract.Citation) ([]contract.Citation, error) {
+	isTest, err := ckgclient.TestFileRule(ckg)
+	if err != nil {
+		return nil, err
+	}
 	out := make([]contract.Citation, 0, len(cits))
 	for _, c := range cits {
-		if testpath.IsTest(c.File) {
+		if isTest(c.File) {
 			continue
 		}
 		out = append(out, c)
 	}
-	return out
+	return out, nil
 }

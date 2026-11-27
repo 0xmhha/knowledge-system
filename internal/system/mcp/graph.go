@@ -112,7 +112,9 @@ func handleFindSymbol(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*
 		return mcpgo.NewToolResultErrorf("%s: %v", ToolNameFindSymbol, err), nil
 	}
 	if excludeTestsArg(req) {
-		citations = filterCitationsTests(citations)
+		if citations, err = filterCitationsTests(d.CKG, citations); err != nil {
+			return mcpgo.NewToolResultErrorf("%s: %v", ToolNameFindSymbol, err), nil
+		}
 	}
 	return mcpgo.NewToolResultStructured(findSymbolResponse{
 		Symbol:       name,

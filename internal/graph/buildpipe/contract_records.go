@@ -9,30 +9,23 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 	gop "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
 	"github.com/0xmhha/knowledge-system/internal/logx"
-	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
-
-// pathLayer is the layer rule of today's is_test column: a file is test code
-// by its path. Increment 3 of docs/graph/SYMBOL-CONTRACT-DESIGN.md section 9.1
-// takes the layer from the build scope's file roles instead.
-func pathLayer(file string) contract.Layer {
-	if testpath.IsTest(file) {
-		return contract.LayerTest
-	}
-	return contract.LayerProduction
-}
 
 // goThroughContract passes the Go pipeline's resolved graph through the
 // contract records (increment 1 of design section 9.1): the graph that goes on
 // is the one rebuilt from the records, so every Go build proves that the
 // records hold what the Go pipeline produces. A field the records cannot hold
 // fails the build instead of disappearing.
-func goThroughContract(log *slog.Logger, rg *parse.ResolvedGraph) (*parse.ResolvedGraph, error) {
+//
+// The layer of a declaration is its file's role in the build scope when
+// roles lists the file, and the path rule otherwise (FileRoles), as
+// docs/graph/SYMBOL-CONTRACT-DESIGN.md section 9.1 plans for increment 3.
+func goThroughContract(log *slog.Logger, rg *parse.ResolvedGraph, roles FileRoles) (*parse.ResolvedGraph, error) {
 	if rg == nil {
 		return nil, nil
 	}
 	start := time.Now()
-	u, err := gop.ToUnit(rg, pathLayer)
+	u, err := gop.ToUnit(rg, roles.layer)
 	if err != nil {
 		return nil, fmt.Errorf("go contract records: %w", err)
 	}

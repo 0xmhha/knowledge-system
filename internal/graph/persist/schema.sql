@@ -112,29 +112,6 @@ CREATE TABLE IF NOT EXISTS manifest (
   value TEXT NOT NULL
 );
 
--- Pending refs (G6 v3, schema 1.5): per-file unresolved cross-file references
--- emitted by Pass 1 and consumed by Pass 2 Resolve. Persisted so the partial-
--- cache rebuild path can reconstruct Pass 2's full input without re-parsing
--- cached files (the v1/v2 silent-drop bug).
---
--- FK src_id → nodes(id) ON DELETE CASCADE matches the file lifecycle: when a
--- dirty/removed file's nodes are dropped via DeleteNodesByFilePath, its
--- pending refs follow automatically — no separate cleanup statement needed.
-CREATE TABLE IF NOT EXISTS pending_refs (
-  file_path     TEXT NOT NULL,
-  src_id        TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-  target_qname  TEXT NOT NULL,
-  -- Canonical id of the target when the parser resolved it with type
-  -- information; empty otherwise. Reloaded refs resolve through it exactly.
-  target_canonical_id TEXT NOT NULL DEFAULT '',
-  edge_type     TEXT NOT NULL,
-  line          INTEGER NOT NULL,
-  hint_file     TEXT,
-  dispatch_kind TEXT,
-  PRIMARY KEY (file_path, src_id, target_qname, edge_type, line)
-);
-CREATE INDEX IF NOT EXISTS idx_pending_refs_file ON pending_refs(file_path);
-
 -- Node PRs (ckg-NEW-2/3/4, schema 1.12): build-time-derived list of pull
 -- requests whose merge commit touched lines overlapping a graph node's
 -- [start_line, end_line] range. Populated by
@@ -144,8 +121,8 @@ CREATE INDEX IF NOT EXISTS idx_pending_refs_file ON pending_refs(file_path);
 -- for the squash-merge 80% case).
 --
 -- FK node_id → nodes(id) ON DELETE CASCADE matches the file lifecycle
--- (same pattern as edges/blobs/pending_refs): when a node's source file
--- drops via DeleteNodesByFilePath, the breadcrumb follows automatically.
+-- (same pattern as edges/blobs): when a node is deleted, its breadcrumbs
+-- follow automatically.
 --
 -- merged_at is RFC3339 UTC text so SQLite's lexicographic ordering
 -- doubles as chronological ordering — drives the cutoff filter in

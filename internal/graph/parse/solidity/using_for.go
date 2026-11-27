@@ -73,6 +73,7 @@ func (v *declVisitor) runUsingFor() {
 	defer func() { cur.Close() }()
 	matches := cur.Matches(query, v.root, v.src)
 	names := query.CaptureNames()
+	boundTypeQueued := map[uint]bool{}
 	for {
 		m := matches.Next()
 		if m == nil {
@@ -97,13 +98,12 @@ func (v *declVisitor) runUsingFor() {
 		if containerNode == nil || libNode == nil {
 			continue
 		}
-		// SrcID must align with the container node emitted by
-		// runContractDecl / runLibraryDecl / runInterfaceDecl — all
-		// hash on (name, "sol", name-node startByte). containerNode is
-		// the same `@name` identifier these emit paths use.
-		containerName := containerNode.Utf8Text(v.src)
-		containerStart := int(containerNode.StartByte())
-		srcID := parse.MakeID(containerName, "sol", containerStart)
+		// The source is the contract, library or interface that holds the
+		// directive; containerOf gives the id its node was emitted with.
+		srcID, _, ok := v.containerOf(containerNode)
+		if !ok {
+			continue
+		}
 		libName := libNode.Utf8Text(v.src)
 		// Skip leading namespace-alias
 		// identifiers. tree-sitter emits one query match per
@@ -146,6 +146,15 @@ func (v *declVisitor) runUsingFor() {
 			Line:         line,
 			DispatchKind: dispatchKindUsingForTypeBind,
 		})
+		// The bound type is named by the directive: the container uses it.
+		// The using_for edge ends at the library only, so GovCouncil's
+		// `using AddressSetLib for AddressSetLib.AddressSet` did not reach
+		// the struct. One directive can match once per identifier of its
+		// library name; the type is queued once.
+		if typeNode != nil && !boundTypeQueued[typeNode.StartByte()] {
+			boundTypeQueued[typeNode.StartByte()] = true
+			v.queueTypeUses(srcID, typeNode)
+		}
 	}
 }
 
@@ -366,12 +375,12 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  receiverName + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
 					ByteOffset:   int(memberNode.StartByte()),
-					DispatchKind: dispatchKindUsingForCall,
+					DispatchKind: arityKind(dispatchKindUsingForCall, memberCallArgc(&memberNode)),
 				})
 				continue
 			}
@@ -384,12 +393,12 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  stateVarName + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
 					ByteOffset:   int(memberNode.StartByte()),
-					DispatchKind: dispatchKindUsingForCall,
+					DispatchKind: arityKind(dispatchKindUsingForCall, memberCallArgc(&memberNode)),
 				})
 				continue
 			}
@@ -411,7 +420,7 @@ func (v *declVisitor) runUsingForCalls() {
 				}
 				encoded += "|" + methodName
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  encoded,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -431,7 +440,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  objName + "|" + fieldName + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -450,7 +459,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  objName + "|" + f1 + "|" + f2 + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -473,7 +482,7 @@ func (v *declVisitor) runUsingForCalls() {
 				}
 				encoded += "|" + methodName
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  encoded,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -492,7 +501,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  innerFnName + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -512,7 +521,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  receiverObj + "|" + innerFnName + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -531,7 +540,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  innerFn1 + "|" + innerFn2 + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -552,7 +561,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  recvObj + "|" + innerFn1 + "|" + innerFn2 + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -571,7 +580,7 @@ func (v *declVisitor) runUsingForCalls() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  innerFn1 + "|" + innerFn2 + "|" + innerFn3 + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -600,7 +609,7 @@ func (v *declVisitor) runUsingForCalls() {
 				}
 				encoded += "|" + methodName
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeCalls,
 					TargetQName:  encoded,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -1006,18 +1015,13 @@ func matchStateVarMethodCall(member *sitter.Node, src []byte) (string, string, b
 		return "", "", false
 	}
 	object := member.ChildByFieldName("object")
-	innerObj := unwrapExpression(object)
+	innerObj := receiverOperand(unwrapExpression(object), src)
 	if innerObj == nil || innerObj.Kind() != "identifier" {
 		return "", "", false
 	}
-	// Must be the function-position of a call_expression. The member
-	// node is wrapped in an expression node, which is itself a child of
-	// the call_expression's `function` field.
-	parent := member.Parent()
-	if parent != nil && parent.Kind() == "expression" {
-		parent = parent.Parent()
-	}
-	if parent == nil || parent.Kind() != "call_expression" {
+	// Must be the callee of a call, directly or under call options
+	// (`token.mint{value: 1}(x)`).
+	if callOfCallee(member) == nil {
 		return "", "", false
 	}
 	return innerObj.Utf8Text(src), property.Utf8Text(src), true
@@ -1627,3 +1631,36 @@ const dispatchKindUsingForGenericMemberChainCall = "using_for_generic_member_cha
 // iterates funcReturnTypes for each segment, and finishes with the
 // using-for binding lookup on the last segment's return type.
 const dispatchKindUsingForGenericChainCall = "using_for_generic_chain_call"
+
+// receiverOperand returns the operand a member access really applies to.
+// The grammar binds a member access looser than a prefix or a binary
+// operator, so `!set.contains(x)` parses as `(!set).contains(x)` and
+// `amount <= token.allowance(a)` as `(amount <= token).allowance(a)`: the
+// receiver is the operand of the prefix operator, or the right operand of
+// the binary one. All six `!set.contains(x)` calls of GovCouncil were missed
+// because of it. `delete x` is left alone: it is a statement on x.
+func receiverOperand(n *sitter.Node, src []byte) *sitter.Node {
+	for n != nil {
+		switch n.Kind() {
+		case kindUnaryExpression:
+			if op := n.ChildByFieldName(fieldOperator); op != nil && op.Utf8Text(src) == opDelete {
+				return n
+			}
+			n = unwrapExpression(n.ChildByFieldName(fieldArgument))
+		case kindBinaryExpression:
+			n = unwrapExpression(n.ChildByFieldName(fieldRight))
+		default:
+			return n
+		}
+	}
+	return nil
+}
+
+// memberCallArgc returns the number of arguments of the call whose callee is
+// member, or unknownArity when member is not a callee.
+func memberCallArgc(member *sitter.Node) int {
+	if call := callOfCallee(member); call != nil {
+		return argumentCount(call)
+	}
+	return unknownArity
+}

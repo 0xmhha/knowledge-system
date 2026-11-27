@@ -28,9 +28,10 @@ import (
 //     (existing tests, ad-hoc CLI use).
 //   - "Type-aware": SetPackages() registers a pre-loaded []*packages.Package
 //     (from detect.GoPackages). ParseFile then locates the file in the loaded
-//     syntax trees and uses the matching *types.Info for receiver resolution
-//     in the concurrency pass — emitting Mutex / Lock edges with EXTRACTED
-//     confidence and zero false positives on user-defined "Mutex" types.
+//     syntax trees and uses the matching *types.Info: Mutex nodes are
+//     EXTRACTED with zero false positives on user-defined "Mutex" types,
+//     and the passes that run after Resolve (lock edges, value uses,
+//     statement links) have the types they need.
 type Parser struct {
 	srcRoot string
 	fset    *token.FileSet
@@ -41,10 +42,17 @@ type Parser struct {
 	// EmitImplementsEdges) can iterate package scopes. Same lifetime as
 	// fileIndex — both populated by SetPackages, both nil in AST-only mode.
 	pkgs []*packages.Package
+	// netRPC reports whether any loaded package imports net/rpc. Set by
+	// SetPackages; in AST-only mode each file is asked for its own imports.
+	netRPC bool
 	// ext indexes the functions, methods and types the build uses but does
 	// not contain (External nodes, schema 1.36). Built on first use.
 	ext     *externalIndex
 	extOnce sync.Once
+	// buildFiles holds the files of the build by base name (paths relative
+	// to srcRoot), set by Resolve. A symbol of a loaded package whose file is
+	// not among them is outside the build (see newExternalIndex).
+	buildFiles map[string][]string
 	// funcFieldTouchesMu guards funcFieldTouches across the parallel
 	// parseConcurrent worker pool. ParseFile is called from many goroutines;
 	// each worker merges its declVisitor's per-file touches into the parser
@@ -85,10 +93,12 @@ func (p *Parser) SetPackages(pkgs []*packages.Package) {
 	if len(pkgs) == 0 {
 		p.fileIndex = nil
 		p.pkgs = nil
+		p.netRPC = false
 		return
 	}
 	p.fileIndex = buildFileIndex(pkgs)
 	p.pkgs = pkgs
+	p.netRPC = importsPackage(pkgs, netRPCPath)
 	p.ext, p.extOnce = nil, sync.Once{}
 }
 
@@ -164,11 +174,12 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 	if tf, ok := p.lookupTyped(path); ok {
 		v := newDeclVisitor(tf.fset, rel, tf.file.Name.Name)
 		v.typesInfo = tf.info
-		// Mutex nodes must be emitted BEFORE the body walk so the Lock/Unlock
-		// detector (in statements.go's CallExpr case) can resolve receivers
-		// to the matching Mutex node ID. Channel emission stays inline with
-		// the body walk because each `make(chan T)` is its own self-contained
-		// node that doesn't need a pre-walk index.
+		v.src, v.comments = src, tf.file.Comments
+		v.netRPC = p.netRPC
+		// Mutex nodes come from the declarations; the edges to them are made
+		// after Resolve (lock_edges.go), when the mutexes of every file are
+		// known. Channel emission stays inline with the body walk because
+		// each `make(chan T)` is its own self-contained node.
 		v.emitConcurrencyDecls(tf.file)
 		ast.Walk(v, tf.file)
 		// Distributed pass: runs AFTER ast.Walk so v.nodes already contains
@@ -189,6 +200,8 @@ func (p *Parser) ParseFile(path string, src []byte) (*parse.ParseResult, error) 
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
 	v := newDeclVisitor(p.fset, rel, f.Name.Name)
+	v.src, v.comments = src, f.Comments
+	v.netRPC = fileImports(f, netRPCPath)
 	v.emitConcurrencyDecls(f)
 	ast.Walk(v, f)
 	v.emitDistributedDecls(f)

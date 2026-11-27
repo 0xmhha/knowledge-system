@@ -11,7 +11,12 @@
 //     embedded in a struct, and dynamic calls (function values, closures),
 //     which have no static callee and are counted separately;
 //   - references from a declaration to a package-level named type, including
-//     the signature of a function declared without a Go body.
+//     the signature of a function declared without a Go body and the type and
+//     initialiser of a package-level var or const;
+//   - the calls and type references that leave the covered files (standard
+//     library, dependencies, files of the module the build scope leaves out,
+//     the builtin error method), which the graph holds as edges to External
+//     nodes.
 //
 // The graph side reads the nodes and the calls, invokes, uses_type and
 // instantiates edges. Each truth declaration is matched to the graph node in

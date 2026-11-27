@@ -22,21 +22,23 @@ import (
 // own SQLite column. Tags match the JSON tags on types.Node so
 // downstream tooling can deserialise the column directly.
 type nodeAttrs struct {
-	Annotation                    *types.AnnotationPayload `json:"annotation,omitempty"`
-	SlotIndex                     int                      `json:"slot_index,omitempty"`
-	HasAssembly                   bool                     `json:"has_assembly,omitempty"`
-	HasLowLevelCall               bool                     `json:"has_low_level_call,omitempty"`
-	HasValueTransfer              bool                     `json:"has_value_transfer,omitempty"`
-	YulBuiltins                   []string                 `json:"yul_builtins,omitempty"`
-	IsFunctionTyped               bool                     `json:"is_function_typed,omitempty"`
-	HasFunctionTypedVar           bool                     `json:"has_function_typed_var,omitempty"`
-	HasFunctionPointerCall        bool                     `json:"has_function_pointer_call,omitempty"`
-	HasExternalCall               bool                     `json:"has_external_call,omitempty"`
-	HasInheritanceMROFallback     bool                     `json:"has_inheritance_mro_fallback,omitempty"`
-	HasFunctionPointerPropagation bool                     `json:"has_function_pointer_propagation,omitempty"`
-	HasSelfReentrantCall          bool                     `json:"has_self_reentrant_call,omitempty"`
-	HasSelfDelegatecallDead       bool                     `json:"has_self_delegatecall_dead,omitempty"`
-	External                      *types.ExternalPackage   `json:"external,omitempty"`
+	Annotation *types.AnnotationPayload `json:"annotation,omitempty"`
+	// SlotIndex is a pointer so that slot 0 is written (`"slot_index":0`)
+	// and a node without a storage slot has no slot_index key at all.
+	SlotIndex                     *int                   `json:"slot_index,omitempty"`
+	HasAssembly                   bool                   `json:"has_assembly,omitempty"`
+	HasLowLevelCall               bool                   `json:"has_low_level_call,omitempty"`
+	HasValueTransfer              bool                   `json:"has_value_transfer,omitempty"`
+	YulBuiltins                   []string               `json:"yul_builtins,omitempty"`
+	IsFunctionTyped               bool                   `json:"is_function_typed,omitempty"`
+	HasFunctionTypedVar           bool                   `json:"has_function_typed_var,omitempty"`
+	HasFunctionPointerCall        bool                   `json:"has_function_pointer_call,omitempty"`
+	HasExternalCall               bool                   `json:"has_external_call,omitempty"`
+	HasInheritanceMROFallback     bool                   `json:"has_inheritance_mro_fallback,omitempty"`
+	HasFunctionPointerPropagation bool                   `json:"has_function_pointer_propagation,omitempty"`
+	HasSelfReentrantCall          bool                   `json:"has_self_reentrant_call,omitempty"`
+	HasSelfDelegatecallDead       bool                   `json:"has_self_delegatecall_dead,omitempty"`
+	External                      *types.ExternalPackage `json:"external,omitempty"`
 }
 
 // marshalNodeAttrs serialises a Node's marker surface into the
@@ -46,7 +48,7 @@ type nodeAttrs struct {
 func marshalNodeAttrs(n *types.Node) string {
 	a := nodeAttrs{
 		Annotation:                    n.Annotation,
-		SlotIndex:                     n.SlotIndex,
+		SlotIndex:                     storedSlot(n),
 		HasAssembly:                   n.HasAssembly,
 		HasLowLevelCall:               n.HasLowLevelCall,
 		HasValueTransfer:              n.HasValueTransfer,
@@ -71,6 +73,17 @@ func marshalNodeAttrs(n *types.Node) string {
 	return string(buf)
 }
 
+// storedSlot returns the slot index to store for a node, or nil when the
+// node has no storage slot. A node has one when it says so
+// (HasStorageSlot), or when it carries a non-zero index without the marker.
+func storedSlot(n *types.Node) *int {
+	if !n.HasStorageSlot && n.SlotIndex == 0 {
+		return nil
+	}
+	slot := n.SlotIndex
+	return &slot
+}
+
 // unmarshalNodeAttrs populates the Node's marker fields from the
 // JSON blob stored in nodes.attrs. Empty / missing blobs leave the
 // fields at their zero values (no-op).
@@ -83,7 +96,10 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
 		return
 	}
 	n.Annotation = a.Annotation
-	n.SlotIndex = a.SlotIndex
+	if a.SlotIndex != nil {
+		n.SlotIndex = *a.SlotIndex
+		n.HasStorageSlot = true
+	}
 	n.HasAssembly = a.HasAssembly
 	n.HasLowLevelCall = a.HasLowLevelCall
 	n.HasValueTransfer = a.HasValueTransfer
@@ -100,7 +116,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
 }
 
 func isZeroAttrs(a nodeAttrs) bool {
-	return a.Annotation == nil && a.SlotIndex == 0 &&
+	return a.Annotation == nil && a.SlotIndex == nil &&
 		!a.HasAssembly &&
 		!a.HasLowLevelCall &&
 		!a.HasValueTransfer &&

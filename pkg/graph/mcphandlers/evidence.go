@@ -38,7 +38,7 @@ import (
 func RegisterEvidenceForIntent(s *server.MCPServer, reader store.Reader, cache *evidence.Cache) {
 	reader = safeReader(reader) // enforce the §11.3 retrieval boundary regardless of caller
 	tool := nsTool("evidence_for_intent",
-		mcp.WithDescription("Past changes like this one: ranks the hunks of past commits against an intent (BM25 over commit subjects, patches and changed names) and returns the top K with their patches and the symbols they modified. Use it to see how similar changes were made before. History that is not reachable from the indexed commit is left out."),
+		mcp.WithDescription("Past changes like this one: ranks the hunks of past commits against an intent (BM25 over commit subjects, patches and changed names) and returns the top K with their patches and the symbols they modified. Use it to see how similar changes were made before. History that is not reachable from the indexed commit is left out. When the graph was built from a source without git history the answer has history: \""+historyUnavailable+"\"."),
 		mcp.WithString("intent",
 			mcp.Description("Free-text task description. Tokenised with the bm25 splitter (camelCase + snake_case + qname-aware). Required unless issue_id is set.")),
 		mcp.WithString("seed_qname",
@@ -68,6 +68,7 @@ func RegisterEvidenceForIntent(s *server.MCPServer, reader store.Reader, cache *
 		if err != nil {
 			return nil, err
 		}
+		pack.History = historyNote(reader)
 		return textResult(pack), nil
 	})
 }

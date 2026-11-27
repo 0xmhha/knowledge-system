@@ -8,7 +8,6 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
-	"github.com/0xmhha/knowledge-system/internal/graph/persist"
 	"github.com/0xmhha/knowledge-system/internal/logx"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 	"golang.org/x/tools/go/packages"
@@ -104,30 +103,15 @@ func sameDeclaration(a, b types.Node) bool {
 	return a.Type == types.NodePackage && path.Dir(a.FilePath) == path.Dir(b.FilePath)
 }
 
-// coldReason names why a build cannot use the cache of the previous graph.
-func coldReason(opt Options, old *persist.Manifest, sameGoBuild bool) string {
-	switch {
-	case opt.NoCache:
-		return "--no-cache"
-	case old == nil:
-		return "no previous graph"
-	case !sameGoBuild:
-		return "go build configuration changed"
-	case old.SchemaVersion != SchemaVersion:
-		return "schema version changed"
-	case old.EffectiveBuilderVersion() != opt.CKGVersion:
-		return "builder version changed"
-	case len(old.Files) == 0:
-		return "previous graph has no file list"
+// logBuildPath records that the build is cold, and that --no-cache asks
+// for nothing more.
+func logBuildPath(log *slog.Logger, opt Options) {
+	l := log.With(logx.AreaKey, "cache")
+	if opt.NoCache {
+		l.Info("cache decision", "path", "cold", "reason", "every build is cold; --no-cache changes nothing")
+		return
 	}
-	return "cache not usable"
-}
-
-// logCacheDecision records which build path runs and why, with the file
-// counts of an incremental or short-circuit decision.
-func logCacheDecision(log *slog.Logger, path, reason string, d CacheDecisions) {
-	log.With(logx.AreaKey, "cache").Info("cache decision", "path", path, "reason", reason,
-		"cached", d.Hits, "changed", d.Misses, "removed", d.Removed)
+	l.Info("cache decision", "path", "cold", "reason", "every build is cold")
 }
 
 // logGoLoad records what the go command reported while loading and

@@ -11,9 +11,8 @@ import (
 // TestConcurrency_AccessedUnderLock_Basic asserts the accessed_under_lock pass emits at
 // least one accessed_under_lock edge from a Field node to a Mutex node for
 // the existing concurrency fixture. The Counter struct has a `count`
-// field protected by `mu`; the Inc/Get methods both lock and touch it,
-// so the V0 simplification (any Lock in function ⇒ all field accesses
-// counted) yields edges Counter.count → Counter.mu.
+// field protected by `mu`; the Inc/Get methods use it while they hold mu,
+// so the edge Counter.count → Counter.mu is there.
 func TestConcurrency_AccessedUnderLock_Basic(t *testing.T) {
 	root := "testdata/concurrency"
 	g, err := gop.LoadAndResolve(root)

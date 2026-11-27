@@ -13,6 +13,30 @@ import (
 
 const defaultChangeHistoryK = 20
 
+// historyKey and historyUnavailable are the key and the text that
+// change_history and evidence_for_intent add to their answer when the graph
+// was built from a source without git history. Both tools read only what
+// the build took from git (merged pull requests, commit hunks), so without
+// the key an empty answer could not be told from "no change matched".
+const (
+	historyKey         = "history"
+	historyUnavailable = "not recorded: the graph was built from a source without git history, so no commit or pull request is known for any symbol"
+)
+
+// historyNote returns historyUnavailable when the graph records no git
+// history, "" otherwise. A build records the commit of its source in the
+// manifest (src_commit) when the source root is a git checkout with
+// commits, and it reads commits and pull requests only then: an empty
+// src_commit means none were read. A manifest that cannot be read says
+// nothing either way, so no note is given.
+func historyNote(reader store.Reader) string {
+	m, err := store.GetManifest(reader)
+	if err != nil || m.CommitHash != "" {
+		return ""
+	}
+	return historyUnavailable
+}
+
 // RegisterChangeHistory wires the change_history tool: the merged pull
 // requests that touched a symbol (number, title, summary, merged-at), newest
 // first. It exposes the graph's existing per-node PR breadcrumbs
@@ -25,7 +49,8 @@ func RegisterChangeHistory(s *server.MCPServer, reader store.Reader) {
 			"PR history for a symbol: the merged pull requests (number, title, summary, merged_at) that changed it, newest first. "+
 				"qname may be a full qualified_name or a bare short name (suffix-resolved; an ambiguous bare name returns candidates). "+
 				"Optional `cutoff` (RFC3339) returns only PRs merged strictly before it; `k` caps the count (default 20). "+
-				"Use this to answer \"when/why did this code change\" without reading git — e.g. which PR introduced or fixed a behaviour.",
+				"Use this to answer \"when/why did this code change\" without reading git — e.g. which PR introduced or fixed a behaviour. "+
+				"When the graph was built from a source without git history the answer has history: \""+historyUnavailable+"\".",
 		),
 		mcp.WithString("qname", mcp.Required()),
 		mcp.WithString("cutoff"),
@@ -44,6 +69,9 @@ func RegisterChangeHistory(s *server.MCPServer, reader store.Reader) {
 		if err != nil {
 			return nil, err
 		}
+		if note := historyNote(reader); note != "" {
+			res[historyKey] = note
+		}
 		return textResult(res), nil
 	})
 }
@@ -55,20 +83,12 @@ func RegisterChangeHistory(s *server.MCPServer, reader store.Reader) {
 // `not_found` — so callers handle resolution one way across the tool set.
 func changeHistory(reader store.Reader, qname string, cutoff time.Time, k int) (map[string]any, error) {
 	resolved, cands, ambiguous, ok := resolveSeed(reader, qname, "")
-	if ambiguous {
-		return map[string]any{
-			"seed_qname": qname,
-			"ambiguous":  true,
-			"candidates": cands,
-			"prs":        []map[string]any{},
-		}, nil
-	}
-	if !ok {
-		return map[string]any{
-			"seed_qname": qname,
-			"not_found":  true,
-			"prs":        []map[string]any{},
-		}, nil
+	if miss := seedMiss(qname, resolved, cands, ambiguous, ok); miss != nil {
+		// A history answer has prs where a traversal has nodes and edges.
+		delete(miss, "nodes")
+		delete(miss, "edges")
+		miss["prs"] = []map[string]any{}
+		return miss, nil
 	}
 
 	nodes, err := resolved.nodes(reader)

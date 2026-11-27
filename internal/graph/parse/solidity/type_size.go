@@ -5,47 +5,21 @@ import (
 	"strings"
 )
 
-// Sol primitive type byte-size lookup for
-// EVM storage packing.
+// Storage byte sizes of the elementary Solidity types, for slot packing.
 //
-// Per Sol §11.1 storage layout: consecutive state variables whose
-// combined size fits a single 32-byte slot share it. Dynamic and
-// reference types (string, bytes, mapping, dynamic array, struct,
-// user-defined) always start a new slot and consume the full 32
-// bytes from the layout's perspective.
+//	bool                             → 1
+//	address, address payable         → 20
+//	uintN  (N ∈ 8..256, N % 8 == 0)  → N/8
+//	intN   (N ∈ 8..256, N % 8 == 0)  → N/8
+//	uint, int                        → 32 (aliases for uint256 / int256)
+//	bytesN (N ∈ 1..32)               → N
 //
-// solTypeSize is conservative: unrecognised signatures (custom user
-// types, arrays of any size, structs) return 32 so packing doesn't
-// accidentally pack them with primitives. The supported set is
-// limited to the well-defined Sol value types whose size is
-// expressible in bytes without inspecting type definitions.
-//
-// Supported (correct size returned):
-//
-//	bool               → 1
-//	address, address payable → 20
-//	uintN  (N ∈ 8..256, N % 8 == 0) → N/8
-//	intN   (N ∈ 8..256, N % 8 == 0) → N/8
-//	uint, int          → 32 (aliases for uint256 / int256)
-//	bytesN (N ∈ 1..32) → N
-//
-// Defaults to 32 (full slot, conservative) for:
-//
-//	bytes (dynamic) / string / arrays / structs / mappings /
-//	user-defined types / anything not in the above list.
-func solTypeSize(sig string) int {
-	if size, ok := solValueTypeSize(sig); ok {
-		return size
-	}
-	return 32
-}
+// Every other type (dynamic bytes, string, arrays, structs, mappings,
+// enums, contracts) is sized by typeSizes.place, which knows the
+// user-defined types of the graph.
 
-// solValueTypeSize returns the byte footprint of a Sol value type
-// signature along with a flag indicating whether the signature is
-// in the recognised value-type set. Callers needing to distinguish
-// "known full-slot type" (uint256, bytes32, int256) from "unknown
-// conservative fallback" (string, custom struct, ...) read the
-// second return.
+// solValueTypeSize returns the storage size in bytes of an elementary value
+// type, and whether typeName is one.
 func solValueTypeSize(sig string) (int, bool) {
 	sig = strings.TrimSpace(sig)
 	switch sig {
@@ -141,7 +115,7 @@ type slotState struct {
 }
 
 // advanceForField returns the slot index this field occupies and
-// the updated state. The field is sized via solTypeSize.
+// the updated state.
 //
 // Packing rules (per Sol §11.1):
 //
@@ -209,4 +183,19 @@ func advanceForArrayField(state slotState, totalBytes int) (int, slotState) {
 	state.slot += slotsNeeded
 	state.used = 0
 	return startSlot, state
+}
+
+// slotBytes is the size of one storage slot.
+const slotBytes = 32
+
+// dynamicArraySuffix ends the type of a dynamic array (`address[]`).
+const dynamicArraySuffix = "[]"
+
+// isDynamicSlotType reports whether a type is a dynamic array, a string or
+// bytes: a value of unknown length that takes exactly one slot where it is
+// declared. Without it a struct with such a member had no known size, and a
+// state variable of that struct was laid out as one slot.
+func isDynamicSlotType(sig string) bool {
+	sig = strings.TrimSpace(sig)
+	return sig == "string" || sig == "bytes" || strings.HasSuffix(sig, dynamicArraySuffix)
 }

@@ -59,8 +59,8 @@ func TestRun_GoBuildSelectsTargetFiles(t *testing.T) {
 }
 
 // TestRun_GoBuildChangeForcesColdBuild: rebuilding the same output directory
-// for another build configuration must not reuse the incremental cache of the
-// first one; the manifest records the configuration.
+// for another build configuration builds cold, as every build does; the
+// manifest records the configuration.
 func TestRun_GoBuildChangeForcesColdBuild(t *testing.T) {
 	src, err := filepath.Abs("../../buildscope/testdata/mod")
 	if err != nil {
@@ -84,14 +84,10 @@ func TestRun_GoBuildChangeForcesColdBuild(t *testing.T) {
 	if darwin.GoBuild != "goos=darwin;goarch=amd64;cgo=0;tags=" {
 		t.Errorf("manifest go_build after the second build = %q", darwin.GoBuild)
 	}
-	if strings.Contains(logs.String(), "incremental build complete") || !strings.Contains(logs.String(), "Go build configuration changed") {
-		t.Errorf("the darwin build reused the linux cache:\n%s", logs.String())
+	if !strings.Contains(logs.String(), "path=cold") {
+		t.Errorf("the darwin build was not cold:\n%s", logs.String())
 	}
-	// The same configuration again is an ordinary cache hit.
 	build("darwin")
-	if strings.Contains(logs.String(), "Go build configuration changed") {
-		t.Errorf("an unchanged configuration was treated as a change:\n%s", logs.String())
-	}
 	st, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
 	if err != nil {
 		t.Fatal(err)

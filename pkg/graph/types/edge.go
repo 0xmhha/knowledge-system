@@ -35,3 +35,72 @@ type Edge struct {
 	// other edge types stay unaffected.
 	Order int `json:"order,omitempty"`
 }
+
+// DispatchGoroutine is the dispatch kind of an edge from a Goroutine node
+// to the code it runs (calls to a function, invokes of an interface method,
+// dispatches_to through a function value or closure, reads_field and
+// writes_field, references to a package-level variable),
+// found in SSA (schema 1.42). A Goroutine is a caller; its edges are kept
+// apart from the function-level ones (IsGoroutineCode).
+const DispatchGoroutine = "goroutine"
+
+// goroutineCodeTypes are the edge types a Goroutine's code edges have.
+var goroutineCodeTypes = map[EdgeType]bool{EdgeCalls: true, EdgeInvokes: true, EdgeDispatchesTo: true,
+	EdgeReadsField: true, EdgeWritesField: true, EdgeReferences: true}
+
+// IsGoroutineCode reports whether e is an edge from a Goroutine to the code
+// it runs (DispatchGoroutine). The graph walks and the readers of the query
+// tools leave these out, so a function's callers and a field's users stay
+// what the function-level edges say; the tools list goroutine callers
+// under a key of their own.
+func IsGoroutineCode(e Edge) bool {
+	return e.DispatchKind == DispatchGoroutine && goroutineCodeTypes[e.Type] ||
+		e.DispatchKind == DispatchGoroutineWrite && e.Type == EdgeReferences
+}
+
+// DispatchGoroutineWrite is the dispatch kind of a references edge from a
+// Goroutine to a package-level variable its code assigns; a read has
+// DispatchGoroutine. (Function-level references say read or write in the
+// dispatch kind, which a goroutine's edge uses to say it is a goroutine's.)
+const DispatchGoroutineWrite = "goroutine_write"
+
+// WithoutGoroutineCode returns edges without the goroutine code edges
+// (IsGoroutineCode), in order. It returns edges itself when there are none.
+func WithoutGoroutineCode(edges []Edge) []Edge {
+	for i, e := range edges {
+		if !IsGoroutineCode(e) {
+			continue
+		}
+		out := append(make([]Edge, 0, len(edges)-1), edges[:i]...)
+		for _, e := range edges[i+1:] {
+			if !IsGoroutineCode(e) {
+				out = append(out, e)
+			}
+		}
+		return out
+	}
+	return edges
+}
+
+// GoroutineCodeSQL is the SQL condition that leaves goroutine code edges
+// out of a query over the edges table (IsGoroutineCode).
+var GoroutineCodeSQL = NotGoroutineCodeSQL("")
+
+// NotGoroutineCodeSQL is GoroutineCodeSQL for an edges table named by the
+// alias prefix ("e." for "FROM edges e").
+func NotGoroutineCodeSQL(prefix string) string {
+	kind, typ := "COALESCE("+prefix+"dispatch_kind, '')", prefix+"type"
+	return "NOT (" + kind + " = '" + DispatchGoroutine + "' AND " + typ +
+		" IN ('calls', 'invokes', 'dispatches_to', 'reads_field', 'writes_field', 'references') OR " +
+		kind + " = '" + DispatchGoroutineWrite + "' AND " + typ + " = 'references')"
+}
+
+// DispatchReceived is the dispatch kind of a flows_to edge from a receive
+// operation's CallSite to a use of the value it received (schema 1.42).
+const DispatchReceived = "received"
+
+// ChannelLockSubKind is the sub kind of a Channel node used as a lock: a
+// channel of empty structs with a buffer of one that is filled where it is
+// made (schema 1.42). Receiving its token is acquires_lock, returning it
+// releases_lock.
+const ChannelLockSubKind = "lock"

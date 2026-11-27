@@ -203,6 +203,36 @@ func TestSchemaValidator_ExternalCallEnds(t *testing.T) {
 	}
 }
 
+// A package-level variable may start a call (its initialiser makes it, schema
+// 1.38) and may not end one.
+func TestSchemaValidator_VariableCallEnds(t *testing.T) {
+	g := &graph.Graph{
+		Nodes: []types.Node{
+			validNode("f", "pkg.F", types.NodeFunction),
+			validNode("v", "pkg.Default", types.NodeVariable),
+		},
+		Edges: []types.Edge{
+			{Src: "v", Dst: "f", Type: types.EdgeCalls, Line: 1, Confidence: types.ConfExtracted},
+			{Src: "v", Dst: "f", Type: types.EdgeInvokes, Line: 2, Confidence: types.ConfExtracted},
+			{Src: "f", Dst: "v", Type: types.EdgeCalls, Line: 3, Confidence: types.ConfExtracted},
+			// The marker of a closure the initialiser calls names no callee.
+			{Src: "v", Dst: "v", Type: types.EdgeInvokes, Line: 4, Confidence: types.ConfExtracted, DispatchKind: "closure"},
+		},
+	}
+	r, err := NewSchemaValidator().Validate(context.Background(), g, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]int{}
+	for _, iss := range r.Issues {
+		got[iss.Code+" "+iss.EdgeKey]++
+	}
+	const want = "calls-bad-dst calls:f:v:3"
+	if got[want] != 1 || len(got) != 1 {
+		t.Errorf("issues %v, want only %q once", got, want)
+	}
+}
+
 func TestSchemaValidator_ImplementsBadDst(t *testing.T) {
 	g := &graph.Graph{
 		Nodes: []types.Node{
@@ -225,5 +255,67 @@ func TestSchemaValidator_ImplementsBadDst(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("expected implements-bad-dst issue, got %+v", r.Issues)
+	}
+}
+
+// A Solidity modifier body makes calls, so a Modifier may start a calls edge
+// and may not end one. A reverts_with edge starts at a function or modifier
+// and ends at an Error.
+func TestSchemaValidator_SolidityEndpoints(t *testing.T) {
+	nodes := []types.Node{
+		validNode("f", "C.f", types.NodeFunction),
+		validNode("m", "C.onlyOwner", types.NodeModifier),
+		validNode("e", "C.NotOwner", types.NodeError),
+		validNode("v", "C.Paused", types.NodeEvent),
+		validNode("s", "C.total", types.NodeField),
+		validNode("k", "C.LIMIT", types.NodeConstant),
+	}
+	cases := []struct {
+		name string
+		edge types.Edge
+		want string
+	}{
+		{"modifier calls a function", types.Edge{Src: "m", Dst: "f", Type: types.EdgeCalls, Line: 1}, ""},
+		{"state variable initialiser calls a function", types.Edge{Src: "s", Dst: "f", Type: types.EdgeCalls, Line: 7}, ""},
+		{"constant initialiser calls a function", types.Edge{Src: "k", Dst: "f", Type: types.EdgeCalls, Line: 8}, ""},
+		{"function calls a state variable", types.Edge{Src: "f", Dst: "s", Type: types.EdgeCalls, Line: 9}, "calls-bad-dst"},
+		{"function calls a modifier", types.Edge{Src: "f", Dst: "m", Type: types.EdgeCalls, Line: 2}, "calls-bad-dst"},
+		{"function reverts with an error", types.Edge{Src: "f", Dst: "e", Type: types.EdgeRevertsWith, Line: 3}, ""},
+		{"modifier reverts with an error", types.Edge{Src: "m", Dst: "e", Type: types.EdgeRevertsWith, Line: 4}, ""},
+		{"reverts with an event", types.Edge{Src: "f", Dst: "v", Type: types.EdgeRevertsWith, Line: 5}, "reverts-with-bad-dst"},
+		{"an error reverts", types.Edge{Src: "e", Dst: "e", Type: types.EdgeRevertsWith, Line: 6}, "reverts-with-bad-src"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.edge.Confidence = types.ConfExtracted
+			g := &graph.Graph{Nodes: nodes, Edges: []types.Edge{tc.edge}}
+			r, err := NewSchemaValidator().Validate(context.Background(), g, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var got []string
+			for _, iss := range r.Issues {
+				got = append(got, iss.Code)
+			}
+			switch {
+			case tc.want == "" && len(got) != 0:
+				t.Errorf("issues %v, want none", got)
+			case tc.want != "" && (len(got) != 1 || got[0] != tc.want):
+				t.Errorf("issues %v, want only %q", got, tc.want)
+			}
+		})
+	}
+}
+
+// An Error node is declared in a file and must name it.
+func TestSchemaValidator_ErrorNeedsFilePath(t *testing.T) {
+	n := validNode("e", "C.NotOwner", types.NodeError)
+	n.FilePath = ""
+	r, err := NewSchemaValidator().Validate(context.Background(), &graph.Graph{Nodes: []types.Node{n}}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Issues) != 1 || r.Issues[0].Code != "empty-file-path" {
+		t.Errorf("issues %v, want one empty-file-path", r.Issues)
 	}
 }

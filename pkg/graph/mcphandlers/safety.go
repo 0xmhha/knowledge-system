@@ -40,6 +40,26 @@ func safeReader(r store.Reader) store.Reader {
 	return &llmSafeReader{Reader: r}
 }
 
+// TestFileRoles forwards the build's record of test files of the wrapped
+// reader (persist.TestFileReader); it holds no Hunk or Commit node.
+func (s *llmSafeReader) TestFileRoles() (map[string]bool, bool, error) {
+	tr, ok := s.Reader.(store.TestFileReader)
+	if !ok {
+		return nil, false, nil
+	}
+	return tr.TestFileRoles()
+}
+
+// GoroutineCode forwards the goroutine code edges of the wrapped reader
+// (store.GoroutineCode).
+func (s *llmSafeReader) GoroutineCode(ids []string, reverse bool) ([]types.Edge, error) {
+	return store.GoroutineCode(s.Reader, ids, reverse)
+}
+
+// UnwrapReader returns the wrapped reader, so caches keyed by store
+// (persist.PrintedName) are shared by its wrappers.
+func (s *llmSafeReader) UnwrapReader() store.Reader { return s.Reader }
+
 func (s *llmSafeReader) FindSymbol(name string, exact bool, opts store.FindSymbolOptions) ([]types.Node, error) {
 	out, err := s.Reader.FindSymbol(name, exact, opts)
 	return filterLLMSafe(out), err
@@ -143,11 +163,27 @@ func (s *llmSafeReader) AllNodes() ([]types.Node, error) {
 
 func (s *llmSafeReader) AllEdges() ([]types.Edge, error) {
 	// Without the corresponding node set there's no clean way to filter
-	// edges in isolation here. Pass through; consumers that touch
-	// AllEdges directly are eval/audit/evidence paths, not direct LLM
-	// surfaces. Evidence still filters confidence='EXTRACTED' at the
-	// indexer for defence in depth.
-	return s.Reader.AllEdges()
+	// Hunk edges in isolation here; consumers that touch AllEdges directly
+	// are eval/audit/evidence paths, not direct LLM surfaces. Evidence
+	// still filters confidence='EXTRACTED' at the indexer for defence in
+	// depth. A Goroutine's code edges are left out, as everywhere in the
+	// tools (types.IsGoroutineCode).
+	out, err := s.Reader.AllEdges()
+	return types.WithoutGoroutineCode(out), err
+}
+
+// QueryEdgesByType leaves a Goroutine's code edges out
+// (types.IsGoroutineCode): the tools list goroutine callers apart.
+func (s *llmSafeReader) QueryEdgesByType(t string) ([]types.Edge, error) {
+	out, err := s.Reader.QueryEdgesByType(t)
+	return types.WithoutGoroutineCode(out), err
+}
+
+// QueryEdgesForNodes leaves a Goroutine's code edges out, as
+// QueryEdgesByType does.
+func (s *llmSafeReader) QueryEdgesForNodes(ids []string) ([]types.Edge, error) {
+	out, err := s.Reader.QueryEdgesForNodes(ids)
+	return types.WithoutGoroutineCode(out), err
 }
 
 // filterLLMSafe drops AMBIGUOUS Hunk + Commit nodes (the

@@ -24,6 +24,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // ErrSeedUnresolved reports that a seed symbol or citation did not resolve to
@@ -207,4 +208,21 @@ type Health struct {
 	// GraphDigest is ckg's logical code-graph digest (Q1) — the alignment
 	// assert's coordinate-pin anchor. Empty on pre-digest graphs.
 	GraphDigest string
+}
+
+// TestFileRuler is a Client that knows the graph's test files (Real). A
+// Client without it (a fake, a dummy) leaves the decision to the path rule.
+type TestFileRuler interface {
+	TestFileRule() (func(file string) bool, error)
+}
+
+// TestFileRule returns the rule for "is this file test code" that code
+// holding c uses for every path it sees, graph citations and vector hits
+// alike: c's graph rule (store.TestFileRule) when c has one, the path rule
+// (testpath.IsTest) otherwise.
+func TestFileRule(c Client) (func(file string) bool, error) {
+	if tr, ok := c.(TestFileRuler); ok {
+		return tr.TestFileRule()
+	}
+	return testpath.IsTest, nil
 }

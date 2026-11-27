@@ -2,6 +2,7 @@ package golang
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -19,6 +20,7 @@ import (
 // deferred until edge persistence supports nullable dst).
 func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, error) {
 	out := &parse.ResolvedGraph{}
+	p.setBuildFiles(results)
 	qIndex := map[string]string{} // qname -> nodeID (Function/Method only)
 	// cIndex maps canonical id -> nodeID for Function/Method nodes. A pending
 	// ref that carries TargetCanonicalID resolves only through it.
@@ -45,13 +47,20 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 		// CallSite -> enclosing Function/Method of the same file, by byte
-		// span. The CallSite qname prefix ("<parentQname>#CallSite@<offset>")
+		// span. The CallSite qname prefix ("<parentQname>#CallSite@<start>-<end>")
 		// is not unique across packages that share a name (two `package
 		// main`, several `init`), so looking the parent up by it attached
 		// calls to the wrong function. Spans work for freshly parsed files and
 		// for cached files reloaded without their edges.
 		for id, parent := range enclosingFuncs(r.Nodes) {
 			callSiteParent[id] = parent
+		}
+		// A call site in a package-level initialiser is inside no function:
+		// the variable it initialises makes the call. The contains edge of
+		// the site names that variable exactly; enclosingFuncs falls back to
+		// spans for files reloaded without their edges.
+		for id, owner := range initialiserOwners(r.Nodes, r.Edges) {
+			callSiteParent[id] = owner
 		}
 	}
 	// The suffix fallback below is for AST-only builds, where targets are
@@ -82,10 +91,11 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				id, ok = cIndex[pr.TargetCanonicalID]
 			} else if typed && !strings.Contains(pr.TargetQName, ".") {
 				// A bare name in a typed build is a callee go/types could not
-				// tie to a declaration in this graph (a method of the builtin
-				// error interface, a call through an expression). qIndex also
-				// holds simple names, so `err.Error()` bound to whichever
-				// `Error` method was indexed last.
+				// tie to a declaration by canonical id (a method of an
+				// interface declared in a function, which the statement pass
+				// resolves by position; a call through an expression). qIndex
+				// also holds simple names, so such a call bound to whichever
+				// method of that name was indexed last.
 				ok = false
 			} else {
 				id, ok = qIndex[pr.TargetQName]
@@ -100,7 +110,8 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 			if !ok && pr.TargetCanonicalID != "" {
 				// A function or method outside the build (standard library,
-				// a dependency): point at its External node.
+				// a dependency, a file of the module the build scope leaves
+				// out, the builtin error method): point at its External node.
 				if n, found := p.ExternalTarget(pr.TargetCanonicalID); found {
 					if !extAdded[n.ID] {
 						extAdded[n.ID] = true
@@ -148,18 +159,38 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 	return out, nil
 }
 
+// LoadOptions tunes LoadAndResolveWith.
+type LoadOptions struct {
+	// Tests loads test files too, as a build does: a package with tests is
+	// then type-checked a second time as its test variant.
+	Tests bool
+	// Skip leaves out the files it returns true for (slash-separated paths
+	// relative to the root), as a build scope leaves files of the module out
+	// of the build. Their packages are still loaded and type-checked.
+	Skip func(rel string) bool
+	// LockPropagation follows the calls made under a lock into their
+	// callees, as ckg build --lock-propagation does (LockOptions.Propagate).
+	LockPropagation bool
+}
+
 // LoadAndResolve is a convenience for tests: walks Go files under root,
 // runs Pass 1 on each, then Pass 2 across the union.
 //
 // Type-aware: registers the loaded packages with the parser via
-// SetPackages so the concurrency pass gets EXTRACTED-confidence
-// Mutex / lock-edge emission instead of falling back to AST-only INFERRED.
+// SetPackages and runs every pass a build runs after Resolve, so a test
+// sees the graph a build of the same files would store.
 func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
+	return LoadAndResolveWith(root, LoadOptions{})
+}
+
+// LoadAndResolveWith is LoadAndResolve with options.
+func LoadAndResolveWith(root string, opts LoadOptions) (*parse.ResolvedGraph, error) {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedFiles | packages.NeedSyntax |
 			packages.NeedTypes | packages.NeedTypesInfo | packages.NeedDeps |
 			packages.NeedImports | packages.NeedModule | packages.NeedCompiledGoFiles,
-		Dir: root,
+		Dir:   root,
+		Tests: opts.Tests,
 	}
 	pkgs, err := packages.Load(cfg, "./...")
 	if err != nil {
@@ -167,7 +198,7 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	}
 	p := New(root)
 	p.SetPackages(pkgs)
-	var results []*parse.ParseResult
+	var paths []string
 	seen := map[string]struct{}{}
 	for _, pkg := range pkgs {
 		for _, path := range pkg.GoFiles {
@@ -175,16 +206,25 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 				continue
 			}
 			seen[path] = struct{}{}
-			src, err := readFile(path)
-			if err != nil {
-				return nil, err
+			if rel, err := filepath.Rel(root, path); err == nil && opts.Skip != nil && opts.Skip(filepath.ToSlash(rel)) {
+				continue
 			}
-			r, err := p.ParseFile(path, src)
-			if err != nil {
-				return nil, err
-			}
-			results = append(results, r)
+			paths = append(paths, path)
 		}
+	}
+	// A build parses files in path order; packages.Load's order is not fixed.
+	sort.Strings(paths)
+	var results []*parse.ParseResult
+	for _, path := range paths {
+		src, err := readFile(path)
+		if err != nil {
+			return nil, err
+		}
+		r, err := p.ParseFile(path, src)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, r)
 	}
 	rg, err := p.Resolve(results)
 	if err != nil || rg == nil {
@@ -194,7 +234,8 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	// (a) the union of nodes (qname → ID lookup) and (b) the loaded package
 	// scopes (go/types satisfaction queries). Wired here so tests using
 	// LoadAndResolve exercise the same code path as production buildpipe.
-	rg.Edges = append(rg.Edges, EmitImplementsEdges(p.Pkgs(), rg.Nodes)...)
+	implEdges, implPending := EmitImplementsEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, implEdges...)
 	// uses_type edges (Function/Method/Struct → Type). Same
 	// post-Resolve location for the same reasons. Cross-package types that
 	// don't have a node in this graph become PendingRefs (q4=A); LoadAndResolve
@@ -202,7 +243,7 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	// production buildpipe path persists them via runGoPipeline.
 	usesEdges, usesPending := EmitUsesTypeEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, usesEdges...)
-	extNodes, extEdges := p.ExternalEdges(usesPending, rg.Nodes)
+	extNodes, extEdges := p.ExternalEdges(append(usesPending, implPending...), rg.Nodes)
 	rg.Nodes = append(rg.Nodes, extNodes...)
 	rg.Edges = append(rg.Edges, extEdges...)
 	// instantiates edges (Function/Method → Type). Walks each
@@ -214,11 +255,17 @@ func LoadAndResolve(root string) (*parse.ResolvedGraph, error) {
 	promNodes, promEdges := EmitPromotedMethods(p.Pkgs(), rg.Nodes)
 	rg.Nodes = append(rg.Nodes, promNodes...)
 	rg.Edges = append(rg.Edges, promEdges...)
+	// One file shows each package, the same on every build (see packages.go).
+	CanonicalPackagePaths(rg.Nodes, isGoTestFile)
 	// Value uses: reads_field / writes_field and references (see value_access.go).
 	rg.Edges = append(rg.Edges, EmitValueAccessEdges(p.Pkgs(), rg.Nodes)...)
 	// Runtime links: dispatches_to from SSA + VTA (see dispatch.go).
-	dispatch, _ := EmitDispatchEdges(p.Pkgs(), rg.Nodes)
-	rg.Edges = append(rg.Edges, dispatch...)
+	dispatch, facts, dst := EmitDispatchEdges(p.Pkgs(), rg.Nodes)
+	rg.Edges = append(rg.Edges, OrderDispatchEdges(append(dispatch, facts.Counted()...))...)
+	// Lock edges: acquires_lock / releases_lock / accessed_under_lock (see
+	// lock_edges.go), after the dispatch pass, which finds channel locks.
+	lockFacts, _ := LockFacts(p.Pkgs(), rg.Nodes, LockOptions{Propagate: opts.LockPropagation, ChanLocks: dst.ChanLockOps()})
+	rg.Edges = append(rg.Edges, lockFacts.Edges()...)
 	// Statement links: what happens inside a function (see statement_links.go).
 	stmtEdges, _ := EmitStatementEdges(p.Pkgs(), rg.Nodes)
 	rg.Edges = append(rg.Edges, stmtEdges...)
@@ -238,13 +285,18 @@ func readFile(path string) ([]byte, error) {
 	return readFileOS(path)
 }
 
-// enclosingFuncs maps each CallSite node of one file to the innermost
-// Function or Method node whose byte span contains it.
+// enclosingFuncs maps each CallSite node of one file to the node that makes
+// the call: the innermost Function or Method whose byte span contains it, or,
+// for a site inside no function, the innermost Variable whose span contains
+// it (the call is in that variable's package-level initialiser).
 func enclosingFuncs(nodes []types.Node) map[string]string {
-	var funcs []types.Node
+	var funcs, vars []types.Node
 	for _, n := range nodes {
-		if n.Type == types.NodeFunction || n.Type == types.NodeMethod {
+		switch n.Type {
+		case types.NodeFunction, types.NodeMethod:
 			funcs = append(funcs, n)
+		case types.NodeVariable:
+			vars = append(vars, n)
 		}
 	}
 	out := map[string]string{}
@@ -252,17 +304,46 @@ func enclosingFuncs(nodes []types.Node) map[string]string {
 		if n.Type != types.NodeCallSite {
 			continue
 		}
-		best := -1
-		for i, f := range funcs {
-			if f.FilePath != n.FilePath || n.StartByte < f.StartByte || n.StartByte >= f.EndByte {
-				continue
-			}
-			if best < 0 || f.EndByte-f.StartByte < funcs[best].EndByte-funcs[best].StartByte {
-				best = i
-			}
+		if id := innermost(funcs, n); id != "" {
+			out[n.ID] = id
+		} else if id := innermost(vars, n); id != "" {
+			out[n.ID] = id
 		}
-		if best >= 0 {
-			out[n.ID] = funcs[best].ID
+	}
+	return out
+}
+
+// innermost returns the ID of the smallest of owners, in site's file, whose
+// byte span contains the start of site; "" when none does.
+func innermost(owners []types.Node, site types.Node) string {
+	best := -1
+	for i, o := range owners {
+		if o.FilePath != site.FilePath || site.StartByte < o.StartByte || site.StartByte >= o.EndByte {
+			continue
+		}
+		if best < 0 || o.EndByte-o.StartByte < owners[best].EndByte-owners[best].StartByte {
+			best = i
+		}
+	}
+	if best < 0 {
+		return ""
+	}
+	return owners[best].ID
+}
+
+// initialiserOwners maps each CallSite node that a Variable contains to that
+// Variable. The declaration pass adds the contains edge when it walks a
+// package-level initialiser, and it knows which name a value belongs to,
+// which spans do not say for `var a, b = f(), g()`.
+func initialiserOwners(nodes []types.Node, edges []types.Edge) map[string]string {
+	kind := make(map[string]types.NodeType, len(nodes))
+	for _, n := range nodes {
+		kind[n.ID] = n.Type
+	}
+	out := map[string]string{}
+	for _, e := range edges {
+		if e.Type == types.EdgeContains && kind[e.Src] == types.NodeVariable && kind[e.Dst] == types.NodeCallSite {
+			out[e.Dst] = e.Src
 		}
 	}
 	return out

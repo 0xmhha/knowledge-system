@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	gotypes "go/types"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -25,6 +26,15 @@ type Decl struct {
 	Name        string `json:"name"`
 	File        string `json:"file"`
 	Line        int    `json:"line"` // line of the declared name
+	// StartByte is the offset of the declaration's first token: the keyword
+	// of a function and of a type, var or const that stands alone, the
+	// specification itself in a parenthesised group. The node starts there.
+	StartByte int `json:"start_byte"`
+	// EndByte is the offset where the declaration ends: after its last
+	// token, or after the comment that follows it on its last line (for a
+	// function, the comments that start on the line of its last token with
+	// only blanks between). The node ends there.
+	EndByte int `json:"end_byte"`
 }
 
 // Pair is one relation between two declarations, keyed by canonical id.
@@ -44,6 +54,13 @@ type Truth struct {
 	StaticCalls    []Pair
 	InterfaceCalls []Pair
 	TypeRefs       []Pair
+	// OutsideCalls and OutsideTypeRefs are the calls and type references
+	// whose target is declared outside the covered files: the standard
+	// library, a dependency, a file of the module the build scope leaves
+	// out, the builtin error method. To is the target's canonical id; the
+	// graph holds such a target as an External node with that id.
+	OutsideCalls    []Pair
+	OutsideTypeRefs []Pair
 	// DynamicCallSites counts calls through a function value, method value or
 	// closure: go/types gives them no callee, so there is no pair to check.
 	DynamicCallSites int
@@ -52,6 +69,26 @@ type Truth struct {
 	CallsOutsideFuncs int
 	// Stmts are the statement links of every function body (statements.go).
 	Stmts map[StmtFact]bool
+	// UnderLock are the (field, mutex) pairs of accessed_under_lock: a field
+	// used in a function body at a point where the mutex is held
+	// (underlock.go). Both are keyed "file:line:name" of their declaration.
+	UnderLock map[[2]string]bool
+	// UnderLockPropagated are the pairs used in a function called while the
+	// mutex is held, where the mutex is still held at the use, up to
+	// propagationDepth calls deep (underlock.go), less the direct pairs.
+	UnderLockPropagated map[[2]string]bool
+	// Dispatch are the (interface method, concrete method) pairs of the
+	// interface dispatches; GoroutineChans the (go statement, make call and
+	// edge type) links of goroutine literals to local channels, and
+	// GoroutineChansUndecided those whose operand has several origins
+	// (dispatch.go).
+	Dispatch                                map[[2]string]bool
+	GoroutineChans, GoroutineChansUndecided map[[3]string]bool
+	// GoroutineLocalChans are the (go statement, make call) pairs the
+	// goroutine check decides: channels made in the go statement's function.
+	GoroutineLocalChans map[[2]string]bool
+	// Messages are the handles and triggers facts (messages.go).
+	Messages *messageFacts
 	// Load is what the go command reported while loading the truth's
 	// packages; Modules compares the outside modules with the scope's.
 	Load    detect.LoadProblems
@@ -91,11 +128,16 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 	// The truth comes from the same go command as the graph. When it cannot
 	// load a package, both lose the same references and agree, so the
 	// problems are reported with the comparison.
-	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
+	t := &Truth{Decls: map[string]Decl{}, Stmts: map[StmtFact]bool{}, UnderLock: map[[2]string]bool{}, UnderLockPropagated: map[[2]string]bool{}, Load: detect.SummarizeLoad(pkgs, 20), Modules: detect.CheckModules(pkgs, b.ScopeModules())}
 	seenFile := map[string]bool{}
 	static := pairSet{}
 	iface := pairSet{}
 	typeRefs := pairSet{}
+	outCalls := pairSet{}
+	outTypes := pairSet{}
+	funcs := truthFuncs(pkgs)
+	chanLocks := findChanLocks(pkgs, absRoot, scope)
+	var calls []truthCall
 	// Test variants load the same production file twice; walk each file once.
 	for _, pkg := range pkgs {
 		if pkg.TypesInfo == nil {
@@ -111,13 +153,21 @@ func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Tr
 			}
 			seenFile[rel] = true
 			w := fileWalker{t: t, info: pkg.TypesInfo, fset: pkg.Fset, rel: rel, root: absRoot, scope: scope,
-				static: static, iface: iface, typeRefs: typeRefs, stmt: t.Stmts}
+				static: static, iface: iface, typeRefs: typeRefs, outCalls: outCalls, outTypes: outTypes, stmt: t.Stmts,
+				funcs: funcs, calls: &calls, chanLocks: chanLocks}
 			w.walk(f)
 		}
 	}
+	propagateTruth(t, calls, funcs, absRoot, scope, chanLocks)
+	pf := collectProgramFacts(pkgs, absRoot, scope, chanLocks)
+	t.Dispatch = pf.dispatchTruth()
+	t.GoroutineChans, t.GoroutineChansUndecided, t.GoroutineLocalChans = pf.goChan, pf.undecidedChan, pf.localChan
+	t.Messages = pf.msg
 	t.StaticCalls = static.sorted()
 	t.InterfaceCalls = iface.sorted()
 	t.TypeRefs = typeRefs.sorted()
+	t.OutsideCalls = outCalls.sorted()
+	t.OutsideTypeRefs = outTypes.sorted()
 	return t, nil
 }
 
@@ -153,23 +203,33 @@ func (s pairSet) sorted() []Pair {
 }
 
 type fileWalker struct {
-	t        *Truth
-	info     *gotypes.Info
-	fset     *token.FileSet
-	rel      string
-	root     string
-	scope    map[string]bool
-	static   pairSet
-	iface    pairSet
-	typeRefs pairSet
-	stmt     map[StmtFact]bool
+	t         *Truth
+	info      *gotypes.Info
+	fset      *token.FileSet
+	rel       string
+	root      string
+	scope     map[string]bool
+	static    pairSet
+	iface     pairSet
+	typeRefs  pairSet
+	outCalls  pairSet
+	outTypes  pairSet
+	stmt      map[StmtFact]bool
+	funcs     map[token.Position]truthFunc
+	calls     *[]truthCall
+	chanLocks chanLockNames
 }
 
 func (w *fileWalker) walk(f *ast.File) {
+	// The file's bytes, for the blanks between a function and the comment
+	// after it; without them a function ends at its last token.
+	src, _ := os.ReadFile(filepath.Join(w.root, filepath.FromSlash(w.rel)))
+	locks := &lockTruth{info: w.info, fset: w.fset, root: w.root, scope: w.scope, out: w.t.UnderLock, funcs: w.funcs, calls: w.calls, chanLocks: w.chanLocks}
 	for _, d := range f.Decls {
 		switch d := d.(type) {
 		case *ast.FuncDecl:
-			cid := w.declare(d.Name)
+			locks.function(d.Body, nil)
+			cid := w.declare(d.Name, d.Pos(), w.funcEnd(d, f.Comments, src))
 			if cid == "" {
 				// No canonical id (a method of an alias type): its statement
 				// links are keyed by file and line, so they are still checked.
@@ -188,45 +248,135 @@ func (w *fileWalker) walk(f *ast.File) {
 			w.statements(d)
 		case *ast.GenDecl:
 			for _, spec := range d.Specs {
-				w.genSpec(spec)
+				// A specification in a group is a declaration of its own;
+				// one that stands alone starts at the keyword.
+				start := d.Pos()
+				if d.Lparen.IsValid() {
+					start = spec.Pos()
+				}
+				w.genSpec(spec, start)
 			}
 		}
 	}
 }
 
-func (w *fileWalker) genSpec(spec ast.Spec) {
+// through returns the end of a declaration whose last token ends at end and
+// which the comment c follows on its last line (nil for none).
+func through(end token.Pos, c *ast.CommentGroup) token.Pos {
+	if c == nil || c.End() <= end {
+		return end
+	}
+	return c.End()
+}
+
+// funcEnd returns the end of the function declaration d: after its last
+// token, or after the comments that start on that token's line with only
+// spaces and tabs before them. The syntax tree attaches such a comment to no
+// function, so comments, the file's comment groups in source order, and src,
+// its bytes, are read.
+func (w *fileWalker) funcEnd(d *ast.FuncDecl, comments []*ast.CommentGroup, src []byte) token.Pos {
+	end := d.End()
+	tf := w.fset.File(end)
+	i := sort.Search(len(comments), func(i int) bool { return comments[i].Pos() >= end })
+	if tf == nil || i == len(comments) {
+		return end
+	}
+	line := tf.Line(end)
+	for _, c := range comments[i].List {
+		from, to := tf.Offset(end), tf.Offset(c.Pos())
+		if tf.Line(c.Pos()) != line || to > len(src) || strings.Trim(string(src[from:to]), funcCommentBlanks) != "" {
+			break
+		}
+		end = c.End()
+		line = tf.Line(end)
+	}
+	return end
+}
+
+// funcCommentBlanks are the bytes that may stand between a function's last
+// token and the comment after it.
+const funcCommentBlanks = " \t"
+
+func (w *fileWalker) genSpec(spec ast.Spec, start token.Pos) {
 	switch s := spec.(type) {
 	case *ast.TypeSpec:
-		cid := w.declare(s.Name)
+		cid := w.declare(s.Name, start, through(s.End(), s.Comment))
 		if cid == "" {
 			return
+		}
+		if s.TypeParams != nil {
+			// The constraint of a type parameter is named by the declaration
+			// (type Cache[K comparable, V blobType] ...).
+			w.typeRefsIn(cid, s.TypeParams)
 		}
 		w.typeRefsIn(cid, s.Type)
 		if it, ok := s.Type.(*ast.InterfaceType); ok && it.Methods != nil {
 			for _, m := range it.Methods.List {
 				for _, n := range m.Names {
-					w.declare(n)
+					w.declare(n, m.Pos(), through(m.End(), m.Comment))
 				}
 			}
 		}
 	case *ast.ValueSpec:
+		keys := make([]string, 0, len(s.Names))
 		for _, n := range s.Names {
-			w.declare(n)
+			key := w.declare(n, start, through(s.End(), s.Comment))
+			keys = append(keys, key)
+			// The type written in the declaration is used by every name it
+			// declares (var a, b T).
+			if key != "" {
+				w.typeRefsIn(key, s.Type)
+			}
 		}
-		for _, v := range s.Values {
-			ast.Inspect(v, func(n ast.Node) bool {
-				if c, ok := n.(*ast.CallExpr); ok && typeutil.StaticCallee(w.info, c) != nil {
-					w.t.CallsOutsideFuncs++
-				}
-				return true
-			})
+		for i, v := range s.Values {
+			// Value i initialises name i; with one value for several names
+			// (var a, b = f()) the first name owns it.
+			owner := keys[0]
+			if i < len(keys) {
+				owner = keys[i]
+			}
+			if owner == "" {
+				// The blank identifier has no key: its initialiser's calls
+				// stay uncompared and are counted.
+				ast.Inspect(v, func(n ast.Node) bool {
+					if c, ok := n.(*ast.CallExpr); ok && typeutil.StaticCallee(w.info, c) != nil {
+						w.t.CallsOutsideFuncs++
+					}
+					return true
+				})
+				continue
+			}
+			w.callsIn(owner, v)
+			w.typeRefsIn(owner, v)
+			w.statementsIn(v)
 		}
 	}
 }
 
-// declare records a package-level declaration and returns its key
-// ("" for the blank identifier and objects without a package).
-func (w *fileWalker) declare(name *ast.Ident) string {
+// callsIn records the calls under root as calls by caller, closures included.
+func (w *fileWalker) callsIn(caller string, root ast.Node) {
+	var lits []*ast.FuncLit // function literals enclosing the current node
+	ast.Inspect(root, func(n ast.Node) bool {
+		if n == nil {
+			return true
+		}
+		for len(lits) > 0 && n.Pos() >= lits[len(lits)-1].End() {
+			lits = lits[:len(lits)-1]
+		}
+		switch n := n.(type) {
+		case *ast.FuncLit:
+			lits = append(lits, n)
+		case *ast.CallExpr:
+			w.call(caller, n, len(lits) > 0)
+		}
+		return true
+	})
+}
+
+// declare records a package-level declaration that spans [start, end) and
+// returns its key ("" for the blank identifier and objects without a
+// package).
+func (w *fileWalker) declare(name *ast.Ident, start, end token.Pos) string {
 	obj := w.info.Defs[name]
 	cid := canonicalID(obj)
 	if cid == "" {
@@ -238,7 +388,8 @@ func (w *fileWalker) declare(name *ast.Ident) string {
 		key = fmt.Sprintf("%s#%s:%d", cid, w.rel, line)
 	}
 	if _, dup := w.t.Decls[key]; !dup {
-		w.t.Decls[key] = Decl{Key: key, CanonicalID: cid, Name: name.Name, File: w.rel, Line: line}
+		w.t.Decls[key] = Decl{Key: key, CanonicalID: cid, Name: name.Name, File: w.rel, Line: line,
+			StartByte: w.fset.Position(start).Offset, EndByte: w.fset.Position(end).Offset}
 	}
 	return key
 }
@@ -276,9 +427,7 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 		if fn.Origin() != nil {
 			fn = fn.Origin()
 		}
-		if w.inScope(fn) {
-			w.static.add(Pair{From: caller, To: canonicalID(fn), File: w.rel, Line: line, InClosure: inClosure})
-		}
+		w.addCall(w.static, Pair{From: caller, File: w.rel, Line: line, InClosure: inClosure}, fn)
 		return
 	}
 	if sel, ok := ast.Unparen(c.Fun).(*ast.SelectorExpr); ok {
@@ -287,9 +436,7 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 		// selected method is declared by an interface; StaticCallee is nil.
 		if s := w.info.Selections[sel]; s != nil && s.Kind() == gotypes.MethodVal {
 			if fn, ok := s.Obj().(*gotypes.Func); ok && isInterfaceMethod(fn) {
-				if w.inScope(fn) {
-					w.iface.add(Pair{From: caller, To: canonicalID(fn), File: w.rel, Line: line, InClosure: inClosure})
-				}
+				w.addCall(w.iface, Pair{From: caller, File: w.rel, Line: line, InClosure: inClosure}, fn)
 				return
 			}
 		}
@@ -298,6 +445,21 @@ func (w *fileWalker) call(caller string, c *ast.CallExpr, inClosure bool) {
 		return // conversion or builtin, not a call to code
 	}
 	w.t.DynamicCallSites++
+}
+
+// addCall records the call p of fn: in set when fn is declared in a covered
+// file, among the outside calls otherwise. A callee without a canonical id (a
+// method of an interface declared in a function or written without a name)
+// has no key to compare by and is left out.
+func (w *fileWalker) addCall(set pairSet, p Pair, fn *gotypes.Func) {
+	if p.To = canonicalID(fn); p.To == "" {
+		return
+	}
+	if w.inScope(fn) {
+		set.add(p)
+	} else {
+		w.outCalls.add(p)
+	}
 }
 
 // isInterfaceMethod reports whether fn is declared by an interface type.
@@ -318,17 +480,23 @@ func (w *fileWalker) typeRefsIn(from string, n ast.Node) {
 	})
 }
 
-// typeRef records a use of a package-level named type declared in scope.
+// typeRef records a use of a package-level named type: among the type
+// references when it is declared in scope, among the outside ones otherwise.
 func (w *fileWalker) typeRef(from string, id *ast.Ident) {
 	tn, ok := w.info.Uses[id].(*gotypes.TypeName)
-	if !ok || tn.Pkg() == nil || tn.Parent() != tn.Pkg().Scope() || !w.inScope(tn) {
+	if !ok || tn.Pkg() == nil || tn.Parent() != tn.Pkg().Scope() {
 		return
 	}
 	to := canonicalID(tn)
 	if to == "" || to == from {
 		return
 	}
-	w.typeRefs.add(Pair{From: from, To: to, File: w.rel, Line: w.fset.Position(id.Pos()).Line})
+	p := Pair{From: from, To: to, File: w.rel, Line: w.fset.Position(id.Pos()).Line}
+	if w.inScope(tn) {
+		w.typeRefs.add(p)
+	} else {
+		w.outTypes.add(p)
+	}
 }
 
 // inScope reports whether obj is declared in a file the graph covers.
@@ -347,9 +515,20 @@ func (w *fileWalker) inScope(obj gotypes.Object) bool {
 //	interface method: <importpath>.<Interface>.<Method>
 //	type/const/var:   <importpath>.<Name>
 //
+// A method declared on an alias (type E = fe12; func (e *E) One()) has the id
+// of the aliased type's method. The Error method of the builtin error
+// interface, which has no package, has builtinErrorID. A method of an
+// interface declared inside a function has none.
+//
 // Written independently of the parser so the two can disagree.
 func canonicalID(obj gotypes.Object) string {
-	if obj == nil || obj.Pkg() == nil || obj.Name() == "_" {
+	if obj == nil || obj.Name() == "_" {
+		return ""
+	}
+	if obj.Pkg() == nil {
+		if fn, ok := obj.(*gotypes.Func); ok && fn.FullName() == builtinErrorFullName {
+			return builtinErrorID
+		}
 		return ""
 	}
 	pkgPath := obj.Pkg().Path()
@@ -367,17 +546,32 @@ func canonicalID(obj gotypes.Object) string {
 		}
 		return pkgPath + "." + fn.Name()
 	}
-	rt := sig.Recv().Type()
+	rt := gotypes.Unalias(sig.Recv().Type())
 	star := ""
 	if p, ok := rt.(*gotypes.Pointer); ok {
-		rt, star = p.Elem(), "*"
+		rt, star = gotypes.Unalias(p.Elem()), "*"
 	}
 	named, ok := rt.(*gotypes.Named)
-	if !ok || named.Obj() == nil {
+	if !ok || named.Obj() == nil || named.Obj().Parent() != pkgScope(named.Obj()) {
 		return ""
 	}
 	if gotypes.IsInterface(named) {
 		return pkgPath + "." + named.Obj().Name() + "." + fn.Name()
 	}
 	return pkgPath + ".(" + star + named.Obj().Name() + ")." + fn.Name()
+}
+
+// builtinErrorID is the canonical id of the Error method of the builtin error
+// interface, and builtinErrorFullName the name go/types gives that method.
+const (
+	builtinErrorID       = "builtin.error.Error"
+	builtinErrorFullName = "(error).Error"
+)
+
+// pkgScope is the scope of obj's package, nil for an object without one.
+func pkgScope(obj gotypes.Object) *gotypes.Scope {
+	if obj.Pkg() == nil {
+		return nil
+	}
+	return obj.Pkg().Scope()
 }

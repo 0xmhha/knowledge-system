@@ -4,8 +4,6 @@ import (
 	"sort"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-
-	"github.com/0xmhha/knowledge-system/internal/graph/parse"
 )
 
 // Sol Yul EVM builtin detection.
@@ -97,7 +95,7 @@ func (v *declVisitor) runYulBuiltins() {
 			if !ok {
 				continue
 			}
-			id := parse.MakeID(fnQ, "sol", fnStart)
+			id := v.declID(fnQ, fnStart)
 			set, exists := byFunc[id]
 			if !exists {
 				set = map[string]bool{}

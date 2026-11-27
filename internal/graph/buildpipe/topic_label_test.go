@@ -37,7 +37,7 @@ func TestEmitDerivedPasses_TopicLabelUsesPageRank(t *testing.T) {
 	}
 
 	// t.TempDir is not a git checkout, so the temporal pass adds nothing.
-	_, tt, _, err := emitDerivedPasses(g, t.TempDir(), nil, discardLog(), true, nil, false, 0, nil)
+	_, tt, _, err := emitDerivedPasses(g, t.TempDir(), nil, discardLog(), true, 0, nil)
 	if err != nil {
 		t.Fatalf("emitDerivedPasses: %v", err)
 	}

@@ -26,6 +26,9 @@ func Compute(g *graph.Graph) {
 		idx[n.ID] = i
 	}
 	for _, e := range g.Edges {
+		if types.IsGoroutineCode(e) {
+			continue // a Goroutine's code edges repeat its function's
+		}
 		si, ok := idx[e.Src]
 		if !ok {
 			continue
@@ -47,9 +50,14 @@ func Compute(g *graph.Graph) {
 // stay out of PageRank: site_calls repeats the function-level calls, and
 // the others describe how a body is built, not how declarations depend on
 // each other, so counting them would move declaration ranks for no reason.
+//
+// The message links (schema 1.42: handles, triggers) stay out as well: they
+// start at statement sites or repeat what the channel edges say, and were
+// not part of the measured ranks.
 var statementLink = map[types.EdgeType]bool{
 	types.EdgeSiteCalls: true, types.EdgeCondReads: true, types.EdgeCondCalls: true,
 	types.EdgeBodyWrites: true, types.EdgeEncloses: true,
+	types.EdgeHandles: true, types.EdgeTriggers: true, types.EdgeLiteralPassedTo: true,
 }
 
 // Type-hierarchy dispatch candidates (dispatches_to, kind type_hierarchy)
@@ -91,6 +99,9 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 	out := make([][]int, n)
 	outDeg := make([]int, n)
 	for _, e := range g.Edges {
+		if types.IsGoroutineCode(e) {
+			continue // a Goroutine's code edges repeat its function's
+		}
 		si, ok := idx[e.Src]
 		if !ok {
 			continue
@@ -99,7 +110,8 @@ func pageRank(g *graph.Graph, damping float64, iters int) {
 		if !ok {
 			continue
 		}
-		if statementLink[e.Type] || e.Type == types.EdgeDispatchesTo && e.DispatchKind == "type_hierarchy" {
+		if statementLink[e.Type] || e.Type == types.EdgeDispatchesTo && e.DispatchKind == "type_hierarchy" ||
+			e.Type == types.EdgeFlowsTo && e.DispatchKind == types.DispatchReceived {
 			continue
 		}
 		out[si] = append(out[si], di)

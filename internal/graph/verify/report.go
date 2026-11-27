@@ -16,6 +16,10 @@ type Report struct {
 	StaticCalls    RelationStats `json:"static_calls"`
 	InterfaceCalls RelationStats `json:"interface_calls"`
 	TypeRefs       RelationStats `json:"type_refs"`
+	// OutsideCalls and OutsideTypeRefs compare the calls and type references
+	// that leave the covered files with the edges to External nodes.
+	OutsideCalls    RelationStats `json:"outside_calls"`
+	OutsideTypeRefs RelationStats `json:"outside_type_refs"`
 	// DynamicCallSites are calls through function values, method values and
 	// closures. go/types gives them no callee, so they are counted, not checked.
 	DynamicCallSites  int             `json:"dynamic_call_sites"`
@@ -28,6 +32,27 @@ type Report struct {
 	// without --observed.
 	Observed       *observe.Report `json:"observed,omitempty"`
 	LocalDeclNodes LocalDeclStats  `json:"unmatched_decl_nodes"`
+	// UnderLock compares the accessed_under_lock edges with the fields a
+	// function uses while it holds the mutex (underlock.go).
+	UnderLock UnderLockStats `json:"accessed_under_lock"`
+	// UnderLockPropagated compares the propagated accessed_under_lock edges
+	// (a field used in a function called while the mutex is held) with the
+	// truth's propagated pairs; all zero for a graph built without
+	// --lock-propagation, except Truth.
+	UnderLockPropagated UnderLockStats `json:"accessed_under_lock_propagated"`
+	// Dispatch compares the interface dispatches_to edges (interface method
+	// -> concrete method) with the implementations go/types allows for the
+	// invoked interface methods (dispatch.go).
+	Dispatch UnderLockStats `json:"dispatches_to_interface"`
+	// GoroutineChans compares the Goroutine -> Channel sends_to/recvs_from
+	// edges with the operations of goroutine literals on local channels.
+	GoroutineChans UnderLockStats `json:"goroutine_channels"`
+	// Handles compares the handles edges (a receive -> the code in its
+	// range) and Triggers the triggers edges (a sender -> a receive on the
+	// same channel, for the local channels the check decides) with the
+	// syntax (messages.go).
+	Handles  UnderLockStats `json:"handles"`
+	Triggers UnderLockStats `json:"triggers"`
 	// Load is what the go command reported while loading the truth. Graph
 	// and truth come from the same go command, so a package it cannot load
 	// is missing from both and the counts above cannot show it.
@@ -50,6 +75,11 @@ type DeclStats struct {
 	Matched        int      `json:"matched"`
 	Missing        int      `json:"missing"`
 	MissingSamples []string `json:"missing_samples,omitempty"`
+	// OtherSpan counts matched declarations whose node does not span the
+	// declaration: from its first token through the comment after it
+	// (Decl.StartByte, Decl.EndByte).
+	OtherSpan        int      `json:"other_span"`
+	OtherSpanSamples []string `json:"other_span_samples,omitempty"`
 }
 
 // RelationStats compares one relation family.
@@ -90,6 +120,21 @@ type UnexpectedStats struct {
 	TypeRefSamples []string `json:"type_ref_samples,omitempty"`
 }
 
+// UnderLockStats compares the accessed_under_lock edges (Field -> Mutex)
+// with the truth's (field, mutex) pairs, both named by the file, line and
+// name of their declarations.
+type UnderLockStats struct {
+	// Truth is the pairs the source supports; Matched those the graph has.
+	Truth   int `json:"truth"`
+	Matched int `json:"matched"`
+	// Edges is the graph's edges; Unsupported those the source does not
+	// support (a field used where the mutex is not held).
+	Edges              int      `json:"edges"`
+	Unsupported        int      `json:"unsupported"`
+	MissingSamples     []string `json:"missing_samples,omitempty"`
+	UnsupportedSamples []string `json:"unsupported_samples,omitempty"`
+}
+
 // LocalDeclStats counts declaration-kind graph nodes that no package-level
 // declaration maps to.
 type LocalDeclStats struct {
@@ -111,11 +156,12 @@ func (r Report) WriteJSON(w io.Writer) error {
 func (r Report) WriteText(w io.Writer) error {
 	p := func(format string, a ...any) { _, _ = fmt.Fprintf(w, format, a...) }
 	p("ckg verify (go): %d files\n", r.Files)
-	p("declarations: truth %d, matched %d, missing %d\n", r.Decls.Truth, r.Decls.Matched, r.Decls.Missing)
+	p("declarations: truth %d, matched %d, missing %d, node spans other bytes %d\n", r.Decls.Truth, r.Decls.Matched, r.Decls.Missing, r.Decls.OtherSpan)
 	for _, rel := range []struct {
 		name string
 		s    RelationStats
-	}{{"static calls", r.StaticCalls}, {"interface calls", r.InterfaceCalls}, {"type refs", r.TypeRefs}} {
+	}{{"static calls", r.StaticCalls}, {"interface calls", r.InterfaceCalls}, {"type refs", r.TypeRefs},
+		{"calls to code outside the graph", r.OutsideCalls}, {"type refs to types outside the graph", r.OutsideTypeRefs}} {
 		p("%s: truth %d, matched %d, misresolved %d, missing %d (in closures %d), endpoint missing %d, recall %.4f\n",
 			rel.name, rel.s.Truth, rel.s.Matched, rel.s.Misresolved, rel.s.Missing, rel.s.MissingInClosure,
 			rel.s.EndpointMissing, rel.s.Recall())
@@ -123,9 +169,27 @@ func (r Report) WriteText(w io.Writer) error {
 	p("dynamic call sites (not checked): %d\n", r.DynamicCallSites)
 	p("calls in package-level initialisers (not checked): %d\n", r.CallsOutsideFuncs)
 	p("unexpected edges: calls %d, type refs %d\n", r.Unexpected.Calls, r.Unexpected.TypeRefs)
+	p("accessed_under_lock: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.UnderLock.Matched, r.UnderLock.Truth, r.UnderLock.Unsupported, r.UnderLock.Edges)
+	p("accessed_under_lock propagated: %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.UnderLockPropagated.Matched, r.UnderLockPropagated.Truth, r.UnderLockPropagated.Unsupported, r.UnderLockPropagated.Edges)
+	p("dispatches_to (interface): %d of %d true pairs in the graph; %d of %d edges unsupported\n",
+		r.Dispatch.Matched, r.Dispatch.Truth, r.Dispatch.Unsupported, r.Dispatch.Edges)
+	p("goroutine channel edges: %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.GoroutineChans.Matched, r.GoroutineChans.Truth, r.GoroutineChans.Unsupported, r.GoroutineChans.Edges)
+	p("handles: %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.Handles.Matched, r.Handles.Truth, r.Handles.Unsupported, r.Handles.Edges)
+	p("triggers (decided local channels): %d of %d true links in the graph; %d of %d edges unsupported\n",
+		r.Triggers.Matched, r.Triggers.Truth, r.Triggers.Unsupported, r.Triggers.Edges)
 	p("declaration nodes with no package-level declaration: %d\n", r.LocalDeclNodes.Count)
 	if r.Statements == nil {
 		p("statement links: none in this graph\n")
+	}
+	if r.Statements != nil {
+		// What one fact is: a statement (its kind and line), a target, the
+		// part and the line; literal_passed_to counts each call site by its
+		// span, so one fact is one edge.
+		p("statement links count facts (statement kind and line, target, part, line; literal_passed_to: call site span, receiver, line)\n")
 	}
 	for _, rel := range stmtRels {
 		s, ok := r.Statements[string(rel)]
@@ -150,12 +214,15 @@ func (r Report) WriteText(w io.Writer) error {
 		}
 	}
 	section("missing declarations", r.Decls.MissingSamples)
+	section("declarations whose node spans other bytes", r.Decls.OtherSpanSamples)
 	section("misresolved static calls", r.StaticCalls.MisresolvedSamples)
 	section("missing static calls", r.StaticCalls.MissingSamples)
 	section("misresolved interface calls", r.InterfaceCalls.MisresolvedSamples)
 	section("missing interface calls", r.InterfaceCalls.MissingSamples)
 	section("misresolved type refs", r.TypeRefs.MisresolvedSamples)
 	section("missing type refs", r.TypeRefs.MissingSamples)
+	section("missing calls to code outside the graph", r.OutsideCalls.MissingSamples)
+	section("missing type refs to types outside the graph", r.OutsideTypeRefs.MissingSamples)
 	section("unexpected call edges", r.Unexpected.CallSamples)
 	section("unexpected type-ref edges", r.Unexpected.TypeRefSamples)
 	section("declaration nodes with no package-level declaration", r.LocalDeclNodes.Samples)

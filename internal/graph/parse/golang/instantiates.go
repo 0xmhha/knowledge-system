@@ -9,15 +9,18 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
-// instantiates.go emits `instantiates` edges from a
-// Function/Method to a Type when the function body materialises a value of
-// that type via:
+// instantiates.go emits `instantiates` edges from a Function/Method, or from
+// a package-level Variable for its initialiser, to a Type when that code
+// materialises a value of the type via:
 //
-//	Type{...}        — composite literal (struct / array / map literal whose
-//	                   Type is a *ast.Ident or *ast.SelectorExpr resolving to
-//	                   a named type)
+//	Type{...}        — composite literal whose type is written as a type name
 //	&Type{...}       — same, addressed
 //	new(Type)        — new builtin
+//
+// The target is the type the source names. For an alias (type G1 = bn256.G1;
+// new(G1)) that is the alias, whose node stands for the name the code uses:
+// resolving the expression's type instead looked through the alias, found a
+// type without a node, and 22 new(T) sites of go-stablenet had no edge.
 //
 // `make(...)` is intentionally NOT emitted in this pass:
 //   - make(map[K]V) and make([]T) target unnamed slice/map types — there is
@@ -30,109 +33,90 @@ import (
 // instantiations whose target type isn't in the node graph are silently
 // dropped; the resolution drift they'd produce is far smaller than uses_type
 // (most struct literals point to types declared in the same package) so the
-// pending_refs path isn't worth the complexity for this edge.
+// pending-ref path isn't worth the complexity for this edge.
 
-// EmitInstantiatesEdges scans every loaded package's function bodies for
-// composite literals and new() calls, emitting instantiates edges from the
-// enclosing Function/Method to the named target type.
+// EmitInstantiatesEdges scans every loaded package's function bodies and
+// package-level initialisers for composite literals and new() calls, emitting
+// instantiates edges from the enclosing Function, Method or Variable to the
+// named target type.
 func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types.Edge {
 	if len(pkgs) == 0 {
 		return nil
 	}
 	typeIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
-	funcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod)
-
 	emitted := make(map[edgeDedupKey]struct{}, 128)
 	var edges []types.Edge
-
-	for _, pkg := range pkgs {
-		if pkg == nil || pkg.Types == nil || pkg.TypesInfo == nil {
-			continue
+	add := func(src *types.Node, info *gotypes.Info, typeExpr ast.Expr) {
+		tn := namedTypeOf(info, typeExpr)
+		if tn == nil {
+			return
 		}
-		pkgName := pkg.Types.Name()
-		for _, f := range pkg.Syntax {
-			if f == nil {
-				continue
-			}
-			for _, decl := range f.Decls {
-				fd, ok := decl.(*ast.FuncDecl)
-				if !ok || fd.Body == nil {
-					continue
-				}
-				var srcQname string
-				if fd.Recv != nil && len(fd.Recv.List) > 0 {
-					srcQname = pkgName + "." + exprName(fd.Recv.List[0].Type) + "." + fd.Name.Name
-				} else {
-					srcQname = pkgName + "." + fd.Name.Name
-				}
-				srcID, ok := funcIndex.lookup(pkg.TypesInfo.Defs[fd.Name], srcQname)
-				if !ok {
-					continue
-				}
-				ast.Inspect(fd.Body, func(n ast.Node) bool {
-					switch x := n.(type) {
-					case *ast.CompositeLit:
-						emitInstantiatesForType(srcID, srcQname, x.Type, pkg.TypesInfo,
-							typeIndex, emitted, &edges)
-					case *ast.CallExpr:
-						// new(T)
-						if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "new" && len(x.Args) == 1 {
-							emitInstantiatesForType(srcID, srcQname, x.Args[0], pkg.TypesInfo,
-								typeIndex, emitted, &edges)
-						}
-					}
-					return true
-				})
-			}
+		dstID, ok := typeIndex.lookup(tn, tn.Pkg().Name()+"."+tn.Name())
+		if !ok || dstID == src.ID {
+			return // a type without a node in this graph
 		}
+		k := edgeDedupKey{src: src.ID, dst: dstID}
+		if _, dup := emitted[k]; dup {
+			return
+		}
+		emitted[k] = struct{}{}
+		edges = append(edges, types.Edge{
+			Src: src.ID, Dst: dstID, Type: types.EdgeInstantiates,
+			Count: 1, Confidence: types.ConfExtracted,
+		})
 	}
+	// The code that runs: function bodies, and the initialisers of
+	// package-level variables, whose Variable is the source as it is for the
+	// calls in them (677 literals and new calls of go-stablenet, among them
+	// var MainnetChainConfig = &ChainConfig{...}).
+	forEachOwnedCode(pkgs, nodes, func(c ownedCode) {
+		if !c.part.runs() {
+			return
+		}
+		ast.Inspect(c.root, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.CompositeLit:
+				add(c.owner, c.info(), x.Type)
+			case *ast.CallExpr:
+				if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "new" && len(x.Args) == 1 {
+					if _, builtin := c.info().Uses[id].(*gotypes.Builtin); builtin {
+						add(c.owner, c.info(), x.Args[0])
+					}
+				}
+			}
+			return true
+		})
+	})
 	return edges
 }
 
-// emitInstantiatesForType resolves a type-expression (composite literal's
-// Type field or new()'s argument) to a *types.Named and emits one edge per
-// distinct target. Anonymous / builtin types are skipped.
-func emitInstantiatesForType(
-	srcID, srcQname string, expr ast.Expr, info *gotypes.Info,
-	typeIndex symbolIndex, emitted map[edgeDedupKey]struct{},
-	out *[]types.Edge,
-) {
-	if expr == nil || info == nil {
-		return
+// namedTypeOf returns the type name that the type expression e is: T, pkg.T,
+// or an instantiated generic T[A]. nil for an unnamed type ([]T{...},
+// map[K]V{...}, struct{...}{...}), a builtin, a type parameter, and for the
+// elided type of an inner composite literal.
+func namedTypeOf(info *gotypes.Info, e ast.Expr) *gotypes.TypeName {
+	if e == nil || info == nil {
+		return nil
 	}
-	t := info.TypeOf(expr)
-	if t == nil {
-		return
+	var id *ast.Ident
+	switch x := ast.Unparen(e).(type) {
+	case *ast.Ident:
+		id = x
+	case *ast.SelectorExpr:
+		id = x.Sel
+	case *ast.IndexExpr:
+		return namedTypeOf(info, x.X)
+	case *ast.IndexListExpr:
+		return namedTypeOf(info, x.X)
+	default:
+		return nil
 	}
-	// Strip pointer (for `&Type{}` cases the composite's Type is the bare
-	// element; new(*T) is unusual but the caller's Args[0] is already the
-	// bare T expression).
-	if ptr, ok := t.(*gotypes.Pointer); ok {
-		t = ptr.Elem()
+	tn, ok := info.Uses[id].(*gotypes.TypeName)
+	if !ok || tn.Pkg() == nil {
+		return nil
 	}
-	named, ok := t.(*gotypes.Named)
-	if !ok {
-		return
+	if _, isParam := tn.Type().(*gotypes.TypeParam); isParam {
+		return nil
 	}
-	obj := named.Obj()
-	if obj == nil || obj.Pkg() == nil {
-		return
-	}
-	dstQname := obj.Pkg().Name() + "." + obj.Name()
-	if dstQname == srcQname {
-		return
-	}
-	dstID, ok := typeIndex.lookup(obj, dstQname)
-	if !ok {
-		return // cross-package type without a node in this graph
-	}
-	k := edgeDedupKey{src: srcID, dst: dstID}
-	if _, dup := emitted[k]; dup {
-		return
-	}
-	emitted[k] = struct{}{}
-	*out = append(*out, types.Edge{
-		Src: srcID, Dst: dstID, Type: types.EdgeInstantiates,
-		Count: 1, Confidence: types.ConfExtracted,
-	})
+	return tn
 }

@@ -18,6 +18,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -67,6 +68,8 @@ names, package fragments) for best results.`,
 			if err != nil {
 				return fmt.Errorf("edges: %w", err)
 			}
+			// A Goroutine's code edges are read apart, as in the tools.
+			edges = types.WithoutGoroutineCode(edges)
 
 			tokens := tokeniseQuestion(question)
 			if len(tokens) == 0 {
@@ -79,7 +82,8 @@ names, package fragments) for best results.`,
 			}
 			adj := buildAdjacency(edges)
 			edgeIdx := buildEdgeIndex(edges)
-			renderQueryAnswer(os.Stdout, question, seedNodes, nodes, adj, edgeIdx, depth, budget)
+			renderQueryAnswer(os.Stdout, question, seedNodes, nodes, adj, edgeIdx, depth, budget,
+				func(n types.Node) string { return persist.PrintedName(store, n) })
 			return nil
 		},
 	}
@@ -230,10 +234,24 @@ func buildEdgeIndex(edges []types.Edge) edgeIndex {
 	return idx
 }
 
-func renderQueryAnswer(w *os.File, question string,
+// A neighbourhood line names the node the walk came from, the relation and
+// the node it reached. The arrow points the way the relation goes: forward
+// when the first node has it to the second, reverse when the second has it to
+// the first.
+const (
+	queryLineForward = "- `%s` —[%s]→ `%s` · %s:%d\n"
+	queryLineReverse = "- `%s` ←[%s]— `%s` · %s:%d\n"
+	queryLegend      = "_A —[r]→ B: A has relation r to B. A ←[r]— B: B has it to A. Every name in a code span opens that node._\n\n"
+)
+
+// renderQueryAnswer writes the seeds and the neighbourhood of an answer;
+// name is the name printed for a node in code spans, the one that opens
+// exactly that node (persist.PrintedName in a build). The neighbourhood
+// printed short names, and 299 of 300 sampled did not resolve back.
+func renderQueryAnswer(w io.Writer, question string,
 	seeds []types.Node, allNodes []types.Node,
 	adj map[string][]string, eidx edgeIndex,
-	depth, tokenBudget int) {
+	depth, tokenBudget int, name func(types.Node) string) {
 	idx := make(map[string]types.Node, len(allNodes))
 	for _, n := range allNodes {
 		idx[n.ID] = n
@@ -241,8 +259,8 @@ func renderQueryAnswer(w *os.File, question string,
 	_, _ = fmt.Fprintf(w, "## Query: %s\n\n", question)
 	_, _ = fmt.Fprintf(w, "Seeds (top-%d by keyword score):\n\n", len(seeds))
 	for i, s := range seeds {
-		_, _ = fmt.Fprintf(w, "%d. **`%s`** [%s] · `%s` · %s:%d\n",
-			i+1, s.Name, s.Type, s.QualifiedName, s.FilePath, s.StartLine)
+		_, _ = fmt.Fprintf(w, "%d. **%s** [%s] · `%s` · %s:%d\n",
+			i+1, s.Name, s.Type, name(s), s.FilePath, s.StartLine)
 	}
 	_, _ = fmt.Fprintln(w)
 
@@ -257,6 +275,7 @@ func renderQueryAnswer(w *os.File, question string,
 	tokens := 0
 	rendered := strings.Builder{}
 	rendered.WriteString("### Neighbourhood (BFS)\n\n")
+	rendered.WriteString(queryLegend)
 bfs:
 	for d := 0; d < depth && len(frontier) > 0; d++ {
 		next := make([]string, 0, len(frontier))
@@ -275,12 +294,17 @@ bfs:
 				if other.ID == "" {
 					continue
 				}
-				line := fmt.Sprintf("- `%s` —[%s]→ `%s` · %s:%d\n",
-					cur.Name, e.Type, other.Name, other.FilePath, other.StartLine)
+				// The walk crosses edges both ways; the arrow follows the
+				// relation, not the walk.
+				format := queryLineForward
+				if e.Src != src {
+					format = queryLineReverse
+				}
+				line := fmt.Sprintf(format, name(cur), e.Type, name(other), other.FilePath, other.StartLine)
 				if (rendered.Len()+len(line))/charsPerToken > tokenBudget {
 					rendered.WriteString("- _… token budget reached; rerun with --budget=N for more._\n")
 					tokens = rendered.Len() / charsPerToken
-					_, _ = w.WriteString(rendered.String())
+					_, _ = io.WriteString(w, rendered.String())
 					_, _ = fmt.Fprintf(w, "\n_~%d tokens, %d nodes visited_\n", tokens, len(visited))
 					return
 				}
@@ -295,6 +319,6 @@ bfs:
 		}
 	}
 	tokens = rendered.Len() / charsPerToken
-	_, _ = w.WriteString(rendered.String())
+	_, _ = io.WriteString(w, rendered.String())
 	_, _ = fmt.Fprintf(w, "\n_~%d tokens, %d nodes visited_\n", tokens, len(visited))
 }

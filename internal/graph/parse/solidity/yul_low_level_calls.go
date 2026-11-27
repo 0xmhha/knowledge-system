@@ -106,7 +106,7 @@ func (v *declVisitor) runYulLowLevelCalls() {
 			if !ok {
 				continue
 			}
-			fnID := parse.MakeID(fnQ, "sol", fnStart)
+			fnID := v.declID(fnQ, fnStart)
 			// Mark the enclosing callable regardless of whether the
 			// receiver argument resolves. This mirrors the
 			// HasLowLevelCall semantics on the Sol side.

@@ -39,7 +39,7 @@ func TestCards_GuardsAndChannels(t *testing.T) {
 	if strings.Contains(count, "coll1.env.refresh:25  e.count++ [") {
 		t.Errorf("e.count++ in refresh is outside every condition:\n%s", count)
 	}
-	fn := x.funcCard(id("coll1.env.refresh"), nil, false)
+	fn := x.funcCard(id("coll1.env.refresh"), nil, true, false)
 	if !strings.Contains(fn, "writes coll1.env.ready [else of L19 if e.root != root {]") {
 		t.Errorf("function card of refresh misses the else guard:\n%s", fn)
 	}

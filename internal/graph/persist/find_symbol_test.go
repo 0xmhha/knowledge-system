@@ -1,6 +1,7 @@
 package persist_test
 
 import (
+	"fmt"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -166,7 +167,7 @@ func TestFindSymbol_DottedSuffixMatchesReceiver(t *testing.T) {
 		want []string
 	}{
 		{"outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
-		{"OUTLIERDETECTIONBALANCER.removesubconn", []string{"od00000000000001"}},
+		{"OUTLIERDETECTIONBALANCER.removesubconn", nil}, // the caller's case is kept
 		{"outlierdetection.outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
 		{"RemoveSubConn", []string{"ci00000000000001", "od00000000000001", "xx00000000000001"}},
 		{"missing.RemoveSubConn", nil},
@@ -182,6 +183,47 @@ func TestFindSymbol_DottedSuffixMatchesReceiver(t *testing.T) {
 		sort.Strings(ids)
 		if strings.Join(ids, ",") != strings.Join(tc.want, ",") {
 			t.Errorf("FindSymbol(%q) = %v, want %v", tc.name, ids, tc.want)
+		}
+	}
+}
+
+// TestFindSymbol_Limit: the default cap is DefaultFindSymbolLimit rows, a
+// positive Limit replaces it and a negative Limit returns every match, in the
+// same order on every call.
+func TestFindSymbol_Limit(t *testing.T) {
+	s, err := persist.Open(filepath.Join(t.TempDir(), "limit.db"))
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	if err := s.Migrate(); err != nil {
+		t.Fatalf("Migrate: %v", err)
+	}
+	const total = persist.DefaultFindSymbolLimit + 20
+	nodes := make([]types.Node, 0, total)
+	for i := range total {
+		nodes = append(nodes, types.Node{ID: fmt.Sprintf("lim%013d", i), Type: types.NodeMethod, Name: "Hash",
+			QualifiedName: fmt.Sprintf("p%03d.T.Hash", i), FilePath: "p/t.go", Language: "go", Confidence: types.ConfExtracted})
+	}
+	if err := s.InsertNodes(nodes); err != nil {
+		t.Fatalf("InsertNodes: %v", err)
+	}
+	for _, tc := range []struct {
+		limit, want int
+	}{
+		{0, persist.DefaultFindSymbolLimit},
+		{7, 7},
+		{persist.FindSymbolNoLimit, total},
+	} {
+		got, err := s.FindSymbol("Hash", false, persist.FindSymbolOptions{Limit: tc.limit})
+		if err != nil {
+			t.Fatalf("FindSymbol(limit %d): %v", tc.limit, err)
+		}
+		if len(got) != tc.want {
+			t.Errorf("FindSymbol(limit %d) returned %d nodes, want %d", tc.limit, len(got), tc.want)
+		}
+		if len(got) > 0 && got[0].QualifiedName != "p000.T.Hash" {
+			t.Errorf("FindSymbol(limit %d) starts at %s, want p000.T.Hash (ordered by qualified name)", tc.limit, got[0].QualifiedName)
 		}
 	}
 }

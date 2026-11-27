@@ -36,7 +36,6 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
-	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // Default tuning; to be revisited with real-prompt data.
@@ -203,6 +202,11 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 
 	relations := intentToRelations(intent)
 	hops := intentToHops(intent)
+	// The graph's record of test files, as Stage 2 demotes by.
+	isTest, err := ckgclient.TestFileRule(e.ckg)
+	if err != nil {
+		return out, fmt.Errorf("stage3: %w", err)
+	}
 
 	// ckgclient.Neighbors traverses one direction per call (mixed
 	// forward+reverse relation sets are rejected), but several Intents
@@ -275,7 +279,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 			// ckgclient doc; the +1 guard avoids divide-by-zero if a
 			// backend ever returns distance 0.
 			score := seed.Score * relationWeight(intent, n.Relation) / float64(1+n.Distance)
-			if eo.demoteTests && testpath.IsTest(n.Target.File) {
+			if eo.demoteTests && isTest(n.Target.File) {
 				score *= stage2.TestDemotionFactor
 			}
 			source := fmt.Sprintf("seed:%s:%s:dist=%d",

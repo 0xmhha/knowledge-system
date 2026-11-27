@@ -84,12 +84,9 @@ func nearestEnclosingBlockEndByte(n *sitter.Node) int {
 //   - `using For` library extension (using_for.go).
 //   - Interface dispatch `IFoo(addr).bar()` (dispatch.go).
 
-// runFunctionDecl replaces the generic runDecl(queryFunction, NodeFunction)
-// path so we can stamp SubKind and queue EdgeOverrides PendingRefs in the
-// same pass. Behaviour for plain functions (no virtual/override modifier)
-// is identical to runDecl — same node ID, same `defines` edge — so existing
-// callers (ABI collection, mapping writes, emits, modifier_invocation,
-// runHasModifier) remain wired against the same Function nodes.
+// runFunctionDecl emits one Function node per function_definition, with the
+// sub kind that says whether it is virtual, an override, or both, and queues
+// the override references of the same declaration.
 func (v *declVisitor) runFunctionDecl() {
 	query, qErr := sitter.NewQuery(v.lang, queryFunction)
 	if qErr != nil {
@@ -121,42 +118,12 @@ func (v *declVisitor) runFunctionDecl() {
 			continue
 		}
 
-		// Build the function node identical to the generic runDecl path so
-		// SrcID hashes line up with existing pending-ref emitters. The only
-		// added field is SubKind. When the function has no
-		// virtual/override modifier, SubKind defaults to "function" — making
-		// the Sol Function SubKind taxonomy explicit (mirrors the contract
-		// SubKind: plain contracts get SubKind="contract", not "").
+		// A function without virtual or override has sub kind "function",
+		// so the taxonomy is explicit (a plain contract has "contract").
 		ident := nameNode.Utf8Text(v.src)
-		startByte := int(nameNode.StartByte())
-		endByte := int(nameNode.EndByte())
-		qname := ident
-		if cn := nearestContractName(nameNode, v.src); cn != "" {
-			qname = cn + "." + ident
-		}
-		id := parse.MakeID(qname, "sol", startByte)
 
 		isVirtual, override := scanFunctionModifiers(declNode, v.src)
-		subKind := functionSubKind(isVirtual, override.present)
-
-		v.nodes = append(v.nodes, types.Node{
-			ID: id, Type: types.NodeFunction, Name: ident, QualifiedName: qname,
-			// canonical id (ADR-0001): no import path in Solidity, so the
-			// relative file path is the qualifier and the parameter-type
-			// signature separates overloads — <relpath>:<Contract>.<func>(<types>).
-			// The file path also separates same-named contracts across
-			// version dirs (e.g. contracts/v1 vs contracts/v2).
-			CanonicalID: v.rel + ":" + qname + funcParamSignature(declNode, v.src),
-			FilePath:    v.rel, StartLine: int(nameNode.StartPosition().Row) + 1,
-			EndLine:   int(nameNode.EndPosition().Row) + 1,
-			StartByte: startByte, EndByte: endByte,
-			Language: "sol", Confidence: types.ConfExtracted,
-			SubKind: subKind,
-		})
-		v.edges = append(v.edges, types.Edge{
-			Src: v.fileID, Dst: id, Type: types.EdgeDefines,
-			Count: 1, Confidence: types.ConfExtracted,
-		})
+		id := v.emitCallable(declNode, functionSubKind(isVirtual, override.present))
 
 		// Emit parameter name→type PendingRefs
 		// so Pass 2 can index (funcID, paramName) → typeName for
@@ -186,7 +153,20 @@ func (v *declVisitor) runFunctionDecl() {
 		// for local-var receiver dispatch resolution.
 		emitLocalVarMetaPending(v, id, declNode)
 
+		fnLine := int(nameNode.StartPosition().Row) + 1
 		if !override.present {
+			// A function may implement an interface function without the
+			// keyword. Pass 2 keeps the reference only when a base that is
+			// an interface declares the function.
+			if hasBases(nearestContractNode(declNode)) {
+				v.pending = append(v.pending, parse.PendingRef{
+					SrcID:        id,
+					EdgeType:     types.EdgeOverrides,
+					TargetQName:  ident,
+					Line:         fnLine,
+					DispatchKind: refImplicitOverride,
+				})
+			}
 			continue
 		}
 		// Emit one PendingRef per override target. When the user wrote
@@ -194,7 +174,6 @@ func (v *declVisitor) runFunctionDecl() {
 		// they wrote bare `override` (no list), we queue a single ref with
 		// an empty TargetQName — the resolver expands this against all of
 		// the enclosing contract's known parents in Pass 2.
-		fnLine := int(nameNode.StartPosition().Row) + 1
 		if len(override.explicitParents) == 0 {
 			v.pending = append(v.pending, parse.PendingRef{
 				SrcID:        id,
@@ -277,12 +256,10 @@ func (v *declVisitor) runModifierOverride() {
 			continue
 		}
 		ident := nameNode.Utf8Text(v.src)
-		qname := ident
-		if cn := nearestContractName(nameNode, v.src); cn != "" {
-			qname = cn + "." + ident
+		srcID, ok := v.callableIDAt(declNode)
+		if !ok {
+			continue
 		}
-		startByte := int(nameNode.StartByte())
-		srcID := parse.MakeID(qname, "sol", startByte)
 		line := int(nameNode.StartPosition().Row) + 1
 
 		if len(override.explicitParents) == 0 {
@@ -319,11 +296,14 @@ func (v *declVisitor) runModifierOverride() {
 // SrcID = function's node ID so Pass 2 can resolve the meta refs against
 // the same funcID space used by containerIDByFuncID.
 // funcParamSignature returns the parenthesised parameter-type list of a
-// function_definition node, e.g. "(address,uint256)" or "()". It feeds the
+// callable declaration, e.g. "(address,uint256)" or "()". It feeds the
 // canonical id (ADR-0001) so Solidity overloads — which differ only by
 // parameter types — get distinct ids. Parameter NAMES are intentionally
 // ignored (anonymous parameters still contribute their type), matching how the
-// Solidity ABI computes a function selector.
+// Solidity ABI computes a function selector. A type is the text the source
+// has (`Lib.Set`, `mapping(address => uint256)`): the last segment alone gave
+// overloads on `A.Set` and `B.Set` one id, and a mapping parameter was left
+// out of the list.
 func funcParamSignature(declNode *sitter.Node, src []byte) string {
 	if declNode == nil {
 		return "()"
@@ -338,7 +318,7 @@ func funcParamSignature(declNode *sitter.Node, src []byte) string {
 		if typeNode == nil {
 			continue
 		}
-		if t := extractTypeNameText(typeNode, src); t != "" {
+		if t := typeText(typeNode, src); t != "" {
 			paramTypes = append(paramTypes, t)
 		}
 	}
@@ -363,7 +343,10 @@ func emitParameterMetaPending(v *declVisitor, funcID string, declNode *sitter.No
 			continue // shouldn't happen — type is required per grammar
 		}
 		paramName := nameNode.Utf8Text(v.src)
-		typeName := extractTypeNameText(typeNode, v.src)
+		// The type as written, qualifier included. Pass 2 keeps it for
+		// member accesses through the parameter and reduces it to the
+		// using-for key itself (usingForTypeKey).
+		typeName := typeText(typeNode, v.src)
 		if paramName == "" || typeName == "" {
 			continue
 		}
@@ -478,7 +461,7 @@ func emitNamedReturnParamMetaPending(v *declVisitor, funcID string, declNode *si
 			continue
 		}
 		paramName := nameNode.Utf8Text(v.src)
-		typeName := extractTypeNameText(typeNode, v.src)
+		typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 		if paramName == "" || typeName == "" {
 			continue
 		}
@@ -660,7 +643,7 @@ func emitTryReturnsBinding(v *declVisitor, funcID string, p *sitter.Node, scopeE
 		return
 	}
 	varName := nameNode.Utf8Text(v.src)
-	typeName := extractTypeNameText(typeNode, v.src)
+	typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 	if varName == "" || typeName == "" {
 		return
 	}
@@ -704,7 +687,7 @@ func emitLocalVarBinding(v *declVisitor, funcID string, decl *sitter.Node) {
 		return
 	}
 	varName := nameNode.Utf8Text(v.src)
-	typeName := extractTypeNameText(typeNode, v.src)
+	typeName := typeText(typeNode, v.src) // as written, see emitParameterMetaPending
 	if varName == "" || typeName == "" {
 		return
 	}
@@ -838,3 +821,21 @@ const (
 	dispatchKindOverride         = "override"
 	dispatchKindOverrideExplicit = "override_explicit"
 )
+
+// kindInheritanceSpecifier is the tree-sitter node of one base in an
+// `is` clause.
+const kindInheritanceSpecifier = "inheritance_specifier"
+
+// hasBases reports whether a contract or interface declaration names at
+// least one base.
+func hasBases(decl *sitter.Node) bool {
+	if decl == nil {
+		return false
+	}
+	for i := uint(0); i < decl.NamedChildCount(); i++ {
+		if c := decl.NamedChild(i); c != nil && c.Kind() == kindInheritanceSpecifier {
+			return true
+		}
+	}
+	return false
+}

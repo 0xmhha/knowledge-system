@@ -77,8 +77,10 @@ func (f Filter) Matches(c Chunk) bool {
 // narrow (Go: "*_test.go"). testpath.IsTest additionally covers test-only
 // support code — testutil*.go, testdata/, test/ — which compiles into the
 // package but exists solely to serve tests. A caller asking for "no tests"
-// means both, and the shared predicate keeps that judgement identical to the
-// one the graph side applies to its own citations.
+// means both. The vector index holds no graph node and no build scope, so a
+// chunk is judged by its path here; code that holds a graph judges files by
+// the graph's record instead (store.TestFileRule), which uses the same path
+// rule for the files it does not hold.
 func isTestChunk(c Chunk) bool {
 	return c.IsTest || testpath.IsTest(c.File)
 }

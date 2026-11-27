@@ -71,7 +71,7 @@ func (v *declVisitor) runChainedExternalCall() {
 					continue
 				}
 				v.pending = append(v.pending, parse.PendingRef{
-					SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+					SrcID:        v.declID(fnQ, fnStart),
 					EdgeType:     types.EdgeInvokes,
 					TargetQName:  fn1 + "|" + fn2 + "|" + methodName,
 					Line:         int(memberNode.StartPosition().Row) + 1,
@@ -93,7 +93,7 @@ func (v *declVisitor) runChainedExternalCall() {
 				continue
 			}
 			v.pending = append(v.pending, parse.PendingRef{
-				SrcID:        parse.MakeID(fnQ, "sol", fnStart),
+				SrcID:        v.declID(fnQ, fnStart),
 				EdgeType:     types.EdgeInvokes, // routed by DispatchKind; no edge emitted
 				TargetQName:  innerFnName + "|" + methodName,
 				Line:         int(memberNode.StartPosition().Row) + 1,
